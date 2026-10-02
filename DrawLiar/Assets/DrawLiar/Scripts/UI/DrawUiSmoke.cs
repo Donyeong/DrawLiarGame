@@ -18,7 +18,7 @@ namespace DrawLiar
             public string Outcome = "RUNNING", Stage = "Starting", Error = "";
             public bool Peer, InputObserved, ChatObserved, HostDisconnected, HomeFlowVerified;
             public bool SecretVerified, DiscussionVerified, RebuttalVerified, VotingVerified, VoteSubmittedOnce, TurnCompleted;
-            public bool PointerReleased, TypingPreserved;
+            public bool PointerReleased, TypingPreserved, EquipmentVerified;
             public int PlayerCount, PlayersInRow;
             public int Strokes; public string CanvasBounds = "", BubbleBounds = "", RenderedBrush = "", RenderedEraser = "";
             public int BoundsChecks;
@@ -135,21 +135,7 @@ namespace DrawLiar
             await Click(FindButton("← 뒤로"));
             await Until(() => HasButton("커스터마이징"), "options back to main");
 
-            bool hadName = PlayerPrefs.HasKey("DrawLiar.Name"), hadColor = PlayerPrefs.HasKey("DrawLiar.Color"), hadAccessory = PlayerPrefs.HasKey("DrawLiar.Accessory");
-            string savedName = PlayerPrefs.GetString("DrawLiar.Name", "");
-            int savedColor = PlayerPrefs.GetInt("DrawLiar.Color", 0), savedAccessory = PlayerPrefs.GetInt("DrawLiar.Accessory", 0);
-            await Click(FindButton("커스터마이징"));
-            await Until(() => HomePanel().Query<TextField>().ToList().Any(field => field.label == "닉네임"), "customization page");
-            Require(HomePanel().Query<DropdownField>().ToList().Any(field => field.label == "작은 장식") && HasButton("이 모습으로 저장"), "Customization controls are missing.");
-            var colors = HomePanel().Query<Button>(className: "swatch").ToList();
-            Require(colors.Count > 1, "Customization colors are missing.");
-            await Click(colors[(savedColor + 1) % colors.Count]);
-            await CaptureHome("customize");
-            await Click(FindButton("← 뒤로"));
-            await Until(() => HasButton("방 만들기"), "customization cancel");
-            Require(hadName == PlayerPrefs.HasKey("DrawLiar.Name") && hadColor == PlayerPrefs.HasKey("DrawLiar.Color") && hadAccessory == PlayerPrefs.HasKey("DrawLiar.Accessory")
-                && savedName == PlayerPrefs.GetString("DrawLiar.Name", "") && savedColor == PlayerPrefs.GetInt("DrawLiar.Color", 0)
-                && savedAccessory == PlayerPrefs.GetInt("DrawLiar.Accessory", 0), "Canceling customization changed saved user preferences.");
+            await CheckEquipment();
 
             await Click(FindButton("방 만들기"));
             await Until(() => HasButton("릴레이 그리기\n한 도화지에 이어 그려요"), "creation mode page");
@@ -387,6 +373,57 @@ namespace DrawLiar
             return element.worldBound.width > 0 && element.worldBound.height > 0;
         }
 
+        private async Task CheckEquipment()
+        {
+            bool hadName=PlayerPrefs.HasKey("DrawLiar.Name"),hadColor=PlayerPrefs.HasKey("DrawLiar.Color"),hadEquipment=PlayerPrefs.HasKey("DrawLiar.Equipment");
+            string savedName=PlayerPrefs.GetString("DrawLiar.Name","");
+            int savedColor=PlayerPrefs.GetInt("DrawLiar.Color",0),savedEquipment=PlayerPrefs.GetInt("DrawLiar.Equipment",0);
+            var root=document.rootVisualElement;
+            AvatarElement Preview()=>root.Q<AvatarElement>(className:"lobby-avatar");
+            async Task Select(int mask)
+            {
+                foreach(var item in new[]{AvatarAccessory.Beret,AvatarAccessory.Brush})
+                {
+                    var button=HomePanel().Q<Button>(item==AvatarAccessory.Beret?"beret-option":"brush-option");
+                    Require(button!=null,"A default painter item is missing.");
+                    if(((int)Preview().Equipment & (int)item)!=(mask & (int)item))await Click(button);
+                    Require(button.ClassListContains("equipped")==((mask & (int)item)!=0),"Equipment selection indicator is incorrect.");
+                }
+                Require((int)Preview().Equipment==mask,"Hat and brush cannot be equipped independently.");
+            }
+            try
+            {
+                if(!hadEquipment)Require(Preview().Equipment==AvatarAccessory.Painter,"New players must start with both default painter items.");
+                await Click(FindButton("커스터마이징"));
+                await Until(()=>HomePanel().Q<Button>("beret-option")!=null,"customization equipment");
+                Require(HomePanel().Query<Button>(className:"equipment-option").ToList().Count==2 && HasButton("이 모습으로 저장"),"Customization controls are missing.");
+                var colors=HomePanel().Query<Button>(className:"swatch").ToList();
+                Require(colors.Count>1,"Customization colors are missing.");
+                await Click(colors[(savedColor+1)%colors.Count]);
+                for(int mask=0;mask<=3;mask++)await Select(mask);
+                await CaptureHome("customize");
+                await Click(FindButton("← 뒤로"));
+                await Until(()=>HasButton("방 만들기"),"customization cancel");
+                Require(hadName==PlayerPrefs.HasKey("DrawLiar.Name") && hadColor==PlayerPrefs.HasKey("DrawLiar.Color") && hadEquipment==PlayerPrefs.HasKey("DrawLiar.Equipment")
+                    && savedName==PlayerPrefs.GetString("DrawLiar.Name","") && savedColor==PlayerPrefs.GetInt("DrawLiar.Color",0)
+                    && savedEquipment==PlayerPrefs.GetInt("DrawLiar.Equipment",0),"Canceling customization changed saved user preferences.");
+                await Click(FindButton("커스터마이징"));await Select((int)AvatarAccessory.Brush);
+                await Click(FindButton("이 모습으로 저장"));
+                Require(PlayerPrefs.GetInt("DrawLiar.Equipment",-1)==(int)AvatarAccessory.Brush,"Brush-only equipment was not saved.");
+                await Click(FindButton("커스터마이징"));
+                Require(Preview().Equipment==AvatarAccessory.Brush,"Saved equipment was lost on reopening customization.");
+                await Select((int)AvatarAccessory.Painter);await CaptureHome("customize-painter");await Click(FindButton("이 모습으로 저장"));
+                Require(PlayerPrefs.GetInt("DrawLiar.Equipment",-1)==(int)AvatarAccessory.Painter,"Both default items were not saved.");
+            }
+            finally
+            {
+                if(hadName)PlayerPrefs.SetString("DrawLiar.Name",savedName);else PlayerPrefs.DeleteKey("DrawLiar.Name");
+                if(hadColor)PlayerPrefs.SetInt("DrawLiar.Color",savedColor);else PlayerPrefs.DeleteKey("DrawLiar.Color");
+                if(hadEquipment)PlayerPrefs.SetInt("DrawLiar.Equipment",savedEquipment);else PlayerPrefs.DeleteKey("DrawLiar.Equipment");
+                PlayerPrefs.Save();
+            }
+        }
+
         private void RequireRoomSettings()
         {
             var settings = network.State.Settings;
@@ -396,6 +433,8 @@ namespace DrawLiar
                 "Phase time inputs were not replicated to the room.");
             Require(settings.Topics != null && settings.Topics.Length == 2 && settings.Topics.Contains("동물") && settings.Topics.Contains("음식"),
                 "Selected topics were not replicated to the room.");
+            Require(network.State.Players.Any(player=>player.Name=="UiPeer0" && player.Accessory==(int)AvatarAccessory.Painter),"Painter equipment was not replicated to the room.");
+            report.EquipmentVerified=true;
         }
         private bool HasButton(string text) => document.rootVisualElement.Query<Button>().ToList().Any(button => button.text == text);
         private VisualElement HomePanel() => document.rootVisualElement.Q<VisualElement>(className: "home-panel");

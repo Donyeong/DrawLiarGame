@@ -76,6 +76,14 @@
 .swatch.selected { border-color: var(--ink); scale: 1.12 1.12; }
 .avatar-colors { margin-bottom: 20px; }
 .avatar-colors .swatch { width: 48px; height: 48px; margin: 5px 13px 5px 0; border-radius: 25px; border-width: 3px; }
+.equipment-options { align-items: stretch; }
+.equipment-option { width: 46%; flex-grow: 1; min-height: 128px; margin: 0 4px; padding: 8px; align-items: center; background-color: #f6eedb; border-color: #b7a88b; }
+.equipment-option.equipped { background-color: #e7e0f3; border-color: #645797; }
+.equipment-option.equipped:hover { background-color: #f0e9fb; }
+.equipment-preview { width: 70px; height: 70px; flex-shrink: 0; }
+.equipment-name { font-size: 16px; margin-top: 3px; }
+.equipment-state { font-size: 12px; color: var(--muted); margin-top: 4px; -unity-font-style: normal; }
+.equipment-option.equipped .equipment-state { color: #645797; }
 .overlay { position: absolute; top: 0; bottom: 0; left: 0; right: 0; background-color: rgba(52,48,75,.38); align-items: center; justify-content: center; opacity: 1; transition-property: opacity; transition-duration: .18s; }
 .modal { width: 580px; max-height: 90%; padding: 30px; background-color: #FFF9ED; border-radius: 13px; border-width: 3px; border-color: var(--ink); translate: 0 0; scale: 1 1; transition-property: translate, scale; transition-duration: .25s; }
 .overlay.enter { opacity: 0; }

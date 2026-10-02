@@ -50,8 +50,9 @@ namespace DrawLiar
             lobby=GetComponent<LobbyServiceBridge>();steam=GetComponent<SteamInviteBridge>();
             lobby.Initialize(network);steam.Initialize();
             draft.Topics=GameDataStore.Load().Topics.Select(t=>t.Name).ToArray();
-            nickname=PlayerPrefs.GetString("DrawLiar.Name","그림콩"+UnityEngine.Random.Range(10,99));
-            avatarColor=PlayerPrefs.GetInt("DrawLiar.Color",0);accessory=PlayerPrefs.GetInt("DrawLiar.Accessory",0);
+            nickname=PlayerPrefs.GetString("DrawLiar.Name","동글이"+UnityEngine.Random.Range(10,99));
+            avatarColor=Mathf.Clamp(PlayerPrefs.GetInt("DrawLiar.Color",0),0,AvatarElement.Colors.Length-1);
+            accessory=Mathf.Clamp(PlayerPrefs.GetInt("DrawLiar.Equipment",(int)AvatarAccessory.Painter),0,(int)AvatarAccessory.Painter);
             var panel=panelSettings=ScriptableObject.CreateInstance<PanelSettings>();
             panel.themeStyleSheet=Resources.Load<ThemeStyleSheet>("DrawLiar/DrawLiarTheme");
             panel.scaleMode=PanelScaleMode.ScaleWithScreenSize;panel.referenceResolution=new Vector2Int(1600,1000);
@@ -545,7 +546,7 @@ namespace DrawLiar
         private void RoleReveal(RoomSnapshot state)
         {
             var modal=Modal(state.LocalIsSpectator?"관전":state.LocalIsLiar?"라이어":"시민");
-            var avatar=new AvatarElement(avatarColor,state.LocalIsLiar?3:accessory);avatar.AddToClassList("avatar-preview");modal.Add(avatar);
+            var avatar=new AvatarElement(avatarColor,accessory);avatar.AddToClassList("avatar-preview");modal.Add(avatar);
             Text(modal,"주제  "+state.Topic,"subtitle");Text(modal,string.IsNullOrEmpty(state.Word)?"다른 사람의 그림에서 제시어를 추리하세요.":"제시어  "+state.Word,"section-title");
             if(!state.LocalIsSpectator)Text(modal,state.LocalIsLiar?"다른 사람의 그림을 보고 제시어를 추측하세요.":"제시어를 그림으로 표현하세요.","rules");Button(modal,"확인",CloseModal,"primary");
         }
@@ -603,14 +604,34 @@ namespace DrawLiar
         {
             var selectedColor=avatarColor;var selectedAccessory=accessory;
             var preview=modal?Box(panel,""):avatarStage;
-            void UpdateAvatar(){preview.Clear();var a=new AvatarElement(selectedColor,selectedAccessory);a.AddToClassList(modal?"avatar-preview":"lobby-avatar");preview.Add(a);}
+            var equipmentButtons=new Dictionary<AvatarAccessory,Button>();
+            void UpdateAvatar()
+            {
+                preview.Clear();var a=new AvatarElement(selectedColor,selectedAccessory);a.AddToClassList(modal?"avatar-preview":"lobby-avatar");preview.Add(a);
+                foreach(var item in equipmentButtons)
+                {
+                    bool equipped=(selectedAccessory & (int)item.Key)!=0;
+                    item.Value.EnableInClassList("equipped",equipped);
+                    item.Value.Q<Label>(className:"equipment-state").text=equipped?"장착 중":"장착하기";
+                    item.Value.tooltip=(item.Key==AvatarAccessory.Beret?"화가 모자":"붓")+(equipped?" · 장착 중 · 클릭하면 해제":" · 클릭하면 장착");
+                }
+            }
             UpdateAvatar();var nameField=Field(panel,"닉네임",nickname);nameField.maxLength=16;
             Text(panel,"몸 색상","section-title");var colors=Box(panel,"row avatar-colors");var swatches=new List<Button>();
             void SelectColor(int color){selectedColor=color;for(var i=0;i<swatches.Count;i++)swatches[i].EnableInClassList("selected",i==color);UpdateAvatar();}
             foreach(var color in Enumerable.Range(0,AvatarElement.Colors.Length)){var b=Button(colors,"",()=>SelectColor(color),"swatch");b.style.backgroundColor=AvatarElement.Colors[color];b.tooltip="몸 색상 "+(color+1);swatches.Add(b);}
             SelectColor(selectedColor);
-            Choice(panel,"작은 장식",new[]{"있는 그대로","작은 왕관","새싹","동그란 안경"},selectedAccessory,i=>{selectedAccessory=i;UpdateAvatar();});
-            Button(panel,"이 모습으로 저장",()=>{nickname=string.IsNullOrWhiteSpace(nameField.value)?"그림콩":nameField.value.Trim();avatarColor=selectedColor;accessory=selectedAccessory;PlayerPrefs.SetString("DrawLiar.Name",nickname);PlayerPrefs.SetInt("DrawLiar.Color",avatarColor);PlayerPrefs.SetInt("DrawLiar.Accessory",accessory);PlayerPrefs.Save();ApplyProfile();if(modal)CloseModal();else Navigate(LobbyScreen.Main);},"primary next-button");
+            var heading=Box(panel,"row spread");Text(heading,"기본 아이템","section-title");Text(heading,"기본 제공","muted");
+            var equipment=Box(panel,"row equipment-options");
+            void AddEquipment(AvatarAccessory item,string name)
+            {
+                var button=Button(equipment,"",()=>{selectedAccessory^=(int)item;UpdateAvatar();},"equipment-option");
+                button.name=item==AvatarAccessory.Beret?"beret-option":"brush-option";
+                var icon=new AvatarElement(0,(int)item);icon.AddToClassList("equipment-preview");button.Add(icon);
+                Text(button,name,"equipment-name");Text(button,"","equipment-state");equipmentButtons[item]=button;
+            }
+            AddEquipment(AvatarAccessory.Beret,"화가 모자");AddEquipment(AvatarAccessory.Brush,"붓");UpdateAvatar();
+            Button(panel,"이 모습으로 저장",()=>{nickname=string.IsNullOrWhiteSpace(nameField.value)?"동글이":nameField.value.Trim();avatarColor=selectedColor;accessory=selectedAccessory;PlayerPrefs.SetString("DrawLiar.Name",nickname);PlayerPrefs.SetInt("DrawLiar.Color",avatarColor);PlayerPrefs.SetInt("DrawLiar.Equipment",accessory);PlayerPrefs.Save();ApplyProfile();if(modal)CloseModal();else Navigate(LobbyScreen.Main);},"primary next-button");
         }
         private void TimeForm(VisualElement panel)
         {

@@ -46,7 +46,7 @@ try {
         if ($status -ne $previous) { Write-Output $status; $previous = $status }
         if (@($reports | Where-Object Outcome -eq 'FAIL').Count -gt 0) { throw ($reports | ConvertTo-Json -Depth 4) }
         if ($reports.Count -eq $PlayerCount -and @($reports | Where-Object {
-            -not $_.InputObserved -or -not $_.SecretVerified -or -not $_.DiscussionVerified -or -not $_.RebuttalVerified -or -not $_.VotingVerified -or -not $_.TurnCompleted -or $_.PlayersInRow -ne $PlayerCount
+            -not $_.InputObserved -or -not $_.EquipmentVerified -or -not $_.SecretVerified -or -not $_.DiscussionVerified -or -not $_.RebuttalVerified -or -not $_.VotingVerified -or -not $_.TurnCompleted -or $_.PlayersInRow -ne $PlayerCount
         }).Count -eq 0 -and @($reports | Where-Object { -not $_.Peer -and $_.VoteSubmittedOnce }).Count -eq 1) {
             if (-not (Test-Path -LiteralPath $stopSignal)) { Set-Content -LiteralPath $stopSignal -Value 'All clients verified drawing, chat, role visibility, discussion, rebuttal, voting, and player layout.' }
         }
