@@ -52,12 +52,6 @@ namespace DrawLiar.Editor
             if (report.summary.result != BuildResult.Succeeded)
                 throw new InvalidOperationException("Build failed: " + report.summary.result);
             File.Copy("Assets/DrawLiar/Resources/DrawLiar/Fonts/OFL.txt", Path.Combine(directory, "Barlow-OFL.txt"), true);
-            var services = Resources.Load<OnlineServicesConfig>("OnlineServicesConfig");
-            string steamAppIdPath = Path.Combine(directory, "steam_appid.txt");
-            bool steamTestBuild = (options & BuildOptions.Development) != 0 || services != null && services.SteamAppId == 480;
-            if (services != null && services.SteamAppId != 0 && steamTestBuild)
-                File.WriteAllText(steamAppIdPath, services.SteamAppId.ToString(System.Globalization.CultureInfo.InvariantCulture));
-            else if (File.Exists(steamAppIdPath)) File.Delete(steamAppIdPath);
             Debug.Log("DRAWLIAR_BUILD_OK " + directory + " " + report.summary.totalSize);
         }
 
@@ -67,7 +61,6 @@ namespace DrawLiar.Editor
             GameSelfCheck.Run();
             GameDataSelfCheck.Run();
             ServicesChecks.Run();
-            VoicePacketChecks.Run();
         }
 
         [MenuItem("DrawLiar/Capture Game Screen")]

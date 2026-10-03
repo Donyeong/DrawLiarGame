@@ -29,7 +29,7 @@ namespace DrawLiar
             RegisterCallback<PointerDownEvent>(Down);
             RegisterCallback<PointerMoveEvent>(Move);
             RegisterCallback<PointerUpEvent>(Up);
-            RegisterCallback<PointerCaptureOutEvent>(_=>{drawing=false;capturedPointer=-1;});
+            RegisterCallback<PointerCaptureOutEvent>(e=>{if(e.pointerId==capturedPointer){drawing=false;capturedPointer=-1;}});
             schedule.Execute(Upload).Every(16);
             RegisterCallback<DetachFromPanelEvent>(_=>Object.Destroy(texture));
         }
@@ -43,13 +43,15 @@ namespace DrawLiar
         private Vector2 Normalize(Vector2 p) => new Vector2(Mathf.Clamp01(p.x/contentRect.width),Mathf.Clamp01(p.y/contentRect.height));
         private void Down(PointerDownEvent e)
         {
-            if(e.button!=0 || !network.CanDraw)return;
+            if(drawing || e.button!=0 || !network.CanDraw)return;
             drawing=true;capturedPointer=e.pointerId;last=Normalize(e.localPosition);this.CapturePointer(e.pointerId);Emit(last);e.StopPropagation();
         }
         private void Move(PointerMoveEvent e)
         {
-            if(!drawing || Time.unscaledTime-lastSend<.025f)return;
-            Emit(Normalize(e.localPosition));e.StopPropagation();
+            if(!drawing || e.pointerId!=capturedPointer)return;
+            e.StopPropagation();
+            if(Time.unscaledTime-lastSend<.025f)return;
+            Emit(Normalize(e.localPosition));
         }
         private void Up(PointerUpEvent e)
         {

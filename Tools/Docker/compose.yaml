@@ -1,0 +1,89 @@
+name: drawliar-dev
+x-app: &app
+  image: ${DRAWLIAR_IMAGE:-drawliar-app:current}
+  restart: unless-stopped
+  init: true
+  mem_limit: 384m
+  cpus: 0.5
+  volumes:
+    - /srv/drawliar/dev/secrets:/secrets:ro
+  environment: &environment
+    ASPNETCORE_ENVIRONMENT: Production
+    ConnectionStrings__DrawLiarDatabase: ${DRAWLIAR_DATABASE}
+    Cluster__Key: ${DRAWLIAR_CLUSTER_KEY}
+    Cluster__CertificateSha256: ${DRAWLIAR_CERTIFICATE_SHA256:?TLS 인증서 SHA256 필요}
+    ASPNETCORE_Kestrel__Endpoints__Internal__Url: http://0.0.0.0:8080
+    ASPNETCORE_Kestrel__Certificates__Default__Path: /secrets/server.pfx
+    ASPNETCORE_Kestrel__Certificates__Default__Password: ${DRAWLIAR_TLS_PASSWORD}
+  depends_on:
+    db:
+      condition: service_healthy
+  healthcheck:
+    test: ["CMD", "curl", "--fail", "--silent", "http://localhost:8080/health"]
+    interval: 10s
+    timeout: 5s
+    retries: 12
+    start_period: 30s
+services:
+  db:
+    image: drawliar-postgres:16-noble
+    restart: unless-stopped
+    mem_limit: 256m
+    environment:
+      POSTGRES_PASSWORD: ${DRAWLIAR_DB_PASSWORD}
+    ports: ["127.0.0.1:15432:5432"]
+    volumes: ["database:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "drawliar", "-d", "drawliar"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+  main:
+    <<: *app
+    working_dir: /apps/MainServer
+    command: ["dotnet", "DrawLiar.MainServer.dll"]
+    ports: ["19050:19050"]
+    environment:
+      <<: *environment
+      ASPNETCORE_Kestrel__Endpoints__Public__Url: https://0.0.0.0:19050
+      MainServer__PublicUrl: https://${DRAWLIAR_PUBLIC_HOST}:19050
+      GameServer__PublicUrl: https://${DRAWLIAR_PUBLIC_HOST}:19060
+      GameServer__NodeId: game-1
+      Google__DesktopClientId: ${GOOGLE_DESKTOP_CLIENT_ID:-}
+      Google__DesktopClientSecret: ${GOOGLE_DESKTOP_CLIENT_SECRET:-}
+      Google__MobileClientId: ${GOOGLE_MOBILE_CLIENT_ID:-}
+  game:
+    <<: *app
+    working_dir: /apps/GameServer
+    command: ["dotnet", "DrawLiar.GameServer.dll"]
+    ports: ["19060:19060"]
+    environment:
+      <<: *environment
+      ASPNETCORE_Kestrel__Endpoints__Public__Url: https://0.0.0.0:19060
+      GameServer__PublicUrl: https://${DRAWLIAR_PUBLIC_HOST}:19060
+      GameServer__MainServerUrl: https://main:19050
+      GameServer__NodeId: game-1
+  dedicated:
+    <<: *app
+    working_dir: /apps/DedicatedServer
+    command: ["dotnet", "DrawLiar.DedicatedServer.dll"]
+    mem_limit: 512m
+    environment:
+      <<: *environment
+      ASPNETCORE_Kestrel__Endpoints__Public__Url: https://0.0.0.0:19070
+      Dedicated__NodeId: dedicated-1
+      Dedicated__GameServerUrl: https://game:19060
+      Dedicated__PublicUrl: wss://${DRAWLIAR_PUBLIC_HOST}:19070/play
+      Dedicated__Capacity: 16
+    ports: ["19070:19070"]
+  admin:
+    <<: *app
+    working_dir: /apps/AdminServer
+    command: ["dotnet", "DrawLiar.AdminServer.dll"]
+    environment:
+      <<: *environment
+      ASPNETCORE_Kestrel__Endpoints__Public__Url: https://0.0.0.0:19080
+      Admin__Key: ${DRAWLIAR_ADMIN_KEY}
+    ports: ["19080:19080"]
+volumes:
+  database:

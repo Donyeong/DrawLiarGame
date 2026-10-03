@@ -1,0 +1,5 @@
+<!doctype html>
+<html lang="ko">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DrawLiar 서버 관리</title><link rel="stylesheet" href="/console.css"><script src="/console.js" defer></script></head>
+<body><main><h1>DrawLiar 서버 관리</h1><form id="auth"><label>관리 키 <input id="key" type="password" required autocomplete="off"></label><button>연결</button><button id="logout" type="button">연결 해제</button></form><p id="status" role="status">관리 키를 입력하세요.</p><form id="search"><label>이름 검색 <input id="query" maxlength="32"></label><button>조회</button></form><h2>계정</h2><table><thead><tr><th>이름</th><th>계정 ID</th><th>코인</th><th>상태</th><th>관리</th></tr></thead><tbody id="accounts"></tbody></table><h2>방</h2><table><thead><tr><th>이름</th><th>방 ID</th><th>참가</th><th>관전</th><th>상태</th></tr></thead><tbody id="rooms"></tbody></table></main></body>
+</html>

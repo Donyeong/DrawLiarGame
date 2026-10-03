@@ -1,0 +1,258 @@
+.app.mobile { padding: 0; background-color: #F7F3EA; color: #34304B; font-size: 16px; --ink: #34304B; --muted: #817A87; --brand: #78679E; --border: #E3DDD4; --mint: #537F70; }
+.mobile .app-content { min-height: 0; min-width: 0; flex-basis: 0; position: relative; }
+.mobile .mobile-hidden { display: none; }
+.mobile .mobile-home-scroll, .mobile .mobile-controls-scroll { flex-grow: 1; flex-basis: 0; min-height: 0; min-width: 0; }
+.mobile .mobile-home { padding: 16px 20px 20px; min-width: 0; }
+.mobile .mobile-home > * { flex-shrink: 0; margin-bottom: 12px; }
+.mobile .mobile-home > .mobile-section { margin-bottom: 16px; }
+.mobile .mobile-logo { flex-shrink: 0; }
+.mobile .mobile-login-logo { width: 200px; height: 86px; margin-bottom: 8px; }
+.mobile .mobile-home-logo { width: 132px; height: 57px; }
+.mobile .mobile-welcome { align-items: center; }
+.mobile .mobile-welcome-mascot { width: 64px; height: 64px; flex-shrink: 0; margin-right: 12px; }
+.mobile .mobile-profile-mascot { width: 48px; height: 48px; flex-shrink: 0; margin-right: 12px; }
+.mobile .mobile-welcome-title { font-size: 22px; -unity-font-style: bold; white-space: normal; margin-bottom: 6px; }
+.mobile .mobile-small { font-size: 13px; white-space: normal; }
+.mobile .mobile-page-title { font-size: 24px; -unity-font-style: bold; white-space: normal; }
+.mobile .mobile-card-title { font-size: 16px; -unity-font-style: bold; white-space: normal; }
+.mobile .mobile-card { width: 100%; max-width: none; background-color: #FFFFFF; border-width: 1px; border-color: #E3DDD4; border-radius: 16px; padding: 16px; }
+.mobile .mobile-card > * { margin-bottom: 10px; flex-shrink: 0; }
+.mobile .mobile-topbar { min-height: 60px; height: 60px; flex-shrink: 0; flex-direction: row; align-items: center; padding: 6px 20px; background-color: #F7F3EA; }
+.mobile .mobile-topbar .mobile-page-title { font-size: 20px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mobile .mobile-topbar .mobile-logo { width: 118px; height: 44px; margin: 0; }
+.mobile .mobile-topbar-logo { width: 132px; height: 44px; flex-grow: 1; flex-shrink: 1; min-width: 0; margin-right: 12px; }
+.mobile .mobile-topbar .mobile-back { width: 48px; min-width: 48px; font-size: 14px; padding: 8px 4px; }
+.mobile .mobile-topbar .mobile-status-pill { align-self: center; margin-right: 8px; }
+.mobile .mobile-topbar .mobile-workspace-title { font-size: 20px; -unity-font-style: bold; margin-left: 12px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mobile .mobile-bottom-nav { min-height: 68px; height: 68px; flex-shrink: 0; flex-direction: row; align-items: stretch; justify-content: space-between; padding: 8px 12px; background-color: #FFFFFF; border-top-width: 1px; border-top-color: #E3DDD4; }
+.mobile .mobile-bottom-nav .mobile-nav-item { flex-grow: 1; flex-basis: 0; min-width: 0; min-height: 48px; height: 48px; padding: 6px 4px; margin: 0 3px; border-width: 0; border-radius: 12px; color: #817A87; background-color: transparent; font-size: 13px; -unity-font-style: normal; -unity-text-align: middle-center; }
+.mobile .mobile-bottom-nav .mobile-nav-selected { background-color: #E9E4F3; color: #34304B; -unity-font-style: bold; }
+.mobile .mobile-hero { background-color: #EDE7F3; border-width: 1px; border-color: #DED5EA; border-radius: 20px; padding: 14px; margin-bottom: 16px; }
+.mobile .mobile-hero .mobile-welcome-mascot { width: 88px; height: 88px; }
+.mobile .mobile-hero .mobile-profile-mascot { width: 88px; height: 88px; }
+.mobile .mobile-hero .mobile-intro { font-size: 26px; }
+.mobile .mobile-actions { width: 100%; }
+.mobile .mobile-actions > .button { width: 100%; min-height: 52px; margin-bottom: 10px; }
+.mobile .mobile-section { width: 100%; min-width: 0; }
+.mobile .mobile-section-header { flex-direction: row; align-items: center; justify-content: space-between; font-size: 16px; -unity-font-style: bold; margin: 4px 0 12px; }
+.mobile .mobile-section-header .mobile-page-title { font-size: 18px; }
+.mobile .mobile-status-pill { align-self: flex-start; background-color: #EDE7F3; color: #78679E; padding: 5px 10px; border-radius: 12px; font-size: 12px; -unity-font-style: bold; white-space: nowrap; }
+.mobile .mobile-profile-hero { flex-direction: row; align-items: center; min-height: 124px; flex-shrink: 0; margin: 0 20px 12px; padding: 12px; background-color: #FFFFFF; border-width: 1px; border-color: #E3DDD4; border-radius: 16px; }
+.mobile .mobile-profile-preview { width: 104px; height: 104px; flex-shrink: 0; margin-right: 12px; align-items: center; justify-content: center; background-color: #EEE8F5; border-radius: 14px; }
+.mobile .mobile-profile-preview .lobby-avatar { width: 104px; height: 104px; }
+.mobile .mobile-profile-hero .grow { min-width: 0; }
+.mobile .mobile-profile-hero .shop-preview-status { font-size: 16px; margin-bottom: 8px; }
+.mobile .mobile-profile-hero .rules { font-size: 12px; margin: 0 0 8px; }
+.mobile .mobile-profile-hero .button { min-height: 48px; padding: 8px 10px; font-size: 14px; }
+.mobile .home-panel { width: 100%; max-width: none; flex-shrink: 0; }
+.mobile .mobile-page-body > * { margin-bottom: 12px; }
+.mobile .mobile-page-body > .screen-title { display: none; }
+.mobile .mobile-page-body > .screen-title.mobile-create-title, .mobile .mobile-page-body > .screen-title.create-title { display: flex; font-size: 20px; margin-bottom: 12px; }
+.mobile .screen-title { font-size: 24px; margin-bottom: 12px; }
+.mobile .mobile-page-heading { align-items: center; margin-bottom: 12px; }
+.mobile .mobile-page-heading .mobile-page-title { font-size: 22px; }
+.mobile .mobile-back { width: 64px; min-width: 64px; flex-shrink: 0; margin: 0; }
+.mobile .mobile-intro { font-size: 26px; -unity-font-style: bold; white-space: normal; }
+.mobile .mobile-navigation, .mobile .mobile-list-actions { width: 100%; }
+.mobile .mobile-navigation .button, .mobile .mobile-list-actions .button { flex-basis: 0; min-width: 0; margin-right: 8px; }
+.mobile .mobile-navigation .button.mobile-last, .mobile .mobile-list-actions .button.mobile-last { margin-right: 0; }
+.mobile .mobile-profile-row { margin-bottom: 8px; }
+.mobile .mobile-footer { font-size: 12px; margin-top: 8px; -unity-text-align: middle-center; }
+.mobile .button { min-height: 48px; height: auto; font-size: 16px; border-radius: 12px; padding: 10px 14px; border-width: 1px; border-color: #DED5EA; color: #34304B; background-color: #E9E4F3; margin: 0; white-space: normal; transition-property: background-color, border-color; transition-duration: .12s; }
+.mobile .button:hover { background-color: #E2DBEE; border-color: #CDC1DD; }
+.mobile .button:active { background-color: #DCD2EA; border-color: #BFAED6; }
+.mobile .button:focus { border-color: #78679E; }
+.mobile .mobile-home > .button, .mobile .mobile-page-body > .button { margin-bottom: 12px; }
+.mobile .mobile-card > .button { margin-bottom: 10px; }
+.mobile .primary { background-color: #F5B553; border-color: #F5B553; color: #34304B; }
+.mobile .primary:hover { background-color: #F8C36F; border-color: #F8C36F; }
+.mobile .primary:active { background-color: #EAA843; border-color: #EAA843; }
+.mobile .secondary { background-color: #E9E4F3; border-color: #DED5EA; color: #34304B; }
+.mobile .danger { color: #9B4A54; background-color: #FAE9E5; border-color: #EBD1CB; }
+.mobile .next-button { margin-top: 12px; height: 48px; }
+.mobile .field { flex-direction: column; align-items: stretch; min-height: 72px; margin: 0 0 12px; font-size: 16px; }
+.mobile .field > .unity-base-field__label { min-width: 0; width: auto; align-self: flex-start; margin: 0 0 6px; font-size: 13px; color: #817A87; }
+.mobile .audio-label { font-size: 16px; }
+.mobile .audio-volume { margin-bottom: 10px; }
+.mobile .audio-slider { height: 48px; min-height: 48px; }
+.mobile .audio-slider .unity-base-slider__tracker { background-color: #D8D0DF; }
+.mobile .audio-slider .unity-base-slider__dragger { width: 24px; height: 24px; border-radius: 12px; background-color: #78679E; }
+.mobile .unity-base-text-field__input, .mobile .unity-base-popup-field__input { min-height: 48px; border-width: 1px; border-color: #DED5EA; border-radius: 12px; padding: 10px 14px; background-color: #FFFFFF; color: #34304B; font-size: 16px; }
+.mobile .unity-base-text-field__input:focus, .mobile .unity-base-popup-field__input:focus { border-color: #78679E; }
+.mobile .unity-toggle { min-height: 48px; flex-direction: row; align-items: center; }
+.mobile .unity-toggle > .unity-base-field__label { align-self: center; margin: 0 12px 0 0; flex-grow: 1; }
+.mobile .unity-toggle__input { min-width: 40px; min-height: 48px; }
+.mobile .time-form .field { flex-direction: column; min-height: 72px; }
+.mobile .time-form .field > .unity-base-field__label { width: auto; }
+.mobile .form-column { width: 50%; padding-right: 8px; }
+.mobile .room-list { height: 360px; margin-top: 8px; }
+.mobile .room-entry, .mobile .mobile-room-item { flex-direction: column; align-items: stretch; padding: 14px; background-color: #FFFFFF; border-width: 1px; border-color: #E3DDD4; border-radius: 16px; margin-bottom: 12px; }
+.mobile .room-entry > *, .mobile .mobile-room-item > * { flex-shrink: 0; margin-bottom: 8px; }
+.mobile .room-entry .player-name, .mobile .mobile-room-item .player-name { font-size: 18px; white-space: normal; }
+.mobile .mobile-room-top { flex-direction: row; align-items: center; min-width: 0; }
+.mobile .mobile-room-top .grow { min-width: 0; margin-right: 8px; }
+.mobile .mobile-room-meta { font-size: 13px; color: #817A87; white-space: normal; }
+.mobile .mobile-room-action { flex-direction: row; align-items: center; margin-bottom: 0; }
+.mobile .mobile-room-action .primary { flex-grow: 1; flex-basis: 0; }
+.mobile .mobile-room-action .secondary { width: 76px; flex-shrink: 0; margin-left: 8px; }
+.mobile .mobile-room-entry-actions { align-items: center; margin-bottom: 0; }
+.mobile .mobile-room-entry-actions .button { min-width: 72px; margin-left: 8px; }
+.mobile .mobile-code-input .unity-base-text-field__input { -unity-font-style: bold; font-size: 24px; -unity-text-align: middle-center; }
+.mobile .shop-list { height: 360px; margin-top: 8px; }
+.mobile .shop-entry { padding: 12px; margin-bottom: 12px; background-color: #FFFFFF; border-width: 1px; border-color: #E3DDD4; border-radius: 16px; }
+.mobile .shop-entry.shop-selected { border-color: #78679E; background-color: #F2EDF8; }
+.mobile .shop-entry, .mobile .room-entry, .mobile .mobile-room-item { transition-property: background-color, border-color; transition-duration: .12s; }
+.mobile .shop-item-image { width: 88px; height: 88px; min-width: 88px; min-height: 88px; }
+.mobile .shop-controls .button, .mobile .shop-actions .button { margin-right: 8px; padding: 10px 8px; }
+.mobile .shop-controls .button.mobile-last, .mobile .shop-actions .button.mobile-last { margin-right: 0; }
+.mobile .mobile-shop-grid { width: 100%; align-self: stretch; flex-direction: row; flex-wrap: wrap; align-items: stretch; min-width: 0; }
+.mobile .mobile-shop-entry { width: 48%; flex-basis: 48%; min-width: 0; margin: 0 2% 12px 0; padding: 10px; }
+.mobile .mobile-shop-product { flex-direction: column; align-items: center; margin-bottom: 8px; }
+.mobile .mobile-shop-image { width: 96px; height: 96px; min-width: 96px; min-height: 96px; margin: 0 0 8px; }
+.mobile .mobile-shop-info { width: 100%; min-width: 0; font-size: 12px; }
+.mobile .shop-item-name { font-size: 15px; margin-bottom: 4px; }
+.mobile .mobile-shop-actions { flex-direction: column; align-items: stretch; }
+.mobile-shop-actions .button { flex-basis: auto; width: 100%; min-height: 48px; font-size: 14px; margin: 0 0 6px; padding: 8px 4px; }
+.mobile-shop-actions .button.mobile-last { margin-bottom: 0; }
+.mobile .topic-list { height: 280px; }
+.mobile .topic-toggle { width: 46%; min-height: 48px; font-size: 16px; background-color: #FFFFFF; border-color: #DED5EA; color: #817A87; }
+.mobile .topic-toggle.topic-selected { background-color: #E9E4F3; border-color: #78679E; color: #34304B; }
+.mobile .mode-option { min-height: 80px; margin-bottom: 10px; }
+.mobile .mobile-customize-preview { align-items: center; height: 144px; }
+.mobile .mobile-customize-preview .lobby-avatar { width: 144px; height: 144px; }
+.mobile .avatar-colors { flex-wrap: wrap; }
+.mobile .avatar-colors .swatch { width: 48px; height: 48px; min-height: 48px; margin: 0 8px 8px 0; padding: 0; }
+.mobile .equipment-option { min-height: 136px; font-size: 16px; background-color: #FFFFFF; border-color: #E3DDD4; }
+.mobile .equipment-option.equipped { background-color: #E9E4F3; border-color: #78679E; }
+.mobile .equipment-state { white-space: normal; }
+.mobile .rules, .mobile .notice { font-size: 13px; color: #817A87; white-space: normal; }
+.mobile .overlay { justify-content: flex-end; align-items: stretch; background-color: rgba(52,48,75,.38); }
+.mobile .modal { width: 100%; max-width: 100%; max-height: 90%; padding: 0; background-color: #FFFFFF; color: #34304B; border-width: 1px; border-color: #E3DDD4; border-radius: 20px 20px 0 0; }
+.mobile .mobile-modal-scroll { min-height: 0; flex-shrink: 1; }
+.mobile .mobile-modal-body { padding: 20px; }
+.mobile .mobile-modal-body > * { flex-shrink: 0; margin-bottom: 10px; }
+.mobile .mobile-modal-body .title { font-size: 24px; }
+.mobile .mobile-modal-body .button { margin-top: 0; }
+.mobile .toast { left: 20px; right: 20px; bottom: 80px; max-width: none; font-size: 14px; padding: 12px 16px; border-width: 0; border-radius: 12px; background-color: #34304B; color: #FFFFFF; }
+.app.mobile.in-game { padding: 0; background-color: #F7F3EA; color: #34304B; --ink: #34304B; --muted: #817A87; --brand: #78679E; --border: #E3DDD4; --mint: #537F70; }
+.mobile.in-game .mobile-room { flex-grow: 1; min-height: 0; padding: 12px 16px; }
+.mobile.in-game .room-hud { height: 48px; min-height: 48px; margin-bottom: 8px; align-items: center; }
+.mobile.in-game .phase-bar { justify-content: flex-start; min-height: 48px; }
+.mobile.in-game .phase-title { font-size: 20px; }
+.mobile.in-game .phase-detail { display: none; }
+.mobile.in-game .timer { font-size: 18px; -unity-font-style: bold; color: #78679E; margin-right: 8px; }
+.mobile.in-game .timer-urgent { color: #BD594A; }
+.mobile.in-game .mobile-round-card { padding: 2px 12px; min-height: 52px; border-radius: 12px; background-color: #FFFFFF; border-width: 1px; border-color: #E3DDD4; align-items: center; margin-bottom: 8px; flex-shrink: 0; }
+.mobile.in-game .mobile-round-card .mobile-small { margin-top: 4px; }
+.mobile.in-game .mobile-code-copy { width: 108px; flex-shrink: 0; padding: 8px; font-size: 14px; }
+.mobile.in-game .secret-bar { margin-bottom: 8px; padding: 10px 12px; min-height: 72px; border-radius: 12px; border-width: 1px; border-color: #DED5EA; background-color: #EEE8F5; flex-shrink: 0; }
+.mobile.in-game .topic { font-size: 12px; color: #817A87; margin: 0 0 4px; }
+.mobile.in-game .mobile-role-line { align-items: center; min-height: 26px; }
+.mobile.in-game .role { font-size: 15px; color: #78679E; border-width: 0; padding: 0; margin: 0 8px 0 0; }
+.mobile.in-game .word, .mobile.in-game .word-hidden { font-size: 18px; color: #34304B; margin: 0; }
+.mobile.in-game .secret-toggle { min-height: 48px; height: 48px; padding: 8px; font-size: 13px; background-color: #FFFFFF; color: #78679E; }
+.mobile.in-game .mobile-workspace { flex-grow: 1; min-height: 0; flex-direction: column; }
+.mobile.in-game .mobile-workspace-title { min-height: 24px; font-size: 13px; color: #817A87; margin: 0 0 8px; }
+.mobile.in-game .canvas-frame { width: 100%; min-height: 0; flex-grow: 0; flex-shrink: 0; border-width: 1px; border-color: #E3DDD4; border-radius: 12px; background-color: #FFFFFF; margin-bottom: 8px; }
+.mobile.in-game .drawing-surface { background-color: #FFFFFF; }
+.mobile.in-game .mobile-controls { min-width: 0; padding-bottom: 0; }
+.mobile.in-game .mobile-controls > * { flex-shrink: 0; margin-bottom: 8px; }
+.mobile.in-game .mobile-bottom-actions { flex-shrink: 0; padding-top: 4px; }
+.mobile.in-game .button { min-height: 48px; height: auto; padding: 8px 12px; border-radius: 12px; font-size: 16px; background-color: #E9E4F3; border-color: #DED5EA; color: #34304B; }
+.mobile.in-game .button:hover { background-color: #E2DBEE; border-color: #CDC1DD; }
+.mobile.in-game .button:active { background-color: #DCD2EA; border-color: #BFAED6; }
+.mobile.in-game .primary, .mobile.in-game .tool-selected { background-color: #F5B553; border-color: #F5B553; color: #34304B; }
+.mobile.in-game .primary:hover, .mobile.in-game .tool-selected:hover { background-color: #F8C36F; border-color: #F8C36F; }
+.mobile.in-game .primary:active { background-color: #EAA843; border-color: #EAA843; }
+.mobile.in-game .secondary { background-color: #E9E4F3; border-color: #DED5EA; color: #34304B; }
+.mobile.in-game .danger { color: #9B4A54; background-color: #FAE9E5; border-color: #EBD1CB; }
+.mobile.in-game .tool-row { margin-bottom: 8px; }
+.mobile.in-game .tool-row .button { width: auto; flex-basis: 0; flex-grow: 1; margin-right: 8px; }
+.mobile.in-game .tool-row .button.mobile-last { margin-right: 0; }
+.mobile.in-game .mobile-palette-scroll { height: 48px; background-color: #FFFFFF; border-width: 1px; border-color: #E3DDD4; border-radius: 12px; }
+.mobile.in-game .palette { width: auto; max-width: none; height: 48px; flex-wrap: nowrap; justify-content: flex-start; align-items: center; padding: 0; }
+.mobile.in-game .palette .swatch { width: 48px; height: 48px; min-height: 48px; flex-shrink: 0; margin: 0 4px 0 0; padding: 0; border-radius: 24px; justify-content: center; align-items: center; border-color: transparent; }
+.mobile.in-game .palette .swatch.selected, .mobile.in-game .palette .swatch:focus { border-color: #78679E; }
+.mobile.in-game .mobile-swatch-dot { width: 28px; height: 28px; border-radius: 14px; flex-shrink: 0; }
+.mobile.in-game .tools > .secret-label, .mobile.in-game .tools > .brush-sizes { display: none; }
+.mobile.in-game .context-info { background-color: #FFFFFF; padding: 10px 12px; border-width: 1px; border-color: #E3DDD4; border-radius: 12px; }
+.mobile.in-game .context-info .vote-avatar { display: none; }
+.mobile.in-game .context-name { font-size: 16px; color: #34304B; margin: 0 0 6px; }
+.mobile.in-game .context-title { font-size: 18px; color: #34304B; margin-bottom: 6px; }
+.mobile.in-game .context-label, .mobile.in-game .context-detail { color: #817A87; font-size: 13px; }
+.mobile.in-game .mobile-roster > .mobile-small { margin-bottom: 6px; font-size: 12px; }
+.mobile.in-game .mobile-roster-scroll { height: 72px; }
+.mobile.in-game .players-strip { height: 72px; flex-direction: row; }
+.mobile.in-game .player, .mobile.in-game .crowded .player { width: 124px; height: 72px; flex-basis: auto; flex-grow: 0; flex-shrink: 0; padding: 10px 8px; border-radius: 12px; border-width: 1px; border-color: #E3DDD4; background-color: #FFFFFF; margin-right: 8px; }
+.mobile.in-game .player { transition-property: background-color, border-color; transition-duration: .12s; }
+.mobile.in-game .player > .row { flex-direction: row; align-items: center; justify-content: flex-start; }
+.mobile.in-game .player .avatar, .mobile.in-game .crowded .player .avatar { width: 32px; height: 32px; margin: 0 8px 0 0; }
+.mobile.in-game .player .grow { min-width: 0; align-items: stretch; }
+.mobile.in-game .player .player-name, .mobile.in-game .crowded .player .player-name { font-size: 13px; color: #34304B; }
+.mobile.in-game .player-status, .mobile.in-game .crowded .player-status { color: #817A87; font-size: 11px; margin-top: 4px; }
+.mobile.in-game .player.selected-player, .mobile.in-game .player.active-player, .mobile.in-game .player.vote-selectable:focus { border-width: 2px; border-color: #78679E; background-color: #EEE8F5; }
+.mobile.in-game .player.vote-selectable:hover { border-color: #78679E; background-color: #EEE8F5; }
+.mobile.in-game .active-player .player-status, .mobile.in-game .selected-player .player-status { color: #78679E; }
+.mobile.in-game .phase-actions .button { margin-top: 0; margin-bottom: 8px; }
+.mobile.in-game .phase-actions .rules { margin: 0 0 8px; }
+.mobile.in-game .chat-open { width: 100%; min-height: 48px; height: 48px; border-width: 1px; color: #78679E; -unity-text-align: middle-center; }
+.mobile.in-game .mobile-chat-sheet { height: 60%; min-height: 220px; padding: 20px; background-color: #FFFFFF; }
+.mobile.in-game .chat-history { flex-grow: 1; max-height: none; min-height: 48px; }
+.mobile.in-game .chat-name { font-size: 13px; color: #78679E; }
+.mobile.in-game .chat-message { font-size: 16px; color: #34304B; }
+.mobile.in-game .chatbar { min-height: 48px; height: 48px; margin-top: 8px; }
+.mobile.in-game .chat-input { height: 48px; margin-right: 8px; }
+.mobile.in-game .guess-input { height: 48px; min-height: 48px; margin-bottom: 8px; }
+.mobile.in-game .chatbar .button { width: 72px; height: 48px; min-height: 48px; }
+.mobile.in-game .unity-base-text-field__input, .mobile.in-game .unity-base-popup-field__input { min-height: 48px; font-size: 16px; padding: 10px 12px; background-color: #FFFFFF; color: #34304B; border-color: #DED5EA; border-radius: 12px; }
+.mobile.in-game .overlay { background-color: rgba(52,48,75,.38); }
+.mobile.in-game .modal { padding: 0; background-color: #FFFFFF; color: #34304B; border-color: #E3DDD4; border-radius: 20px 20px 0 0; }
+.mobile.in-game .modal .title { color: #34304B; font-size: 24px; }
+.mobile.in-game .modal .subtitle, .mobile.in-game .modal .field > .unity-base-field__label { color: #817A87; }
+.mobile.in-game .score-row { border-bottom-color: #E3DDD4; }
+.mobile.in-game .toast { bottom: 20px; background-color: #34304B; color: #FFFFFF; border-width: 0; border-radius: 12px; }
+.mobile-landscape .mobile-topbar { height: 52px; min-height: 52px; padding-top: 2px; padding-bottom: 2px; }
+.mobile-landscape .mobile-bottom-nav { height: 60px; min-height: 60px; padding-top: 6px; padding-bottom: 6px; }
+.mobile-landscape .mobile-home { padding-top: 12px; max-width: 760px; width: 100%; align-self: center; }
+.mobile-landscape .mobile-hero { padding: 14px; }
+.mobile-landscape .mobile-profile-hero { min-height: 104px; margin-bottom: 8px; max-width: 760px; width: 94%; align-self: center; }
+.mobile-landscape .mobile-profile-preview, .mobile-landscape .mobile-profile-preview .lobby-avatar { width: 80px; height: 80px; }
+.mobile-landscape.in-game .mobile-room { padding: 8px 16px; }
+.mobile-landscape.in-game .mobile-round-card { display: none; }
+.mobile-landscape.in-game .mobile-workspace { flex-direction: row; }
+.mobile-landscape.in-game .canvas-frame { width: 50%; flex-basis: 0; flex-grow: 1; flex-shrink: 1; margin: 0 12px 0 0; }
+.mobile-landscape.in-game .mobile-controls-scroll { width: 48%; flex-basis: auto; flex-grow: 0; flex-shrink: 0; }
+.mobile-landscape.in-game .mobile-secret { flex-direction: row; align-items: center; min-height: 52px; margin: 0 0 8px; }
+.mobile-landscape.in-game .mobile-secret .topic { margin: 0 8px 0 0; flex-shrink: 0; }
+.mobile-landscape.in-game .mobile-role-line { flex-grow: 1; min-width: 0; }
+.mobile-landscape.in-game .mobile-secret .role, .mobile-landscape.in-game .mobile-secret .word { font-size: 16px; }
+.mobile-landscape.in-game .mobile-controls > * { margin-bottom: 8px; }
+.mobile-landscape.in-game .mobile-roster > .mobile-small { display: none; }
+.mobile-landscape.in-game .mobile-bottom-actions { flex-direction: row; align-items: flex-start; padding-top: 0; margin-bottom: 0; }
+.mobile-landscape.in-game .phase-actions .button { margin-bottom: 0; }
+.mobile-landscape.in-game .phase-actions { flex-grow: 1; min-width: 0; margin-right: 8px; }
+.mobile-landscape.in-game .chat-open { width: 104px; flex-shrink: 0; }
+.mobile.keyboard-open .mobile-chat-sheet { height: 85%; min-height: 150px; }
+.mobile.keyboard-open .mobile-bottom-nav { display: none; }
+.mobile-portrait.keyboard-open.in-game .mobile-room { padding-top: 8px; padding-bottom: 8px; }
+.mobile.keyboard-open.in-game .mobile-round-card { display: none; }
+.mobile-landscape.keyboard-open.in-game .mobile-chat-sheet { height: 100%; max-height: 100%; min-height: 0; padding: 8px 12px; }
+.mobile-landscape.keyboard-open.in-game .mobile-chat-sheet .mobile-page-heading { min-height: 48px; margin-bottom: 8px; flex-shrink: 0; }
+.mobile-landscape.keyboard-open.in-game .mobile-chat-sheet .chat-history { min-height: 0; flex-basis: 0; flex-shrink: 1; }
+.mobile-landscape.keyboard-open.in-game .mobile-chat-sheet .chatbar { margin-top: 8px; flex-shrink: 0; }
+.mobile-landscape.keyboard-open.in-game .mobile-chat-sheet .chat-input { min-width: 0; flex-grow: 1; }
+.mobile.in-game .mobile-waiting .mobile-workspace { flex-direction: column; }
+.mobile.in-game .mobile-waiting .mobile-controls-scroll { width: 100%; flex-grow: 1; flex-basis: 0; min-height: 0; }
+.mobile.in-game .mobile-waiting .mobile-roster-scroll { height: auto; min-height: 0; }
+.mobile.in-game .mobile-waiting .players-strip { width: 100%; height: auto; min-height: 0; flex-direction: row; flex-wrap: wrap; }
+.mobile.in-game .mobile-waiting .player, .mobile.in-game .mobile-waiting .crowded .player { width: 48%; height: 88px; min-height: 88px; margin: 0 2% 8px 0; padding: 12px; }
+.mobile.in-game .mobile-waiting .mobile-roster > .mobile-small { display: flex; font-size: 15px; -unity-font-style: bold; color: #34304B; margin-bottom: 8px; }
+.mobile.in-game .mobile-waiting .mobile-bottom-actions { flex-direction: column; flex-shrink: 0; padding-top: 8px; }
+.mobile.in-game .mobile-waiting .phase-actions { width: 100%; margin-right: 0; }
+.mobile.in-game .mobile-waiting .phase-actions .button { margin-bottom: 8px; }
+.mobile.in-game .mobile-waiting .chat-open { width: 100%; }
+.mobile-landscape.in-game .mobile-waiting .mobile-round-card { display: flex; }
+.mobile .draw-button-scale { scale: 1 1; translate: 0 0; transition-property: background-color, border-color, scale, opacity; transition-duration: .10s; }
+.mobile .draw-button-scale.draw-pressed { scale: .94 .94; transition-duration: .08s; }
+.mobile .draw-button-scale.draw-released { scale: 1.03 1.03; transition-duration: .07s; }
+.mobile .draw-button-scale:disabled, .mobile.reduce-motion .draw-button-scale, .mobile.reduce-motion .draw-button-scale.draw-pressed, .mobile.reduce-motion .draw-button-scale.draw-released { scale: 1 1; translate: 0 0; }

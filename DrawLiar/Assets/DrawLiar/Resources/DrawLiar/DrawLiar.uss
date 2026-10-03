@@ -65,11 +65,29 @@
 .section-title { font-size: 18px; -unity-font-style: bold; margin: 15px 0 10px 0; }
 .field { margin: 5px 0; min-height: 39px; }
 .field > .unity-base-field__label { min-width: 108px; color: var(--muted); align-self: center; }
+.audio-options { margin-bottom: 12px; }
+.audio-volume { margin-bottom: 8px; }
+.audio-label { font-size: 15px; }
+.audio-percentage { font-size: 13px; color: var(--muted); }
+.audio-slider { height: 40px; min-height: 40px; margin: 0; }
+.audio-slider .unity-base-slider__tracker { height: 4px; background-color: #b7a88b; }
+.audio-slider .unity-base-slider__dragger { width: 20px; height: 20px; border-radius: 10px; background-color: var(--brand); }
 .unity-base-text-field__input, .unity-base-popup-field__input { border-radius: 6px; border-width: 2px; border-color: #b7a88b; background-color: #fffdf6; color: var(--ink); padding: 8px 12px; min-height: 38px; }
 .unity-text-field__input:focus { border-color: #645797; }
 .form-column { width: 50%; padding-right: 12px; }
 .room-list { height: 270px; margin-top: 15px; }
 .room-entry { border-radius: 6px; border-width: 1px; border-color: #b7a88b; background-color: #f6eedb; padding: 10px; margin-bottom: 10px; flex-direction: row; justify-content: space-between; align-items: center; }
+.shop-preview-status { font-size: 18px; -unity-font-style: bold; white-space: normal; }
+.shop-controls { margin-bottom: 8px; }
+.shop-controls .button { flex-basis: 0; min-width: 0; }
+.shop-list { height: 320px; margin-top: 8px; }
+.shop-entry { padding: 12px; margin-bottom: 12px; border-radius: 12px; border-width: 2px; border-color: #b7a88b; background-color: #f6eedb; flex-shrink: 0; }
+.shop-entry.shop-selected { border-color: #645797; background-color: #e7e0f3; }
+.shop-product { margin-bottom: 8px; }
+.shop-item-image { width: 96px; height: 96px; min-width: 96px; min-height: 96px; flex-shrink: 0; margin-right: 12px; }
+.shop-item-info { min-width: 0; }
+.shop-item-name { font-size: 18px; -unity-font-style: bold; white-space: normal; margin-bottom: 8px; }
+.shop-actions .button { flex-basis: 0; min-width: 0; }
 .notice { white-space: normal; color: #866d51; margin: 12px 0 0 0; font-size: 13px; }
 .player-name { -unity-font-style: bold; font-size: 13px; overflow: hidden; text-overflow: ellipsis; }
 .swatch { width: 25px; height: 25px; min-height: 0; padding: 0; margin: 4px; border-radius: 13px; border-width: 2px; border-color: rgba(52,48,75,.2); }
@@ -96,7 +114,6 @@
 .reveal-liar { align-items: center; margin: 8px; }
 .reveal-liar .avatar-preview { width: 85px; height: 85px; }
 .rules { white-space: normal; color: var(--muted); font-size: 12px; margin: 8px 0; }
-.voice-on { color: rgb(70,154,110); }
 .toast { position: absolute; bottom: 55px; align-self: center; background-color: #34304B; color: white; padding: 12px 24px; border-radius: 8px; font-size: 14px; white-space: normal; max-width: 800px; }
 .motion-enter { transition-property: opacity, translate; transition-timing-function: ease-out; }
 .compact .home-layout { max-width: 93%; }
@@ -147,8 +164,8 @@
 .in-game .primary, .in-game .tool-selected { background-color: #e4b66b; border-color: #e4b66b; color: #282b27; }
 .in-game .primary:hover, .in-game .tool-selected:hover { background-color: #f0c580; border-color: #f0c580; }
 .in-game .danger { color: #e17f67; }
-.in-game .secret-toggle, .in-game .chat-open, .in-game .voice-settings { height: 28px; min-height: 28px; padding: 0; border-width: 0; background-color: transparent; color: #a6ab9f; font-size: 14px; -unity-font-style: normal; -unity-text-align: middle-left; }
-.in-game .secret-toggle:hover, .in-game .chat-open:hover, .in-game .voice-settings:hover { background-color: transparent; color: #efeadf; }
+.in-game .secret-toggle, .in-game .chat-open { height: 28px; min-height: 28px; padding: 0; border-width: 0; background-color: transparent; color: #a6ab9f; font-size: 14px; -unity-font-style: normal; -unity-text-align: middle-left; }
+.in-game .secret-toggle:hover, .in-game .chat-open:hover { background-color: transparent; color: #efeadf; }
 .in-game .tools { flex-direction: column; flex-shrink: 0; }
 .in-game .tool-row { flex-direction: row; justify-content: space-between; margin-bottom: 16px; }
 .in-game .tool-row .button { width: 48%; }
@@ -164,9 +181,6 @@
 .in-game .context-info { flex-direction: column; }
 .in-game .context-label { font-size: 14px; color: #a6ab9f; margin-bottom: 12px; }
 .in-game .context-info .vote-avatar { width: 100px; height: 100px; margin: 20px 0 12px 0; }
-.in-game .speaker-row { margin-top: 20px; }
-.in-game .speaker-row .avatar { width: 56px; height: 56px; margin-right: 12px; flex-shrink: 0; }
-.in-game .speaker-name { font-size: 18px; flex-shrink: 1; overflow: hidden; text-overflow: ellipsis; }
 .in-game .word-hidden { font-size: 28px; color: #A6AB9F; }
 .in-game .context-info .player-name, .in-game .context-name { font-size: 32px; -unity-font-style: bold; margin-bottom: 16px; white-space: normal; }
 .in-game .context-title { font-size: 24px; -unity-font-style: bold; margin-bottom: 16px; white-space: normal; }
@@ -174,8 +188,6 @@
 .in-game .phase-actions { flex-direction: column; flex-shrink: 0; }
 .in-game .phase-actions .button { width: 100%; margin-top: 8px; }
 .in-game .phase-actions .rules { font-size: 13px; margin-top: 16px; }
-.in-game .voice-hint { color: #a6ab9f; font-size: 14px; margin-top: 16px; }
-.in-game .voice-settings { margin-top: 4px; }
 .in-game .chat-history { max-height: 190px; min-height: 0; flex-shrink: 1; margin-bottom: 12px; }
 .in-game .chat-entry { margin-bottom: 12px; }
 .in-game .chat-name { font-size: 14px; color: #a6ab9f; margin-bottom: 8px; }
@@ -194,7 +206,6 @@
 .in-game .player.active-player, .in-game .player.selected-player { background-color: #30342f; border-color: #e4b66b; }
 .in-game .active-player .player-status, .in-game .selected-player .player-status { color: #e4b66b; }
 .in-game .player.vote-selectable:hover, .in-game .player.vote-selectable:focus { background-color: #30342f; border-color: #e4b66b; }
-.in-game .player.speaking { border-color: #6faf8f; }
 .in-game .crowded .player { padding: 8px; margin-right: 8px; }
 .in-game .crowded .player .avatar { width: 32px; height: 32px; margin-right: 8px; }
 .in-game .crowded .player .player-name { font-size: 14px; }

@@ -1,0 +1,3 @@
+ALTER TABLE "Room" ADD COLUMN IF NOT EXISTS "PlayerAccountIds" jsonb NOT NULL DEFAULT '[]';
+ALTER TABLE "Room" ADD COLUMN IF NOT EXISTS "SpectatorAccountIds" jsonb NOT NULL DEFAULT '[]';
+ALTER TABLE "Room" ADD COLUMN IF NOT EXISTS "CustomTopics" jsonb NOT NULL DEFAULT '[]';

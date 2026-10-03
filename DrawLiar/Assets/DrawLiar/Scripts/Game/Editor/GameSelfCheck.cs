@@ -1,3 +1,4 @@
+#nullable disable
 using System;
 using System.Linq;
 
@@ -27,6 +28,9 @@ namespace DrawLiar.Editor
             VerifyDistinctVictoryConditions();
             VerifyCustomScoresAndFinalResults();
             VerifyTopicPoolAndTimers();
+            VerifyReconnectsAndSpectatorCapacity();
+            VerifyExplicitSpectatorsAndSeatPriority();
+            VerifyFixedCapacityAndStartThreshold();
 #if UNITY_EDITOR
             UnityEngine.Debug.Log("DrawLiar game self-check PASS: modes, victory rules, multiple liars, scores, secrecy, spectators, disconnects, topic selection, all phase timers and optional rebuttal.");
 #else
@@ -44,6 +48,108 @@ namespace DrawLiar.Editor
             Topics = new[] { new TopicData { Name = "과일", Words = new[] { "사과" } } }
         };
 
+        private static void VerifyReconnectsAndSpectatorCapacity()
+        {
+            var game = new GameSession(new RoomSettings { RebuttalSeconds = 0 }, Data(), 18);
+            for (int id = 1; id <= GameRules.MAX_PLAYERS; id++) Check(game.Join(id, "P" + id, 0, 0), "Active seat accepts player.");
+            Check(!game.Join(9, "Full", 0, 0), "Full lobby rejects ninth active player.");
+            Check(game.Start(0), "Full room starts.");
+            for (int id = 9; id < 41; id++) Check(game.Join(id, "S" + id, 0, 0), "Full match accepts spectator.");
+            Check(!game.Join(41, "Overflow", 0, 0), "Spectator capacity is bounded.");
+            var before = game.Snapshot(1, 1, 0);
+            game.Disconnect(1, 0);
+            Check(game.Join(1, "변경요청", 7, 3), "Disconnected account rejoins stable player ID.");
+            var after = game.Snapshot(1, 2, 0);
+            Check(after.LocalIsLiar == before.LocalIsLiar && after.Word == before.Word && !after.LocalIsSpectator,
+                "Reconnect preserves role and private word.");
+            Check(after.Players.Single(player => player.Id == 1).Name == "P1", "Match identity is preserved on reconnect.");
+            Check(after.Players.Length == 40 && game.ActiveCount == GameRules.MAX_PLAYERS && game.SpectatorCount == 32,
+                "Reconnect adds no duplicate participant.");
+            double now = 100;
+            game.Tick(now);
+            while (game.Phase == GamePhase.Drawing) game.EndTurn(game.ArtistId, now);
+            game.Tick(now += 100);
+            Check(game.Vote(1, 2, now), "Connected player submits vote.");
+            game.Disconnect(1, now);
+            Check(game.Join(1, "P1", 0, 0), "Voting player reconnects.");
+            Check(game.Snapshot(1, 2, now).Players.Single(player => player.Id == 1).HasVoted && !game.Vote(1, 3, now),
+                "Reconnect cannot overwrite submitted vote.");
+            game.ReturnToLobby();
+            Check(game.ActiveCount == GameRules.MAX_PLAYERS && game.SpectatorCount == 32, "Returning lobby respects active seat capacity.");
+        }
+
+        private static void VerifyExplicitSpectatorsAndSeatPriority()
+        {
+            var game = new GameSession(new RoomSettings { RebuttalSeconds = 0 }, Data(), 18);
+            Check(game.Join(1, "A", 0, 0), "First participant joins.");
+            Check(game.Join(2, "B", 0, 0, spectatorOnly: true), "Explicit spectator joins before other participants.");
+            Check(game.Join(3, "C", 0, 0) && game.Join(4, "D", 0, 0), "Remaining active seats are filled.");
+            Check(game.Start(0), "Three participants start with an explicit spectator present.");
+            Check(game.Snapshot(2, 1, 0).Players.Where(player => !player.IsSpectator).Select(player => player.Id)
+                .OrderBy(id => id).SequenceEqual(new[] { 1, 3, 4 }), "Spectator ID order cannot displace an active participant.");
+            Check(game.Snapshot(2, 1, 0).LocalIsSpectator && game.Snapshot(2, 1, 0).Word == "",
+                "Explicit spectator remains spectator and receives no word.");
+            game.Tick(100);
+            int turns = 0;
+            while (game.Phase == GamePhase.Drawing)
+            {
+                Check(game.ArtistId != 2 && !game.EndTurn(2, 100), "Explicit spectator cannot draw or finish another player's turn.");
+                Check(game.EndTurn(game.ArtistId, 100), "Active participant completes drawing.");
+                turns++;
+            }
+            Check(turns == 3, "All original active participants draw.");
+            game.Tick(200);
+            Check(game.Phase == GamePhase.Voting && !game.Vote(2, 1, 200), "Explicit spectator cannot vote.");
+            game.Disconnect(2, 200);
+            Check(game.Join(2, "B", 0, 0), "Explicit spectator reconnects without requesting spectator mode again.");
+            game.ReturnToLobby();
+            Check(game.Snapshot(2, 1, 200).LocalIsSpectator && game.Snapshot(2, 1, 200).Players
+                .Where(player => !player.IsSpectator).Select(player => player.Id).OrderBy(id => id)
+                .SequenceEqual(new[] { 1, 3, 4 }), "Lobby reset and reconnect preserve explicit intent and existing active seats.");
+            Check(game.Start(200) && game.Snapshot(2, 1, 200).LocalIsSpectator && game.Snapshot(2, 1, 200).Word == "",
+                "Explicit spectator stays spectator in the next match.");
+
+            var vacancy = new GameSession(new RoomSettings(), Data(), 22);
+            for (int id = 1; id <= GameRules.MAX_PLAYERS; id++) Check(vacancy.Join(id, "P" + id, 0, 0), "Vacancy scenario fills active seats.");
+            Check(vacancy.Start(0) && vacancy.Join(9, "Late", 0, 0), "Ordinary late join begins as temporary spectator.");
+            Check(vacancy.Snapshot(9, 1, 0).LocalIsSpectator, "Temporary spectator does not join the current round.");
+            vacancy.Disconnect(8, 0);
+            vacancy.ReturnToLobby();
+            Check(!vacancy.Snapshot(9, 1, 0).LocalIsSpectator && vacancy.ActiveCount == GameRules.MAX_PLAYERS,
+                "Ordinary late join fills a vacated seat in the next lobby.");
+            Check(vacancy.Start(0) && !vacancy.Snapshot(9, 1, 0).LocalIsSpectator,
+                "Promoted temporary spectator participates in the next match.");
+        }
+
+        private static void VerifyFixedCapacityAndStartThreshold()
+        {
+            foreach (int capacity in new[] { -1, 3, 8, 12 })
+            {
+                var settings = new RoomSettings { MaxPlayers = capacity };
+                settings.Validate();
+                Check(settings.MaxPlayers == GameRules.MAX_PLAYERS, "Room capacity is fixed at eight.");
+            }
+
+            var game = new GameSession(new RoomSettings { LiarCount = 7 }, Data(), 23);
+            Check(game.Join(1, "A", 0, 0) && game.Join(2, "B", 0, 0), "Two participants join.");
+            Check(game.Join(10, "Observer", 0, 0, spectatorOnly: true), "Explicit spectator joins.");
+            Check(game.ActiveCount == 2 && !game.CanStart && !game.Start(0),
+                "Two participants cannot start even with a connected spectator.");
+            Check(game.Join(3, "C", 0, 0) && game.CanStart, "Three participants can start before all eight seats are full.");
+            game.Disconnect(3, 0);
+            Check(!game.CanStart && !game.Start(0), "Disconnected third participant cannot satisfy the start threshold.");
+            Check(game.Join(3, "C", 0, 0) && game.Start(0), "Three connected participants start with seven configured liars.");
+            var roles = new[] { 1, 2, 3 }.Select(id => game.Snapshot(id, 1, 0)).ToArray();
+            Check(game.Settings.LiarCount == 2 && roles.All(snapshot => snapshot.Settings.LiarCount == 2)
+                && roles.Count(snapshot => snapshot.LocalIsLiar) == 2,
+                "Starting fewer participants reduces and publishes the actual liar count, preserving one citizen.");
+            Check(game.Snapshot(10, 1, 0).LocalIsSpectator && game.Snapshot(10, 1, 0).Word == "",
+                "Spectator remains excluded from roles and the private word.");
+            int canvasVersion = game.CanvasVersion;
+            Check(!game.CanStart && !game.Start(1) && game.Phase == GamePhase.RoleReveal && game.Round == 1
+                && game.CanvasVersion == canvasVersion, "An ongoing match cannot restart.");
+        }
+
         private static void VerifyTopicPoolAndTimers()
         {
             var data = Data();
@@ -59,7 +165,7 @@ namespace DrawLiar.Editor
                 VoteSeconds = 8, RevealSeconds = 3, GuessSeconds = 11, ResultSeconds = 5
             };
             var game = new GameSession(settings, data, 12);
-            for (int id = 0; id < 3; id++) game.Join(id, "P" + id, 0, 0, "v" + id);
+            for (int id = 0; id < 3; id++) game.Join(id, "P" + id, 0, 0);
             Check(game.Settings.Topics.SequenceEqual(new[] { "동물", "음식" }), "Topic names are unique and nonempty.");
             settings.Topics[0] = "과일";
             var snapshot = game.Snapshot(0, 0, 0);
@@ -105,12 +211,12 @@ namespace DrawLiar.Editor
         {
             var game = new GameSession(new RoomSettings { RebuttalSeconds = 0, Mode = mode, Victory = victory, LiarCount = 2, RoundCount = 1, TargetScore = 5 }, Data(), 42);
             Check(!game.Start(0), "Too few players cannot start.");
-            for (int id = 0; id < 5; id++) Check(game.Join(id, "P" + id, id, 0, "voice-" + id), "Player joins.");
+            for (int id = 0; id < 5; id++) Check(game.Join(id, "P" + id, id, 0), "Player joins.");
             Check(game.Start(0), "Valid match starts.");
             int[] liars = Enumerable.Range(0, 5).Where(id => game.Snapshot(id, 0, 0).LocalIsLiar).ToArray();
             int[] citizens = Enumerable.Range(0, 5).Except(liars).ToArray();
             Check(liars.Length == 2, "Configured liar count.");
-            Check(game.Join(5, "Spectator", 0, 0, "voice-5"), "Late spectator joins.");
+            Check(game.Join(5, "Spectator", 0, 0), "Late spectator joins.");
             Check(game.Snapshot(5, 0, 0).LocalIsSpectator && game.Snapshot(5, 0, 0).Word == "", "Spectator gets no word.");
             Check(game.Snapshot(liars[0], 0, 0).Word == "", "Liar gets no word.");
             Check(game.Snapshot(citizens[0], 0, 0).Word == "사과", "Citizen gets word.");
@@ -184,9 +290,9 @@ namespace DrawLiar.Editor
         private static void VerifyDisconnectsAndNextRound()
         {
             var game = new GameSession(new RoomSettings { RebuttalSeconds = 0, RoundCount = 2 }, Data(), 7);
-            for (int id = 0; id < 4; id++) game.Join(id, "P" + id, 0, 0, "v" + id);
+            for (int id = 0; id < 4; id++) game.Join(id, "P" + id, 0, 0);
             game.Start(0);
-            game.Join(4, "Late", 0, 0, "v4");
+            game.Join(4, "Late", 0, 0);
             double now = 100;
             game.Tick(now);
             int oldArtist = game.ArtistId;
@@ -211,7 +317,7 @@ namespace DrawLiar.Editor
             for (int seed = 0; seed < 100; seed++)
             {
                 game = new GameSession(new RoomSettings { RebuttalSeconds = 0, RoundCount = 1 }, Data(), seed);
-                foreach (int id in new[] { -1, 0, int.MinValue }) game.Join(id, "P" + id, 0, 0, "v" + id);
+                foreach (int id in new[] { -1, 0, int.MinValue }) game.Join(id, "P" + id, 0, 0);
                 Check(!game.EndTurn(-1, 0) && game.Phase == GamePhase.Lobby, "ID -1 cannot skip a non-drawing phase.");
                 game.Start(0);
                 if (game.Snapshot(-1, 0, 0).LocalIsLiar) break;
@@ -258,7 +364,7 @@ namespace DrawLiar.Editor
         private static void VerifyDistinctVictoryConditions()
         {
             var rounds = new GameSession(new RoomSettings { RebuttalSeconds = 0, RoundCount = 3, TargetScore = 1 }, Data(), 10);
-            for (int id = 0; id < 3; id++) rounds.Join(id, "P" + id, 0, 0, "v" + id);
+            for (int id = 0; id < 3; id++) rounds.Join(id, "P" + id, 0, 0);
             rounds.Start(0);
             double now = 0;
             for (int round = 1; round <= 3; round++)
@@ -272,7 +378,7 @@ namespace DrawLiar.Editor
             var pointsData = Data();
             pointsData.Scoring = new ScoreRules { LiarUncaught = 7, LiarCorrectGuess = 11, CitizenCorrectVote = 13 };
             var points = new GameSession(new RoomSettings { RebuttalSeconds = 0, Victory = VictoryMode.TargetScore, RoundCount = 1, TargetScore = 9 }, pointsData, 11);
-            for (int id = 0; id < 3; id++) points.Join(id, "P" + id, 0, 0, "v" + id);
+            for (int id = 0; id < 3; id++) points.Join(id, "P" + id, 0, 0);
             points.Start(0);
             now = 0;
             PlayUnvotedRound(points, ref now);
@@ -297,7 +403,7 @@ namespace DrawLiar.Editor
             data.Scoring = new ScoreRules { LiarUncaught = 7, LiarCorrectGuess = 11, CitizenCorrectVote = 13 };
             data.Topics = data.Topics.Concat(new[] { new TopicData { Name = "우리 주제", Words = new[] { "우리 단어" } } }).ToArray();
             var game = new GameSession(new RoomSettings { RebuttalSeconds = 0, RoundCount = 1, Topics = new[] { "우리 주제" } }, data, 5);
-            for (int id = 0; id < 3; id++) game.Join(id, "P" + id, 0, 0, "v" + id);
+            for (int id = 0; id < 3; id++) game.Join(id, "P" + id, 0, 0);
             game.Start(0);
             var liar = Enumerable.Range(0, 3).Single(id => game.Snapshot(id, 0, 0).LocalIsLiar);
             var citizens = Enumerable.Range(0, 3).Where(id => id != liar).ToArray();

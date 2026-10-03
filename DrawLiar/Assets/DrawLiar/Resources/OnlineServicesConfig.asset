@@ -12,5 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4302eb7400078bd45844bc7646df1310, type: 3}
   m_Name: OnlineServicesConfig
   m_EditorClassIdentifier: Assembly-CSharp::DrawLiar.OnlineServicesConfig
-  EnvironmentName: production
-  SteamAppId: 480
+  _mainServerUrl: https://34.158.195.192:19050
+  _certificateSha256: BAD6EA9A7B25D3052C93577686E6C3626B77391457B02C438F0B92C2CCB48FAC
+  _allowLocalDevelopmentServer: 0

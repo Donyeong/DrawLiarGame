@@ -1,344 +1,295 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
-using Mirror;
+using System.IO;
+using System.Net.WebSockets;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace DrawLiar
 {
-    public struct DrawProfileMessage : NetworkMessage
+    public sealed class DrawNetworkManager : MonoBehaviour
     {
-        public string Name;
-        public int Color, Accessory;
-        public string VoiceId;
-    }
-    public enum DrawRequestKind : byte { Configure, Start, EndTurn, Vote, Guess, Chat, Lobby }
-    public struct DrawRequestMessage : NetworkMessage
-    {
-        public DrawRequestKind Kind;
-        public string Text;
-        public int Target;
-    }
-    public struct DrawStateMessage : NetworkMessage { public string Json; }
-    public struct DrawStrokeMessage : NetworkMessage { public DrawStroke Stroke; }
-    public struct DrawCanvasMessage : NetworkMessage
-    {
-        public int Version;
-        public bool Reset;
-        public DrawStroke[] Strokes;
-    }
-    public struct DrawChatMessage : NetworkMessage { public ChatLine Line; }
-    public struct DrawNoticeMessage : NetworkMessage { public string Text; }
-
-    public sealed class DrawNetworkManager : NetworkManager
-    {
-        private sealed class ClientLimits
+        private const int MAXIMUM_STROKES = 12000;
+        private const int MAXIMUM_FRAME_BYTES = 1024 * 1024;
+        private const int MAXIMUM_PENDING_FRAMES = 512;
+        private sealed class IncomingQueue
         {
-            public double StrokeWindow, RequestWindow, LastChat = -10;
-            public int Strokes, Requests;
-            public bool CanvasFullNotice;
+            public readonly int Generation;
+            public readonly ConcurrentQueue<GameplayEnvelope> Frames = new ConcurrentQueue<GameplayEnvelope>();
+            public int Pending;
+            public string Failure;
+
+            public IncomingQueue(int generation) => Generation = generation;
         }
 
-        // ponytail: replay is capped at 24k segments; add image checkpoints if longer canvases are needed.
-        private const int MaximumStrokes = 24000;
-        private const int CanvasBatchSize = 64;
-        private readonly List<DrawStroke> serverCanvas = new List<DrawStroke>();
-        private readonly List<DrawStroke> localCanvas = new List<DrawStroke>();
-        private readonly Dictionary<int, ClientLimits> limits = new Dictionary<int, ClientLimits>();
-        private RoomSettings pendingSettings = new RoomSettings();
-        private GameSession game;
-        private DrawProfileMessage profile = new DrawProfileMessage { Name = "그림친구", VoiceId = "" };
-        private double nextSnapshot;
-        private int localCanvasVersion;
+        private IncomingQueue _incoming = new IncomingQueue(0);
+        private readonly List<DrawStroke> _canvas = new List<DrawStroke>();
+        private readonly SemaphoreSlim _sendLock = new SemaphoreSlim(1, 1);
+        private WebSocket _socket;
+        private CancellationTokenSource _lifetime;
+        private TaskCompletionSource<bool> _initialState;
+        private int _generation, _pendingSends, _canvasVersion;
+        private long _sequence;
 
         public RoomSnapshot State { get; private set; }
+        public bool IsConnected => _socket != null && _socket.State == WebSocketState.Open && State != null;
         public int LocalPlayerId => State?.LocalPlayerId ?? -1;
-        public int CanvasVersion => localCanvasVersion;
-        public bool CanDraw => NetworkClient.isConnected && State != null && State.Phase == GamePhase.Drawing
-            && State.ArtistId == LocalPlayerId && !State.LocalIsSpectator;
+        public int CanvasVersion => _canvasVersion;
+        public bool CanDraw => IsConnected && State.Phase == GamePhase.Drawing && State.ArtistId == LocalPlayerId && !State.LocalIsSpectator;
         public event Action<RoomSnapshot> StateChanged;
         public event Action<DrawStroke> StrokeReceived;
         public event Action CanvasCleared;
         public event Action<ChatLine> ChatReceived;
         public event Action<string> Notice;
 
+        public async Task ConnectAsync(DedicatedAssignment assignment)
+        {
+            if (assignment == null || string.IsNullOrEmpty(assignment.JoinTicket)) throw new ArgumentException("방 입장권이 없습니다.");
+            Leave();
+            var uri = new Uri(assignment.DedicatedUrl);
+            if (uri.Scheme != "ws" && uri.Scheme != "wss") throw new ArgumentException("데디케이티드 주소가 올바르지 않습니다.");
+            var config = OnlineServicesConfig.Load();
+            config.ValidateServerUrl(assignment.DedicatedUrl);
+            int generation = _generation;
+            var lifetime = _lifetime = new CancellationTokenSource();
+            var ready = _initialState = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            try
+            {
+                using (var timeout = CancellationTokenSource.CreateLinkedTokenSource(lifetime.Token))
+                {
+                    timeout.CancelAfter(TimeSpan.FromSeconds(20));
+                    var socket = await DrawWebSocketClient.ConnectAsync(uri, config.CertificateSha256, timeout.Token);
+                    if (generation != _generation) { socket.Dispose(); throw new OperationCanceledException(); }
+                    _socket = socket;
+                    await SendAsync(new GameplayEnvelope { Type = "hello", Ticket = assignment.JoinTicket, RoomId = assignment.RoomId }, generation, timeout.Token);
+                    _ = ReceiveAsync(socket, generation, lifetime.Token);
+                    var completed = await Task.WhenAny(ready.Task, Task.Delay(TimeSpan.FromSeconds(20), lifetime.Token));
+                    if (completed != ready.Task) throw new TimeoutException("방 상태를 받지 못했습니다.");
+                    await ready.Task;
+                }
+            }
+            catch
+            {
+                if (generation == _generation) Leave();
+                throw;
+            }
+        }
+
         public void ConfigureRoom(RoomSettings settings)
         {
-            if (settings == null) return;
-            pendingSettings = settings.Copy();
-            pendingSettings.Topics ??= GameDataStore.Load().Topics.Select(topic => topic.Name).ToArray();
-            pendingSettings.Validate();
-            if (!NetworkServer.active) maxConnections = pendingSettings.MaxPlayers;
-            if (NetworkClient.isConnected) Request(DrawRequestKind.Configure, JsonUtility.ToJson(pendingSettings));
+            if (settings == null || !IsConnected) return;
+            var valid = settings.Copy();
+            valid.Validate();
+            Send(new GameplayEnvelope { Type = "request", Kind = "configure", Settings = valid });
         }
 
-        public void SetProfile(string name, int color, int accessory, string voiceId)
-        {
-            profile = new DrawProfileMessage
-            {
-                Name = GameRules.CleanText(name, 16, "그림친구"), Color = Mathf.Clamp(color, 0, 7),
-                Accessory = Mathf.Clamp(accessory, 0, 3), VoiceId = GameRules.CleanText(voiceId, 80)
-            };
-            if (NetworkClient.isConnected) NetworkClient.Send(profile);
-        }
-
-        public void StartMatch() => Request(DrawRequestKind.Start);
-        public void EndTurn() => Request(DrawRequestKind.EndTurn);
-        public void Vote(int id) => Request(DrawRequestKind.Vote, target: id);
-        public void Guess(string answer) => Request(DrawRequestKind.Guess, GameRules.CleanText(answer, 40));
-        public void Chat(string text) => Request(DrawRequestKind.Chat, GameRules.CleanText(text, 160));
-        public void ReturnToLobby() => Request(DrawRequestKind.Lobby);
+        public void StartMatch() => Request("start");
+        public void EndTurn() => Request("endTurn");
+        public void Vote(int id) => Request("vote", target: id);
+        public void Guess(string answer) => Request("guess", GameRules.CleanText(answer, 40));
+        public void Chat(string text) => Request("chat", GameRules.CleanText(text, 160));
+        public void ReturnToLobby() => Request("lobby");
 
         public void SendStroke(DrawStroke stroke)
         {
             if (!CanDraw) return;
-            stroke.CanvasVersion = CanvasVersion;
-            if (GameRules.ValidStroke(stroke, CanvasVersion)) NetworkClient.Send(new DrawStrokeMessage { Stroke = stroke });
+            stroke.CanvasVersion = _canvasVersion;
+            if (GameRules.ValidStroke(stroke, _canvasVersion)) Send(new GameplayEnvelope { Type = "stroke", Stroke = stroke });
         }
 
         public void ReplayCanvas()
         {
             CanvasCleared?.Invoke();
-            foreach (var stroke in localCanvas) StrokeReceived?.Invoke(stroke);
+            foreach (var stroke in _canvas) StrokeReceived?.Invoke(stroke);
         }
 
         public void Leave()
         {
-            if (NetworkServer.active && NetworkClient.active) StopHost();
-            else if (NetworkClient.active) StopClient();
-            else if (NetworkServer.active) StopServer();
-        }
-
-        public override void OnStartServer()
-        {
-            autoCreatePlayer = false;
-            game = new GameSession(pendingSettings, GameDataStore.Load());
-            game.Changed += BroadcastState;
-            game.CanvasCleared += ClearServerCanvas;
-            serverCanvas.Clear();
-            limits.Clear();
-            NetworkServer.RegisterHandler<DrawProfileMessage>(ReceiveProfile);
-            NetworkServer.RegisterHandler<DrawRequestMessage>(ReceiveRequest);
-            NetworkServer.RegisterHandler<DrawStrokeMessage>(ReceiveStroke);
-        }
-
-        public override void OnStartClient()
-        {
-            autoCreatePlayer = false;
-            NetworkClient.RegisterHandler<DrawStateMessage>(message =>
-            {
-                State = JsonUtility.FromJson<RoomSnapshot>(message.Json);
-                StateChanged?.Invoke(State);
-            });
-            NetworkClient.RegisterHandler<DrawStrokeMessage>(message => ReceiveLocalStroke(message.Stroke));
-            NetworkClient.RegisterHandler<DrawCanvasMessage>(ReceiveCanvas);
-            NetworkClient.RegisterHandler<DrawChatMessage>(message => ChatReceived?.Invoke(message.Line));
-            NetworkClient.RegisterHandler<DrawNoticeMessage>(message => Notice?.Invoke(message.Text));
-        }
-
-        public override void OnClientConnect()
-        {
-            base.OnClientConnect();
-            NetworkClient.Send(profile);
-        }
-
-        public override void OnServerConnect(NetworkConnectionToClient connection)
-        {
-            limits[connection.connectionId] = new ClientLimits();
-        }
-
-        public override void OnServerDisconnect(NetworkConnectionToClient connection)
-        {
-            game?.Disconnect(connection.connectionId, Time.unscaledTimeAsDouble);
-            limits.Remove(connection.connectionId);
-            base.OnServerDisconnect(connection);
-        }
-
-        public override void OnClientDisconnect()
-        {
+            int generation = Interlocked.Increment(ref _generation);
+            _lifetime?.Cancel();
+            _lifetime?.Dispose();
+            _lifetime = null;
+            _socket?.Abort();
+            _socket?.Dispose();
+            _socket = null;
+            _initialState?.TrySetCanceled();
+            _initialState = null;
+            Interlocked.Exchange(ref _incoming, new IncomingQueue(generation));
+            _sequence = 0;
+            _canvas.Clear();
+            _canvasVersion = 0;
             State = null;
-            localCanvas.Clear();
-            localCanvasVersion = 0;
             CanvasCleared?.Invoke();
             StateChanged?.Invoke(null);
-            Notice?.Invoke("방 연결이 종료되었어요. 방장이 나가면 방이 닫힙니다.");
         }
 
-        public override void OnClientError(TransportError error, string reason)
+        public async Task LeaveAsync()
         {
-            Notice?.Invoke("연결 오류: " + reason);
-        }
-
-        public override void OnStopServer()
-        {
-            if (game != null)
+            int generation = _generation;
+            var socket = _socket;
+            if (socket != null && socket.State == WebSocketState.Open)
             {
-                game.Changed -= BroadcastState;
-                game.CanvasCleared -= ClearServerCanvas;
-            }
-            game = null;
-            serverCanvas.Clear();
-            limits.Clear();
-        }
-
-        public override void Update()
-        {
-            base.Update();
-            if (!NetworkServer.active || game == null) return;
-            double now = Time.unscaledTimeAsDouble;
-            game.Tick(now);
-            if (now >= nextSnapshot)
-            {
-                nextSnapshot = now + .5;
-                BroadcastState();
-            }
-        }
-
-        private void Request(DrawRequestKind kind, string text = "", int target = -1)
-        {
-            if (NetworkClient.isConnected) NetworkClient.Send(new DrawRequestMessage { Kind = kind, Text = text, Target = target });
-        }
-
-        private bool AllowRequest(NetworkConnectionToClient connection)
-        {
-            if (!limits.TryGetValue(connection.connectionId, out var rate)) return false;
-            double now = Time.unscaledTimeAsDouble;
-            if (now - rate.RequestWindow >= 1) { rate.RequestWindow = now; rate.Requests = 0; }
-            return ++rate.Requests <= 15;
-        }
-
-        private void ReceiveProfile(NetworkConnectionToClient connection, DrawProfileMessage message)
-        {
-            if (game == null || !AllowRequest(connection)) return;
-            if ((message.Name?.Length ?? 0) > 100 || (message.VoiceId?.Length ?? 0) > 100) return;
-            int id = connection.connectionId;
-            if (game.Contains(id)) game.UpdateProfile(id, message.Name, message.Color, message.Accessory, message.VoiceId);
-            else if (game.Join(id, message.Name, message.Color, message.Accessory, message.VoiceId)) SendCanvas(connection);
-            else
-            {
-                connection.Send(new DrawNoticeMessage { Text = "방이 가득 찼어요." });
-                connection.Disconnect();
-            }
-        }
-
-        private void ReceiveRequest(NetworkConnectionToClient connection, DrawRequestMessage request)
-        {
-            if (game == null || !game.Contains(connection.connectionId) || !AllowRequest(connection)) return;
-            double now = Time.unscaledTimeAsDouble;
-            bool host = connection == NetworkServer.localConnection;
-            int textLimit = host && request.Kind == DrawRequestKind.Configure ? 32768 : 2048;
-            if ((request.Text?.Length ?? 0) > textLimit) return;
-            switch (request.Kind)
-            {
-                case DrawRequestKind.Configure:
-                    if (host)
+                using (var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(2)))
+                {
+                    try
                     {
-                        try
-                        {
-                            var settings = JsonUtility.FromJson<RoomSettings>(request.Text);
-                            if (settings != null && game.Configure(settings))
-                            {
-                                maxConnections = game.Settings.MaxPlayers;
-                                NetworkServer.maxConnections = maxConnections;
-                            }
-                        }
-                        catch (ArgumentException) { SendNotice(connection, "방 설정을 읽을 수 없어요."); }
+                        await _sendLock.WaitAsync(timeout.Token);
+                        try { await socket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "", timeout.Token); }
+                        finally { _sendLock.Release(); }
                     }
-                    break;
-                case DrawRequestKind.Start:
-                    if (host && !game.Start(now, GameDataStore.Load())) SendNotice(connection, "참가자는 최소 3명이며 라이어보다 많아야 합니다. 사용할 주제도 하나 이상 선택해 주세요.");
-                    break;
-                case DrawRequestKind.EndTurn: game.EndTurn(connection.connectionId, now); break;
-                case DrawRequestKind.Vote:
-                    if (!game.Vote(connection.connectionId, request.Target, now)) SendNotice(connection, "투표할 수 없어요. 다른 참가자에게 한 번만 투표해 주세요.");
-                    break;
-                case DrawRequestKind.Guess:
-                    if (!game.Guess(connection.connectionId, request.Text, now)) SendNotice(connection, "정답 추측은 라이어가 추측 시간에 한 번만 제출할 수 있어요.");
-                    break;
-                case DrawRequestKind.Chat:
-                    ReceiveChat(connection, request.Text, now);
-                    break;
-                case DrawRequestKind.Lobby:
-                    if (host && game.Phase == GamePhase.MatchResults) game.ReturnToLobby();
-                    break;
+                    catch (Exception exception) when (exception is WebSocketException || exception is OperationCanceledException || exception is ObjectDisposedException) { }
+                }
+            }
+            if (generation == _generation) Leave();
+        }
+
+        private void Request(string kind, string text = "", int target = -1)
+        {
+            if (IsConnected) Send(new GameplayEnvelope { Type = "request", Kind = kind, Text = text, Target = target });
+        }
+
+        private void Send(GameplayEnvelope envelope)
+        {
+            if (_lifetime != null) _ = SendObservedAsync(envelope, _generation, _lifetime.Token);
+        }
+
+        private async Task SendObservedAsync(GameplayEnvelope envelope, int generation, CancellationToken cancellation)
+        {
+            try { await SendAsync(envelope, generation, cancellation); }
+            catch (Exception exception) when (exception is WebSocketException || exception is IOException || exception is OperationCanceledException || exception is ObjectDisposedException)
+            {
+                if (generation == _generation && !cancellation.IsCancellationRequested)
+                    Enqueue(new GameplayEnvelope { Type = "disconnected", Text = "서버 연결이 끊겼습니다." }, generation);
             }
         }
 
-        private void ReceiveChat(NetworkConnectionToClient connection, string text, double now)
+        private async Task SendAsync(GameplayEnvelope envelope, int generation, CancellationToken cancellation)
         {
-            var rate = limits[connection.connectionId];
-            text = GameRules.CleanText(text, 160);
-            if (text.Length == 0 || now - rate.LastChat < .7) return;
-            rate.LastChat = now;
-            var line = new ChatLine { PlayerId = connection.connectionId, Name = game.PlayerName(connection.connectionId), Text = text };
-            NetworkServer.SendToAll(new DrawChatMessage { Line = line }, sendToReadyOnly: true);
+            if (Interlocked.Increment(ref _pendingSends) > MAXIMUM_PENDING_FRAMES)
+            {
+                Interlocked.Decrement(ref _pendingSends);
+                throw new IOException("송신 대기열이 가득 찼습니다.");
+            }
+            try
+            {
+                await _sendLock.WaitAsync(cancellation);
+                try
+                {
+                    var socket = _socket;
+                    if (generation != Volatile.Read(ref _generation) || socket == null) return;
+                    var bytes = Encoding.UTF8.GetBytes(JsonUtility.ToJson(envelope));
+                    await socket.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Text, true, cancellation);
+                }
+                finally { _sendLock.Release(); }
+            }
+            finally { Interlocked.Decrement(ref _pendingSends); }
         }
 
-        private void ReceiveStroke(NetworkConnectionToClient connection, DrawStrokeMessage message)
+        private async Task ReceiveAsync(WebSocket socket, int generation, CancellationToken cancellation)
         {
-            if (game == null || game.Phase != GamePhase.Drawing || game.ArtistId != connection.connectionId || !GameRules.ValidStroke(message.Stroke, game.CanvasVersion)
-                || !limits.TryGetValue(connection.connectionId, out var rate)) return;
-            double now = Time.unscaledTimeAsDouble;
-            if (now - rate.StrokeWindow >= 1) { rate.StrokeWindow = now; rate.Strokes = 0; }
-            if (++rate.Strokes > 180) return;
-            if (serverCanvas.Count >= MaximumStrokes)
+            var buffer = new byte[8192];
+            try
             {
-                if (!rate.CanvasFullNotice) SendNotice(connection, "이 도화지가 가득 찼어요. 턴을 마치고 다음 그림을 기다려 주세요.");
-                rate.CanvasFullNotice = true;
+                while (!cancellation.IsCancellationRequested && socket.State == WebSocketState.Open)
+                {
+                    using (var frame = new MemoryStream())
+                    {
+                        WebSocketReceiveResult result;
+                        do
+                        {
+                            result = await socket.ReceiveAsync(new ArraySegment<byte>(buffer), cancellation);
+                            if (result.MessageType == WebSocketMessageType.Close) throw new IOException("서버가 연결을 종료했습니다.");
+                            if (result.MessageType != WebSocketMessageType.Text || frame.Length + result.Count > MAXIMUM_FRAME_BYTES) throw new IOException("서버 메시지가 올바르지 않습니다.");
+                            frame.Write(buffer, 0, result.Count);
+                        } while (!result.EndOfMessage);
+                        var envelope = JsonUtility.FromJson<GameplayEnvelope>(Encoding.UTF8.GetString(frame.ToArray()));
+                        if (envelope == null || !Enqueue(envelope, generation)) throw new IOException("수신 대기열이 가득 찼습니다.");
+                    }
+                }
+            }
+            catch (Exception exception) when (exception is WebSocketException || exception is IOException || exception is OperationCanceledException || exception is ObjectDisposedException || exception is ArgumentException)
+            {
+                if (!cancellation.IsCancellationRequested && generation == _generation)
+                    Enqueue(new GameplayEnvelope { Type = "disconnected", Text = "서버 연결이 종료되었습니다. 로비에서 다시 참가할 수 있습니다." }, generation);
+            }
+        }
+
+        private bool Enqueue(GameplayEnvelope envelope, int generation)
+        {
+            var incoming = Volatile.Read(ref _incoming);
+            var socket = _socket;
+            if (generation != incoming.Generation || generation != Volatile.Read(ref _generation)) return false;
+            if (Interlocked.Increment(ref incoming.Pending) > MAXIMUM_PENDING_FRAMES)
+            {
+                Interlocked.Decrement(ref incoming.Pending);
+                Interlocked.CompareExchange(ref incoming.Failure, "수신 대기열이 가득 차 연결을 종료했습니다.", null);
+                socket?.Abort();
+                return false;
+            }
+            incoming.Frames.Enqueue(envelope);
+            return true;
+        }
+
+        private void Update()
+        {
+            var incoming = Volatile.Read(ref _incoming);
+            var failure = Interlocked.Exchange(ref incoming.Failure, null);
+            if (failure != null && incoming.Generation == Volatile.Read(ref _generation))
+            {
+                _initialState?.TrySetException(new IOException(failure));
+                Leave();
+                Notice?.Invoke(failure);
                 return;
             }
-            serverCanvas.Add(message.Stroke);
-            NetworkServer.SendToAll(message, sendToReadyOnly: true);
-        }
-
-        private void BroadcastState()
-        {
-            if (game == null || !NetworkServer.active) return;
-            foreach (var connection in NetworkServer.connections.Values)
+            for (int count = 0; count < 128 && incoming.Frames.TryDequeue(out var message); count++)
             {
-                if (connection == null || !connection.isAuthenticated || !game.Contains(connection.connectionId)) continue;
-                var snapshot = game.Snapshot(connection.connectionId, NetworkServer.localConnection?.connectionId ?? -1, Time.unscaledTimeAsDouble);
-                connection.Send(new DrawStateMessage { Json = JsonUtility.ToJson(snapshot) });
+                Interlocked.Decrement(ref incoming.Pending);
+                if (incoming.Generation != Volatile.Read(ref _generation)) break;
+                if (message.Sequence > 0)
+                {
+                    if (message.Sequence <= _sequence) continue;
+                    _sequence = message.Sequence;
+                }
+                switch (message.Type)
+                {
+                    case "state":
+                        State = message.State;
+                        var ready = _initialState;
+                        StateChanged?.Invoke(State);
+                        if (State != null && incoming.Generation == Volatile.Read(ref _generation)) ready?.TrySetResult(true);
+                        break;
+                    case "canvas":
+                        if (message.Reset)
+                        {
+                            _canvas.Clear();
+                            _canvasVersion = message.Version;
+                            CanvasCleared?.Invoke();
+                        }
+                        if (message.Version == _canvasVersion && message.Strokes != null)
+                            foreach (var stroke in message.Strokes) ReceiveStroke(stroke);
+                        break;
+                    case "stroke": ReceiveStroke(message.Stroke); break;
+                    case "chat": ChatReceived?.Invoke(message.Line); break;
+                    case "notice": Notice?.Invoke(message.Text); break;
+                    case "disconnected":
+                        _initialState?.TrySetException(new IOException(message.Text));
+                        Leave();
+                        Notice?.Invoke(message.Text);
+                        break;
+                }
             }
         }
 
-        private void ClearServerCanvas()
+        private void ReceiveStroke(DrawStroke stroke)
         {
-            serverCanvas.Clear();
-            foreach (var rate in limits.Values) rate.CanvasFullNotice = false;
-            if (NetworkServer.active) NetworkServer.SendToAll(new DrawCanvasMessage
-                { Version = game.CanvasVersion, Reset = true, Strokes = Array.Empty<DrawStroke>() }, sendToReadyOnly: true);
-        }
-
-        private void SendCanvas(NetworkConnectionToClient connection)
-        {
-            connection.Send(new DrawCanvasMessage { Version = game.CanvasVersion, Reset = true, Strokes = Array.Empty<DrawStroke>() });
-            for (int offset = 0; offset < serverCanvas.Count; offset += CanvasBatchSize)
-            {
-                int count = Math.Min(CanvasBatchSize, serverCanvas.Count - offset);
-                connection.Send(new DrawCanvasMessage { Version = game.CanvasVersion, Strokes = serverCanvas.GetRange(offset, count).ToArray() });
-            }
-        }
-
-        private void ReceiveCanvas(DrawCanvasMessage message)
-        {
-            if (message.Reset)
-            {
-                localCanvas.Clear();
-                localCanvasVersion = message.Version;
-                CanvasCleared?.Invoke();
-            }
-            if (message.Version != localCanvasVersion || message.Strokes == null) return;
-            foreach (var stroke in message.Strokes) ReceiveLocalStroke(stroke);
-        }
-
-        private void ReceiveLocalStroke(DrawStroke stroke)
-        {
-            if (stroke.CanvasVersion != localCanvasVersion || localCanvas.Count >= MaximumStrokes) return;
-            localCanvas.Add(stroke);
+            if (!GameRules.ValidStroke(stroke, _canvasVersion) || _canvas.Count >= MAXIMUM_STROKES) return;
+            _canvas.Add(stroke);
             StrokeReceived?.Invoke(stroke);
         }
 
-        private static void SendNotice(NetworkConnectionToClient connection, string text) => connection.Send(new DrawNoticeMessage { Text = text });
+        private void OnDestroy() => Leave();
     }
 }

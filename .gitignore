@@ -87,9 +87,15 @@ sysinfo.txt
 
 # Output
 /Tools/Preview/
+/DrawLiar/output/
 /DrawLiar/.utmp/
 /.codex-temp/
 /Private/
+/Server/**/bin/
+/Server/**/obj/
+/Tools/**/__pycache__/
+/Tools/Firebase/node_modules/
+/Tools/Docker/.env
 *.pfx
 *.p12
 *.key

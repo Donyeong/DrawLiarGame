@@ -30,4 +30,4 @@
 - F:\Works\KonaSurvival
 - F:\Works\Projects\ProjectRa\ProjectRA
 
-## Network는 Mirror을 사용한다
+## 네트워크 변경 시 AgentGuide/Network.md를 참조한다.

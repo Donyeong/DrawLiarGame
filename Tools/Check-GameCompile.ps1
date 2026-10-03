@@ -49,5 +49,5 @@ $arguments += @($sources | Sort-Object | ForEach-Object { '"' + $_ + '"' })
 Write-Host "Checking $($sources.Count) source files against $($references.Count) imported Unity assemblies."
 & $dotnetPath $compilerPath "@$responsePath"
 $compileExitCode = $LASTEXITCODE
-if ($compileExitCode -eq 0) { Write-Host 'C# compilation passed. Unity import, Mirror weaving, and runtime validation are still required.' }
+if ($compileExitCode -eq 0) { Write-Host 'C# compilation passed. Unity import and runtime validation are still required.' }
 exit $compileExitCode

@@ -1,0 +1,29 @@
+pipeline {
+    agent { node { label 'built-in'; customWorkspace 'C:\\DrawLiar' } }
+    options { disableConcurrentBuilds(); timestamps(); buildDiscarder(logRotator(numToKeepStr: '10')) }
+    parameters {
+        string(name: 'VM_HOST', defaultValue: '34.158.195.192', description: 'Ubuntu 24.04 서버')
+        string(name: 'SSH_CREDENTIAL_ID', defaultValue: 'konasurvival-ubuntu-ssh', description: '기존 Jenkins 배포 SSH 인증')
+        string(name: 'KNOWN_HOSTS_CREDENTIAL_ID', defaultValue: 'konasurvival-ubuntu-known-hosts', description: '검증한 SSH 호스트 키')
+        booleanParam(name: 'DEPLOY_TO_VM', defaultValue: true, description: 'DrawLiar 서버 배포')
+    }
+    stages {
+        stage('Build Linux Servers') {
+            steps { powershell '& ./Tools/LinuxServer/Build-Servers.ps1 -RepositoryPath $env:WORKSPACE' }
+        }
+        stage('Deploy DrawLiar') {
+            when { expression { params.DEPLOY_TO_VM } }
+            steps {
+                withCredentials([
+                    sshUserPrivateKey(credentialsId: params.SSH_CREDENTIAL_ID, keyFileVariable: 'DRAWLIAR_SSH_KEY', usernameVariable: 'DRAWLIAR_SSH_USER'),
+                    file(credentialsId: params.KNOWN_HOSTS_CREDENTIAL_ID, variable: 'DRAWLIAR_KNOWN_HOSTS')
+                ]) {
+                    withEnv(["DRAWLIAR_VM_HOST=${params.VM_HOST ?: '34.158.195.192'}"]) {
+                        powershell '& ./Tools/Jenkins/Deploy-Servers.ps1 -VmHost $env:DRAWLIAR_VM_HOST'
+                    }
+                }
+            }
+        }
+    }
+    post { always { archiveArtifacts artifacts: 'Build/LinuxServer/**', allowEmptyArchive: true } }
+}

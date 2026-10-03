@@ -1,0 +1,6 @@
+FROM ubuntu:24.04
+RUN mkdir -p /etc/postgresql-common && printf 'create_main_cluster = false\n' > /etc/postgresql-common/createcluster.conf && apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends postgresql-16 ca-certificates && rm -rf /var/lib/apt/lists/*
+ENV PATH=/usr/lib/postgresql/16/bin:$PATH PGDATA=/var/lib/postgresql/data
+COPY --chmod=0755 postgres-entrypoint.sh /usr/local/bin/
+ENTRYPOINT ["/usr/local/bin/postgres-entrypoint.sh"]
+STOPSIGNAL SIGINT

@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DrawLiar.Shared\DrawLiar.Shared.csproj" />
+    <Compile Include="..\..\DrawLiar\Assets\DrawLiar\Scripts\Game\GameModels.cs" Link="GameModels.cs" />
+    <Compile Include="..\..\DrawLiar\Assets\DrawLiar\Scripts\Game\GameRules.cs" Link="GameRules.cs" />
+    <Compile Include="..\..\DrawLiar\Assets\DrawLiar\Scripts\Game\GameSession.cs" Link="GameSession.cs" />
+    <Compile Include="..\..\DrawLiar\Assets\DrawLiar\Scripts\Game\GameplayEnvelope.cs" Link="GameplayEnvelope.cs" />
+    <Compile Include="..\..\DrawLiar\Assets\DrawLiar\Scripts\Game\Editor\GameSelfCheck.cs" Link="GameSelfCheck.cs" />
+    <Compile Include="..\DrawLiar.DedicatedServer\DedicatedRoom.cs" Link="Dedicated\DedicatedRoom.cs" />
+    <Compile Include="..\DrawLiar.DedicatedServer\GameConnection.cs" Link="Dedicated\GameConnection.cs" />
+    <Compile Include="..\DrawLiar.DedicatedServer\GameplayWire.cs" Link="Dedicated\GameplayWire.cs" />
+  </ItemGroup>
+</Project>

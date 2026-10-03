@@ -1,360 +1,354 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-using Mirror;
-using Unity.Services.Authentication;
-using Unity.Services.Core;
-using Unity.Services.Core.Environments;
-using Unity.Services.Lobbies;
-using Unity.Services.Lobbies.Models;
-using Unity.Services.Relay;
-using Unity.Services.Relay.Models;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace DrawLiar
 {
     public sealed class PublicRoomInfo
     {
         public string Id;
+        public string Code;
         public string Name;
         public int Players;
         public int MaxPlayers;
+        public int Spectators;
+        public bool IsInProgress;
     }
 
     [DisallowMultipleComponent]
     public sealed class LobbyServiceBridge : MonoBehaviour
     {
-        const string RelayKey = "relay";
-        const string ProtocolKey = "protocol";
-        const string ProtocolVersion = "drawliar-2";
-        readonly List<PublicRoomInfo> publicRooms = new List<PublicRoomInfo>();
-        DrawNetworkManager manager;
-        RelayMirrorTransport relayTransport;
-        Lobby lobby;
-        string originalHost;
-        bool hosting;
-        bool maintaining;
-        bool quitting;
-        float nextMaintenance;
-        Task authenticationTask;
+        private readonly List<PublicRoomInfo> _publicRooms = new List<PublicRoomInfo>();
+        private DrawNetworkManager _manager;
+        private OnlineServicesConfig _config;
+        private string _mainSession = "", _gameSession = "", _gameServerUrl = "", _roomCode = "";
+        private CancellationToken _lifetime;
+        private CancellationTokenSource _googleCancellation;
 
-        public string RoomCode => lobby?.LobbyCode ?? "";
-        public string Status { get; private set; } = "친구를 초대해 함께 그려보세요.";
+        public string RoomCode => _roomCode;
+        public bool IsGoogleSigningIn => _googleCancellation != null;
+        public string Status { get; private set; } = "게스트 또는 Google 계정으로 시작하세요.";
         public bool IsBusy { get; private set; }
-        public bool IsOnlineRoom => lobby != null;
-        public IReadOnlyList<PublicRoomInfo> PublicRooms => publicRooms;
+        public bool IsOnlineRoom => _manager != null && _manager.IsConnected;
+        public bool IsAuthenticated => !string.IsNullOrEmpty(_gameSession);
+        public ProfileData Profile { get; private set; }
+        public FriendListResponse Friends { get; private set; } = new FriendListResponse();
+        public ShopResponse Shop { get; private set; } = new ShopResponse();
+        public IReadOnlyList<PublicRoomInfo> PublicRooms => _publicRooms;
         public event Action Changed;
+        public event Action ProfileChanged;
 
-        public void Initialize(DrawNetworkManager networkManager)
+        public void Initialize(DrawNetworkManager manager)
         {
-            manager = networkManager;
-            relayTransport = GetComponent<RelayMirrorTransport>();
-            if (relayTransport == null) relayTransport = gameObject.AddComponent<RelayMirrorTransport>();
+            _manager = manager;
+            _lifetime = destroyCancellationToken;
+            _config = OnlineServicesConfig.Load();
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            string[] arguments = Environment.GetCommandLineArgs();
+            int index = Array.IndexOf(arguments, "-drawMainServer");
+            if (index >= 0 && index + 1 < arguments.Length) _config.SetDevelopmentServer(arguments[index + 1]);
+#endif
+            _manager.StateChanged += OnRoomState;
         }
 
-        async Task AuthenticateAsync()
+        private void OnRoomState(RoomSnapshot state)
         {
-            if (authenticationTask != null)
+            if (state == null) _roomCode = "";
+            Changed?.Invoke();
+        }
+
+        public Task GuestLoginAsync() => RunAsync(async () =>
+        {
+            var credentials = DrawGuestCredentialStore.GetOrCreate();
+            await EnterOutgameAsync(await SendAsync<LoginResponse>(_config.MainServerUrl, "/api/auth/guest", "POST",
+                new GuestLoginRequest { GuestId = credentials.GuestId, GuestSecret = credentials.GuestSecret }));
+        });
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        public Task DevelopmentLoginAsync(string displayName) => RunAsync(async () =>
+        {
+            await EnterOutgameAsync(await SendAsync<LoginResponse>(_config.MainServerUrl, "/api/auth/development", "POST",
+                new DevelopmentLoginRequest { DisplayName = displayName }));
+        });
+#endif
+
+        private async Task EnterOutgameAsync(LoginResponse login)
+        {
+            if (login == null || string.IsNullOrEmpty(login.SessionToken) || string.IsNullOrEmpty(login.AssignmentToken))
+                throw new InvalidOperationException("서버 로그인 응답을 확인할 수 없습니다.");
+            _config.ValidateServerUrl(login.GameServerUrl);
+            var session = await SendAsync<GameSessionResponse>(login.GameServerUrl, "/api/session/enter", "POST",
+                new EnterGameRequest { AssignmentToken = login.AssignmentToken });
+            if (string.IsNullOrEmpty(session.SessionToken) || session.Profile == null || session.Profile.AccountId != login.AccountId)
+                throw new InvalidOperationException("서버 로그인 응답을 확인할 수 없습니다.");
+            _mainSession = login.SessionToken;
+            _gameServerUrl = login.GameServerUrl.TrimEnd('/');
+            _gameSession = session.SessionToken;
+            SetProfile(session.Profile);
+            SetStatus("로그인했습니다. 방을 만들거나 참가하세요.");
+        }
+
+        public Task GoogleLoginAsync(bool link = false) => RunAsync(async () =>
+        {
+            if (link && string.IsNullOrEmpty(_mainSession)) throw new InvalidOperationException("먼저 로그인해 주세요.");
+            using var cancellation = CancellationTokenSource.CreateLinkedTokenSource(_lifetime);
+            cancellation.CancelAfter(TimeSpan.FromMinutes(4));
+            _googleCancellation = cancellation;
+            try
             {
-                await authenticationTask;
-                return;
+                var challenge = await SendAsync<GoogleChallengeResponse>(_config.MainServerUrl, "/api/auth/google/challenge", "POST",
+                    new GoogleChallengeRequest { Platform = GoogleAccountProvider.Platform }, link ? _mainSession : "");
+                SetStatus("Google 계정 인증을 완료해 주세요.");
+                var request = await GoogleAccountProvider.AuthenticateAsync(challenge, cancellation.Token);
+                cancellation.Token.ThrowIfCancellationRequested();
+                _googleCancellation = null;
+                SetStatus(link ? "Google 계정을 연동하고 있습니다…" : "Google 로그인 정보를 확인하고 있습니다…");
+                if (link)
+                {
+                    SetProfile(await SendAsync<ProfileData>(_config.MainServerUrl, "/api/auth/google/link", "POST", request, _mainSession));
+                    SetStatus("Google 계정을 연동했습니다.");
+                }
+                else await EnterOutgameAsync(await SendAsync<LoginResponse>(_config.MainServerUrl, "/api/auth/google", "POST", request));
             }
-            authenticationTask = AuthenticateCoreAsync();
-            try { await authenticationTask; }
-            finally { authenticationTask = null; }
-        }
+            finally { _googleCancellation = null; }
+        });
 
-        async Task AuthenticateCoreAsync()
+        public void CancelGoogleLogin() => _googleCancellation?.Cancel();
+
+        public Task SaveProfileAsync(string displayName, int avatarColor, int accessory) => RunAsync(async () =>
         {
-            var config = Resources.Load<OnlineServicesConfig>("OnlineServicesConfig");
-            if (UnityServices.State != ServicesInitializationState.Initialized)
-            {
-                var options = new InitializationOptions();
-                options.SetEnvironmentName(config != null ? config.EnvironmentName : "production");
-                string[] args = Environment.GetCommandLineArgs();
-                for (int i = 0; i + 1 < args.Length; i++)
-                    if (args[i] == "-ugsProfile") options.SetProfile(args[i + 1]);
-                await UnityServices.InitializeAsync(options);
-            }
-            if (!AuthenticationService.Instance.IsSignedIn || AuthenticationService.Instance.IsExpired)
-                await AuthenticationService.Instance.SignInAnonymouslyAsync();
-        }
+            RequireLogin();
+            SetProfile(await SendGameAsync<ProfileData>("/api/profile", "PATCH",
+                new UpdateProfileRequest { DisplayName = displayName.Trim(), AvatarColor = avatarColor, Accessory = accessory }));
+            SetStatus("캐릭터를 저장했습니다.");
+        });
+
+        public Task RefreshFriendsAsync() => RunAsync(async () =>
+        {
+            RequireLogin(); Friends = await SendGameAsync<FriendListResponse>("/api/friends", "GET");
+            SetStatus("친구 목록을 갱신했습니다.");
+        });
+
+        public Task RequestFriendAsync(string accountId) => RunAsync(async () =>
+        {
+            RequireLogin();
+            await SendGameAsync<ApiError>("/api/friends/request", "POST", new FriendRequest { AccountId = accountId.Trim() });
+            Friends = await SendGameAsync<FriendListResponse>("/api/friends", "GET");
+            SetStatus("친구 요청을 보냈습니다.");
+        });
+
+        public Task RespondFriendAsync(string accountId, bool accept) => RunAsync(async () =>
+        {
+            RequireLogin();
+            await SendGameAsync<ApiError>("/api/friends/respond", "POST", new FriendRespondRequest { AccountId = accountId, Accept = accept });
+            Friends = await SendGameAsync<FriendListResponse>("/api/friends", "GET");
+            SetStatus(accept ? "친구 요청을 수락했습니다." : "친구 요청을 거절했습니다.");
+        });
+
+        public Task RemoveFriendAsync(string accountId) => RunAsync(async () =>
+        {
+            RequireLogin(); await SendGameAsync<ApiError>("/api/friends/" + Uri.EscapeDataString(accountId), "DELETE");
+            Friends = await SendGameAsync<FriendListResponse>("/api/friends", "GET"); SetStatus("친구를 삭제했습니다.");
+        });
+
+        public Task RefreshShopAsync() => RunAsync(async () =>
+        {
+            RequireLogin(); Shop = await SendGameAsync<ShopResponse>("/api/shop", "GET"); SetStatus("상점을 갱신했습니다.");
+        });
+
+        public Task PurchaseAsync(string productId) => RunAsync(async () =>
+        {
+            RequireLogin();
+            SetProfile(await SendGameAsync<ProfileData>("/api/shop/purchase", "POST",
+                new PurchaseRequest { ProductId = productId, OperationId = Guid.NewGuid().ToString("N") }));
+            SetStatus("아이템을 구매했습니다.");
+        });
 
         public Task HostAsync(RoomSettings settings) => RunAsync(async () =>
         {
-            EnsureStopped();
-            settings = settings?.Copy() ?? new RoomSettings();
-            settings.Validate();
-            await AuthenticateAsync();
-            SetStatus("Relay 서버를 준비하고 있습니다…");
-            var allocation = await RelayService.Instance.CreateAllocationAsync(settings.MaxPlayers - 1);
-            string relayCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
-            SetStatus("온라인 방을 만들고 있습니다…");
-            lobby = await LobbyService.Instance.CreateLobbyAsync(settings.RoomName, settings.MaxPlayers, new CreateLobbyOptions
-            {
-                IsPrivate = settings.IsPrivate,
-                Player = new Player(AuthenticationService.Instance.PlayerId, allocationId: allocation.AllocationId.ToString()),
-                Data = new Dictionary<string, DataObject>
-                {
-                    [RelayKey] = new DataObject(DataObject.VisibilityOptions.Member, relayCode),
-                    [ProtocolKey] = new DataObject(DataObject.VisibilityOptions.Public, ProtocolVersion, DataObject.IndexOptions.S1)
-                }
-            });
-            hosting = true;
-            originalHost = lobby.HostId;
-            relayTransport.Configure(allocation.ToRelayServerData("dtls"));
-            ActivateTransport();
-            manager.ConfigureRoom(settings);
-            manager.StartHost();
-            nextMaintenance = Time.unscaledTime + 10f;
-            SetStatus("온라인 방을 만들었습니다. 초대 코드: " + RoomCode);
-        }, true);
-
-        public Task JoinCodeAsync(string code) => JoinAsync("Lobby.JoinLobbyByCode", async () =>
-        {
-            string normalized = NormalizeCode(code);
-            if (normalized.Length == 0) throw new InvalidOperationException("초대 코드를 입력하세요.");
-            return await LobbyService.Instance.JoinLobbyByCodeAsync(normalized);
+            RequireAvailable();
+            settings = settings?.Copy() ?? new RoomSettings(); settings.Validate();
+            var serverSettings = JsonUtility.FromJson<ServerRoomSettings>(JsonUtility.ToJson(settings));
+            var customTopics = GameDataStore.LoadCustomTopics().Where(topic => settings.Topics == null || settings.Topics.Contains(topic.Name))
+                .Select(topic => new ServerTopicData { Name = topic.Name, Words = topic.Words }).ToArray();
+            var assignment = await SendGameAsync<DedicatedAssignment>("/api/rooms", "POST",
+                new CreateRoomRequest { Settings = serverSettings, CustomTopics = customTopics });
+            await ConnectRoomAsync(assignment);
         });
 
-        public Task JoinLobbyAsync(string lobbyId) => JoinAsync("Lobby.JoinLobbyById", () => LobbyService.Instance.JoinLobbyByIdAsync(lobbyId));
+        public Task JoinCodeAsync(string code, bool asSpectator = false) => JoinLobbyAsync(NormalizeCode(code), asSpectator);
 
-        Task JoinAsync(string joinApi, Func<Task<Lobby>> join) => RunAsync(async () =>
+        public Task JoinLobbyAsync(string roomId, bool asSpectator = false) => RunAsync(async () =>
         {
-            string stage = "Join.Preflight";
-            try
-            {
-                EnsureStopped();
-                stage = "Authentication";
-                await AuthenticateAsync();
-                SetStatus("온라인 방에 참가하고 있습니다…");
-                stage = joinApi;
-                lobby = await join();
-                stage = "Join.ValidateLobby";
-                originalHost = lobby.HostId;
-                hosting = false;
-                if (lobby.Data == null || !lobby.Data.TryGetValue(ProtocolKey, out var protocol) || protocol.Value != ProtocolVersion)
-                    throw new InvalidOperationException("게임 버전이 다른 방입니다.");
-                if (!lobby.Data.TryGetValue(RelayKey, out var data) || string.IsNullOrEmpty(data.Value))
-                    throw new InvalidOperationException("방의 Relay 연결 정보가 없습니다.");
-                stage = "Relay.JoinAllocation";
-                var allocation = await RelayService.Instance.JoinAllocationAsync(data.Value);
-                stage = "Lobby.UpdatePlayer";
-                await LobbyService.Instance.UpdatePlayerAsync(lobby.Id, AuthenticationService.Instance.PlayerId, new UpdatePlayerOptions
-                {
-                    AllocationId = allocation.AllocationId.ToString()
-                });
-                stage = "Mirror.StartClient";
-                relayTransport.Configure(allocation.ToRelayServerData("dtls"));
-                ActivateTransport();
-                manager.networkAddress = "relay";
-                manager.StartClient();
-                nextMaintenance = Time.unscaledTime + 10f;
-                SetStatus("방에 연결하고 있습니다…");
-            }
-            catch (Exception exception)
-            {
-                exception.Data["DrawLiarApi"] = stage;
-                throw;
-            }
-        }, true);
+            RequireAvailable();
+            if (string.IsNullOrWhiteSpace(roomId)) throw new InvalidOperationException("방 코드를 입력하세요.");
+            var assignment = await SendGameAsync<DedicatedAssignment>("/api/rooms/" + Uri.EscapeDataString(roomId) + "/join", "POST",
+                new JoinRoomRequest { AsSpectator = asSpectator });
+            await ConnectRoomAsync(assignment);
+        });
 
-        public Task RefreshAsync() => RunAsync(async () =>
+        private async Task ConnectRoomAsync(DedicatedAssignment assignment)
         {
-            await AuthenticateAsync();
-            SetStatus("공개 방을 찾고 있습니다…");
-            var result = await LobbyService.Instance.QueryLobbiesAsync(new QueryLobbiesOptions
-            {
-                Count = 30,
-                Filters = new List<QueryFilter>
-                {
-                    new QueryFilter(QueryFilter.FieldOptions.AvailableSlots, "0", QueryFilter.OpOptions.GT),
-                    new QueryFilter(QueryFilter.FieldOptions.S1, ProtocolVersion, QueryFilter.OpOptions.EQ)
-                }
-            });
-            publicRooms.Clear();
-            foreach (var room in result.Results)
-                publicRooms.Add(new PublicRoomInfo { Id = room.Id, Name = room.Name, Players = room.MaxPlayers - room.AvailableSlots, MaxPlayers = room.MaxPlayers });
-            SetStatus(publicRooms.Count == 0 ? "참가 가능한 공개 방이 없습니다." : $"공개 방 {publicRooms.Count}개를 찾았습니다.");
+            SetStatus("게임 서버에 연결하고 있습니다…");
+            await _manager.ConnectAsync(assignment);
+            _roomCode = string.IsNullOrEmpty(assignment.RoomCode) ? assignment.RoomId : assignment.RoomCode;
+            SetStatus("방에 연결했습니다. 방 코드: " + _roomCode);
+        }
+
+        public Task RefreshAsync() => SearchRoomsAsync("");
+        public Task SearchRoomsAsync(string search) => RunAsync(async () =>
+        {
+            RequireLogin();
+            var response = await SendGameAsync<RoomListResponse>("/api/rooms?search=" + Uri.EscapeDataString(search.Trim()), "GET");
+            _publicRooms.Clear();
+            foreach (var room in response.Rooms)
+                _publicRooms.Add(new PublicRoomInfo { Id = room.RoomId, Code = room.RoomCode, Name = room.Name, Players = room.PlayerCount,
+                    MaxPlayers = room.Settings.MaxPlayers, Spectators = room.SpectatorCount, IsInProgress = room.IsInProgress });
+            SetStatus(_publicRooms.Count == 0 ? "공개 방이 없습니다." : $"공개 방 {_publicRooms.Count}개를 찾았습니다.");
         });
 
         public Task LeaveAsync() => RunAsync(async () =>
         {
-            manager.Leave();
-            await CleanupLobbyAsync();
-            SetStatus("방에서 나왔습니다.");
+            await _manager.LeaveAsync(); _roomCode = ""; SetStatus("방에서 나왔습니다.");
         });
 
-        void EnsureStopped()
+        public Task LogoutAsync() => RunAsync(async () =>
         {
-            if (manager == null) throw new InvalidOperationException("네트워크 매니저가 초기화되지 않았습니다.");
-            if (NetworkServer.active || NetworkClient.active || lobby != null)
-                throw new InvalidOperationException("현재 방에서 나간 뒤 다른 방에 참가하세요.");
-        }
-
-        void ActivateTransport()
-        {
-            if (NetworkServer.active || NetworkClient.active) throw new InvalidOperationException("실행 중에는 Transport를 바꿀 수 없습니다.");
-            manager.transport = relayTransport;
-            Transport.active = relayTransport;
-        }
-
-        async Task RunAsync(Func<Task> operation, bool cleanupOnFailure = false)
-        {
-            if (IsBusy) return;
-            bool alreadyConnected = lobby != null || NetworkClient.active || NetworkServer.active;
-            IsBusy = true;
-            Changed?.Invoke();
-            try { await operation(); }
-            catch (Exception exception)
+            await _manager.LeaveAsync();
+            try
             {
-                Debug.LogWarning("[DrawLiar Lobby] " + FormatDiagnostic(exception));
-                if (cleanupOnFailure && !alreadyConnected)
-                {
-                    manager?.Leave();
-                    relayTransport?.Shutdown();
-                    await CleanupLobbyAsync();
-                }
-                SetStatus(DescribeError(exception));
+                if (!string.IsNullOrEmpty(_gameSession)) await SendGameAsync<ApiError>("/api/session/logout", "POST");
+                if (!string.IsNullOrEmpty(_mainSession)) await SendAsync<ApiError>(_config.MainServerUrl, "/api/session/logout", "POST", null, _mainSession);
             }
+            finally
+            {
+                _mainSession = _gameSession = _gameServerUrl = _roomCode = "";
+                Profile = null; Friends = new FriendListResponse(); Shop = new ShopResponse(); _publicRooms.Clear();
+                ProfileChanged?.Invoke(); SetStatus("로그아웃했습니다.");
+            }
+        });
+
+        private void RequireLogin()
+        {
+            if (!IsAuthenticated) throw new InvalidOperationException("먼저 로그인해 주세요.");
+        }
+        private void RequireAvailable()
+        {
+            RequireLogin();
+            if (_manager == null) throw new InvalidOperationException("네트워크가 초기화되지 않았습니다.");
+            if (_manager.IsConnected) throw new InvalidOperationException("현재 방에서 나온 뒤 참가하세요.");
+        }
+        private void SetProfile(ProfileData profile)
+        {
+            if (profile == null || string.IsNullOrEmpty(profile.AccountId) || string.IsNullOrEmpty(profile.DisplayName))
+                throw new InvalidOperationException("서버 프로필 응답을 확인할 수 없습니다.");
+            Profile = profile;
+            ProfileChanged?.Invoke();
+        }
+        private void SetStatus(string status) { Status = status; Changed?.Invoke(); }
+
+        private async Task RunAsync(Func<Task> operation)
+        {
+            if (IsBusy) throw new InvalidOperationException("요청을 처리하고 있습니다. 잠시 기다려 주세요.");
+            IsBusy = true; Changed?.Invoke();
+            try { await operation(); }
+            catch (OperationCanceledException) { SetStatus("요청을 취소했습니다."); throw; }
+            catch (Exception exception) { SetStatus(exception.Message); throw; }
             finally { IsBusy = false; Changed?.Invoke(); }
         }
 
-        async void Update()
+        private Task<T> SendGameAsync<T>(string path, string method, object body = null) where T : class, new() =>
+            SendAsync<T>(_gameServerUrl, path, method, body, _gameSession);
+
+        private async Task<T> SendAsync<T>(string baseUrl, string path, string method, object body = null, string bearer = "") where T : class, new()
         {
-            if (quitting || IsBusy || maintaining || lobby == null) return;
-            if (relayTransport.AllocationInvalid)
+            _lifetime.ThrowIfCancellationRequested();
+            _config.ValidateServerUrl(baseUrl);
+            using var request = new UnityWebRequest(baseUrl.TrimEnd('/') + path, method);
+            request.redirectLimit = 0;
+            request.downloadHandler = new DownloadHandlerBuffer();
+            request.certificateHandler = _config.CreateCertificateHandler();
+            request.timeout = 20;
+            request.SetRequestHeader("Accept", "application/json");
+            if (body != null)
             {
-                maintaining = true;
-                manager.Leave();
-                await CleanupLobbyAsync();
-                SetStatus("Relay 연결이 만료되거나 연결에 실패해 방을 종료했습니다. 방을 다시 만들거나 참가하세요.");
-                maintaining = false;
-                return;
+                request.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(JsonUtility.ToJson(body)));
+                request.SetRequestHeader("Content-Type", "application/json");
             }
-            if (!NetworkClient.active && !NetworkServer.active)
-            {
-                maintaining = true;
-                await CleanupLobbyAsync();
-                SetStatus("호스트와 연결이 종료되었습니다.");
-                maintaining = false;
-                return;
-            }
-            if (Time.unscaledTime < nextMaintenance) return;
-            nextMaintenance = Time.unscaledTime + (hosting ? 15f : 10f);
-            maintaining = true;
-            var current = lobby;
+            if (!string.IsNullOrEmpty(bearer)) request.SetRequestHeader("Authorization", "Bearer " + bearer);
+            var operation = request.SendWebRequest();
             try
             {
-                await AuthenticateAsync();
-                if (lobby != current) return;
-                if (hosting) await LobbyService.Instance.SendHeartbeatPingAsync(current.Id);
-                else
-                {
-                    var updated = await LobbyService.Instance.GetLobbyAsync(current.Id);
-                    if (lobby != current) return;
-                    if (updated.HostId != originalHost)
-                    {
-                        manager.Leave();
-                        await CleanupLobbyAsync();
-                        SetStatus("방장이 나가서 방이 종료되었습니다.");
-                    }
-                    else
-                    {
-                        lobby = updated;
-                        if (NetworkClient.isConnected) SetStatus("온라인 방에 연결되었습니다.");
-                    }
-                }
+                while (!operation.isDone) { _lifetime.ThrowIfCancellationRequested(); await Task.Yield(); }
             }
-            catch (LobbyServiceException exception)
+            catch { request.Abort(); throw; }
+            if (request.result != UnityWebRequest.Result.Success)
             {
-                if (lobby != current) return;
-                if (exception.Reason == LobbyExceptionReason.LobbyNotFound || exception.Reason == LobbyExceptionReason.Forbidden)
-                {
-                    manager.Leave();
-                    await CleanupLobbyAsync();
-                    SetStatus("방이 종료되었거나 참가 권한이 없어 연결을 종료했습니다.");
-                }
-                else SetStatus("로비 연결 확인 중: " + exception.Reason);
+                string code = "ConnectionFailed";
+                try { code = JsonUtility.FromJson<ApiError>(request.downloadHandler.text)?.Code ?? code; } catch (ArgumentException) { }
+                throw new InvalidOperationException(DescribeError(code, request.responseCode));
             }
-            catch (Exception exception) { SetStatus("로비 연결 확인 중: " + exception.Message); }
-            finally { maintaining = false; }
-        }
-
-        async Task CleanupLobbyAsync()
-        {
-            var previous = lobby;
-            bool wasHost = hosting;
-            lobby = null;
-            hosting = false;
-            originalHost = null;
-            Changed?.Invoke();
-            if (previous == null) return;
-            try
+            if (string.IsNullOrEmpty(request.downloadHandler.text))
             {
-                await AuthenticateAsync();
-                if (wasHost) await LobbyService.Instance.DeleteLobbyAsync(previous.Id);
-                else if (AuthenticationService.Instance.IsSignedIn)
-                    await LobbyService.Instance.RemovePlayerAsync(previous.Id, AuthenticationService.Instance.PlayerId);
+                if (typeof(T) == typeof(ApiError)) return new T();
+                throw new InvalidOperationException("서버 응답을 확인할 수 없습니다.");
             }
-            catch (Exception exception) { Debug.LogWarning("[DrawLiar Lobby cleanup] " + FormatDiagnostic(exception)); }
+            return JsonUtility.FromJson<T>(request.downloadHandler.text) ?? throw new InvalidOperationException("서버 응답을 확인할 수 없습니다.");
         }
-
-        async void OnApplicationQuit()
-        {
-            quitting = true;
-            await CleanupLobbyAsync();
-        }
-
-        void SetStatus(string value) { Status = value; Changed?.Invoke(); }
 
         public static string NormalizeCode(string value)
         {
             if (string.IsNullOrWhiteSpace(value)) return "";
-            string code = value.Trim().ToUpperInvariant();
-            if (code.Length > 12) throw new InvalidOperationException("올바른 초대 코드를 입력하세요.");
-            foreach (char character in code)
-                if (character < 'A' || character > 'Z')
-                    if (character < '0' || character > '9') throw new InvalidOperationException("초대 코드에는 영문과 숫자만 사용할 수 있습니다.");
+            if (value.Length > 64) throw new InvalidOperationException("6자리 방 코드를 입력하세요.");
+            if (Guid.TryParse(value.Trim(), out Guid legacyId)) return legacyId.ToString();
+            string code = new string(value.Where(character => !char.IsWhiteSpace(character) && character != '-').ToArray()).ToUpperInvariant();
+            const string ALPHABET = "23456789ABCDEFGHJKMNPQRSTVWXYZ";
+            if (code.Length != 6 || code.Any(character => ALPHABET.IndexOf(character) < 0))
+                throw new InvalidOperationException("영문·숫자 6자리 방 코드를 확인하세요.");
             return code;
         }
 
-        static string FormatDiagnostic(Exception exception)
+        private static string DescribeError(string code, long status)
         {
-            var text = new StringBuilder("api=").Append(exception.Data["DrawLiarApi"] ?? "unspecified");
-            for (var error = exception; error != null; error = error.InnerException)
+            switch (code)
             {
-                text.AppendLine().Append(error.GetType().FullName).Append(" hresult=").Append(error.HResult);
-                if (error is RequestFailedException request) text.Append(" code=").Append(request.ErrorCode);
-                if (error is LobbyServiceException lobbyError) text.Append(" reason=").Append(lobbyError.Reason);
-                if (error is RelayServiceException relayError) text.Append(" reason=").Append(relayError.Reason);
-                // SDK HTTP types are internal. Read only response status, never bodies, headers, or exception messages.
-                if (error.GetType().Namespace == "Unity.Services.Lobbies.Http" || error.GetType().Namespace == "Unity.Services.Relay.Http")
-                {
-                    var response = error.GetType().GetField("Response")?.GetValue(error);
-                    if (response != null)
-                    {
-                        text.Append(" http=").Append(response.GetType().GetProperty("StatusCode")?.GetValue(response));
-                        text.Append(" networkError=").Append(response.GetType().GetProperty("IsNetworkError")?.GetValue(response));
-                    }
-                }
-                text.AppendLine().Append(error.StackTrace);
+                case "InvalidGuestCredential": return "게스트 인증 정보를 확인할 수 없습니다. Google 연동 계정은 Google로 로그인하세요.";
+                case "ExternalLoginRequired": return "Google에 연동된 계정입니다. Google로 로그인해 주세요.";
+                case "InvalidCredentials": return "인증 정보를 확인하세요.";
+                case "AlreadyExists": return "이미 추가한 항목입니다.";
+                case "RoomUnavailable": return "방을 찾지 못했습니다. 방 코드를 확인하세요.";
+                case "InvalidRoomCode": return "영문·숫자 6자리 방 코드를 확인하세요.";
+                case "RoomFull": return "참가 인원이 가득 찼습니다. 관전으로 참가할 수 있습니다.";
+                case "InsufficientCoins": return "코인이 부족합니다.";
+                case "GoogleUnavailable": return "서버의 Google 로그인 설정을 확인해야 합니다.";
+                case "InvalidGoogleCredential": return "Google 인증에 실패했습니다. 다시 로그인해 주세요.";
+                case "GoogleAlreadyLinked": return "이미 연동한 Google 계정입니다.";
+                case "InvalidDisplayName": return "닉네임은 2~16자의 글자, 숫자, 밑줄로 입력하세요.";
+                case "GameServerUnavailable": return "로비 서버가 준비 중입니다. 잠시 후 다시 시도하세요.";
+                case "DedicatedUnavailable": return "게임 서버가 준비 중입니다. 잠시 후 다시 시도하세요.";
+                case "InvalidTopics": return "주제 이름과 제시어를 확인하세요.";
+                case "InvalidSettings": return "방 설정을 확인하세요.";
+                case "AlreadyOwnsRoom": return "이미 만든 방에 다시 참가하거나 방을 닫은 뒤 새 방을 만드세요.";
+                case "AccessoryNotOwned": return "보유한 아이템만 장착할 수 있습니다.";
+                case "AlreadyOwned": return "이미 보유한 아이템입니다.";
+                case "FriendLimit": return "친구 목록의 최대 인원에 도달했습니다.";
+                case "AccountNotFound": return "계정 ID를 찾지 못했습니다.";
+                case "FriendRequestNotFound": return "친구 요청을 찾지 못했습니다. 목록을 갱신하세요.";
             }
-            return text.ToString();
+            if (status == 401) return "로그인이 만료되었습니다. 다시 로그인해 주세요.";
+            if (status == 429) return "요청이 많습니다. 잠시 후 다시 시도하세요.";
+            return status == 0 ? "서버에 연결하지 못했습니다. 인터넷 연결을 확인하세요." : "요청을 처리하지 못했습니다: " + code;
         }
 
-        static string DescribeError(Exception exception)
+        private void OnDestroy()
         {
-            if (exception is LobbyServiceException lobbyException)
-            {
-                if (lobbyException.Reason == LobbyExceptionReason.LobbyNotFound) return "방을 찾지 못했습니다. 초대 코드를 확인하세요.";
-                if (lobbyException.Reason == LobbyExceptionReason.LobbyFull) return "방의 인원이 가득 찼습니다.";
-                if (lobbyException.Reason == LobbyExceptionReason.RateLimited) return "요청이 많습니다. 잠시 후 다시 시도하세요.";
-            }
-            if (exception is RequestFailedException)
-                return "온라인 연결 실패: " + exception.Message + " Unity Dashboard에서 Authentication·Lobby·Relay 활성화와 인터넷 연결을 확인하세요.";
-            return exception.Message;
+            _googleCancellation?.Cancel();
+            if (_manager != null) _manager.StateChanged -= OnRoomState;
         }
     }
 }

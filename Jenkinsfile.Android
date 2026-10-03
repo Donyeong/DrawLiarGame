@@ -1,0 +1,151 @@
+pipeline {
+    agent { node { label 'built-in'; customWorkspace 'C:\\DrawLiarJenkins' } }
+    options {
+        disableConcurrentBuilds()
+        skipDefaultCheckout(true)
+        timestamps()
+        timeout(time: 90, unit: 'MINUTES')
+        buildDiscarder(logRotator(numToKeepStr: '10', artifactNumToKeepStr: '5'))
+    }
+    triggers { cron('TZ=Asia/Seoul\n0 1 * * *') }
+    parameters {
+        choice(name: 'BUILD_FORMAT', choices: ['APK', 'AAB'], description: 'APK는 Firebase 테스트 배포, AAB는 Jenkins 보관')
+        string(name: 'BUNDLE_VERSION', defaultValue: '0.1.0', description: 'Android 표시 버전')
+        booleanParam(name: 'DEVELOPMENT_BUILD', defaultValue: false, description: 'Unity Development Build')
+        booleanParam(name: 'UPLOAD_FIREBASE', defaultValue: true, description: 'APK를 DrawLiar Firebase 앱에 업로드하고 테스터 그룹에 배포')
+        booleanParam(name: 'NOTIFY_DISCORD', defaultValue: true, description: '지정한 DrawLiar Discord 채널에 빌드 결과 전송')
+    }
+    environment {
+        DRAWLIAR_SOURCE_REPOSITORY = 'C:\\DrawLiar'
+        DRAWLIAR_CACHE = 'C:\\DrawLiarJenkinsCache'
+        LOCALAPPDATA = 'C:\\DrawLiarJenkinsCache\\LocalAppData'
+        TEMP = 'C:\\DrawLiarJenkinsCache\\Temp'
+        TMP = 'C:\\DrawLiarJenkinsCache\\Temp'
+        GRADLE_USER_HOME = 'C:\\DrawLiarJenkinsCache\\Gradle'
+        DRAWLIAR_UNITY_PATH = 'C:\\Program Files\\Unity\\Hub\\Editor\\6000.3.20f1\\Editor\\Unity.exe'
+        FIREBASE_APP_ID = '1:560556107495:android:0f486de5f877beb877e442'
+        FIREBASE_GROUPS = 'drawliar-testers'
+    }
+    stages {
+        stage('Snapshot Current Project') {
+            steps {
+                script {
+                    env.DRAWLIAR_UPLOAD_RESULT = 'NOT_STARTED'
+                    env.DRAWLIAR_DISTRIBUTION_RESULT = 'NOT_STARTED'
+                    env.DRAWLIAR_SOURCE_READY = 'false'
+                    env.DRAWLIAR_BUILD_ARTIFACT_READY = 'false'
+                    env.BUILD_FORMAT = params.BUILD_FORMAT
+                    env.BUNDLE_VERSION = params.BUNDLE_VERSION
+                }
+                powershell '''
+                    $ErrorActionPreference = 'Stop'
+                    foreach ($path in @($env:LOCALAPPDATA, $env:TEMP, $env:GRADLE_USER_HOME)) {
+                        [void][IO.Directory]::CreateDirectory($path)
+                    }
+                    & "$env:DRAWLIAR_SOURCE_REPOSITORY/Tools/Jenkins/Sync-AndroidSource.ps1" -SourceRepository $env:DRAWLIAR_SOURCE_REPOSITORY -Workspace $env:WORKSPACE
+                '''
+                script {
+                    env.DRAWLIAR_SOURCE_READY = 'true'
+                    env.DRAWLIAR_SOURCE_REVISION = powershell(returnStdout: true, script: '''
+                        $source = Get-Content -Raw -LiteralPath 'Build/Logs/AndroidSource.json' | ConvertFrom-Json
+                        if ($source.UncommittedChanges) { Write-Output ($source.Revision + ' (local changes)') }
+                        else { Write-Output $source.Revision }
+                    ''').trim()
+                }
+            }
+        }
+        stage('Build Android') {
+            steps {
+                withCredentials([
+                    file(credentialsId: 'drawliar-android-keystore', variable: 'DRAWLIAR_KEYSTORE_FILE'),
+                    string(credentialsId: 'drawliar-android-keystore-password', variable: 'DRAWLIAR_KEYSTORE_PASS'),
+                    string(credentialsId: 'drawliar-android-keystore-password', variable: 'DRAWLIAR_KEY_ALIAS_PASS')
+                ]) {
+                    withEnv(["DRAWLIAR_KEY_ALIAS=androiddebugkey", "DRAWLIAR_DEVELOPMENT_BUILD=${params.DEVELOPMENT_BUILD}"]) {
+                        powershell '''
+                            $ErrorActionPreference = 'Stop'
+                            & './Tools/Jenkins/Build-Android.ps1' -UnityPath $env:DRAWLIAR_UNITY_PATH -ProjectPath "$env:WORKSPACE/DrawLiar" -BuildFormat $env:BUILD_FORMAT -BundleVersion $env:BUNDLE_VERSION -BuildNumber ([int]$env:BUILD_NUMBER) -Development ([bool]::Parse($env:DRAWLIAR_DEVELOPMENT_BUILD)) | Out-Null
+                        '''
+                    }
+                }
+                script { env.DRAWLIAR_BUILD_ARTIFACT_READY = 'true' }
+            }
+        }
+        stage('Upload and Distribute to Firebase') {
+            when { expression { params.UPLOAD_FIREBASE && params.BUILD_FORMAT == 'APK' } }
+            steps {
+                script { env.DRAWLIAR_UPLOAD_RESULT = 'RUNNING' }
+                withCredentials([file(credentialsId: 'drawliar-firebase-app-distribution', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                    withEnv(["UPLOAD_RESULT=${env.WORKSPACE}\\Build\\Logs\\FirebaseUploadResult.json", "DOWNLOAD_RESULT=${env.WORKSPACE}\\.jenkins-private\\FirebaseDownload.json", "BUILD_FILE=${env.WORKSPACE}\\Build\\Android\\DrawLiar.apk", 'FIREBASE_UPLOAD_ONLY=false', 'FIREBASE_ALLOW_TESTER_EMAIL=true']) {
+                        powershell '''
+                            $ErrorActionPreference = 'Stop'
+                            & 'C:/Program Files/nodejs/npm.cmd' ci --prefix './Tools/Firebase' --no-audit --no-fund
+                            if ($LASTEXITCODE -ne 0) { throw 'Firebase dependencies installation failed.' }
+                            & 'C:/Program Files/nodejs/node.exe' './Tools/Firebase/distribute.cjs' './Build/Android/DrawLiar.apk'
+                            if ($LASTEXITCODE -ne 0) { throw 'DrawLiar Firebase upload failed.' }
+                        '''
+                    }
+                }
+                script {
+                    env.DRAWLIAR_ARTIFACT_URL = powershell(returnStdout: true, script: '''
+                        $upload = Get-Content -Raw -LiteralPath 'Build/Logs/FirebaseUploadResult.json' | ConvertFrom-Json
+                        if (!$upload.Success -or $upload.AppId -ne $env:FIREBASE_APP_ID -or $upload.PackageName -ne 'com.rascallab.drawliar' -or $upload.BuildVersion -ne $env:BUILD_NUMBER -or $upload.DisplayVersion -ne $env:BUNDLE_VERSION) { throw 'Firebase release does not match this build.' }
+                        if ($upload.Distribution -notin @('DISTRIBUTED', 'EMPTY_GROUP') -or @($upload.Groups).Count -ne 1 -or $upload.Groups[0] -ne 'drawliar-testers') { throw 'Firebase tester group distribution was not completed.' }
+                        Write-Output $upload.testingUri
+                    ''').trim()
+                    env.DRAWLIAR_FIREBASE_CONSOLE_URL = powershell(returnStdout: true, script: '''
+                        $upload = Get-Content -Raw -LiteralPath 'Build/Logs/FirebaseUploadResult.json' | ConvertFrom-Json
+                        Write-Output $upload.FirebaseConsoleUri
+                    ''').trim()
+                    env.DRAWLIAR_UPLOAD_RESULT = 'SUCCESS'
+                    env.DRAWLIAR_DISTRIBUTION_RESULT = powershell(returnStdout: true, script: '''
+                        $upload = Get-Content -Raw -LiteralPath 'Build/Logs/FirebaseUploadResult.json' | ConvertFrom-Json
+                        Write-Output $upload.Distribution
+                    ''').trim()
+                }
+            }
+        }
+    }
+    post {
+        cleanup {
+            script {
+                if (env.DRAWLIAR_UPLOAD_RESULT == 'RUNNING') {
+                    env.DRAWLIAR_UPLOAD_RESULT = currentBuild.currentResult == 'ABORTED' ? 'ABORTED' : 'FAILURE'
+                }
+                else if (env.DRAWLIAR_UPLOAD_RESULT == 'NOT_STARTED') {
+                    env.DRAWLIAR_UPLOAD_RESULT = 'SKIPPED'
+                }
+                if (env.DRAWLIAR_DISTRIBUTION_RESULT == 'NOT_STARTED') {
+                    env.DRAWLIAR_DISTRIBUTION_RESULT = env.DRAWLIAR_UPLOAD_RESULT == 'SKIPPED' ? 'SKIPPED' : 'FAILURE'
+                }
+                if (env.DRAWLIAR_BUILD_ARTIFACT_READY == 'true') {
+                    archiveArtifacts artifacts: 'Build/Android/*.apk,Build/Android/*.aab', allowEmptyArchive: false, fingerprint: true
+                }
+                if (env.DRAWLIAR_SOURCE_READY == 'true') {
+                    archiveArtifacts artifacts: 'Build/Logs/AndroidBuildResult.json,Build/Logs/AndroidSource.json,Build/Logs/FirebaseUploadResult.json,Build/Logs/AndroidBuild.log', allowEmptyArchive: true
+                }
+                if (params.NOTIFY_DISCORD && fileExists('Tools/Jenkins/Notify-AndroidBuild.ps1')) {
+                    catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                        timeout(time: 35, unit: 'SECONDS') {
+                            withCredentials([string(credentialsId: 'drawliar-discord-build-webhook', variable: 'DRAWLIAR_DISCORD_WEBHOOK')]) {
+                                def downloadResult = env.DRAWLIAR_UPLOAD_RESULT == 'SUCCESS' && env.DRAWLIAR_BUILD_ARTIFACT_READY == 'true' ? "${env.WORKSPACE}\\.jenkins-private\\FirebaseDownload.json" : ''
+                                withEnv(["DRAWLIAR_NOTIFY_RESULT=${currentBuild.currentResult}", "DRAWLIAR_NOTIFY_DURATION=${currentBuild.durationString}", "DRAWLIAR_VERSION_CODE=${env.BUILD_NUMBER}", "DRAWLIAR_DOWNLOAD_RESULT=${downloadResult}"]) {
+                                    powershell '''
+                                        $receipt = './Build/Logs/DiscordNotification.json'
+                                        if (Test-Path -LiteralPath $receipt -PathType Leaf) { Remove-Item -LiteralPath $receipt -Force }
+                                        & './Tools/Jenkins/Notify-AndroidBuild.ps1' -ReceiptPath $receipt
+                                    '''
+                                }
+                            }
+                        }
+                    }
+                }
+                powershell '''
+                    $download = Join-Path $env:WORKSPACE '.jenkins-private/FirebaseDownload.json'
+                    if (Test-Path -LiteralPath $download -PathType Leaf) { Remove-Item -LiteralPath $download -Force }
+                '''
+                archiveArtifacts artifacts: 'Build/Logs/DiscordNotification.json', allowEmptyArchive: true
+            }
+        }
+    }
+}

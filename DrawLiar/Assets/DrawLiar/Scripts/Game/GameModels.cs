@@ -1,3 +1,4 @@
+#nullable disable
 using System;
 using System.Linq;
 
@@ -12,7 +13,7 @@ namespace DrawLiar
     [Serializable]
     public sealed class RoomSettings
     {
-        public int MaxPlayers = 8;
+        public int MaxPlayers = GameRules.MAX_PLAYERS;
         public int LiarCount = 1;
         public int RoundCount = 5;
         public int TargetScore = 10;
@@ -39,7 +40,7 @@ namespace DrawLiar
 
         public void Validate()
         {
-            MaxPlayers = Clamp(MaxPlayers, 3, 12);
+            MaxPlayers = GameRules.MAX_PLAYERS;
             LiarCount = Clamp(LiarCount, 1, MaxPlayers - 1);
             RoundCount = Clamp(RoundCount, 1, 30);
             TargetScore = Clamp(TargetScore, 1, 1000);
@@ -74,7 +75,6 @@ namespace DrawLiar
         public bool IsCaught;
         public int AvatarColor;
         public int Accessory;
-        public string VoiceId;
         public bool HasVoted;
         public bool HasGuessed;
         public int VoteCount;

@@ -1,3 +1,4 @@
+#nullable disable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +8,8 @@ namespace DrawLiar
 {
     public static class GameRules
     {
+        public const int MIN_START_PLAYERS = 3;
+        public const int MAX_PLAYERS = ServerRoomSettings.MAX_PLAYERS;
         public const string TieRule = "최다 득표 동률은 모두 지목 · 투표가 없으면 아무도 지목되지 않아요";
 
         public static string CleanText(string value, int maxLength, string fallback = "")

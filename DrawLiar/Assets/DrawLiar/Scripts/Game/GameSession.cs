@@ -1,3 +1,4 @@
+#nullable disable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,9 +10,9 @@ namespace DrawLiar
         private sealed class Participant
         {
             public int Id;
-            public string Name, VoiceId, Guess = "";
+            public string Name, Guess = "";
             public int Score, RoundPoints, Color, Accessory;
-            public bool Connected = true, Spectator, Liar, Caught, Guessed;
+            public bool Connected = true, Spectator, SpectatorOnly, Liar, Caught, Guessed;
             public int? Vote;
         }
 
@@ -31,8 +32,10 @@ namespace DrawLiar
         public int CanvasVersion { get; private set; }
         public int ArtistId => Phase == GamePhase.Drawing && turnIndex < turns.Length ? turns[turnIndex] : -1;
         public int ConnectedCount => players.Values.Count(player => player.Connected);
+        public int ActiveCount => players.Values.Count(player => player.Connected && !player.Spectator);
+        public int SpectatorCount => players.Values.Count(player => player.Connected && player.Spectator);
         public bool CanStart => (Phase == GamePhase.Lobby || Phase == GamePhase.MatchResults)
-            && ConnectedCount >= 3 && Settings.LiarCount < ConnectedCount;
+            && ActiveCount >= GameRules.MIN_START_PLAYERS;
         public event Action Changed;
         public event Action CanvasCleared;
 
@@ -46,31 +49,41 @@ namespace DrawLiar
         }
 
         public bool Contains(int id) => players.TryGetValue(id, out var player) && player.Connected;
+        public bool HasParticipant(int id) => players.ContainsKey(id);
+        public bool IsSpectator(int id) => players.TryGetValue(id, out var player) && player.Spectator;
 
-        public bool Join(int id, string name, int color, int accessory, string voiceId)
+        public bool Join(int id, string name, int color, int accessory, bool spectator = false, bool spectatorOnly = false)
         {
-            if (players.ContainsKey(id) || ConnectedCount >= Settings.MaxPlayers || players.Count >= 64) return false;
+            if (players.TryGetValue(id, out var existing))
+            {
+                if (existing.Connected) return false;
+                existing.Connected = true;
+                Changed?.Invoke();
+                return true;
+            }
+            spectator |= spectatorOnly || Phase != GamePhase.Lobby && Phase != GamePhase.MatchResults;
+            if (players.Count >= 64 || (spectator
+                ? players.Values.Count(player => player.Spectator) >= 32
+                : players.Values.Count(player => !player.Spectator) >= Settings.MaxPlayers)) return false;
             players[id] = new Participant
             {
                 Id = id, Name = GameRules.CleanText(name, 16, "그림친구"),
                 Color = Math.Max(0, Math.Min(7, color)), Accessory = Math.Max(0, Math.Min(3, accessory)),
-                VoiceId = GameRules.CleanText(voiceId, 80), Spectator = Phase != GamePhase.Lobby
+                Spectator = spectator, SpectatorOnly = spectatorOnly
             };
             Changed?.Invoke();
             return true;
         }
 
-        public void UpdateProfile(int id, string name, int color, int accessory, string voiceId)
+        public void UpdateProfile(int id, string name, int color, int accessory)
         {
             if (!players.TryGetValue(id, out var player)) return;
-            // Identity is stable during a match so votes, voice controls, and scores stay recognizable.
             if (Phase == GamePhase.Lobby)
             {
                 player.Name = GameRules.CleanText(name, 16, "그림친구");
                 player.Color = Math.Max(0, Math.Min(7, color));
                 player.Accessory = Math.Max(0, Math.Min(3, accessory));
             }
-            player.VoiceId = GameRules.CleanText(voiceId, 80);
             Changed?.Invoke();
         }
 
@@ -83,7 +96,6 @@ namespace DrawLiar
             else
             {
                 player.Connected = false;
-                player.Guessed = true;
                 if (matchDecided) { Changed?.Invoke(); return; }
                 if (!player.Spectator && ActivePlayers().Count() < 2)
                 {
@@ -91,6 +103,8 @@ namespace DrawLiar
                     FinishMatch();
                 }
                 else if (ArtistId == id) NextArtist(now);
+                else if (Phase == GamePhase.Voting && ActivePlayers().All(voter => voter.Vote.HasValue)) RevealLiars(now);
+                else if (Phase == GamePhase.Guessing && ActivePlayers().Where(liar => liar.Liar).All(liar => liar.Guessed)) ScoreRound(now);
             }
             Changed?.Invoke();
         }
@@ -101,7 +115,6 @@ namespace DrawLiar
             var valid = settings.Copy();
             valid.Validate();
             valid.Topics ??= (data?.Topics ?? Array.Empty<TopicData>()).Where(IsValidTopic).Select(entry => entry.Name).ToArray();
-            valid.MaxPlayers = Math.Max(valid.MaxPlayers, ConnectedCount);
             Settings = valid;
             Changed?.Invoke();
             return true;
@@ -113,9 +126,10 @@ namespace DrawLiar
             if (gameData != null) data = gameData;
             if (!AvailableTopics().Any()) return false;
             foreach (var id in players.Values.Where(player => !player.Connected).Select(player => player.Id).ToArray()) players.Remove(id);
+            AssignSeats();
+            Settings.LiarCount = Math.Min(Settings.LiarCount, ActiveCount - 1);
             foreach (var player in players.Values)
             {
-                player.Spectator = false;
                 player.Score = 0;
             }
             Round = 0;
@@ -134,9 +148,10 @@ namespace DrawLiar
             winners = Array.Empty<int>();
             matchDecided = false;
             foreach (var id in players.Values.Where(player => !player.Connected).Select(player => player.Id).ToArray()) players.Remove(id);
+            AssignSeats();
             foreach (var player in players.Values)
             {
-                player.Spectator = player.Liar = player.Caught = player.Guessed = false;
+                player.Liar = player.Caught = player.Guessed = false;
                 player.Score = player.RoundPoints = 0;
                 player.Vote = null;
                 player.Guess = "";
@@ -219,7 +234,7 @@ namespace DrawLiar
                 {
                     Id = player.Id, Name = player.Name, Score = player.Score, RoundPoints = result ? player.RoundPoints : 0,
                     IsSpectator = player.Spectator, IsConnected = player.Connected, IsLiar = reveal && player.Liar,
-                    IsCaught = reveal && player.Caught, AvatarColor = player.Color, Accessory = player.Accessory, VoiceId = player.VoiceId,
+                    IsCaught = reveal && player.Caught, AvatarColor = player.Color, Accessory = player.Accessory,
                     HasVoted = player.Vote.HasValue, HasGuessed = reveal && player.Guessed,
                     VoteCount = reveal ? players.Values.Count(voter => voter.Vote == player.Id) : 0,
                     Guess = result && player.Liar ? player.Guess : ""
@@ -228,6 +243,14 @@ namespace DrawLiar
         }
 
         private IEnumerable<Participant> ActivePlayers() => players.Values.Where(player => player.Connected && !player.Spectator);
+        private void AssignSeats()
+        {
+            var eligible = players.Values.Where(player => !player.SpectatorOnly)
+                .OrderBy(player => player.Spectator).ThenBy(player => player.Id).ToArray();
+            foreach (var player in players.Values) player.Spectator = true;
+            for (int index = 0; index < Math.Min(Settings.MaxPlayers, eligible.Length); index++) eligible[index].Spectator = false;
+        }
+
         private bool IsActive(int id) => players.TryGetValue(id, out var player) && player.Connected && !player.Spectator;
         private static bool IsValidTopic(TopicData entry) => entry != null && !string.IsNullOrWhiteSpace(entry.Name)
             && entry.Words != null && entry.Words.Any(value => !string.IsNullOrWhiteSpace(value));

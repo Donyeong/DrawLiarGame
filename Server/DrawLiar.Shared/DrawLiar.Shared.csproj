@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>net10.0</TargetFramework><ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable></PropertyGroup>
+  <ItemGroup><FrameworkReference Include="Microsoft.AspNetCore.App" /><PackageReference Include="Npgsql" Version="10.0.3" /><PackageReference Include="Google.Apis.Auth" Version="1.74.0" /></ItemGroup>
+  <ItemGroup><Compile Include="../../DrawLiar/Assets/DrawLiar/Scripts/Services/ServerContracts.cs" Link="ServerContracts.cs" /></ItemGroup>
+  <ItemGroup><EmbeddedResource Include="Database/*.sql" /><EmbeddedResource Include="../../DrawLiar/Assets/DrawLiar/Resources/DrawLiar/GameData.json" LogicalName="DrawLiar.BuiltInGameData.json" /></ItemGroup>
+</Project>
