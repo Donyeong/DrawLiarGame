@@ -43,9 +43,23 @@ namespace DrawLiar
 
         private static TopicData[] ReadCustomTopics(string path)
         {
+#if UNITY_WEBGL && !UNITY_EDITOR
+            if (path == CustomTopicsPath)
+            {
+                string content = DrawBrowserInterop.LoadCustomTopics();
+                if (string.IsNullOrEmpty(content)) return Array.Empty<TopicData>();
+                if (Encoding.UTF8.GetByteCount(content) > MaximumFileBytes) throw new IOException("커스텀 주제 파일은 8MiB까지 사용할 수 있습니다.");
+                return ParseCustomTopics(content);
+            }
+#endif
             if (!File.Exists(path)) return Array.Empty<TopicData>();
             if (new FileInfo(path).Length > MaximumFileBytes) throw new IOException("커스텀 주제 파일은 8MiB까지 사용할 수 있습니다.");
-            var parsed = JsonUtility.FromJson<CustomTopics>(File.ReadAllText(path));
+            return ParseCustomTopics(File.ReadAllText(path));
+        }
+
+        private static TopicData[] ParseCustomTopics(string content)
+        {
+            var parsed = JsonUtility.FromJson<CustomTopics>(content);
             if (parsed?.Topics == null) throw new ArgumentException("커스텀 주제 파일 형식이 올바르지 않습니다. 기존 파일은 보존됩니다.");
             return Sanitize(parsed.Topics);
         }
@@ -57,6 +71,9 @@ namespace DrawLiar
             var content = JsonUtility.ToJson(new CustomTopics { Topics = valid }, true);
             if (Encoding.UTF8.GetByteCount(content) > MaximumFileBytes) throw new ArgumentException("커스텀 주제 파일은 8MiB까지 저장할 수 있습니다.");
             path = path ?? CustomTopicsPath;
+#if UNITY_WEBGL && !UNITY_EDITOR
+            if (path == CustomTopicsPath) { DrawBrowserInterop.SaveCustomTopics(content); return; }
+#endif
             Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(path)));
             string temporary = path + ".tmp";
             File.WriteAllText(temporary, content);

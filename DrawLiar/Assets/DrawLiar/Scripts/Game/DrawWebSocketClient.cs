@@ -20,6 +20,9 @@ namespace DrawLiar
         {
             if (uri.Scheme != "wss" && uri.Scheme != "ws" || !string.IsNullOrEmpty(uri.UserInfo) || !string.IsNullOrEmpty(uri.Fragment))
                 throw new ArgumentException("웹소켓 주소가 올바르지 않습니다.");
+#if UNITY_WEBGL && !UNITY_EDITOR
+            return await DrawBrowserWebSocket.ConnectAsync(uri, cancellation);
+#else
             var tcp = new TcpClient { NoDelay = true };
             Stream stream = null;
             try
@@ -63,8 +66,10 @@ namespace DrawLiar
                 tcp.Dispose();
                 throw;
             }
+#endif
         }
 
+#if !UNITY_WEBGL || UNITY_EDITOR
         private static void ValidateHandshake(string header, string key)
         {
             if (!header.EndsWith("\r\n\r\n", StringComparison.Ordinal)) throw new IOException("웹소켓 헤더가 너무 큽니다.");
@@ -112,5 +117,6 @@ namespace DrawLiar
                 base.Dispose(disposing);
             }
         }
+#endif
     }
 }

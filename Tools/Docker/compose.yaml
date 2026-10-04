@@ -15,6 +15,7 @@ x-app: &app
     ASPNETCORE_Kestrel__Endpoints__Internal__Url: http://0.0.0.0:8080
     ASPNETCORE_Kestrel__Certificates__Default__Path: /secrets/server.pfx
     ASPNETCORE_Kestrel__Certificates__Default__Password: ${DRAWLIAR_TLS_PASSWORD}
+    Network__TrustedProxies__0: ${DRAWLIAR_WEB_PROXY_IP:-127.0.0.1}
   depends_on:
     db:
       condition: service_healthy
@@ -52,6 +53,7 @@ services:
       Google__DesktopClientId: ${GOOGLE_DESKTOP_CLIENT_ID:-}
       Google__DesktopClientSecret: ${GOOGLE_DESKTOP_CLIENT_SECRET:-}
       Google__MobileClientId: ${GOOGLE_MOBILE_CLIENT_ID:-}
+      Google__WebClientId: ${GOOGLE_WEB_CLIENT_ID:-}
   game:
     <<: *app
     working_dir: /apps/GameServer

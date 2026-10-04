@@ -20,9 +20,20 @@ internal static partial class Integration
 
     public static async Task RunAsync(string[] args)
     {
+        if (args.Contains("--profile-rules-only"))
+        {
+            await VerifyProfileRulesAsync();
+            return;
+        }
+        if (args.Contains("--profile-database-only"))
+        {
+            await VerifyProfileDatabaseAsync();
+            return;
+        }
         DrawLiar.Editor.GameSelfCheck.Run();
         VerifyAvatarPartRules();
         await VerifyRoomPolicyAsync();
+        await VerifyProfileRulesAsync();
         VerifyGuestCredentialRules();
         if (args.Contains("--lobby-chat-only"))
         {

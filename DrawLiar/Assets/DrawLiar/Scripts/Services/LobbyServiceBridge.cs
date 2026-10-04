@@ -119,14 +119,15 @@ namespace DrawLiar
         {
             if (login == null || string.IsNullOrEmpty(login.SessionToken) || string.IsNullOrEmpty(login.AssignmentToken))
                 throw new InvalidOperationException("서버 로그인 응답을 확인할 수 없습니다.");
-            _config.ValidateServerUrl(login.GameServerUrl);
-            var session = await SendAsync<GameSessionResponse>(login.GameServerUrl, "/api/session/enter", "POST",
+            string gameServerUrl = _config.ResolveGameServerUrl(login.GameServerUrl);
+            _config.ValidateServerUrl(gameServerUrl);
+            var session = await SendAsync<GameSessionResponse>(gameServerUrl, "/api/session/enter", "POST",
                 new EnterGameRequest { AssignmentToken = login.AssignmentToken });
             if (string.IsNullOrEmpty(session.SessionToken) || session.Profile == null || session.Profile.AccountId != login.AccountId)
                 throw new InvalidOperationException("서버 로그인 응답을 확인할 수 없습니다.");
             StopLobbyChat(true);
             _mainSession = login.SessionToken;
-            _gameServerUrl = login.GameServerUrl.TrimEnd('/');
+            _gameServerUrl = gameServerUrl.TrimEnd('/');
             _gameSession = session.SessionToken;
             SetProfile(session.Profile);
             StartLobbyChat();
@@ -137,7 +138,7 @@ namespace DrawLiar
         {
             if (link && string.IsNullOrEmpty(_mainSession)) throw new InvalidOperationException("먼저 로그인해 주세요.");
             using var cancellation = CancellationTokenSource.CreateLinkedTokenSource(_lifetime);
-            cancellation.CancelAfter(TimeSpan.FromMinutes(4));
+            DrawAsync.CancelAfter(cancellation, TimeSpan.FromMinutes(4));
             _googleCancellation = cancellation;
             try
             {
@@ -167,6 +168,21 @@ namespace DrawLiar
                 new UpdateProfileRequest { DisplayName = displayName.Trim(), AvatarColor = avatarColor, Accessory = accessory }));
             SetStatus("캐릭터를 저장했습니다.");
         });
+
+        public async Task<PublicProfileData> GetPublicProfileAsync(string accountId, CancellationToken cancellationToken)
+        {
+            RequireLogin();
+            if (!Guid.TryParse(accountId, out var id)) throw new InvalidOperationException("프로필을 불러오지 못했습니다.");
+            string session = _gameSession;
+            string viewer = Profile?.AccountId;
+            var profile = await SendAsync<PublicProfileData>(_gameServerUrl, "/api/profiles/" + id, "GET",
+                bearer: session, cancellationToken: cancellationToken);
+            cancellationToken.ThrowIfCancellationRequested();
+            if (session != _gameSession || viewer != Profile?.AccountId) throw new OperationCanceledException();
+            if (profile == null || !string.Equals(profile.AccountId, id.ToString(), StringComparison.OrdinalIgnoreCase))
+                throw new InvalidOperationException("프로필을 불러오지 못했습니다.");
+            return profile;
+        }
 
         public Task RefreshFriendsAsync() => RunAsync(async () =>
         {
@@ -315,9 +331,10 @@ namespace DrawLiar
         private Task<T> SendGameAsync<T>(string path, string method, object body = null) where T : class, new() =>
             SendAsync<T>(_gameServerUrl, path, method, body, _gameSession);
 
-        private async Task<T> SendAsync<T>(string baseUrl, string path, string method, object body = null, string bearer = "") where T : class, new()
+        private async Task<T> SendAsync<T>(string baseUrl, string path, string method, object body = null, string bearer = "", CancellationToken cancellationToken = default) where T : class, new()
         {
-            _lifetime.ThrowIfCancellationRequested();
+            using var cancellation = CancellationTokenSource.CreateLinkedTokenSource(_lifetime, cancellationToken);
+            cancellation.Token.ThrowIfCancellationRequested();
             _config.ValidateServerUrl(baseUrl);
             using var request = new UnityWebRequest(baseUrl.TrimEnd('/') + path, method);
             request.redirectLimit = 0;
@@ -334,7 +351,8 @@ namespace DrawLiar
             var operation = request.SendWebRequest();
             try
             {
-                while (!operation.isDone) { _lifetime.ThrowIfCancellationRequested(); await Task.Yield(); }
+                while (!operation.isDone) { cancellation.Token.ThrowIfCancellationRequested(); await Task.Yield(); }
+                cancellation.Token.ThrowIfCancellationRequested();
             }
             catch { request.Abort(); throw; }
             if (request.result != UnityWebRequest.Result.Success)

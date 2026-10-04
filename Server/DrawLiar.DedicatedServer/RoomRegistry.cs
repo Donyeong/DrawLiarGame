@@ -5,16 +5,21 @@ namespace DrawLiar.DedicatedServer;
 internal sealed class RoomRegistry : BackgroundService
 {
     private readonly object _gate = new();
+    private const int MAX_PENDING_RESULTS = 2048;
+    private readonly object _resultGate = new();
+    private readonly Dictionary<string, MatchResultRequest> _pendingResults = new(StringComparer.Ordinal);
     private readonly Dictionary<string, DedicatedRoom> _rooms = new(StringComparer.Ordinal);
     private readonly SemaphoreSlim _statusChanged = new(0, 1);
     private readonly GameData _data;
     private readonly int _capacity;
+    private readonly string _nodeId;
 
     public static double Now => Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
 
     public RoomRegistry(IConfiguration configuration)
     {
         _capacity = Math.Clamp(configuration.GetValue("Dedicated:Capacity", 32), 1, 128);
+        _nodeId = configuration["Dedicated:NodeId"] ?? "dedicated-1";
         string path = configuration["Dedicated:GameDataPath"] ?? Path.Combine(AppContext.BaseDirectory, "GameData.json");
         _data = System.Text.Json.JsonSerializer.Deserialize<GameData>(File.ReadAllText(path), GameplayWire.Json)
             ?? throw new InvalidDataException("게임 주제 데이터가 없습니다.");
@@ -42,7 +47,8 @@ internal sealed class RoomRegistry : BackgroundService
             if (!_rooms.TryGetValue(ticket.Room.RoomId, out var room))
             {
                 if (_rooms.Count >= _capacity) return null;
-                _rooms[ticket.Room.RoomId] = room = new DedicatedRoom(ticket.Room, _data, ticket.CustomTopics, Now, NotifyStatusChanged);
+                _rooms[ticket.Room.RoomId] = room = new DedicatedRoom(ticket.Room, _data, ticket.CustomTopics, Now,
+                    NotifyStatusChanged, CanRecordMatch, QueueResult);
                 created = true;
             }
             if (room.Join(connection, ticket, Now)) return room;
@@ -54,6 +60,28 @@ internal sealed class RoomRegistry : BackgroundService
     public RoomStatusData[] Statuses()
     {
         lock (_gate) return _rooms.Values.Select(room => room.Status()).ToArray();
+    }
+
+    private bool CanRecordMatch()
+    {
+        lock (_resultGate) return _pendingResults.Count < MAX_PENDING_RESULTS - _capacity;
+    }
+
+    private void QueueResult(MatchResultRequest result)
+    {
+        result.NodeId = _nodeId;
+        lock (_resultGate) _pendingResults.TryAdd(result.MatchId, result);
+        NotifyStatusChanged();
+    }
+
+    public MatchResultRequest[] PendingResults()
+    {
+        lock (_resultGate) return _pendingResults.Values.Take(64).ToArray();
+    }
+
+    public void AcknowledgeResult(string matchId)
+    {
+        lock (_resultGate) _pendingResults.Remove(matchId);
     }
 
     public void AcknowledgeHeartbeat(RoomStatusData[] statuses, string[] roomIds)

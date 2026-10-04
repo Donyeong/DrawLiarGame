@@ -15,6 +15,11 @@
     <Compile Include="..\DrawLiar.DedicatedServer\DedicatedRoom.cs" Link="Dedicated\DedicatedRoom.cs" />
     <Compile Include="..\DrawLiar.DedicatedServer\GameConnection.cs" Link="Dedicated\GameConnection.cs" />
     <Compile Include="..\DrawLiar.DedicatedServer\GameplayWire.cs" Link="Dedicated\GameplayWire.cs" />
+    <Compile Include="..\DrawLiar.DedicatedServer\RoomRegistry.cs" Link="Dedicated\RoomRegistry.cs" />
     <Compile Include="..\DrawLiar.GameServer\LobbyChatHub.cs" Link="GameServer\LobbyChatHub.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Using Include="Microsoft.Extensions.Configuration" />
+    <Using Include="Microsoft.Extensions.Hosting" />
   </ItemGroup>
 </Project>

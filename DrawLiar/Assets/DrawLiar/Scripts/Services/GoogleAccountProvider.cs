@@ -8,12 +8,22 @@ namespace DrawLiar
 {
     internal static class GoogleAccountProvider
     {
-        public static string Platform => Application.isMobilePlatform ? "mobile" : "desktop";
+        public static string Platform
+        {
+            get
+            {
+#if UNITY_WEBGL && !UNITY_EDITOR
+                return "web";
+#else
+                return Application.isMobilePlatform ? "mobile" : "desktop";
+#endif
+            }
+        }
         public static bool IsSupported
         {
             get
             {
-#if UNITY_ANDROID || UNITY_EDITOR_WIN || UNITY_EDITOR_OSX || UNITY_EDITOR_LINUX || UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX
+#if UNITY_WEBGL || UNITY_ANDROID || UNITY_EDITOR_WIN || UNITY_EDITOR_OSX || UNITY_EDITOR_LINUX || UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX
                 return true;
 #else
                 return false;
@@ -23,7 +33,10 @@ namespace DrawLiar
 
         public static async Task<GoogleAuthRequest> AuthenticateAsync(GoogleChallengeResponse challenge, CancellationToken cancellationToken)
         {
-#if UNITY_EDITOR_WIN || UNITY_EDITOR_OSX || UNITY_EDITOR_LINUX || UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX
+#if UNITY_WEBGL && !UNITY_EDITOR
+            return new GoogleAuthRequest { ChallengeId = challenge.ChallengeId,
+                IdToken = await DrawBrowserRuntime.AuthenticateGoogleAsync(challenge.ClientId, challenge.Nonce, cancellationToken) };
+#elif UNITY_EDITOR_WIN || UNITY_EDITOR_OSX || UNITY_EDITOR_LINUX || UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX
             var authorization = await GoogleDesktopAuthentication.AuthenticateAsync(challenge.ClientId, challenge.Nonce, Application.OpenURL, cancellationToken);
             return new GoogleAuthRequest { ChallengeId = challenge.ChallengeId, Code = authorization.Code,
                 CodeVerifier = authorization.CodeVerifier, RedirectUri = authorization.RedirectUri };

@@ -21,7 +21,7 @@ namespace DrawLiar
         {
             get
             {
-#if !UNITY_SERVER && (UNITY_EDITOR_WIN || (UNITY_STANDALONE_WIN && !UNITY_EDITOR) || (UNITY_ANDROID && !UNITY_EDITOR))
+#if !UNITY_SERVER && (UNITY_EDITOR_WIN || (UNITY_STANDALONE_WIN && !UNITY_EDITOR) || (UNITY_ANDROID && !UNITY_EDITOR) || (UNITY_WEBGL && !UNITY_EDITOR))
                 return true;
 #else
                 return false;
@@ -41,8 +41,12 @@ namespace DrawLiar
                     var secret = new byte[32];
                     try
                     {
+#if UNITY_WEBGL && !UNITY_EDITOR
+                        DrawBrowserInterop.FillRandom(secret);
+#else
                         using (var random = RandomNumberGenerator.Create()) random.GetBytes(secret);
-                        var credentials = new GuestCredentials { GuestId = Guid.NewGuid().ToString("D"), GuestSecret = Encode(secret) };
+#endif
+                        var credentials = new GuestCredentials { GuestId = CreateId(), GuestSecret = Encode(secret) };
                         return Decode(Write(JsonUtility.ToJson(credentials), true));
                     }
                     finally { Array.Clear(secret, 0, secret.Length); }
@@ -89,6 +93,8 @@ namespace DrawLiar
                     WindowsGuestCredentials.Delete(DirectoryPath);
 #elif UNITY_ANDROID && !UNITY_EDITOR && !UNITY_SERVER
                     CallAndroid("Delete", null);
+#elif UNITY_WEBGL && !UNITY_EDITOR && !UNITY_SERVER
+                    DrawBrowserInterop.DeleteGuestCredentials();
 #endif
                 }
                 catch { throw new InvalidOperationException(STORAGE_ERROR); }
@@ -101,6 +107,8 @@ namespace DrawLiar
             return WindowsGuestCredentials.Load(DirectoryPath);
 #elif UNITY_ANDROID && !UNITY_EDITOR && !UNITY_SERVER
             return CallAndroid("Load", null);
+#elif UNITY_WEBGL && !UNITY_EDITOR && !UNITY_SERVER
+            return DrawBrowserInterop.LoadGuestCredentials();
 #else
             throw new InvalidOperationException(STORAGE_ERROR);
 #endif
@@ -112,6 +120,8 @@ namespace DrawLiar
             return WindowsGuestCredentials.Save(DirectoryPath, payload, onlyIfMissing);
 #elif UNITY_ANDROID && !UNITY_EDITOR && !UNITY_SERVER
             return CallAndroid(onlyIfMissing ? "SaveIfMissing" : "Save", payload);
+#elif UNITY_WEBGL && !UNITY_EDITOR && !UNITY_SERVER
+            return DrawBrowserInterop.SaveGuestCredentials(payload, onlyIfMissing);
 #else
             throw new InvalidOperationException(STORAGE_ERROR);
 #endif
@@ -140,6 +150,18 @@ namespace DrawLiar
         }
 
         private static string Encode(byte[] secret) => Convert.ToBase64String(secret).TrimEnd('=').Replace('+', '-').Replace('/', '_');
+        private static string CreateId()
+        {
+#if UNITY_WEBGL && !UNITY_EDITOR
+            var bytes = new byte[16];
+            DrawBrowserInterop.FillRandom(bytes);
+            bytes[7] = (byte)((bytes[7] & 15) | 64);
+            bytes[8] = (byte)((bytes[8] & 63) | 128);
+            return new Guid(bytes).ToString("D");
+#else
+            return Guid.NewGuid().ToString("D");
+#endif
+        }
         private static void RequireSupported()
         {
             if (!IsSupported) throw new InvalidOperationException("이 플랫폼에서는 게스트 로그인을 지원하지 않습니다.");

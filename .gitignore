@@ -131,3 +131,8 @@ crashlytics-build.properties
 # Unity AI 어시스턴트가 만드는 빈 파일
 /DrawLiar/Assets/AssistantCustomInstructions.txt
 /DrawLiar/Assets/AssistantCustomInstructions.txt.meta
+
+# I2가 자동 생성하는 빈 기본 소스
+/DrawLiar/Assets/Resources.meta
+/DrawLiar/Assets/Resources/I2Languages.asset
+/DrawLiar/Assets/Resources/I2Languages.asset.meta

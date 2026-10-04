@@ -32,11 +32,11 @@ namespace DrawLiar
         private sealed class PendingMessage
         {
             public readonly string RequestId = Guid.NewGuid().ToString("N");
-            public readonly TaskCompletionSource<bool> Completion = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            public readonly TaskCompletionSource<bool> Completion = DrawAsync.Completion<bool>();
         }
 
         private readonly List<LobbyChatMessage> _messages = new List<LobbyChatMessage>();
-        private readonly SemaphoreSlim _sendLock = new SemaphoreSlim(1, 1);
+        private readonly DrawAsyncGate _sendLock = new DrawAsyncGate();
         private Connection _connection;
         private PendingMessage _pendingMessage;
         private string _sessionToken = "";
@@ -60,7 +60,7 @@ namespace DrawLiar
             var builder = new UriBuilder(uri)
             {
                 Scheme = uri.Scheme == "https" ? "wss" : "ws",
-                Path = "/ws/lobby",
+                Path = uri.AbsolutePath.TrimEnd('/') + "/ws/lobby",
                 Query = "",
                 Fragment = ""
             };
@@ -116,7 +116,7 @@ namespace DrawLiar
             {
                 using (var timeout = CancellationTokenSource.CreateLinkedTokenSource(connection.Cancellation.Token))
                 {
-                    timeout.CancelAfter(TimeSpan.FromSeconds(10));
+                    DrawAsync.CancelAfter(timeout, TimeSpan.FromSeconds(10));
                     byte[] bytes = Encoding.UTF8.GetBytes(JsonUtility.ToJson(new LobbyChatEnvelope
                     {
                         Type = "chat", RequestId = pending.RequestId, Text = text
@@ -146,10 +146,10 @@ namespace DrawLiar
         {
             var connection = _connection;
             if (connection == null) return;
-            if (Interlocked.Exchange(ref connection.Overflow, 0) != 0) Disconnect();
+            if (DrawAsync.Exchange(ref connection.Overflow, 0) != 0) Disconnect();
             for (int count = 0; count < 32 && connection.Incoming.TryDequeue(out var envelope); count++)
             {
-                Interlocked.Decrement(ref connection.Pending);
+                DrawAsync.Decrement(ref connection.Pending);
                 if (_connection != connection) return;
                 switch (envelope.Type)
                 {
@@ -234,19 +234,19 @@ namespace DrawLiar
                     {
                         using (var attempt = CancellationTokenSource.CreateLinkedTokenSource(connection.Cancellation.Token))
                         {
-                            attempt.CancelAfter(TimeSpan.FromSeconds(20));
+                            DrawAsync.CancelAfter(attempt, TimeSpan.FromSeconds(20));
                             socket = await DrawWebSocketClient.ConnectAsync(uri, certificatePin, attempt.Token);
                             connection.Cancellation.Token.ThrowIfCancellationRequested();
                             connection.Socket = socket;
                             await SendFrameAsync(socket, authentication, attempt.Token);
-                            var ready = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+                            var ready = DrawAsync.Completion<bool>();
                             var receiving = ReceiveAsync(socket, connection, ready, attempt.Token);
                             try
                             {
                                 using (attempt.Token.Register(() => ready.TrySetCanceled()))
                                     if (await ready.Task)
                                     {
-                                        attempt.CancelAfter(Timeout.InfiniteTimeSpan);
+                                        DrawAsync.CancelAfter(attempt, Timeout.InfiniteTimeSpan);
                                         retrySeconds = 2;
                                     }
                                 await receiving;
@@ -270,7 +270,7 @@ namespace DrawLiar
                         socket?.Dispose();
                     }
                     if (connection.Cancellation.IsCancellationRequested || connection.InvalidSession) break;
-                    await Task.Delay(TimeSpan.FromSeconds(retrySeconds), connection.Cancellation.Token);
+                    await DrawAsync.Delay(TimeSpan.FromSeconds(retrySeconds), connection.Cancellation.Token);
                     retrySeconds = Math.Min(retrySeconds * 2, 30);
                 }
             }
@@ -326,10 +326,10 @@ namespace DrawLiar
         private static bool Enqueue(Connection connection, LobbyChatEnvelope envelope)
         {
             if (connection.Cancellation.IsCancellationRequested) return false;
-            if (Interlocked.Increment(ref connection.Pending) > MAXIMUM_PENDING_FRAMES)
+            if (DrawAsync.Increment(ref connection.Pending) > MAXIMUM_PENDING_FRAMES)
             {
-                Interlocked.Decrement(ref connection.Pending);
-                Interlocked.Exchange(ref connection.Overflow, 1);
+                DrawAsync.Decrement(ref connection.Pending);
+                DrawAsync.Exchange(ref connection.Overflow, 1);
                 connection.Socket?.Abort();
                 return false;
             }

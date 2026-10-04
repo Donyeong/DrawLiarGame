@@ -1,3 +1,4 @@
+using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -5,6 +6,7 @@ using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,6 +34,16 @@ public static class ServerRuntime
         });
         builder.WebHost.ConfigureKestrel(options => options.Limits.MaxRequestBodySize = 128 * 1024);
         builder.Services.AddSingleton<ServerDatabase>();
+        builder.Services.Configure<ForwardedHeadersOptions>(options =>
+        {
+            options.ForwardedHeaders = ForwardedHeaders.XForwardedFor;
+            options.ForwardLimit = 1;
+            foreach (string proxy in builder.Configuration.GetSection("Network:TrustedProxies").Get<string[]>() ?? [])
+            {
+                if (!IPAddress.TryParse(proxy, out var address)) throw new InvalidOperationException("Network:TrustedProxies에는 IP 주소만 설정합니다.");
+                options.KnownProxies.Add(address);
+            }
+        });
         builder.Services.AddRateLimiter(options =>
         {
             options.RejectionStatusCode = 429;
@@ -56,6 +68,7 @@ public static class ServerRuntime
     public static async Task InitializeAsync(WebApplication app, bool mapHealth = true)
     {
         await app.Services.GetRequiredService<ServerDatabase>().InitializeAsync();
+        app.UseForwardedHeaders();
         app.Use(async (context, next) =>
         {
             try

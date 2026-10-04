@@ -144,7 +144,7 @@
 .player-name { -unity-font-style: bold; font-size: 13px; overflow: hidden; text-overflow: ellipsis; }
 .swatch { width: 25px; height: 25px; min-height: 0; padding: 0; margin: 4px; border-radius: 13px; border-width: 2px; border-color: rgba(52,48,75,.2); }
 .swatch.selected { border-color: var(--ink); scale: 1.12 1.12; }
-.avatar-colors { margin-bottom: 20px; }
+.avatar-colors { margin-bottom: 20px; padding: 4px; overflow: visible; }
 .avatar-colors .swatch { width: 48px; height: 48px; margin: 5px 13px 5px 0; border-radius: 25px; border-width: 3px; }
 .customize-scroll { height: 510px; flex-shrink: 0; }
 .compact .customize-scroll { height: 400px; }
@@ -364,6 +364,35 @@
 .utility-friend-list .room-entry { flex-direction: row; align-items: center; min-height: 74px; flex-shrink: 0; margin-bottom: 12px; padding: 12px; border-width: 1px; border-color: #E7DDC7; border-radius: 12px; background-color: #FFF9ED; }
 .app .utility-friend-list .player-name { flex-basis: 0; min-width: 0; margin: 0; padding: 0; font-size: 16px; -unity-font-style: normal; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .utility-friend-list .avatar { width: 48px; height: 48px; flex-shrink: 0; margin-right: 12px; }
+.profile-trigger { border-radius: 12px; }
+.profile-trigger:focus { background-color: rgba(120,103,158,.16); }
+.friend-profile-identity { min-width: 0; min-height: 48px; }
+.utility-friend-list .friend-pending { flex-shrink: 0; margin: 0 0 0 8px; font-size: 14px; }
+.app .modal.public-profile-popup { width: 760px; height: 720px; max-width: 94%; max-height: 90%; }
+.public-profile-body { min-width: 0; padding: 4px; }
+.public-profile-hero { min-width: 0; margin-bottom: 16px; }
+.public-profile-avatar { width: 104px; height: 104px; flex-shrink: 0; margin-right: 20px; }
+.public-profile-identity { min-width: 0; }
+.public-profile-name { margin: 0 0 8px; padding: 0; font-size: 24px; -unity-font-style: bold; white-space: normal; }
+.public-profile-joined { flex-wrap: wrap; }
+.public-profile-joined .public-profile-label { margin-right: 8px; }
+.public-profile-label { margin: 0; padding: 0; font-size: 14px; color: #736957; white-space: normal; }
+.public-profile-friend-actions { min-height: 48px; flex-shrink: 0; flex-wrap: wrap; margin-bottom: 20px; }
+.app .public-profile-friend-actions .button { min-width: 112px; margin: 0 8px 4px 0; }
+.public-profile-state { padding: 8px 12px; border-radius: 8px; background-color: #E9E4F3; color: #645797; font-size: 14px; }
+.public-profile-stat-grid { flex-wrap: wrap; align-items: stretch; margin-bottom: 20px; }
+.public-profile-stat { width: 31%; flex-shrink: 0; min-height: 76px; margin: 0 2% 10px 0; padding: 10px 12px; border-width: 1px; border-color: #E7DDC7; border-radius: 10px; background-color: #FFF9ED; }
+.public-profile-stat-value { margin: 0 0 4px; padding: 0; font-size: 22px; -unity-font-style: bold; color: #34304B; }
+.public-profile-match { flex-shrink: 0; margin-bottom: 10px; padding: 12px; border-width: 1px; border-color: #E7DDC7; border-radius: 10px; background-color: #FFF9ED; }
+.public-profile-match-summary { margin: 8px 0; }
+.public-profile-match-summary > Label { margin: 0; padding: 0; font-size: 17px; }
+.public-profile-match-score { -unity-font-style: bold; }
+.public-profile-match-detail { flex-wrap: wrap; }
+.public-profile-match-detail .public-profile-label { margin-right: 8px; }
+.public-profile-win, .public-profile-loss { margin: 0 0 0 8px; padding: 4px 8px; border-radius: 6px; font-size: 14px; }
+.public-profile-win { background-color: #D9EFE7; color: #2F7862; }
+.public-profile-loss { background-color: #E9E4F3; color: #645797; }
+.public-profile-message, .public-profile-empty { margin: 12px 0; padding: 0; font-size: 16px; color: #736957; white-space: normal; }
 .app .utility-friend-list .room-entry .button { min-width: 88px; margin-left: 8px; }
 .utility-friend-list .muted { margin: 0 0 12px; font-size: 16px; white-space: normal; }
 .app .shop-page .button.icon-button, .app .utility-popup .button.icon-button { padding: 0; }

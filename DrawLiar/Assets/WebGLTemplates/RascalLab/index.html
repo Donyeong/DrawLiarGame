@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>{{{ PRODUCT_NAME }}} · RascalLab</title>
+    <link rel="stylesheet" href="player.css">
+  </head>
+  <body>
+    <canvas id="unity-canvas" width="{{{ WIDTH }}}" height="{{{ HEIGHT }}}" tabindex="0" aria-label="LiarCanvas"></canvas>
+    <div id="loading" role="status">
+      <strong>LiarCanvas</strong>
+      <progress id="progress" max="1" value="0"></progress>
+      <span id="status">게임 불러오는 중</span>
+    </div>
+    <script src="player.js"></script>
+  </body>
+</html>

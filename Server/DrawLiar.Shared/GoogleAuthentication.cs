@@ -12,7 +12,7 @@ public sealed class GoogleAuthentication(IConfiguration configuration, ServerDat
 
     public Task<GoogleChallengeResponse> ChallengeAsync(GoogleChallengeRequest request, Guid? accountId)
     {
-        string key = request.Platform switch { "desktop" => "Google:DesktopClientId", "mobile" => "Google:MobileClientId", _ => throw new ApiException("InvalidPlatform") };
+        string key = request.Platform switch { "desktop" => "Google:DesktopClientId", "mobile" => "Google:MobileClientId", "web" => "Google:WebClientId", _ => throw new ApiException("InvalidPlatform") };
         return _database.CreateChallengeAsync(_configuration[key] ?? "", request.Platform, accountId);
     }
 
@@ -34,7 +34,7 @@ public sealed class GoogleAuthentication(IConfiguration configuration, ServerDat
             || string.IsNullOrWhiteSpace(payload.Subject) || payload.Subject.Length > 255)
             throw new ApiException("InvalidGoogleCredential", 401);
         // 외부 인증의 sub만 계정 식별자로 사용하며 이메일이 같은 계정을 자동 연결하지 않는다.
-        string displayName = "화가_" + ServerRuntime.NewToken()[..8];
+        string displayName = GuestNicknameGenerator.Create();
         return await _database.GoogleAccountAsync(payload.Subject, displayName, accountId);
     }
 

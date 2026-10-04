@@ -176,6 +176,7 @@ public sealed partial class ServerDatabase
             roomCode = RoomCodes.Create();
         } while (await Execute(connection, transaction, "INSERT INTO \"Room\" (\"RoomId\",\"RoomCode\",\"OwnerAccountId\",\"NodeId\",\"Settings\",\"CustomTopics\") VALUES ($1,$2,$3,$4,$5::jsonb,$6::jsonb) ON CONFLICT (\"RoomCode\") DO NOTHING",
             roomId, roomCode, session.AccountId, nodeId, JsonSerializer.Serialize(settings, ServerRuntime.Json), JsonSerializer.Serialize(request.CustomTopics, ServerRuntime.Json)) == 0);
+        await Execute(connection, transaction, "INSERT INTO \"RoomGameAuthority\" (\"RoomId\",\"NodeId\") VALUES ($1,$2)", roomId, nodeId);
         var assignment = await CreateTicket(connection, transaction, session, roomId, roomCode, publicUrl, false);
         await transaction.CommitAsync();
         return assignment;
@@ -299,6 +300,7 @@ public sealed partial class ServerDatabase
         var issued = await IssueSession(connection, transaction, accountId, "dedicated:" + request.NodeId, sessionHash, session.ExpiresAt);
         var profile = await ReadProfile(connection, transaction, accountId);
         var customTopics = JsonSerializer.Deserialize<ServerTopicData[]>((string)(await Scalar(connection, transaction, "SELECT \"CustomTopics\"::text FROM \"Room\" WHERE \"RoomId\"=$1", roomId))!, ServerRuntime.Json)!;
+        await Execute(connection, transaction, "INSERT INTO \"RoomGameAdmission\" (\"RoomId\",\"AccountId\") VALUES ($1,$2) ON CONFLICT DO NOTHING", roomId, accountId);
         await transaction.CommitAsync();
         return new RedeemTicketResponse { AccountId = accountId.ToString(), AdmissionId = admissionId, Profile = profile, Room = room, SessionToken = issued.Token, IsSpectator = spectator, SpectatorOnly = spectatorOnly, CustomTopics = customTopics };
     }

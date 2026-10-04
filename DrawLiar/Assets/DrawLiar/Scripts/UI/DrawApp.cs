@@ -9,7 +9,7 @@ using L = DrawLiar.DrawLocalization;
 
 namespace DrawLiar
 {
-    public sealed class DrawApp : MonoBehaviour
+    public sealed partial class DrawApp : MonoBehaviour
     {
         private DrawNetworkManager network;
         private LobbyServiceBridge lobby;
@@ -49,6 +49,10 @@ namespace DrawLiar
         private Label _shopPreviewStatus;
         private Button _shopPreviewReset;
         private MobileUILayout _mobileLayout;
+#if UNITY_WEBGL && !UNITY_EDITOR
+        private DrawBrowserTextInput _browserTextInput;
+        private bool _webRenderedMode, _webLayoutRebuildPending;
+#endif
         private VisualElement _mobileRoomStack, _mobileWorkspace, _mobileControls, _mobileSecret, _mobileCanvas, _mobileRoster, _mobileActions, _mobileChatSheet;
         private Label _mobileRoundInfo, _mobileRoundHint;
         private Button _mobileRoomCode;
@@ -96,13 +100,20 @@ namespace DrawLiar
         private void OnEnable()
         {
             L.LanguageChanged+=OnLanguageChanged;
+#if UNITY_WEBGL && !UNITY_EDITOR
+            if(root!=null)_browserTextInput=new DrawBrowserTextInput(root);
+#endif
 #if ENABLE_INPUT_SYSTEM
             if(_lobbyChatPanel!=null)AttachLobbyChatKeyboard();
 #endif
         }
         private void OnDisable()
         {
+            ClosePublicProfile(false);
             L.LanguageChanged-=OnLanguageChanged;
+#if UNITY_WEBGL && !UNITY_EDITOR
+            _browserTextInput?.Dispose();_browserTextInput=null;
+#endif
 #if ENABLE_INPUT_SYSTEM
             DetachLobbyChatKeyboard();
 #endif
@@ -117,7 +128,11 @@ namespace DrawLiar
             nickname=PlayerPrefs.GetString("DrawLiar.Name","동글이"+UnityEngine.Random.Range(10,99));
             avatarColor=Mathf.Clamp(PlayerPrefs.GetInt("DrawLiar.Color",0),0,AvatarElement.Colors.Length-1);
             accessory=AvatarParts.Sanitize(PlayerPrefs.GetInt("DrawLiar.Equipment",(int)AvatarAccessory.Painter));
+#if UNITY_WEBGL && !UNITY_EDITOR
+            var panel=panelSettings=DrawLocalizedTypography.CreateBrowserPanel();
+#else
             var panel=panelSettings=ScriptableObject.CreateInstance<PanelSettings>();
+#endif
             panel.themeStyleSheet=Resources.Load<ThemeStyleSheet>("DrawLiar/DrawLiarTheme");
             panel.scaleMode=PanelScaleMode.ScaleWithScreenSize;panel.referenceResolution=new Vector2Int(1600,1000);
             panel.screenMatchMode=PanelScreenMatchMode.MatchWidthOrHeight;panel.match=.5f;
@@ -126,7 +141,13 @@ namespace DrawLiar
             root.styleSheets.Add(Resources.Load<StyleSheet>("DrawLiar/DrawLiar"));
             root.styleSheets.Add(Resources.Load<StyleSheet>("DrawLiar/DrawLiarMobile"));
             DrawLocalizedTypography.Apply(root);root.EnableInClassList("rtl",L.IsRightToLeft);
+#if UNITY_WEBGL && !UNITY_EDITOR
+            _browserTextInput=new DrawBrowserTextInput(root);
+#endif
             _mobileLayout=new MobileUILayout(root,panelSettings);
+#if UNITY_WEBGL && !UNITY_EDITOR
+            _webRenderedMode=IsMobile;
+#endif
             _mobileLayout.LayoutChanged+=OnMobileLayoutChanged;
             reducedMotion=PlayerPrefs.GetInt("DrawLiar.ReduceMotion",0)==1;
             root.EnableInClassList("reduce-motion",reducedMotion);
@@ -251,6 +272,7 @@ namespace DrawLiar
         {
             var page=Box(content,"mobile-lobby");var profile=Box(page,"mobile-lobby-profile row");
             avatarStage=Box(profile,"mobile-lobby-avatar");UpdateLobbyAvatar(avatarColor,accessory);
+            BindProfileTarget(avatarStage,lobby.Profile?.AccountId);
             var identity=Box(profile,"mobile-lobby-identity grow");RawText(identity,nickname,"mobile-lobby-name");
             Text(identity,lobby.Profile?.HasGoogleAccount==true?"Google":"게스트","mobile-account-state");
             Button(identity,"꾸미기",()=>Navigate(LobbyScreen.Customize),"secondary mobile-customize");
@@ -274,6 +296,7 @@ namespace DrawLiar
             var sidebar=Box(workspace,"pc-lobby-sidebar");sidebar.name="pc-lobby-sidebar";
             var profile=Box(sidebar,"pc-lobby-card pc-lobby-profile");
             avatarStage=Box(profile,"pc-lobby-avatar");UpdateLobbyAvatar(avatarColor,accessory);
+            BindProfileTarget(avatarStage,lobby.Profile?.AccountId);
             RawText(profile,nickname,"pc-lobby-name");Text(profile,lobby.Profile?.HasGoogleAccount==true?"Google":"게스트","pc-lobby-account");
             Button(profile,"꾸미기",()=>Navigate(LobbyScreen.Customize),"secondary pc-lobby-customize");
             var services=Box(sidebar,"pc-lobby-card pc-lobby-services");
@@ -547,7 +570,7 @@ namespace DrawLiar
             RawText(panel,lobby.Profile.DisplayName,"section-title");
             Text(panel,lobby.Profile.HasGoogleAccount?"Google 연동 계정":lobby.Profile.IsGuest?"게스트 계정":"기존 계정","muted");
             Text(panel,"계정 ID: {0}","rules",lobby.Profile.AccountId);
-            Button(panel,"계정 ID 복사",()=>{GUIUtility.systemCopyBuffer=lobby.Profile.AccountId;Toast("계정 ID를 복사했습니다.");},"secondary");
+            Button(panel,"계정 ID 복사",()=>Run(async()=>{await DrawClipboard.CopyAsync(lobby.Profile.AccountId);Toast("계정 ID를 복사했습니다.");}),"secondary");
             if(!lobby.Profile.HasGoogleAccount)
             {
                 var link=Button(panel,"Google 계정 연동",()=>Run(()=>lobby.GoogleLoginAsync(true)),"primary google-link");link.SetEnabled(GoogleAccountProvider.IsSupported&&!lobby.IsBusy);
@@ -572,7 +595,7 @@ namespace DrawLiar
             if(lobby.Friends.Incoming.Length>0)Text(friendList,"받은 요청","section-title");
             foreach(var friend in lobby.Friends.Incoming)
             {
-                var row=Box(friendList,"room-entry");RawText(row,friend.DisplayName,"player-name grow");
+                var row=Box(friendList,"room-entry");FriendProfileIdentity(row,friend);
                 Button(row,"수락",()=>Run(()=>lobby.RespondFriendAsync(friend.AccountId,true)),"primary").name="friend-accept-"+friend.AccountId;
                 Button(row,"거절",()=>Run(()=>lobby.RespondFriendAsync(friend.AccountId,false)),"secondary").name="friend-reject-"+friend.AccountId;
             }
@@ -580,11 +603,15 @@ namespace DrawLiar
             if(lobby.Friends.Friends.Length==0)Text(friendList,"친구가 없습니다.","muted");
             foreach(var friend in lobby.Friends.Friends)
             {
-                var row=Box(friendList,"room-entry");row.Add(new AvatarElement(friend.AvatarColor,friend.Accessory));RawText(row,friend.DisplayName,"player-name grow");
+                var row=Box(friendList,"room-entry");FriendProfileIdentity(row,friend);
                 Button(row,"삭제",()=>Run(()=>lobby.RemoveFriendAsync(friend.AccountId)),"secondary").name="friend-remove-"+friend.AccountId;
             }
             if(lobby.Friends.Outgoing.Length>0)Text(friendList,"보낸 요청","section-title");
-            foreach(var friend in lobby.Friends.Outgoing)Text(friendList,"{0} · 수락 대기","muted",friend.DisplayName);
+            foreach(var friend in lobby.Friends.Outgoing)
+            {
+                var row=Box(friendList,"room-entry");FriendProfileIdentity(row,friend);
+                Text(row,"수락 대기","muted friend-pending");
+            }
         }
 
         private void ShopPage()
@@ -851,7 +878,7 @@ namespace DrawLiar
                 LeftToRightInput(input);
                 input.textEdition.keyboardType=TouchScreenKeyboardType.ASCIICapable;input.textEdition.autoCorrection=false;
                 input.RegisterValueChangedCallback(e=>{if(ReferenceEquals(e.target,input))input.SetValueWithoutNotify(NormalizeRoomCodeInput(e.newValue));});
-                Button(codeRow,"붙여넣기",()=>{input.value=NormalizeRoomCodeInput(GUIUtility.systemCopyBuffer);},"secondary mobile-code-paste");
+                Button(codeRow,"붙여넣기",()=>Run(async()=>{input.value=NormalizeRoomCodeInput(await DrawClipboard.ReadAsync());}),"secondary mobile-code-paste");
                 void Join(bool watch)=>Run(()=>lobby.JoinCodeAsync(RequireMobileRoomCode(input.value),watch));
                 var actions=Box(panel,"mobile-join-actions row");Button(actions,"참가하기",()=>Join(false),"primary grow");Button(actions,"관전",()=>Join(true),"secondary grow mobile-last");return;
             }
@@ -925,6 +952,7 @@ namespace DrawLiar
 
         private void Room()
         {
+            ClosePublicProfile(false);
             ResetLobbyChatView();_mobileLobbyChatButton=null;
             inRoom=true;content.Clear();publicRoomList=null;serviceNotice=null;playerKey="";actionKey="";contextKey="";
             playerCards.Clear();playerStatuses.Clear();selectedPlayerId=-1;secretHidden=false;voteSubmitted=false;
@@ -1017,7 +1045,7 @@ namespace DrawLiar
             _mobileRoundInfo=Text(round,"","mobile-card-title");_mobileRoundHint=Text(round,"","muted mobile-small");
             roomBadge=Text(round,"","mobile-hidden");roundCaption=Text(round,"","mobile-hidden");
             roomBadge.languageDirection=LanguageDirection.LTR;
-            _mobileRoomCode=Button(metadata,"",()=>{GUIUtility.systemCopyBuffer=lobby.RoomCode;Toast("방 코드를 복사했습니다.");},"secondary mobile-code-copy");SetRawText(_mobileRoomCode,DisplayRoomCode(lobby.RoomCode));
+            _mobileRoomCode=Button(metadata,"",()=>Run(async()=>{await DrawClipboard.CopyAsync(lobby.RoomCode);Toast("방 코드를 복사했습니다.");}),"secondary mobile-code-copy");SetRawText(_mobileRoomCode,DisplayRoomCode(lobby.RoomCode));
             _mobileRoomCode.languageDirection=LanguageDirection.LTR;
             _mobileSecret=Box(_mobileRoomStack,"secret-bar mobile-secret");topic=Text(_mobileSecret,"","topic");
             var identity=Box(_mobileSecret,"mobile-role-line row");role=Text(identity,"","role");word=Text(identity,"","word grow");secretToggle=Button(identity,"숨기기",()=>{secretHidden=!secretHidden;RefreshSecret(network.State);},"secret-toggle");
@@ -1041,6 +1069,17 @@ namespace DrawLiar
 
         private void OnMobileLayoutChanged()
         {
+#if UNITY_WEBGL && !UNITY_EDITOR
+            if(_webRenderedMode!=IsMobile)
+            {
+                if(!_webLayoutRebuildPending)
+                {
+                    _webLayoutRebuildPending=true;
+                    root.schedule.Execute(RebuildBrowserLayout);
+                }
+                return;
+            }
+#endif
             if(!inRoom||_mobileWorkspace==null||!IsMobile)return;
             if(_mobileLayout.IsPortrait||network.State?.Phase==GamePhase.Lobby)
             {
@@ -1055,6 +1094,42 @@ namespace DrawLiar
             SizeMobileCanvas();
             SizeMobileWaitingPlayers();
         }
+
+#if UNITY_WEBGL && !UNITY_EDITOR
+        private void RebuildBrowserLayout()
+        {
+            try
+            {
+                if(content==null||_webRenderedMode==IsMobile)return;
+                root.focusController?.focusedElement?.Blur();
+                var popup=_utilityPopupScreen;
+                var oldOverlay=overlay;CloseModal();oldOverlay?.RemoveFromHierarchy();
+                _webRenderedMode=IsMobile;
+                if(inRoom&&network.State!=null)
+                {
+                    string chatDraft=chatInput?.value??"";
+                    bool chatVisible=chatbar?.style.display==DisplayStyle.Flex;
+                    var chatLines=chatHistory?.contentContainer.Children().ToArray();
+                    var brushColor=surface?.BrushColor;var brushSize=surface?.BrushSize;var eraser=surface?.Eraser;
+                    int selected=selectedPlayerId;bool hidden=secretHidden,submitted=voteSubmitted;
+                    Room();
+                    selectedPlayerId=selected;secretHidden=hidden;voteSubmitted=submitted;
+                    if(surface!=null&&brushColor.HasValue){surface.BrushColor=brushColor.Value;surface.BrushSize=brushSize.Value;surface.Eraser=eraser.Value;}
+                    if(chatLines!=null)foreach(var line in chatLines)chatHistory.Add(line);
+                    if(chatInput!=null)chatInput.SetValueWithoutNotify(chatDraft);
+                    RefreshState(network.State);
+                    if(chatVisible)OpenChat();
+                }
+                else Home();
+                if(popup.HasValue)OpenUtilityPopup(popup.Value);
+            }
+            finally
+            {
+                _webLayoutRebuildPending=false;
+                if(_webRenderedMode!=IsMobile)OnMobileLayoutChanged();
+            }
+        }
+#endif
 
         private void SizeMobileWaitingPlayers()
         {
@@ -1130,6 +1205,7 @@ namespace DrawLiar
         }
         private void RoomShortcut(KeyDownEvent e)
         {
+            if(_profileOverlay!=null){if(e.keyCode==KeyCode.Escape)ClosePublicProfile();e.StopPropagation();return;}
             if(!inRoom&&e.keyCode==KeyCode.Escape&&overlay!=null){CloseModal();e.StopPropagation();return;}
             if(!inRoom)return;
             if(e.keyCode==KeyCode.Escape&&_roomOptionsSaving){e.StopPropagation();return;}
@@ -1143,7 +1219,7 @@ namespace DrawLiar
             var state=network.State;if(state==null)return;
             CloseChat();var modal=Modal("메뉴");RawText(modal,state.Settings.RoomName,"subtitle");
             if(CanEditRoomOptions(state))Button(modal,"방 옵션",RoomOptions,"secondary").name="room-options-menu";
-            Button(modal,"방 코드 복사",()=>{GUIUtility.systemCopyBuffer=lobby.RoomCode;Toast("방 코드를 복사했습니다.");},"secondary");
+            Button(modal,"방 코드 복사",()=>Run(async()=>{await DrawClipboard.CopyAsync(lobby.RoomCode);Toast("방 코드를 복사했습니다.");}),"secondary");
             if(IsMobile&&state.Phase!=GamePhase.Lobby&&!string.IsNullOrEmpty(state.Word))
                 Button(modal,secretHidden?"제시어 보기":"제시어 숨기기",()=>{secretHidden=!secretHidden;RefreshSecret(network.State);CloseModal();},"secondary");
             Button(modal,"옵션",Options,"secondary");
@@ -1290,7 +1366,7 @@ namespace DrawLiar
             bool toolsWereVisible=drawingTools.resolvedStyle.display!=DisplayStyle.None;
             drawingTools.style.display=network.CanDraw?DisplayStyle.Flex:DisplayStyle.None;drawingTools.SetEnabled(network.CanDraw);
             if(network.CanDraw&&!toolsWereVisible)Enter(drawingTools,140,4);
-            var key=string.Join("|",state.Players.Select(p=>$"{p.Id},{p.Name},{p.Score},{p.IsLiar},{p.IsSpectator},{p.IsConnected},{p.AvatarColor},{p.Accessory},{p.HasVoted}"))+state.ArtistId+state.Phase;
+            var key=string.Join("|",state.Players.Select(p=>$"{p.Id},{p.AccountId},{p.Name},{p.Score},{p.IsLiar},{p.IsSpectator},{p.IsConnected},{p.AvatarColor},{p.Accessory},{p.HasVoted}"))+state.ArtistId+state.Phase;
             if(key!=playerKey){playerKey=key;Players(state);}
             var local=state.Players.FirstOrDefault(p=>p.Id==state.LocalPlayerId);
             var actions=$"{state.Phase}/{state.ArtistId}/{state.CanStart}/{state.IsHost}/{local?.HasVoted}/{local?.HasGuessed}/{selectedPlayerId}/{voteSubmitted}";
@@ -1322,7 +1398,7 @@ namespace DrawLiar
             {
                 var p=players[i];var card=Box(playerStrip,"player");card.userData=p.Id;card.focusable=true;card.tabIndex=0;
                 card.EnableInClassList("last-player",i==players.Length-1);playerCards[p.Id]=card;
-                var row=Box(card,"row");row.Add(new AvatarElement(p.AvatarColor,p.Accessory));var info=Box(row,"grow");
+                var row=Box(card,"row");var avatar=new AvatarElement(p.AvatarColor,p.Accessory);row.Add(avatar);BindProfileTarget(avatar,p.AccountId);var info=Box(row,"grow");
                 if(p.Id==state.LocalPlayerId)Text(info,"{0} · 나","player-name",p.Name);else RawText(info,p.Name,"player-name");card.tooltip=p.Name;
                 playerStatuses[p.Id]=Text(info,"","player-status");
                 void Activate()
@@ -1412,7 +1488,7 @@ namespace DrawLiar
                     if(state.IsHost){var b=Button(phaseActions,"게임 시작",network.StartMatch,"primary",DrawSound.UiConfirm);b.SetEnabled(state.CanStart);}else Text(phaseActions,"방장 시작 대기","muted");
                     if(state.IsHost)Button(phaseActions,"방 옵션",RoomOptions,"secondary").name="room-options-open";
                     if(state.IsHost&&!state.CanStart)Text(phaseActions,"참가자 {0}명 필요","rules",GameRules.MIN_START_PLAYERS);
-                    if(!IsMobile)Button(phaseActions,"방 코드 복사",()=>{GUIUtility.systemCopyBuffer=lobby.RoomCode;Toast("방 코드를 복사했습니다.");},"secondary");break;
+                    if(!IsMobile)Button(phaseActions,"방 코드 복사",()=>Run(async()=>{await DrawClipboard.CopyAsync(lobby.RoomCode);Toast("방 코드를 복사했습니다.");}),"secondary");break;
                 case GamePhase.Drawing:if(network.CanDraw)Button(phaseActions,"그리기 완료",network.EndTurn,"primary",DrawSound.UiConfirm);break;
                 case GamePhase.Voting:
                     if(state.LocalIsSpectator){Text(phaseActions,"관전 중","muted");break;}
@@ -1453,7 +1529,7 @@ namespace DrawLiar
             var list=DrawSmoothScroll.Create();list.style.maxHeight=380;modal.Add(list);
             foreach(var p in state.Players.Where(p=>!p.IsSpectator).OrderByDescending(p=>p.Score))
             {
-                var row=Box(list,"score-row");var identity=Box(row,"row");identity.Add(new AvatarElement(p.AvatarColor,p.Accessory));
+                var row=Box(list,"score-row");var identity=Box(row,"row");var avatar=new AvatarElement(p.AvatarColor,p.Accessory);identity.Add(avatar);BindProfileTarget(avatar,p.AccountId);
                 string template=state.Winners.Contains(p.Id)?(p.IsLiar?"★ {0} · 라이어":"★ {0} · 시민"):(p.IsLiar?"{0} · 라이어":"{0} · 시민");
                 Text(identity,template,"",p.Name);Text(row,"{0}점 (+{1})","player-score",p.Score,p.RoundPoints);
             }
@@ -1467,6 +1543,7 @@ namespace DrawLiar
             foreach(var player in state.Players.Where(p=>p.IsLiar))
             {
                 var identity=Box(identities,"reveal-liar");var avatar=new AvatarElement(player.AvatarColor,player.Accessory);avatar.AddToClassList("avatar-preview");identity.Add(avatar);
+                BindProfileTarget(avatar,player.AccountId);
                 RawText(identity,player.Name,"player-name");Text(identity,player.IsCaught?"지목됨":"지목 안 됨","rules");
             }
             Enter(identities,120,0,reducedMotion?0:400);
@@ -1671,6 +1748,7 @@ namespace DrawLiar
         }
         private void RefreshServiceStatus()
         {
+            RefreshPublicProfileActions();
             var save=root.Q<Button>("customize-save");if(save!=null)save.SetEnabled(save.userData is bool canSave&&canSave&&!lobby.IsBusy);
             shopList?.Query<Button>().ForEach(button=>{if(lobby.IsBusy)button.SetEnabled(false);});
             root.Query<Button>(className:"guest-login").ForEach(button=>button.SetEnabled(DrawGuestCredentialStore.IsSupported&&!lobby.IsBusy));
@@ -1704,6 +1782,7 @@ namespace DrawLiar
         }
         private void CloseModal()
         {
+            ClosePublicProfile(false);
             var returnFocus=_popupReturnFocus;_popupReturnFocus=null;
             if(_utilityPopupScreen.HasValue)friendList=null;
             _utilityPopupScreen=null;
@@ -1719,7 +1798,7 @@ namespace DrawLiar
         }
         private void Toast(string message)
         {
-            if(string.IsNullOrWhiteSpace(message))return;root.Q<Label>("toast")?.RemoveFromHierarchy();var label=Text(root,message,"toast");label.name="toast";DrawUIMotion.ShowToast(label,4200);
+            if(string.IsNullOrWhiteSpace(message))return;root.Q<Label>("toast")?.RemoveFromHierarchy();var label=Text(root,message,"toast");label.name="toast";label.pickingMode=PickingMode.Ignore;DrawUIMotion.ShowToast(label,4200);
         }
 
         private void CreateServiceNotice(VisualElement parent)
@@ -1759,10 +1838,12 @@ namespace DrawLiar
             lastServiceStatus=lobby.Status;if(serviceNotice!=null)SetRawText(serviceNotice,lastServiceStatus);
             RefreshLobbyChat();
             DrawLocalizedTypography.Apply(root);
+            if(_profileOverlay!=null)BeginPublicProfileLoad();
             shopList?.schedule.Execute(()=>shopList?.Query<VisualElement>(className:"shop-entry").ForEach(card=>SizeShopActions(card,card.Q<VisualElement>(className:"shop-actions")))).StartingIn(1);
         }
         private void OnDestroy()
         {
+            ClosePublicProfile(false);
             ResetLobbyChatView();
             if(network!=null){network.StateChanged-=RefreshState;network.ChatReceived-=OnChat;}
             if(lobby!=null){lobby.Changed-=RefreshServiceStatus;lobby.ProfileChanged-=OnProfileChanged;lobby.LobbyChatChanged-=RefreshLobbyChat;lobby.LobbyChatNotice-=Toast;}
@@ -1800,10 +1881,27 @@ namespace DrawLiar
         }
         private static void Classes(VisualElement e,string classes){foreach(var c in classes.Split(' '))if(c.Length>0)e.AddToClassList(c);}
         private static TextField Field(VisualElement parent,string label,string value){var e=new TextField(L.Text(label)){value=L.Raw(value)};SetText(e.labelElement,label);e.AddToClassList("field");parent.Add(e);return e;}
+#if UNITY_WEBGL && !UNITY_EDITOR
+        private static TextField Int(VisualElement parent,string label,int value,int min,int max,Action<int> changed)
+        {
+            int current=Mathf.Clamp(value,min,max);
+            var field=new TextField(L.Text(label)){value=current.ToString(System.Globalization.CultureInfo.InvariantCulture),isDelayed=true,maxLength=10};
+            field.textEdition.keyboardType=TouchScreenKeyboardType.NumberPad;
+            SetText(field.labelElement,label);field.AddToClassList("field");LeftToRightInput(field);
+            field.RegisterValueChangedCallback(e=>
+            {
+                if(!ReferenceEquals(e.target,field))return;
+                if(int.TryParse(e.newValue,System.Globalization.NumberStyles.Integer,System.Globalization.CultureInfo.InvariantCulture,out int parsed))current=Mathf.Clamp(parsed,min,max);
+                field.SetValueWithoutNotify(current.ToString(System.Globalization.CultureInfo.InvariantCulture));changed(current);
+            });
+            parent.Add(field);return field;
+        }
+#else
         private static IntegerField Int(VisualElement parent,string label,int value,int min,int max,Action<int> changed)
         {
             var field=new IntegerField(L.Text(label)){value=value,isDelayed=true};SetText(field.labelElement,label);field.AddToClassList("field");field.RegisterValueChangedCallback(e=>{if(!ReferenceEquals(e.target,field))return;var v=Mathf.Clamp(e.newValue,min,max);field.SetValueWithoutNotify(v);changed(v);});parent.Add(field);return field;
         }
+#endif
         private static DropdownField Choice(VisualElement parent,string label,string[] options,int index,Action<int> changed)
         {
             var field=new DropdownField(L.Text(label),options.Select(L.Text).ToList(),Mathf.Clamp(index,0,options.Length-1));SetText(field.labelElement,label);LOCALIZED_CHOICES.Add(field,options);field.AddToClassList("field");field.RegisterValueChangedCallback(e=>{if(ReferenceEquals(e.target,field))changed(field.index);});parent.Add(field);return field;

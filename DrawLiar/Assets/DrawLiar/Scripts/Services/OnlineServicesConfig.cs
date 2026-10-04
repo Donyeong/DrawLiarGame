@@ -11,7 +11,17 @@ namespace DrawLiar
         [SerializeField] private string _mainServerUrl = "https://34.158.195.192:19050";
         [SerializeField] private string _certificateSha256 = "";
         [SerializeField] private bool _allowLocalDevelopmentServer;
-        public string MainServerUrl => _mainServerUrl;
+        public string MainServerUrl
+        {
+            get
+            {
+#if UNITY_WEBGL && !UNITY_EDITOR
+                return DrawBrowserInterop.ServerUrl("mainServerUrl", false);
+#else
+                return _mainServerUrl;
+#endif
+            }
+        }
         public string CertificateSha256 => _certificateSha256;
 
         public static OnlineServicesConfig Load()
@@ -29,9 +39,37 @@ namespace DrawLiar
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             if (_allowLocalDevelopmentServer && uri.IsLoopback && (uri.Scheme == "http" || uri.Scheme == "ws")) return;
 #endif
+#if UNITY_WEBGL && DEVELOPMENT_BUILD && !UNITY_EDITOR
+            if (uri.IsLoopback && (uri.Scheme == "http" || uri.Scheme == "ws")) return;
+#endif
             throw new InvalidOperationException("서버 연결에는 HTTPS가 필요합니다.");
         }
-        public CertificateHandler CreateCertificateHandler() => DrawServerTrust.CreateCertificateHandler(_certificateSha256);
+        public CertificateHandler CreateCertificateHandler()
+        {
+#if UNITY_WEBGL && !UNITY_EDITOR
+            return null;
+#else
+            return DrawServerTrust.CreateCertificateHandler(_certificateSha256);
+#endif
+        }
+
+        public string ResolveGameServerUrl(string assignedUrl)
+        {
+#if UNITY_WEBGL && !UNITY_EDITOR
+            return DrawBrowserInterop.ServerUrl("gameServerUrl", false);
+#else
+            return assignedUrl;
+#endif
+        }
+
+        public string ResolveDedicatedServerUrl(string assignedUrl)
+        {
+#if UNITY_WEBGL && !UNITY_EDITOR
+            return DrawBrowserInterop.ServerUrl("dedicatedServerUrl", true);
+#else
+            return assignedUrl;
+#endif
+        }
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
         public void SetDevelopmentServer(string address)

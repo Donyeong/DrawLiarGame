@@ -320,6 +320,12 @@
 .app.mobile-landscape .shop-profile-name { height: 20px; margin-bottom: 6px; font-size: 16px; }
 .app.mobile-landscape .shop-preview-controls .shop-preview-status { min-height: 18px; margin-bottom: 6px; font-size: 13px; }
 .app.mobile .modal.utility-popup { width: 100%; max-width: 100%; height: 88%; max-height: 704px; min-height: 0; padding: 16px; border-width: 2px; border-color: #34304B; border-radius: 20px 20px 0 0; background-color: #FFFFFF; }
+.app.mobile .modal.public-profile-popup { max-height: 90%; }
+.mobile .public-profile-avatar { width: 88px; height: 88px; margin-right: 12px; }
+.mobile .public-profile-name { font-size: 22px; }
+.mobile .public-profile-stat { width: 48%; padding: 10px; }
+.mobile .public-profile-label { font-size: 14px; }
+.mobile .public-profile-match-summary > Label { font-size: 16px; }
 .app.mobile .utility-popup-header { margin-bottom: 12px; }
 .app.mobile .utility-popup .utility-popup-close { margin-top: 12px; }
 .app.mobile .utility-popup-form { padding-right: 0; }

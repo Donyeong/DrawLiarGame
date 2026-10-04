@@ -9,6 +9,8 @@ namespace DrawLiar
         private const int POLL_INTERVAL_MS = 125;
         private readonly VisualElement _root;
         private readonly PanelSettings _panelSettings;
+        private Vector2Int _pcReferenceResolution;
+        private float _pcMatch;
         private readonly IVisualElementScheduledItem _poll;
         private bool _editorMobilePreview, _disposed, _keyboardOpen, _hasMetrics, _geometryDirty = true;
         private int _screenWidth, _screenHeight, _unoccludedHeight;
@@ -39,6 +41,8 @@ namespace DrawLiar
         {
             _root = root ?? throw new ArgumentNullException(nameof(root));
             _panelSettings = panelSettings ?? throw new ArgumentNullException(nameof(panelSettings));
+            _pcReferenceResolution = panelSettings.referenceResolution;
+            _pcMatch = panelSettings.match;
             _editorMobilePreview = Application.isEditor && forceMobilePreview;
 #if UNITY_EDITOR
             _editorTestMode = (EditorTestMode)Mathf.Clamp(UnityEditor.SessionState.GetInt(EDITOR_TEST_MODE_KEY, 0), 0, 2);
@@ -60,6 +64,8 @@ namespace DrawLiar
 #if UNITY_EDITOR
             if (_editorTestMode == EditorTestMode.Automatic && height > width) _editorMobilePreview = true;
             bool mobile = _editorTestMode != EditorTestMode.PC && (Application.isMobilePlatform || _editorMobilePreview);
+#elif UNITY_WEBGL
+            bool mobile = Application.isMobilePlatform || DrawBrowserInterop.IsMobile;
 #else
             bool mobile = Application.isMobilePlatform || _editorMobilePreview;
 #endif
@@ -103,6 +109,16 @@ namespace DrawLiar
             keyboardHeight = mobile ? Mathf.Clamp(keyboardHeight, 0, height) : 0;
             bool changed = !_hasMetrics || mobile != IsMobile || portrait != IsPortrait || width != _screenWidth || height != _screenHeight
                 || orientation != _orientation || safeArea != _safeArea || Mathf.Abs(keyboardHeight - _keyboardHeight) > .5f || keyboardOpen != _keyboardOpen;
+            if (mobile && !IsMobile)
+            {
+                _pcReferenceResolution = _panelSettings.referenceResolution;
+                _pcMatch = _panelSettings.match;
+            }
+            else if (!mobile && IsMobile)
+            {
+                _panelSettings.referenceResolution = _pcReferenceResolution;
+                _panelSettings.match = _pcMatch;
+            }
             IsMobile = mobile; IsPortrait = portrait;
             _screenWidth = width; _screenHeight = height; _orientation = orientation;
             _safeArea = safeArea; _keyboardHeight = keyboardHeight; _keyboardOpen = mobile && keyboardOpen; _hasMetrics = true;

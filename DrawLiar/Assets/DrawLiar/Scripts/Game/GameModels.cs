@@ -64,6 +64,7 @@ namespace DrawLiar
     public sealed class PlayerView
     {
         public int Id;
+        public string AccountId = "";
         public string Name;
         public int Score;
         public int RoundPoints;
@@ -77,6 +78,27 @@ namespace DrawLiar
         public bool HasGuessed;
         public int VoteCount;
         public string Guess;
+    }
+
+    public sealed class CompletedMatchData
+    {
+        public string MatchId = "";
+        public DrawingMode Mode;
+        public int RoundCount;
+        public CompletedMatchPlayerData[] Players = Array.Empty<CompletedMatchPlayerData>();
+    }
+
+    public sealed class CompletedMatchPlayerData
+    {
+        public int PlayerId;
+        public int Score;
+        public int Rank;
+        public bool Won;
+        public int RoundsPlayed;
+        public int CitizenRounds;
+        public int LiarRounds;
+        public int CorrectVotes;
+        public int CorrectGuesses;
     }
 
     [Serializable]

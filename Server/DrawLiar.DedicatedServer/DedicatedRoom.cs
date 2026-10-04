@@ -13,6 +13,7 @@ internal sealed class DedicatedRoom
     private readonly HashSet<string> _admittedIds = new(StringComparer.Ordinal);
     private readonly Dictionary<string, double> _reconnectUntil = new(StringComparer.Ordinal);
     private readonly Action _statusChanged;
+    private readonly Func<bool> _canRecordMatch;
     private string _ownerAccountId;
     private int _nextPlayerId = 1;
     private long _sequence;
@@ -21,11 +22,14 @@ internal sealed class DedicatedRoom
 
     public string RoomId { get; }
 
-    public DedicatedRoom(ServerRoomData room, GameData data, ServerTopicData[] customTopics, double now, Action statusChanged)
+    public DedicatedRoom(ServerRoomData room, GameData data, ServerTopicData[] customTopics, double now, Action statusChanged,
+        Func<bool>? canRecordMatch = null, Action<MatchResultRequest>? matchCompleted = null)
     {
         _statusChanged = statusChanged;
+        _canRecordMatch = canRecordMatch ?? (() => true);
         RoomId = room.RoomId;
         _ownerAccountId = room.OwnerAccountId;
+        string nodeId = room.NodeId;
         _closeAfter = now + 120;
         var settings = System.Text.Json.JsonSerializer.Deserialize<RoomSettings>(
             System.Text.Json.JsonSerializer.Serialize(room.Settings, GameplayWire.Json), GameplayWire.Json)!;
@@ -40,6 +44,21 @@ internal sealed class DedicatedRoom
             })).ToArray()
         };
         _session = new GameSession(settings, roomData);
+        _session.MatchCompleted += completed =>
+        {
+            var accounts = _playerIds.ToDictionary(pair => pair.Value, pair => pair.Key);
+            matchCompleted?.Invoke(new MatchResultRequest
+            {
+                NodeId = nodeId, RoomId = RoomId, MatchId = completed.MatchId, PlayedAt = DateTimeOffset.UtcNow.ToString("O"),
+                Mode = (int)completed.Mode, RoundCount = completed.RoundCount,
+                Players = completed.Players.Select(player => new MatchPlayerResult
+                {
+                    AccountId = accounts[player.PlayerId], Score = player.Score, Rank = player.Rank, Won = player.Won,
+                    RoundsPlayed = player.RoundsPlayed, CitizenRounds = player.CitizenRounds, LiarRounds = player.LiarRounds,
+                    CorrectVotes = player.CorrectVotes, CorrectGuesses = player.CorrectGuesses
+                }).ToArray()
+            });
+        };
         _session.Changed += () => _dirty = true;
         _session.CanvasCleared += () =>
         {
@@ -213,7 +232,7 @@ internal sealed class DedicatedRoom
 
     private bool StartLocked(bool host, double now)
     {
-        if (!host) return false;
+        if (!host || !_canRecordMatch()) return false;
         foreach (var connection in _connections.Values.Where(connection => !connection.IsAlive).ToArray())
             Disconnect(connection, now);
         return _connections.Values.Count(connection => connection.IsAlive && !_session.IsSpectator(connection.PlayerId))
@@ -270,12 +289,18 @@ internal sealed class DedicatedRoom
     private void BroadcastSnapshotsLocked(double now)
     {
         int hostId = _playerIds.TryGetValue(_ownerAccountId, out int id) ? id : -1;
+        var accounts = _playerIds.ToDictionary(pair => pair.Value, pair => pair.Key);
         long sequence = ++_sequence;
         foreach (var connection in _connections.Values)
+        {
+            var snapshot = _session.Snapshot(connection.PlayerId, hostId, now);
+            foreach (var player in snapshot.Players)
+                player.AccountId = accounts.TryGetValue(player.Id, out string? accountId) ? accountId : "";
             connection.Queue(new GameplayEnvelope
             {
-                Type = "state", State = _session.Snapshot(connection.PlayerId, hostId, now), Sequence = sequence
+                Type = "state", State = snapshot, Sequence = sequence
             });
+        }
         _lastSnapshot = now;
         _dirty = false;
     }

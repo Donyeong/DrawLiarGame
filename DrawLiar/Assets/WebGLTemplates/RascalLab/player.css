@@ -1,0 +1,8 @@
+html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #f8f4e9; color: #39334e; }
+body { font: 16px system-ui, sans-serif; }
+#unity-canvas { display: block; width: 100%; height: 100%; outline: none; }
+#loading { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 20px; padding: 24px; text-align: center; background: #f8f4e9; }
+#loading[hidden] { display: none; }
+#loading strong { font-size: 30px; }
+#progress { width: min(320px, 80vw); height: 12px; accent-color: #8070ac; }
+#status { max-width: 540px; white-space: pre-wrap; }

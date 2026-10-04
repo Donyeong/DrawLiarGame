@@ -6062,6 +6062,465 @@ MonoBehaviour:
         \u0627\u0644\u062F\u0631\u062F\u0634\u0629."
       Flags: 000000000000000000000000
       Languages_Touch: []
+    - Term: UI/7ZSE66Gc7ZWE
+      TermType: 0
+      Description: "\uD504\uB85C\uD544"
+      Languages:
+      - "\uD504\uB85C\uD544"
+      - Profile
+      - "\u4E2A\u4EBA\u8D44\u6599"
+      - "\u500B\u4EBA\u8CC7\u6599"
+      - "\u30D7\u30ED\u30D5\u30A3\u30FC\u30EB"
+      - Perfil
+      - Perfil
+      - Profil
+      - Profil
+      - Profil
+      - "\u092A\u094D\u0930\u094B\u092B\u093C\u093E\u0907\u0932"
+      - "\u0627\u0644\u0645\u0644\u0641 \u0627\u0644\u0634\u062E\u0635\u064A"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7ZSE66Gc7ZWEIOuztOq4sA
+      TermType: 0
+      Description: "\uD504\uB85C\uD544 \uBCF4\uAE30"
+      Languages:
+      - "\uD504\uB85C\uD544 \uBCF4\uAE30"
+      - View profile
+      - "\u67E5\u770B\u8D44\u6599"
+      - "\u67E5\u770B\u8CC7\u6599"
+      - "\u30D7\u30ED\u30D5\u30A3\u30FC\u30EB\u3092\u898B\u308B"
+      - Ver perfil
+      - Ver perfil
+      - Voir le profil
+      - Profil ansehen
+      - Lihat profil
+      - "\u092A\u094D\u0930\u094B\u092B\u093C\u093E\u0907\u0932 \u0926\u0947\u0916\u0947\u0902"
+      - "\u0639\u0631\u0636 \u0627\u0644\u0645\u0644\u0641 \u0627\u0644\u0634\u062E\u0635\u064A"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/64K0IO2UhOuhnO2VhA
+      TermType: 0
+      Description: "\uB0B4 \uD504\uB85C\uD544"
+      Languages:
+      - "\uB0B4 \uD504\uB85C\uD544"
+      - My profile
+      - "\u6211\u7684\u8D44\u6599"
+      - "\u6211\u7684\u8CC7\u6599"
+      - "\u30DE\u30A4\u30D7\u30ED\u30D5\u30A3\u30FC\u30EB"
+      - Mi perfil
+      - Meu perfil
+      - Mon profil
+      - Mein Profil
+      - Profil saya
+      - "\u092E\u0947\u0930\u0940 \u092A\u094D\u0930\u094B\u092B\u093C\u093E\u0907\u0932"
+      - "\u0645\u0644\u0641\u064A \u0627\u0644\u0634\u062E\u0635\u064A"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7ZSE66Gc7ZWE7J2EIOu2iOufrOyYpOuKlCDspJHigKY
+      TermType: 0
+      Description: "\uD504\uB85C\uD544\uC744 \uBD88\uB7EC\uC624\uB294 \uC911\u2026"
+      Languages:
+      - "\uD504\uB85C\uD544\uC744 \uBD88\uB7EC\uC624\uB294 \uC911\u2026"
+      - "Loading profile\u2026"
+      - "\u6B63\u5728\u52A0\u8F7D\u8D44\u6599\u2026"
+      - "\u6B63\u5728\u8F09\u5165\u8CC7\u6599\u2026"
+      - "\u30D7\u30ED\u30D5\u30A3\u30FC\u30EB\u3092\u8AAD\u307F\u8FBC\u307F\u4E2D\u2026"
+      - "Cargando perfil\u2026"
+      - "Carregando perfil\u2026"
+      - "Chargement du profil\u2026"
+      - "Profil wird geladen\u2026"
+      - "Memuat profil\u2026"
+      - "\u092A\u094D\u0930\u094B\u092B\u093C\u093E\u0907\u0932 \u0932\u094B\u0921
+        \u0939\u094B \u0930\u0939\u0940 \u0939\u0948\u2026"
+      - "\u062C\u0627\u0631\u064D \u062A\u062D\u0645\u064A\u0644 \u0627\u0644\u0645\u0644\u0641
+        \u0627\u0644\u0634\u062E\u0635\u064A\u2026"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7ZSE66Gc7ZWE7J2EIOu2iOufrOyYpOyngCDrqrvtlojsirXri4jri6Qu
+      TermType: 0
+      Description: "\uD504\uB85C\uD544\uC744 \uBD88\uB7EC\uC624\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4."
+      Languages:
+      - "\uD504\uB85C\uD544\uC744 \uBD88\uB7EC\uC624\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4."
+      - Unable to load this profile.
+      - "\u65E0\u6CD5\u52A0\u8F7D\u6B64\u8D44\u6599\u3002"
+      - "\u7121\u6CD5\u8F09\u5165\u6B64\u8CC7\u6599\u3002"
+      - "\u30D7\u30ED\u30D5\u30A3\u30FC\u30EB\u3092\u8AAD\u307F\u8FBC\u3081\u307E\u305B\u3093\u3067\u3057\u305F\u3002"
+      - No se pudo cargar el perfil.
+      - "N\xE3o foi poss\xEDvel carregar o perfil."
+      - Impossible de charger ce profil.
+      - Dieses Profil konnte nicht geladen werden.
+      - Profil ini tidak dapat dimuat.
+      - "\u092A\u094D\u0930\u094B\u092B\u093C\u093E\u0907\u0932 \u0932\u094B\u0921
+        \u0928\u0939\u0940\u0902 \u0939\u094B \u0938\u0915\u0940\u0964"
+      - "\u062A\u0639\u0630\u0631 \u062A\u062D\u0645\u064A\u0644 \u0647\u0630\u0627
+        \u0627\u0644\u0645\u0644\u0641 \u0627\u0644\u0634\u062E\u0635\u064A."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/64uk7IucIOyLnOuPhA
+      TermType: 0
+      Description: "\uB2E4\uC2DC \uC2DC\uB3C4"
+      Languages:
+      - "\uB2E4\uC2DC \uC2DC\uB3C4"
+      - Retry
+      - "\u91CD\u8BD5"
+      - "\u91CD\u8A66"
+      - "\u518D\u8A66\u884C"
+      - Reintentar
+      - Tentar novamente
+      - "R\xE9essayer"
+      - Erneut versuchen
+      - Coba lagi
+      - "\u092B\u093F\u0930 \u0915\u094B\u0936\u093F\u0936 \u0915\u0930\u0947\u0902"
+      - "\u0625\u0639\u0627\u062F\u0629 \u0627\u0644\u0645\u062D\u0627\u0648\u0644\u0629"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/6rCA7J6F7J28
+      TermType: 0
+      Description: "\uAC00\uC785\uC77C"
+      Languages:
+      - "\uAC00\uC785\uC77C"
+      - Joined
+      - "\u52A0\u5165\u65E5\u671F"
+      - "\u52A0\u5165\u65E5\u671F"
+      - "\u767B\u9332\u65E5"
+      - Fecha de registro
+      - Data de cadastro
+      - Inscription
+      - Beigetreten
+      - Bergabung
+      - "\u091C\u0941\u0921\u093C\u0928\u0947 \u0915\u0940 \u0924\u093E\u0930\u0940\u0916"
+      - "\u062A\u0627\u0631\u064A\u062E \u0627\u0644\u0627\u0646\u0636\u0645\u0627\u0645"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7Ya17IKwIOyghOyggQ
+      TermType: 0
+      Description: "\uD1B5\uC0B0 \uC804\uC801"
+      Languages:
+      - "\uD1B5\uC0B0 \uC804\uC801"
+      - Career stats
+      - "\u7D2F\u8BA1\u6218\u7EE9"
+      - "\u7D2F\u8A08\u6230\u7E3E"
+      - "\u901A\u7B97\u6210\u7E3E"
+      - "Estad\xEDsticas generales"
+      - "Estat\xEDsticas gerais"
+      - Statistiques globales
+      - Gesamtstatistik
+      - Statistik keseluruhan
+      - "\u0915\u0941\u0932 \u0906\u0901\u0915\u0921\u093C\u0947"
+      - "\u0627\u0644\u0625\u062D\u0635\u0627\u0621\u0627\u062A \u0627\u0644\u0625\u062C\u0645\u0627\u0644\u064A\u0629"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/6rK96riwIOyImA
+      TermType: 0
+      Description: "\uACBD\uAE30 \uC218"
+      Languages:
+      - "\uACBD\uAE30 \uC218"
+      - Matches played
+      - "\u6BD4\u8D5B\u573A\u6570"
+      - "\u6BD4\u8CFD\u5834\u6578"
+      - "\u8A66\u5408\u6570"
+      - Partidas jugadas
+      - Partidas jogadas
+      - "Parties jou\xE9es"
+      - Gespielte Partien
+      - Jumlah pertandingan
+      - "\u0916\u0947\u0932\u0947 \u0917\u090F \u092E\u0948\u091A"
+      - "\u0627\u0644\u0645\u0628\u0627\u0631\u064A\u0627\u062A \u0627\u0644\u0645\u0644\u0639\u0648\u0628\u0629"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7Iq566asIOyImA
+      TermType: 0
+      Description: "\uC2B9\uB9AC \uC218"
+      Languages:
+      - "\uC2B9\uB9AC \uC218"
+      - Wins
+      - "\u83B7\u80DC\u573A\u6570"
+      - "\u7372\u52DD\u5834\u6578"
+      - "\u52DD\u5229\u6570"
+      - Victorias
+      - "Vit\xF3rias"
+      - Victoires
+      - Siege
+      - Kemenangan
+      - "\u091C\u0940\u0924"
+      - "\u0639\u062F\u062F \u0645\u0631\u0627\u062A \u0627\u0644\u0641\u0648\u0632"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7Iq566Wg
+      TermType: 0
+      Description: "\uC2B9\uB960"
+      Languages:
+      - "\uC2B9\uB960"
+      - Win rate
+      - "\u80DC\u7387"
+      - "\u52DD\u7387"
+      - "\u52DD\u7387"
+      - Porcentaje de victorias
+      - "Taxa de vit\xF3rias"
+      - Taux de victoire
+      - Siegquote
+      - Persentase kemenangan
+      - "\u091C\u0940\u0924 \u0915\u093E \u092A\u094D\u0930\u0924\u093F\u0936\u0924"
+      - "\u0646\u0633\u0628\u0629 \u0627\u0644\u0641\u0648\u0632"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7LSdIOygkOyImA
+      TermType: 0
+      Description: "\uCD1D \uC810\uC218"
+      Languages:
+      - "\uCD1D \uC810\uC218"
+      - Total score
+      - "\u603B\u5206"
+      - "\u7E3D\u5206"
+      - "\u7DCF\u5F97\u70B9"
+      - "Puntuaci\xF3n total"
+      - "Pontua\xE7\xE3o total"
+      - Score total
+      - Gesamtpunktzahl
+      - Total poin
+      - "\u0915\u0941\u0932 \u0938\u094D\u0915\u094B\u0930"
+      - "\u0645\u062C\u0645\u0648\u0639 \u0627\u0644\u0646\u0642\u0627\u0637"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7LWc6rOgIOygkOyImA
+      TermType: 0
+      Description: "\uCD5C\uACE0 \uC810\uC218"
+      Languages:
+      - "\uCD5C\uACE0 \uC810\uC218"
+      - Best score
+      - "\u6700\u9AD8\u5206"
+      - "\u6700\u9AD8\u5206"
+      - "\u6700\u9AD8\u5F97\u70B9"
+      - "Mejor puntuaci\xF3n"
+      - "Melhor pontua\xE7\xE3o"
+      - Meilleur score
+      - "H\xF6chste Punktzahl"
+      - Poin tertinggi
+      - "\u0938\u0930\u094D\u0935\u0936\u094D\u0930\u0947\u0937\u094D\u0920 \u0938\u094D\u0915\u094B\u0930"
+      - "\u0623\u0639\u0644\u0649 \u0646\u062A\u064A\u062C\u0629"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7ZSM66CI7J20IOudvOyatOuTnA
+      TermType: 0
+      Description: "\uD50C\uB808\uC774 \uB77C\uC6B4\uB4DC"
+      Languages:
+      - "\uD50C\uB808\uC774 \uB77C\uC6B4\uB4DC"
+      - Rounds played
+      - "\u5DF2\u73A9\u56DE\u5408"
+      - "\u5DF2\u73A9\u56DE\u5408"
+      - "\u30D7\u30EC\u30A4\u3057\u305F\u30E9\u30A6\u30F3\u30C9"
+      - Rondas jugadas
+      - Rodadas jogadas
+      - "Manches jou\xE9es"
+      - Gespielte Runden
+      - Ronde dimainkan
+      - "\u0916\u0947\u0932\u0947 \u0917\u090F \u0930\u093E\u0909\u0902\u0921"
+      - "\u0627\u0644\u062C\u0648\u0644\u0627\u062A \u0627\u0644\u0645\u0644\u0639\u0648\u0628\u0629"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7Iuc66-8IOudvOyatOuTnA
+      TermType: 0
+      Description: "\uC2DC\uBBFC \uB77C\uC6B4\uB4DC"
+      Languages:
+      - "\uC2DC\uBBFC \uB77C\uC6B4\uB4DC"
+      - Citizen rounds
+      - "\u5E73\u6C11\u56DE\u5408"
+      - "\u5E73\u6C11\u56DE\u5408"
+      - "\u5E02\u6C11\u30E9\u30A6\u30F3\u30C9"
+      - Rondas como ciudadano
+      - "Rodadas como cidad\xE3o"
+      - Manches comme citoyen
+      - "Runden als B\xFCrger"
+      - Ronde sebagai warga
+      - "\u0928\u093E\u0917\u0930\u093F\u0915 \u0915\u0947 \u0930\u0942\u092A \u092E\u0947\u0902
+        \u0930\u093E\u0909\u0902\u0921"
+      - "\u062C\u0648\u0644\u0627\u062A \u0627\u0644\u0645\u0648\u0627\u0637\u0646"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/65287J207Ja0IOudvOyatOuTnA
+      TermType: 0
+      Description: "\uB77C\uC774\uC5B4 \uB77C\uC6B4\uB4DC"
+      Languages:
+      - "\uB77C\uC774\uC5B4 \uB77C\uC6B4\uB4DC"
+      - Liar rounds
+      - "\u8BF4\u8C0E\u8005\u56DE\u5408"
+      - "\u8AAA\u8B0A\u8005\u56DE\u5408"
+      - "\u30E9\u30A4\u30A2\u30FC\u30E9\u30A6\u30F3\u30C9"
+      - Rondas como mentiroso
+      - Rodadas como mentiroso
+      - Manches comme menteur
+      - "Runden als L\xFCgner"
+      - Ronde sebagai pembohong
+      - "\u091D\u0942\u0920\u0947 \u0915\u0947 \u0930\u0942\u092A \u092E\u0947\u0902
+        \u0930\u093E\u0909\u0902\u0921"
+      - "\u062C\u0648\u0644\u0627\u062A \u0627\u0644\u0643\u0627\u0630\u0628"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7KCV64u1IO2IrO2RnA
+      TermType: 0
+      Description: "\uC815\uB2F5 \uD22C\uD45C"
+      Languages:
+      - "\uC815\uB2F5 \uD22C\uD45C"
+      - Correct votes
+      - "\u6B63\u786E\u6295\u7968"
+      - "\u6B63\u78BA\u6295\u7968"
+      - "\u6B63\u3057\u3044\u6295\u7968"
+      - Votos correctos
+      - Votos corretos
+      - Votes corrects
+      - Richtige Stimmen
+      - Suara benar
+      - "\u0938\u0939\u0940 \u0935\u094B\u091F"
+      - "\u0627\u0644\u062A\u0635\u0648\u064A\u062A\u0627\u062A \u0627\u0644\u0635\u062D\u064A\u062D\u0629"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7LWc6re8IOqyveq4sA
+      TermType: 0
+      Description: "\uCD5C\uADFC \uACBD\uAE30"
+      Languages:
+      - "\uCD5C\uADFC \uACBD\uAE30"
+      - Recent matches
+      - "\u6700\u8FD1\u6BD4\u8D5B"
+      - "\u6700\u8FD1\u6BD4\u8CFD"
+      - "\u6700\u8FD1\u306E\u8A66\u5408"
+      - Partidas recientes
+      - Partidas recentes
+      - "Parties r\xE9centes"
+      - Letzte Partien
+      - Pertandingan terbaru
+      - "\u0939\u093E\u0932 \u0915\u0947 \u092E\u0948\u091A"
+      - "\u0627\u0644\u0645\u0628\u0627\u0631\u064A\u0627\u062A \u0627\u0644\u0623\u062E\u064A\u0631\u0629"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7JmE66OM7ZWcIOqyveq4sCDquLDroZ3snbQg7JeG7Iq164uI64ukLg
+      TermType: 0
+      Description: "\uC644\uB8CC\uD55C \uACBD\uAE30 \uAE30\uB85D\uC774 \uC5C6\uC2B5\uB2C8\uB2E4."
+      Languages:
+      - "\uC644\uB8CC\uD55C \uACBD\uAE30 \uAE30\uB85D\uC774 \uC5C6\uC2B5\uB2C8\uB2E4."
+      - No completed matches yet.
+      - "\u6682\u65E0\u5DF2\u5B8C\u6210\u7684\u6BD4\u8D5B\u8BB0\u5F55\u3002"
+      - "\u66AB\u7121\u5DF2\u5B8C\u6210\u7684\u6BD4\u8CFD\u7D00\u9304\u3002"
+      - "\u7D42\u4E86\u3057\u305F\u8A66\u5408\u306E\u8A18\u9332\u306F\u3042\u308A\u307E\u305B\u3093\u3002"
+      - "A\xFAn no hay partidas completadas."
+      - "Ainda n\xE3o h\xE1 partidas conclu\xEDdas."
+      - "Aucune partie termin\xE9e pour le moment."
+      - Noch keine abgeschlossenen Partien.
+      - Belum ada pertandingan selesai.
+      - "\u0905\u092D\u0940 \u0924\u0915 \u0915\u094B\u0908 \u092A\u0942\u0930\u093E
+        \u0939\u0941\u0906 \u092E\u0948\u091A \u0928\u0939\u0940\u0902 \u0939\u0948\u0964"
+      - "\u0644\u0627 \u062A\u0648\u062C\u062F \u0645\u0628\u0627\u0631\u064A\u0627\u062A
+        \u0645\u0643\u062A\u0645\u0644\u0629 \u0628\u0639\u062F."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/ezB97JyEIC8gezF966qF
+      TermType: 0
+      Description: "{0}\uC704 / {1}\uBA85"
+      Languages:
+      - "{0}\uC704 / {1}\uBA85"
+      - Rank {0} / {1}
+      - "\u7B2C{0}\u540D / \u5171{1}\u4EBA"
+      - "\u7B2C{0}\u540D / \u5171{1}\u4EBA"
+      - "{0}\u4F4D / {1}\u4EBA"
+      - Puesto {0} / {1}
+      - "Posi\xE7\xE3o {0} / {1}"
+      - Rang {0} / {1}
+      - Platz {0} / {1}
+      - Peringkat {0} / {1}
+      - "\u0938\u094D\u0925\u093E\u0928 {0} / {1}"
+      - "\u0627\u0644\u0645\u0631\u0643\u0632 {0} / {1}"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7Iq566as
+      TermType: 0
+      Description: "\uC2B9\uB9AC"
+      Languages:
+      - "\uC2B9\uB9AC"
+      - Win
+      - "\u80DC\u5229"
+      - "\u52DD\u5229"
+      - "\u52DD\u5229"
+      - Victoria
+      - "Vit\xF3ria"
+      - Victoire
+      - Sieg
+      - Menang
+      - "\u091C\u0940\u0924"
+      - "\u0641\u0648\u0632"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7Yyo67Cw
+      TermType: 0
+      Description: "\uD328\uBC30"
+      Languages:
+      - "\uD328\uBC30"
+      - Loss
+      - "\u5931\u8D25"
+      - "\u5931\u6557"
+      - "\u6557\u5317"
+      - Derrota
+      - Derrota
+      - "D\xE9faite"
+      - Niederlage
+      - Kalah
+      - "\u0939\u093E\u0930"
+      - "\u062E\u0633\u0627\u0631\u0629"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7LKY66asIOykkeKApg
+      TermType: 0
+      Description: "\uCC98\uB9AC \uC911\u2026"
+      Languages:
+      - "\uCC98\uB9AC \uC911\u2026"
+      - "Processing\u2026"
+      - "\u5904\u7406\u4E2D\u2026"
+      - "\u8655\u7406\u4E2D\u2026"
+      - "\u51E6\u7406\u4E2D\u2026"
+      - "Procesando\u2026"
+      - "Processando\u2026"
+      - "Traitement\u2026"
+      - "Wird verarbeitet\u2026"
+      - "Memproses\u2026"
+      - "\u092A\u094D\u0930\u0915\u094D\u0930\u093F\u092F\u093E \u091C\u093E\u0930\u0940
+        \u0939\u0948\u2026"
+      - "\u062C\u0627\u0631\u064D \u0627\u0644\u0645\u0639\u0627\u0644\u062C\u0629\u2026"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7Lmc6rWsIOuqqeuhneycvOuhnA
+      TermType: 0
+      Description: "\uCE5C\uAD6C \uBAA9\uB85D\uC73C\uB85C"
+      Languages:
+      - "\uCE5C\uAD6C \uBAA9\uB85D\uC73C\uB85C"
+      - Back to friends
+      - "\u8FD4\u56DE\u597D\u53CB\u5217\u8868"
+      - "\u8FD4\u56DE\u597D\u53CB\u5217\u8868"
+      - "\u30D5\u30EC\u30F3\u30C9\u4E00\u89A7\u3078"
+      - Volver a amigos
+      - Voltar aos amigos
+      - Retour aux amis
+      - Zur Freundesliste
+      - Kembali ke teman
+      - "\u092E\u093F\u0924\u094D\u0930 \u0938\u0942\u091A\u0940 \u092A\u0930 \u0935\u093E\u092A\u0938"
+      - "\u0627\u0644\u0639\u0648\u062F\u0629 \u0625\u0644\u0649 \u0627\u0644\u0623\u0635\u062F\u0642\u0627\u0621"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7IiY6529IOuMgOq4sA
+      TermType: 0
+      Description: "\uC218\uB77D \uB300\uAE30"
+      Languages:
+      - "\uC218\uB77D \uB300\uAE30"
+      - Pending acceptance
+      - "\u7B49\u5F85\u63A5\u53D7"
+      - "\u7B49\u5F85\u63A5\u53D7"
+      - "\u627F\u8A8D\u5F85\u3061"
+      - "Pendiente de aceptaci\xF3n"
+      - "Aguardando aceita\xE7\xE3o"
+      - "En attente d\u2019acceptation"
+      - Wartet auf Annahme
+      - Menunggu persetujuan
+      - "\u0938\u094D\u0935\u0940\u0915\u0943\u0924\u093F \u0915\u0940 \u092A\u094D\u0930\u0924\u0940\u0915\u094D\u0937\u093E"
+      - "\u0628\u0627\u0646\u062A\u0638\u0627\u0631 \u0627\u0644\u0642\u0628\u0648\u0644"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
     CaseInsensitiveTerms: 0
     OnMissingTranslation: 0
     mTerm_AppName:

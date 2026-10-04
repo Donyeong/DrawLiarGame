@@ -25,6 +25,8 @@ app.Map("/ws/lobby", lobbyChat.HandleAsync);
 app.MapPost("/api/session/enter", (EnterGameRequest request) => database.EnterGameAsync(request.AssignmentToken, nodeId));
 app.MapPost("/api/session/logout", (Func<HttpContext, Task<IResult>>)(async context => { await database.LogoutAsync(await Authenticate(context)); return Results.NoContent(); }));
 app.MapGet("/api/profile", (Func<HttpContext, Task<ProfileData>>)(async context => await database.ProfileAsync((await Authenticate(context)).AccountId)));
+app.MapGet("/api/profiles/{accountId}", async (HttpContext context, string accountId) =>
+    await database.PublicProfileAsync((await Authenticate(context)).AccountId, ServerRuntime.AccountId(accountId), context.RequestAborted));
 app.MapPatch("/api/profile", async (HttpContext context, UpdateProfileRequest request) => await database.UpdateProfileAsync((await Authenticate(context)).AccountId, request));
 app.MapGet("/api/friends", (Func<HttpContext, Task<FriendListResponse>>)(async context => await database.FriendsAsync((await Authenticate(context)).AccountId)));
 app.MapPost("/api/friends/request", async (HttpContext context, FriendRequest request) => { await database.RequestFriendAsync((await Authenticate(context)).AccountId, ServerRuntime.AccountId(request.AccountId)); return Results.NoContent(); });
@@ -37,6 +39,12 @@ app.MapPost("/api/rooms", async (HttpContext context, CreateRoomRequest request)
 app.MapPost("/api/rooms/{roomId}/join", async (HttpContext context, string roomId, JoinRoomRequest request) => await database.JoinRoomAsync(await Authenticate(context), roomId, request.AsSpectator)).RequireRateLimiting("room-join");
 app.MapPost("/internal/dedicated/register", async (HttpContext context, RegisterDedicatedRequest request) => { ServerRuntime.RequireCluster(context, app.Configuration); await database.RegisterDedicatedAsync(request, app.Environment.IsDevelopment()); return Results.NoContent(); });
 app.MapPost("/internal/dedicated/heartbeat", async (HttpContext context, DedicatedHeartbeatRequest request) => { ServerRuntime.RequireCluster(context, app.Configuration); return await database.DedicatedHeartbeatAsync(request); });
+app.MapPost("/internal/dedicated/matches", async (HttpContext context, MatchResultRequest request) =>
+{
+    ServerRuntime.RequireCluster(context, app.Configuration);
+    await database.RecordMatchAsync(request, context.RequestAborted);
+    return Results.NoContent();
+});
 app.MapPost("/internal/tickets/redeem", async (HttpContext context, RedeemTicketRequest request) => { ServerRuntime.RequireCluster(context, app.Configuration); return await database.RedeemTicketAsync(request); });
 app.MapPost("/internal/sessions/check", async (HttpContext context, SessionCheckRequest request) => { ServerRuntime.RequireCluster(context, app.Configuration); return new SessionCheckResponse { Valid = await database.CheckDedicatedSessionAsync(request) }; });
 await app.RunAsync();

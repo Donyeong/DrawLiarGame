@@ -29,6 +29,62 @@ namespace DrawLiar
         public int[] OwnedAccessories = Array.Empty<int>();
     }
     [Serializable] public sealed class UpdateProfileRequest { public string DisplayName = ""; public int AvatarColor; public int Accessory; }
+    [Serializable] public sealed class PublicProfileData
+    {
+        public string AccountId = "";
+        public string DisplayName = "";
+        public int AvatarColor;
+        public int Accessory;
+        public string JoinedAt = "";
+        public string Friendship = "None";
+        public ProfileStatsData Stats = new ProfileStatsData();
+        public ProfileMatchData[] RecentMatches = Array.Empty<ProfileMatchData>();
+    }
+    [Serializable] public sealed class ProfileStatsData
+    {
+        public int MatchesPlayed;
+        public int MatchesWon;
+        public int TotalScore;
+        public int BestScore;
+        public int RoundsPlayed;
+        public int CitizenRounds;
+        public int LiarRounds;
+        public int CorrectVotes;
+        public int CorrectGuesses;
+    }
+    [Serializable] public sealed class ProfileMatchData
+    {
+        public string MatchId = "";
+        public string PlayedAt = "";
+        public int Score;
+        public int Rank;
+        public int PlayerCount;
+        public int Mode;
+        public bool Won;
+        public int RoundCount;
+    }
+    [Serializable] public sealed class MatchResultRequest
+    {
+        public string NodeId = "";
+        public string RoomId = "";
+        public string MatchId = "";
+        public string PlayedAt = "";
+        public int Mode;
+        public int RoundCount;
+        public MatchPlayerResult[] Players = Array.Empty<MatchPlayerResult>();
+    }
+    [Serializable] public sealed class MatchPlayerResult
+    {
+        public string AccountId = "";
+        public int Score;
+        public int Rank;
+        public bool Won;
+        public int RoundsPlayed;
+        public int CitizenRounds;
+        public int LiarRounds;
+        public int CorrectVotes;
+        public int CorrectGuesses;
+    }
     [Serializable] public sealed class GoogleChallengeRequest { public string Platform = "desktop"; }
     [Serializable] public sealed class GoogleChallengeResponse { public string ChallengeId = ""; public string Nonce = ""; public string ClientId = ""; public string ExpiresAt = ""; }
     [Serializable] public sealed class GoogleAuthRequest { public string ChallengeId = ""; public string IdToken = ""; public string Code = ""; public string CodeVerifier = ""; public string RedirectUri = ""; }

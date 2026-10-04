@@ -27,7 +27,7 @@ namespace DrawLiar
 
         private IncomingQueue _incoming = new IncomingQueue(0);
         private readonly List<DrawStroke> _canvas = new List<DrawStroke>();
-        private readonly SemaphoreSlim _sendLock = new SemaphoreSlim(1, 1);
+        private readonly DrawAsyncGate _sendLock = new DrawAsyncGate();
         private WebSocket _socket;
         private CancellationTokenSource _lifetime;
         private TaskCompletionSource<bool> _initialState;
@@ -50,24 +50,25 @@ namespace DrawLiar
         {
             if (assignment == null || string.IsNullOrEmpty(assignment.JoinTicket)) throw new ArgumentException("방 입장권이 없습니다.");
             Leave();
-            var uri = new Uri(assignment.DedicatedUrl);
-            if (uri.Scheme != "ws" && uri.Scheme != "wss") throw new ArgumentException("데디케이티드 주소가 올바르지 않습니다.");
             var config = OnlineServicesConfig.Load();
-            config.ValidateServerUrl(assignment.DedicatedUrl);
+            string dedicatedUrl = config.ResolveDedicatedServerUrl(assignment.DedicatedUrl);
+            var uri = new Uri(dedicatedUrl);
+            if (uri.Scheme != "ws" && uri.Scheme != "wss") throw new ArgumentException("데디케이티드 주소가 올바르지 않습니다.");
+            config.ValidateServerUrl(dedicatedUrl);
             int generation = _generation;
             var lifetime = _lifetime = new CancellationTokenSource();
-            var ready = _initialState = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            var ready = _initialState = DrawAsync.Completion<bool>();
             try
             {
                 using (var timeout = CancellationTokenSource.CreateLinkedTokenSource(lifetime.Token))
                 {
-                    timeout.CancelAfter(TimeSpan.FromSeconds(20));
+                    DrawAsync.CancelAfter(timeout, TimeSpan.FromSeconds(20));
                     var socket = await DrawWebSocketClient.ConnectAsync(uri, config.CertificateSha256, timeout.Token);
                     if (generation != _generation) { socket.Dispose(); throw new OperationCanceledException(); }
                     _socket = socket;
                     await SendAsync(new GameplayEnvelope { Type = "hello", Ticket = assignment.JoinTicket, RoomId = assignment.RoomId }, generation, timeout.Token);
                     _ = ReceiveAsync(socket, generation, lifetime.Token);
-                    var completed = await Task.WhenAny(ready.Task, Task.Delay(TimeSpan.FromSeconds(20), lifetime.Token));
+                    var completed = await Task.WhenAny(ready.Task, DrawAsync.Delay(TimeSpan.FromSeconds(20), lifetime.Token));
                     if (completed != ready.Task) throw new TimeoutException("방 상태를 받지 못했습니다.");
                     await ready.Task;
                 }
@@ -88,7 +89,7 @@ namespace DrawLiar
             if (valid.Topics == null || valid.Topics.Length == 0) throw new InvalidOperationException(DrawLocalization.Text("주제를 하나 이상 선택하세요."));
             string expected = JsonUtility.ToJson(valid);
             if (JsonUtility.ToJson(State.Settings) == expected) return;
-            var completion = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            var completion = DrawAsync.Completion<bool>();
             void OnState(RoomSnapshot state)
             {
                 if (!CanConfigureRoom(state)) completion.TrySetException(new InvalidOperationException(DrawLocalization.Text("방 옵션 변경 권한이 없습니다.")));
@@ -102,7 +103,7 @@ namespace DrawLiar
             {
                 using (var timeout = CancellationTokenSource.CreateLinkedTokenSource(_lifetime.Token))
                 {
-                    timeout.CancelAfter(TimeSpan.FromSeconds(10));
+                    DrawAsync.CancelAfter(timeout, TimeSpan.FromSeconds(10));
                     await SendAsync(new GameplayEnvelope { Type = "request", Kind = "configure", Settings = valid }, _generation, timeout.Token);
                     using (timeout.Token.Register(() => completion.TrySetCanceled())) await completion.Task;
                 }
@@ -144,7 +145,7 @@ namespace DrawLiar
 
         public void Leave()
         {
-            int generation = Interlocked.Increment(ref _generation);
+            int generation = DrawAsync.Increment(ref _generation);
             _lifetime?.Cancel();
             _lifetime?.Dispose();
             _lifetime = null;
@@ -153,7 +154,7 @@ namespace DrawLiar
             _socket = null;
             _initialState?.TrySetCanceled();
             _initialState = null;
-            Interlocked.Exchange(ref _incoming, new IncomingQueue(generation));
+            DrawAsync.Exchange(ref _incoming, new IncomingQueue(generation));
             _sequence = 0;
             _canvas.Clear();
             _canvasVersion = 0;
@@ -168,8 +169,9 @@ namespace DrawLiar
             var socket = _socket;
             if (socket != null && socket.State == WebSocketState.Open)
             {
-                using (var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(2)))
+                using (var timeout = new CancellationTokenSource())
                 {
+                    DrawAsync.CancelAfter(timeout, TimeSpan.FromSeconds(2));
                     try
                     {
                         await _sendLock.WaitAsync(timeout.Token);
@@ -204,9 +206,9 @@ namespace DrawLiar
 
         private async Task SendAsync(GameplayEnvelope envelope, int generation, CancellationToken cancellation)
         {
-            if (Interlocked.Increment(ref _pendingSends) > MAXIMUM_PENDING_FRAMES)
+            if (DrawAsync.Increment(ref _pendingSends) > MAXIMUM_PENDING_FRAMES)
             {
-                Interlocked.Decrement(ref _pendingSends);
+                DrawAsync.Decrement(ref _pendingSends);
                 throw new IOException("송신 대기열이 가득 찼습니다.");
             }
             try
@@ -215,13 +217,13 @@ namespace DrawLiar
                 try
                 {
                     var socket = _socket;
-                    if (generation != Volatile.Read(ref _generation) || socket == null) return;
+                    if (generation != DrawAsync.Read(ref _generation) || socket == null) return;
                     var bytes = Encoding.UTF8.GetBytes(JsonUtility.ToJson(envelope));
                     await socket.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Text, true, cancellation);
                 }
                 finally { _sendLock.Release(); }
             }
-            finally { Interlocked.Decrement(ref _pendingSends); }
+            finally { DrawAsync.Decrement(ref _pendingSends); }
         }
 
         private async Task ReceiveAsync(WebSocket socket, int generation, CancellationToken cancellation)
@@ -255,13 +257,13 @@ namespace DrawLiar
 
         private bool Enqueue(GameplayEnvelope envelope, int generation)
         {
-            var incoming = Volatile.Read(ref _incoming);
+            var incoming = DrawAsync.Read(ref _incoming);
             var socket = _socket;
-            if (generation != incoming.Generation || generation != Volatile.Read(ref _generation)) return false;
-            if (Interlocked.Increment(ref incoming.Pending) > MAXIMUM_PENDING_FRAMES)
+            if (generation != incoming.Generation || generation != DrawAsync.Read(ref _generation)) return false;
+            if (DrawAsync.Increment(ref incoming.Pending) > MAXIMUM_PENDING_FRAMES)
             {
-                Interlocked.Decrement(ref incoming.Pending);
-                Interlocked.CompareExchange(ref incoming.Failure, "수신 대기열이 가득 차 연결을 종료했습니다.", null);
+                DrawAsync.Decrement(ref incoming.Pending);
+                DrawAsync.CompareExchange(ref incoming.Failure, "수신 대기열이 가득 차 연결을 종료했습니다.", null);
                 socket?.Abort();
                 return false;
             }
@@ -271,9 +273,9 @@ namespace DrawLiar
 
         private void Update()
         {
-            var incoming = Volatile.Read(ref _incoming);
-            var failure = Interlocked.Exchange(ref incoming.Failure, null);
-            if (failure != null && incoming.Generation == Volatile.Read(ref _generation))
+            var incoming = DrawAsync.Read(ref _incoming);
+            var failure = DrawAsync.Exchange(ref incoming.Failure, null);
+            if (failure != null && incoming.Generation == DrawAsync.Read(ref _generation))
             {
                 _initialState?.TrySetException(new IOException(failure));
                 Leave();
@@ -282,8 +284,8 @@ namespace DrawLiar
             }
             for (int count = 0; count < 128 && incoming.Frames.TryDequeue(out var message); count++)
             {
-                Interlocked.Decrement(ref incoming.Pending);
-                if (incoming.Generation != Volatile.Read(ref _generation)) break;
+                DrawAsync.Decrement(ref incoming.Pending);
+                if (incoming.Generation != DrawAsync.Read(ref _generation)) break;
                 if (message.Sequence > 0)
                 {
                     if (message.Sequence <= _sequence) continue;
@@ -295,7 +297,7 @@ namespace DrawLiar
                         State = message.State;
                         var ready = _initialState;
                         StateChanged?.Invoke(State);
-                        if (State != null && incoming.Generation == Volatile.Read(ref _generation)) ready?.TrySetResult(true);
+                        if (State != null && incoming.Generation == DrawAsync.Read(ref _generation)) ready?.TrySetResult(true);
                         break;
                     case "canvas":
                         if (message.Reset)

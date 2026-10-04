@@ -1,0 +1,306 @@
+using System;
+using System.Globalization;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using UnityEngine;
+using UnityEngine.UIElements;
+
+namespace DrawLiar
+{
+    public sealed partial class DrawApp
+    {
+        private VisualElement _profileOverlay, _profileModal, _profileBody, _profileReturnFocus;
+        private CancellationTokenSource _profileCancellation;
+        private string _profileAccountId, _profileViewerAccountId;
+        private int _profileVersion;
+        private bool _profileActionBusy;
+
+        private void BindProfileTarget(VisualElement target, string accountId)
+        {
+            if (target == null || !Guid.TryParse(accountId, out _)) return;
+            target.name = "profile-open-" + accountId;
+            target.pickingMode = PickingMode.Position;
+            target.focusable = true;
+            target.tabIndex = 0;
+            target.AddToClassList("profile-trigger");
+            SetTooltip(target, "프로필 보기");
+            target.RegisterCallback<ClickEvent>(evt =>
+            {
+                if (evt.button != 0) return;
+                OpenPublicProfile(accountId, target);
+                evt.StopImmediatePropagation();
+            });
+            target.RegisterCallback<KeyDownEvent>(evt =>
+            {
+                if (evt.keyCode != KeyCode.Return && evt.keyCode != KeyCode.KeypadEnter && evt.keyCode != KeyCode.Space) return;
+                OpenPublicProfile(accountId, target);
+                evt.StopImmediatePropagation();
+            });
+            target.RegisterCallback<NavigationSubmitEvent>(evt =>
+            {
+                OpenPublicProfile(accountId, target);
+                evt.StopImmediatePropagation();
+            });
+        }
+
+        private void FriendProfileIdentity(VisualElement row, FriendData friend)
+        {
+            var identity = Box(row, "row friend-profile-identity grow");
+            identity.Add(new AvatarElement(friend.AvatarColor, friend.Accessory));
+            RawText(identity, friend.DisplayName, "player-name grow");
+            BindProfileTarget(identity, friend.AccountId);
+        }
+
+        private void OpenPublicProfile(string accountId, VisualElement origin = null)
+        {
+            if (root == null || !lobby.IsAuthenticated || !Guid.TryParse(accountId, out _)) return;
+            if (_profileOverlay != null && _profileAccountId == accountId) return;
+            var returnFocus = origin ?? root.focusController?.focusedElement as VisualElement;
+            ClosePublicProfile(false);
+            _profileReturnFocus = returnFocus;
+            _profileAccountId = accountId;
+            _profileViewerAccountId = lobby.Profile?.AccountId;
+            var popup = _profileOverlay = Box(root, "overlay enter utility-overlay profile-overlay");
+            popup.name = "profile-overlay";
+            var modal = _profileModal = Box(popup, "modal utility-popup public-profile-popup");
+            modal.name = "public-profile-popup";
+            var header = Box(modal, "row utility-popup-header");
+            Text(header, "프로필", "utility-popup-title grow");
+            IconButton(header, "닫기", DrawUIIcon.Kind.Close, () => ClosePublicProfile(), "utility-popup-x").name = "public-profile-x";
+            var scroll = DrawSmoothScroll.Create();
+            scroll.AddToClassList("utility-popup-scroll");
+            scroll.AddToClassList("public-profile-scroll");
+            modal.Add(scroll);
+            _profileBody = Box(scroll, "public-profile-body");
+            _profileBody.name = "public-profile-body";
+            Button(modal, _utilityPopupScreen == LobbyScreen.Friends ? "친구 목록으로" : "닫기",
+                () => ClosePublicProfile(), "secondary utility-popup-close", DrawSound.UiCancel).name = "public-profile-close";
+            popup.focusable = true;
+            popup.Focus();
+            popup.RegisterCallback<PointerDownEvent>(evt =>
+            {
+                if (_profileOverlay != popup || !ReferenceEquals(evt.target, popup)) return;
+                ClosePublicProfile();
+                evt.StopImmediatePropagation();
+            });
+            popup.RegisterCallback<KeyDownEvent>(PublicProfileShortcut, TrickleDown.TrickleDown);
+            popup.RegisterCallback<DetachFromPanelEvent>(evt =>
+            {
+                if (ReferenceEquals(evt.target, popup) && _profileOverlay == popup) ClosePublicProfile(false);
+            });
+            DrawUIMotion.ShowModal(popup, modal);
+            HideMobileScrollers();
+            BeginPublicProfileLoad();
+        }
+
+        private void PublicProfileShortcut(KeyDownEvent evt)
+        {
+            if (evt.keyCode == KeyCode.Escape)
+            {
+                ClosePublicProfile();
+                evt.StopImmediatePropagation();
+                return;
+            }
+            if (evt.keyCode != KeyCode.Tab || _profileModal == null) return;
+            var controls = _profileModal.Query<VisualElement>().ToList().Where(control => control.canGrabFocus
+                && control.enabledInHierarchy && control.tabIndex >= 0 && control.resolvedStyle.visibility == Visibility.Visible
+                && IsVisible(control)).ToList();
+            if (controls.Count == 0) return;
+            int index = controls.IndexOf(root.focusController?.focusedElement as VisualElement);
+            int next = index < 0 ? (evt.shiftKey ? controls.Count - 1 : 0)
+                : (index + (evt.shiftKey ? -1 : 1) + controls.Count) % controls.Count;
+            root.focusController?.IgnoreEvent(evt);
+            controls[next].Focus();
+            evt.StopImmediatePropagation();
+        }
+
+        private void BeginPublicProfileLoad()
+        {
+            if (_profileOverlay == null) return;
+            CancelPublicProfileRequest();
+            _profileActionBusy = false;
+            _profileCancellation = CancellationTokenSource.CreateLinkedTokenSource(destroyCancellationToken);
+            int version = ++_profileVersion;
+            var popup = _profileOverlay;
+            var token = _profileCancellation.Token;
+            _profileBody.Clear();
+            Text(_profileBody, "프로필을 불러오는 중…", "public-profile-message");
+            _ = LoadPublicProfileAsync(popup, version, token);
+        }
+
+        private bool IsCurrentPublicProfile(VisualElement popup, int version, CancellationToken token)
+        {
+            return !token.IsCancellationRequested && _profileOverlay == popup && popup.panel != null
+                && _profileVersion == version && lobby.IsAuthenticated && lobby.Profile?.AccountId == _profileViewerAccountId;
+        }
+
+        private async Task LoadPublicProfileAsync(VisualElement popup, int version, CancellationToken token)
+        {
+            try
+            {
+                var profile = await lobby.GetPublicProfileAsync(_profileAccountId, token);
+                if (IsCurrentPublicProfile(popup, version, token)) RenderPublicProfile(profile);
+            }
+            catch (OperationCanceledException) { }
+            catch (Exception)
+            {
+                if (!IsCurrentPublicProfile(popup, version, token)) return;
+                _profileBody.Clear();
+                Text(_profileBody, "프로필을 불러오지 못했습니다.", "public-profile-message");
+                Button(_profileBody, "다시 시도", BeginPublicProfileLoad, "secondary").name = "public-profile-retry";
+            }
+        }
+
+        private void RenderPublicProfile(PublicProfileData profile)
+        {
+            _profileBody.Clear();
+            var hero = Box(_profileBody, "row public-profile-hero");
+            var avatar = new AvatarElement(profile.AvatarColor, profile.Accessory);
+            avatar.AddToClassList("public-profile-avatar");
+            hero.Add(avatar);
+            var identity = Box(hero, "grow public-profile-identity");
+            RawText(identity, profile.DisplayName, "public-profile-name");
+            var joined = Box(identity, "row public-profile-joined");
+            Text(joined, "가입일", "public-profile-label");
+            RawText(joined, PublicProfileDate(profile.JoinedAt), "public-profile-label");
+            var actions = Box(_profileBody, "row public-profile-friend-actions");
+            RenderPublicProfileFriendship(actions, profile);
+            Text(_profileBody, "통산 전적", "section-title");
+            var stats = profile.Stats ?? new ProfileStatsData();
+            var grid = Box(_profileBody, "row public-profile-stat-grid");
+            PublicProfileStat(grid, "경기 수", stats.MatchesPlayed);
+            PublicProfileStat(grid, "승리 수", stats.MatchesWon);
+            PublicProfileStatValue(grid, "승률", (stats.MatchesPlayed == 0 ? 0 : (double)stats.MatchesWon / stats.MatchesPlayed).ToString("P0", PublicProfileCulture()));
+            PublicProfileStat(grid, "총 점수", stats.TotalScore);
+            PublicProfileStat(grid, "최고 점수", stats.BestScore);
+            PublicProfileStat(grid, "플레이 라운드", stats.RoundsPlayed);
+            PublicProfileStat(grid, "시민 라운드", stats.CitizenRounds);
+            PublicProfileStat(grid, "라이어 라운드", stats.LiarRounds);
+            PublicProfileStat(grid, "정답 투표", stats.CorrectVotes);
+            PublicProfileStat(grid, "정답 추측", stats.CorrectGuesses);
+            Text(_profileBody, "최근 경기", "section-title");
+            var matches = profile.RecentMatches ?? Array.Empty<ProfileMatchData>();
+            if (matches.Length == 0) Text(_profileBody, "완료한 경기 기록이 없습니다.", "public-profile-empty");
+            foreach (var match in matches.Take(10))
+            {
+                if (match == null) continue;
+                var card = Box(_profileBody, "public-profile-match");
+                var heading = Box(card, "row");
+                RawText(heading, PublicProfileDate(match.PlayedAt, true), "grow public-profile-label");
+                Text(heading, match.Won ? "승리" : "패배", match.Won ? "public-profile-win" : "public-profile-loss");
+                var summary = Box(card, "row public-profile-match-summary");
+                Text(summary, "{0}위 / {1}명", "grow", match.Rank, match.PlayerCount);
+                Text(summary, "{0}점", "public-profile-match-score", match.Score);
+                var detail = Box(card, "row public-profile-match-detail");
+                Text(detail, match.Mode == (int)DrawingMode.Individual ? "한 명씩 그리기" : "릴레이 그리기", "grow public-profile-label");
+                Text(detail, "{0}라운드", "public-profile-label", match.RoundCount);
+            }
+        }
+
+        private static void PublicProfileStat(VisualElement grid, string title, int value)
+        {
+            PublicProfileStatValue(grid, title, value.ToString("N0", PublicProfileCulture()));
+        }
+
+        private static void PublicProfileStatValue(VisualElement grid, string title, string value)
+        {
+            var stat = Box(grid, "public-profile-stat");
+            RawText(stat, value, "public-profile-stat-value");
+            Text(stat, title, "public-profile-label");
+        }
+
+        private void RenderPublicProfileFriendship(VisualElement actions, PublicProfileData profile)
+        {
+            switch (profile.Friendship)
+            {
+                case "Self": Text(actions, "내 프로필", "public-profile-state"); break;
+                case "Friends": Text(actions, "친구", "public-profile-state"); break;
+                case "Outgoing": Text(actions, "수락 대기", "public-profile-state"); break;
+                case "Incoming":
+                    Button(actions, "수락", () => StartPublicProfileFriendAction(() => lobby.RespondFriendAsync(profile.AccountId, true)), "primary").name = "public-profile-accept";
+                    Button(actions, "거절", () => StartPublicProfileFriendAction(() => lobby.RespondFriendAsync(profile.AccountId, false)), "secondary").name = "public-profile-reject";
+                    break;
+                case "None":
+                    Button(actions, "친구 요청", () => StartPublicProfileFriendAction(() => lobby.RequestFriendAsync(profile.AccountId)), "primary").name = "public-profile-request";
+                    break;
+            }
+            RefreshPublicProfileActions();
+        }
+
+        private void RefreshPublicProfileActions()
+        {
+            _profileBody?.Q<VisualElement>(className: "public-profile-friend-actions")?.Query<Button>()
+                .ForEach(button => button.SetEnabled(!_profileActionBusy && !lobby.IsBusy));
+        }
+
+        private void StartPublicProfileFriendAction(Func<Task> action)
+        {
+            if (_profileActionBusy || _profileOverlay == null || lobby.IsBusy) return;
+            _profileActionBusy = true;
+            var actions = _profileBody.Q<VisualElement>(className: "public-profile-friend-actions");
+            actions.Query<Button>().ForEach(button => button.SetEnabled(false));
+            Text(actions, "처리 중…", "public-profile-state");
+            _ = PublicProfileFriendActionAsync(action, _profileOverlay, _profileVersion, _profileCancellation.Token);
+        }
+
+        private async Task PublicProfileFriendActionAsync(Func<Task> action, VisualElement popup, int version, CancellationToken token)
+        {
+            try
+            {
+                await action();
+                if (IsCurrentPublicProfile(popup, version, token)) BeginPublicProfileLoad();
+            }
+            catch (Exception exception)
+            {
+                if (!IsCurrentPublicProfile(popup, version, token)) return;
+                DrawAudio.Instance?.Play(DrawSound.UiError);
+                Toast(exception.Message);
+                BeginPublicProfileLoad();
+            }
+        }
+
+        private static CultureInfo PublicProfileCulture()
+        {
+            try { return CultureInfo.GetCultureInfo(DrawLocalization.CurrentLanguageCode); }
+            catch (CultureNotFoundException) { return CultureInfo.InvariantCulture; }
+        }
+
+        private static string PublicProfileDate(string timestamp, bool includeTime = false)
+        {
+            return DateTimeOffset.TryParse(timestamp, CultureInfo.InvariantCulture, DateTimeStyles.None, out var date)
+                ? date.ToLocalTime().ToString(includeTime ? "g" : "d", PublicProfileCulture()) : "—";
+        }
+
+        private void CancelPublicProfileRequest()
+        {
+            var cancellation = _profileCancellation;
+            _profileCancellation = null;
+            if (cancellation == null) return;
+            cancellation.Cancel();
+            cancellation.Dispose();
+        }
+
+        private void ClosePublicProfile(bool restoreFocus = true)
+        {
+            CancelPublicProfileRequest();
+            ++_profileVersion;
+            var popup = _profileOverlay;
+            var modal = _profileModal;
+            var returnFocus = _profileReturnFocus;
+            var accountId = _profileAccountId;
+            _profileOverlay = _profileModal = _profileBody = _profileReturnFocus = null;
+            _profileAccountId = _profileViewerAccountId = null;
+            _profileActionBusy = false;
+            if (popup == null) return;
+            DrawUIMotion.HideModal(popup, modal);
+            if (!restoreFocus || root == null) return;
+            root.schedule.Execute(() =>
+            {
+                if (_profileOverlay != null) return;
+                var target = returnFocus?.panel != null ? returnFocus : root.Q<VisualElement>("profile-open-" + accountId);
+                (target ?? overlay?.Q<Button>())?.Focus();
+            }).StartingIn(180);
+        }
+    }
+}

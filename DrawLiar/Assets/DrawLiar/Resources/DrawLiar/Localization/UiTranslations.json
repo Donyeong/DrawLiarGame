@@ -5337,6 +5337,431 @@
         "चैट कनेक्ट होने के बाद फिर से कोशिश करें।",
         "يرجى المحاولة مجددًا بعد اتصال الدردشة."
       ]
+    },
+    {
+      "Key": "프로필",
+      "Values": [
+        "프로필",
+        "Profile",
+        "个人资料",
+        "個人資料",
+        "プロフィール",
+        "Perfil",
+        "Perfil",
+        "Profil",
+        "Profil",
+        "Profil",
+        "प्रोफ़ाइल",
+        "الملف الشخصي"
+      ]
+    },
+    {
+      "Key": "프로필 보기",
+      "Values": [
+        "프로필 보기",
+        "View profile",
+        "查看资料",
+        "查看資料",
+        "プロフィールを見る",
+        "Ver perfil",
+        "Ver perfil",
+        "Voir le profil",
+        "Profil ansehen",
+        "Lihat profil",
+        "प्रोफ़ाइल देखें",
+        "عرض الملف الشخصي"
+      ]
+    },
+    {
+      "Key": "내 프로필",
+      "Values": [
+        "내 프로필",
+        "My profile",
+        "我的资料",
+        "我的資料",
+        "マイプロフィール",
+        "Mi perfil",
+        "Meu perfil",
+        "Mon profil",
+        "Mein Profil",
+        "Profil saya",
+        "मेरी प्रोफ़ाइल",
+        "ملفي الشخصي"
+      ]
+    },
+    {
+      "Key": "프로필을 불러오는 중…",
+      "Values": [
+        "프로필을 불러오는 중…",
+        "Loading profile…",
+        "正在加载资料…",
+        "正在載入資料…",
+        "プロフィールを読み込み中…",
+        "Cargando perfil…",
+        "Carregando perfil…",
+        "Chargement du profil…",
+        "Profil wird geladen…",
+        "Memuat profil…",
+        "प्रोफ़ाइल लोड हो रही है…",
+        "جارٍ تحميل الملف الشخصي…"
+      ]
+    },
+    {
+      "Key": "프로필을 불러오지 못했습니다.",
+      "Values": [
+        "프로필을 불러오지 못했습니다.",
+        "Unable to load this profile.",
+        "无法加载此资料。",
+        "無法載入此資料。",
+        "プロフィールを読み込めませんでした。",
+        "No se pudo cargar el perfil.",
+        "Não foi possível carregar o perfil.",
+        "Impossible de charger ce profil.",
+        "Dieses Profil konnte nicht geladen werden.",
+        "Profil ini tidak dapat dimuat.",
+        "प्रोफ़ाइल लोड नहीं हो सकी।",
+        "تعذر تحميل هذا الملف الشخصي."
+      ]
+    },
+    {
+      "Key": "다시 시도",
+      "Values": [
+        "다시 시도",
+        "Retry",
+        "重试",
+        "重試",
+        "再試行",
+        "Reintentar",
+        "Tentar novamente",
+        "Réessayer",
+        "Erneut versuchen",
+        "Coba lagi",
+        "फिर कोशिश करें",
+        "إعادة المحاولة"
+      ]
+    },
+    {
+      "Key": "가입일",
+      "Values": [
+        "가입일",
+        "Joined",
+        "加入日期",
+        "加入日期",
+        "登録日",
+        "Fecha de registro",
+        "Data de cadastro",
+        "Inscription",
+        "Beigetreten",
+        "Bergabung",
+        "जुड़ने की तारीख",
+        "تاريخ الانضمام"
+      ]
+    },
+    {
+      "Key": "통산 전적",
+      "Values": [
+        "통산 전적",
+        "Career stats",
+        "累计战绩",
+        "累計戰績",
+        "通算成績",
+        "Estadísticas generales",
+        "Estatísticas gerais",
+        "Statistiques globales",
+        "Gesamtstatistik",
+        "Statistik keseluruhan",
+        "कुल आँकड़े",
+        "الإحصاءات الإجمالية"
+      ]
+    },
+    {
+      "Key": "경기 수",
+      "Values": [
+        "경기 수",
+        "Matches played",
+        "比赛场数",
+        "比賽場數",
+        "試合数",
+        "Partidas jugadas",
+        "Partidas jogadas",
+        "Parties jouées",
+        "Gespielte Partien",
+        "Jumlah pertandingan",
+        "खेले गए मैच",
+        "المباريات الملعوبة"
+      ]
+    },
+    {
+      "Key": "승리 수",
+      "Values": [
+        "승리 수",
+        "Wins",
+        "获胜场数",
+        "獲勝場數",
+        "勝利数",
+        "Victorias",
+        "Vitórias",
+        "Victoires",
+        "Siege",
+        "Kemenangan",
+        "जीत",
+        "عدد مرات الفوز"
+      ]
+    },
+    {
+      "Key": "승률",
+      "Values": [
+        "승률",
+        "Win rate",
+        "胜率",
+        "勝率",
+        "勝率",
+        "Porcentaje de victorias",
+        "Taxa de vitórias",
+        "Taux de victoire",
+        "Siegquote",
+        "Persentase kemenangan",
+        "जीत का प्रतिशत",
+        "نسبة الفوز"
+      ]
+    },
+    {
+      "Key": "총 점수",
+      "Values": [
+        "총 점수",
+        "Total score",
+        "总分",
+        "總分",
+        "総得点",
+        "Puntuación total",
+        "Pontuação total",
+        "Score total",
+        "Gesamtpunktzahl",
+        "Total poin",
+        "कुल स्कोर",
+        "مجموع النقاط"
+      ]
+    },
+    {
+      "Key": "최고 점수",
+      "Values": [
+        "최고 점수",
+        "Best score",
+        "最高分",
+        "最高分",
+        "最高得点",
+        "Mejor puntuación",
+        "Melhor pontuação",
+        "Meilleur score",
+        "Höchste Punktzahl",
+        "Poin tertinggi",
+        "सर्वश्रेष्ठ स्कोर",
+        "أعلى نتيجة"
+      ]
+    },
+    {
+      "Key": "플레이 라운드",
+      "Values": [
+        "플레이 라운드",
+        "Rounds played",
+        "已玩回合",
+        "已玩回合",
+        "プレイしたラウンド",
+        "Rondas jugadas",
+        "Rodadas jogadas",
+        "Manches jouées",
+        "Gespielte Runden",
+        "Ronde dimainkan",
+        "खेले गए राउंड",
+        "الجولات الملعوبة"
+      ]
+    },
+    {
+      "Key": "시민 라운드",
+      "Values": [
+        "시민 라운드",
+        "Citizen rounds",
+        "平民回合",
+        "平民回合",
+        "市民ラウンド",
+        "Rondas como ciudadano",
+        "Rodadas como cidadão",
+        "Manches comme citoyen",
+        "Runden als Bürger",
+        "Ronde sebagai warga",
+        "नागरिक के रूप में राउंड",
+        "جولات المواطن"
+      ]
+    },
+    {
+      "Key": "라이어 라운드",
+      "Values": [
+        "라이어 라운드",
+        "Liar rounds",
+        "说谎者回合",
+        "說謊者回合",
+        "ライアーラウンド",
+        "Rondas como mentiroso",
+        "Rodadas como mentiroso",
+        "Manches comme menteur",
+        "Runden als Lügner",
+        "Ronde sebagai pembohong",
+        "झूठे के रूप में राउंड",
+        "جولات الكاذب"
+      ]
+    },
+    {
+      "Key": "정답 투표",
+      "Values": [
+        "정답 투표",
+        "Correct votes",
+        "正确投票",
+        "正確投票",
+        "正しい投票",
+        "Votos correctos",
+        "Votos corretos",
+        "Votes corrects",
+        "Richtige Stimmen",
+        "Suara benar",
+        "सही वोट",
+        "التصويتات الصحيحة"
+      ]
+    },
+    {
+      "Key": "최근 경기",
+      "Values": [
+        "최근 경기",
+        "Recent matches",
+        "最近比赛",
+        "最近比賽",
+        "最近の試合",
+        "Partidas recientes",
+        "Partidas recentes",
+        "Parties récentes",
+        "Letzte Partien",
+        "Pertandingan terbaru",
+        "हाल के मैच",
+        "المباريات الأخيرة"
+      ]
+    },
+    {
+      "Key": "완료한 경기 기록이 없습니다.",
+      "Values": [
+        "완료한 경기 기록이 없습니다.",
+        "No completed matches yet.",
+        "暂无已完成的比赛记录。",
+        "暫無已完成的比賽紀錄。",
+        "終了した試合の記録はありません。",
+        "Aún no hay partidas completadas.",
+        "Ainda não há partidas concluídas.",
+        "Aucune partie terminée pour le moment.",
+        "Noch keine abgeschlossenen Partien.",
+        "Belum ada pertandingan selesai.",
+        "अभी तक कोई पूरा हुआ मैच नहीं है।",
+        "لا توجد مباريات مكتملة بعد."
+      ]
+    },
+    {
+      "Key": "{0}위 / {1}명",
+      "Values": [
+        "{0}위 / {1}명",
+        "Rank {0} / {1}",
+        "第{0}名 / 共{1}人",
+        "第{0}名 / 共{1}人",
+        "{0}位 / {1}人",
+        "Puesto {0} / {1}",
+        "Posição {0} / {1}",
+        "Rang {0} / {1}",
+        "Platz {0} / {1}",
+        "Peringkat {0} / {1}",
+        "स्थान {0} / {1}",
+        "المركز {0} / {1}"
+      ]
+    },
+    {
+      "Key": "승리",
+      "Values": [
+        "승리",
+        "Win",
+        "胜利",
+        "勝利",
+        "勝利",
+        "Victoria",
+        "Vitória",
+        "Victoire",
+        "Sieg",
+        "Menang",
+        "जीत",
+        "فوز"
+      ]
+    },
+    {
+      "Key": "패배",
+      "Values": [
+        "패배",
+        "Loss",
+        "失败",
+        "失敗",
+        "敗北",
+        "Derrota",
+        "Derrota",
+        "Défaite",
+        "Niederlage",
+        "Kalah",
+        "हार",
+        "خسارة"
+      ]
+    },
+    {
+      "Key": "처리 중…",
+      "Values": [
+        "처리 중…",
+        "Processing…",
+        "处理中…",
+        "處理中…",
+        "処理中…",
+        "Procesando…",
+        "Processando…",
+        "Traitement…",
+        "Wird verarbeitet…",
+        "Memproses…",
+        "प्रक्रिया जारी है…",
+        "جارٍ المعالجة…"
+      ]
+    },
+    {
+      "Key": "친구 목록으로",
+      "Values": [
+        "친구 목록으로",
+        "Back to friends",
+        "返回好友列表",
+        "返回好友列表",
+        "フレンド一覧へ",
+        "Volver a amigos",
+        "Voltar aos amigos",
+        "Retour aux amis",
+        "Zur Freundesliste",
+        "Kembali ke teman",
+        "मित्र सूची पर वापस",
+        "العودة إلى الأصدقاء"
+      ]
+    },
+    {
+      "Key": "수락 대기",
+      "Values": [
+        "수락 대기",
+        "Pending acceptance",
+        "等待接受",
+        "等待接受",
+        "承認待ち",
+        "Pendiente de aceptación",
+        "Aguardando aceitação",
+        "En attente d’acceptation",
+        "Wartet auf Annahme",
+        "Menunggu persetujuan",
+        "स्वीकृति की प्रतीक्षा",
+        "بانتظار القبول"
+      ]
     }
   ]
 }

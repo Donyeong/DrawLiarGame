@@ -12,6 +12,8 @@ internal sealed class GameClusterClient : BackgroundService
     private readonly string _nodeId, _publicUrl;
     private volatile bool _registered;
     private double _lastSuccess = RoomRegistry.Now;
+    private double _nextResultAttempt;
+    private int _resultFailures;
 
     public bool IsReady => _registered && RoomRegistry.Now - _lastSuccess < 30;
     public string NodeId => _nodeId;
@@ -73,6 +75,7 @@ internal sealed class GameClusterClient : BackgroundService
                     register.EnsureSuccessStatusCode();
                     _registered = true;
                 }
+                await FlushResultsAsync(stoppingToken);
                 var statuses = _rooms.Statuses();
                 using var heartbeat = await _http.PostAsJsonAsync("/internal/dedicated/heartbeat",
                     new DedicatedHeartbeatRequest { NodeId = _nodeId, Rooms = statuses }, GameplayWire.Json, stoppingToken);
@@ -123,6 +126,32 @@ internal sealed class GameClusterClient : BackgroundService
                 });
         }
         catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested) { }
+    }
+
+    private async Task FlushResultsAsync(CancellationToken cancellationToken)
+    {
+        if (RoomRegistry.Now < _nextResultAttempt) return;
+        double started = RoomRegistry.Now;
+        foreach (var result in _rooms.PendingResults())
+        {
+            if (RoomRegistry.Now - started >= 2) break;
+            try
+            {
+                using var response = await _http.PostAsJsonAsync("/internal/dedicated/matches", result, GameplayWire.Json, cancellationToken);
+                response.EnsureSuccessStatusCode();
+                _rooms.AcknowledgeResult(result.MatchId);
+                _resultFailures = 0;
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
+            catch (Exception exception) when (exception is HttpRequestException or OperationCanceledException)
+            {
+                _resultFailures = Math.Min(_resultFailures + 1, 4);
+                _nextResultAttempt = RoomRegistry.Now + Math.Min(60, 5 * (1 << _resultFailures));
+                _logger.LogWarning("완료 경기 기록을 재시도합니다: {FailureType}", exception.GetType().Name);
+                return;
+            }
+        }
+        _nextResultAttempt = RoomRegistry.Now + 1;
     }
 
     public override void Dispose()

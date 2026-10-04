@@ -14,6 +14,7 @@ namespace DrawLiar
             public int Score, RoundPoints, Color, Accessory;
             public bool Connected = true, Spectator, SpectatorOnly, Liar, Caught, Guessed;
             public int? Vote;
+            public int RoundsPlayed, CitizenRounds, LiarRounds, CorrectVotes, CorrectGuesses;
         }
 
         private readonly Dictionary<int, Participant> players = new Dictionary<int, Participant>();
@@ -24,6 +25,10 @@ namespace DrawLiar
         private int[] turns = Array.Empty<int>();
         private int[] winners = Array.Empty<int>();
         private bool matchDecided;
+        private bool _completionEmitted;
+        private string _matchId = "";
+        private int _completedRounds;
+        private int[] _roundParticipants = Array.Empty<int>();
         private string topic = "", word = "", summary = GameRules.TieRule;
 
         public GamePhase Phase { get; private set; }
@@ -38,6 +43,7 @@ namespace DrawLiar
             && ActiveCount >= GameRules.MIN_START_PLAYERS;
         public event Action Changed;
         public event Action CanvasCleared;
+        public event Action<CompletedMatchData> MatchCompleted;
 
         public GameSession(RoomSettings settings, GameData gameData, int? seed = null)
         {
@@ -133,7 +139,11 @@ namespace DrawLiar
             foreach (var player in players.Values)
             {
                 player.Score = 0;
+                player.RoundsPlayed = player.CitizenRounds = player.LiarRounds = player.CorrectVotes = player.CorrectGuesses = 0;
             }
+            _matchId = Guid.NewGuid().ToString();
+            _completedRounds = 0;
+            _completionEmitted = false;
             Round = 0;
             winners = Array.Empty<int>();
             matchDecided = false;
@@ -282,6 +292,7 @@ namespace DrawLiar
             var participants = ActivePlayers().ToArray();
             Shuffle(participants);
             foreach (var player in participants.Take(Math.Min(Settings.LiarCount, participants.Length - 1))) player.Liar = true;
+            _roundParticipants = participants.Select(player => player.Id).ToArray();
             Shuffle(participants);
             turns = participants.Select(player => player.Id).ToArray();
             turnIndex = -1;
@@ -330,10 +341,23 @@ namespace DrawLiar
                 player.RoundPoints = GameRules.RoundScore(player.Liar, player.Caught, correctGuess, correctVote, scoring);
                 player.Score += player.RoundPoints;
             }
+            foreach (int id in _roundParticipants)
+            {
+                if (!players.TryGetValue(id, out var participant)) continue;
+                participant.RoundsPlayed++;
+                if (participant.Liar) participant.LiarRounds++;
+                else participant.CitizenRounds++;
+                if (!participant.Liar && participant.Vote.HasValue
+                    && players.TryGetValue(participant.Vote.Value, out var target) && target.Liar) participant.CorrectVotes++;
+                if (participant.Liar && participant.Guessed
+                    && GameRules.NormalizeGuess(participant.Guess) == GameRules.NormalizeGuess(word)) participant.CorrectGuesses++;
+            }
+            _completedRounds++;
             if (Settings.Victory == VictoryMode.RoundCount ? Round >= Settings.RoundCount
                 : ActivePlayers().Any(player => player.Score >= Settings.TargetScore)) DecideWinners();
             summary = "정답은 “" + word + "”! 시민은 정확한 투표, 라이어는 생존과 정답으로 득점해요.";
             SetPhase(GamePhase.RoundResults, Settings.ResultSeconds, now);
+            if (matchDecided) PublishMatchCompleted();
         }
 
         private void FinishMatch()
@@ -341,7 +365,28 @@ namespace DrawLiar
             if (!matchDecided) DecideWinners();
             Phase = GamePhase.MatchResults;
             if (!summary.StartsWith("참가자")) summary = winners.Length > 1 ? "동점 공동 우승! 함께 축하해요." : "최고 점수의 주인공이 정해졌어요!";
+            PublishMatchCompleted();
             Changed?.Invoke();
+        }
+
+        private void PublishMatchCompleted()
+        {
+            if (!_completionEmitted && _completedRounds > 0)
+            {
+                _completionEmitted = true;
+                var participants = players.Values.Where(player => player.RoundsPlayed > 0).ToArray();
+                MatchCompleted?.Invoke(new CompletedMatchData
+                {
+                    MatchId = _matchId, Mode = Settings.Mode, RoundCount = _completedRounds,
+                    Players = participants.OrderBy(player => player.Id).Select(player => new CompletedMatchPlayerData
+                    {
+                        PlayerId = player.Id, Score = player.Score,
+                        Rank = 1 + participants.Count(other => other.Score > player.Score), Won = winners.Contains(player.Id),
+                        RoundsPlayed = player.RoundsPlayed, CitizenRounds = player.CitizenRounds, LiarRounds = player.LiarRounds,
+                        CorrectVotes = player.CorrectVotes, CorrectGuesses = player.CorrectGuesses
+                    }).ToArray()
+                });
+            }
         }
 
         private void DecideWinners()

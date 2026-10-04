@@ -1,0 +1,274 @@
+#if UNITY_WEBGL && !UNITY_EDITOR
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UIElements;
+
+namespace DrawLiar
+{
+    internal sealed class DrawBrowserTextInput : IDisposable
+    {
+        [Serializable] private sealed class InputFields { public InputField[] Fields; }
+        [Serializable] private sealed class InputField
+        {
+            public int Id, Limit, Keyboard;
+            public float X, Y, Width, Height, ClipX, ClipY, ClipWidth, ClipHeight, HitX, HitY, HitWidth, HitHeight, FontSize;
+            public bool Multiline, Password, Correction, Rtl;
+            public string Value, Placeholder, Name, Color, Background;
+        }
+
+        private readonly VisualElement _root;
+        private readonly Dictionary<TextField, int> _ids = new Dictionary<TextField, int>();
+        private readonly Dictionary<int, TextField> _fields = new Dictionary<int, TextField>();
+        private readonly IVisualElementScheduledItem _poller;
+        private TextField _active;
+        private TextElement _text;
+        private StyleFloat _opacity;
+        private bool _hideKeyboard, _captureKeyboard, _dispatching, _reading, _disposed;
+        private string _knownValue;
+        private int _nextId, _activeId;
+        private float _nextLayout;
+
+        public DrawBrowserTextInput(VisualElement root)
+        {
+            _root = root;
+            root.RegisterCallback<FocusInEvent>(OnFocusIn, TrickleDown.TrickleDown);
+            root.RegisterCallback<FocusOutEvent>(OnFocusOut, TrickleDown.TrickleDown);
+            root.RegisterCallback<KeyDownEvent>(OnKeyDown, TrickleDown.TrickleDown);
+            root.RegisterCallback<DetachFromPanelEvent>(OnDetached);
+            _poller = root.schedule.Execute(Poll).Every(16);
+            RefreshFields();
+        }
+
+        private static TextField ParentField(VisualElement element)
+        {
+            while (element != null)
+            {
+                if (element is TextField field) return field;
+                element = element.parent;
+            }
+            return null;
+        }
+
+        private static bool IsVisible(VisualElement element)
+        {
+            if (element.panel == null || !element.enabledInHierarchy) return false;
+            for (var parent = element; parent != null; parent = parent.parent)
+                if (parent.resolvedStyle.display == DisplayStyle.None || parent.resolvedStyle.visibility == Visibility.Hidden) return false;
+            return true;
+        }
+
+        private static bool IsRightToLeft(VisualElement element)
+        {
+            for (var parent = element; parent != null; parent = parent.parent)
+                if (parent.languageDirection != LanguageDirection.Inherit) return parent.languageDirection == LanguageDirection.RTL;
+            return false;
+        }
+
+        private static Rect Intersection(Rect first, Rect second)
+        {
+            float left = Mathf.Max(first.xMin, second.xMin), top = Mathf.Max(first.yMin, second.yMin);
+            float right = Mathf.Min(first.xMax, second.xMax), bottom = Mathf.Min(first.yMax, second.yMax);
+            return new Rect(left, top, Mathf.Max(0, right - left), Mathf.Max(0, bottom - top));
+        }
+
+        private void RefreshFields()
+        {
+            _nextLayout = Time.unscaledTime + .08f;
+            Rect panel = _root.panel?.visualTree.worldBound ?? default;
+            if (panel.width <= 0 || panel.height <= 0) return;
+            var found = new HashSet<TextField>();
+            var configuration = new List<InputField>();
+            foreach (var field in _root.Query<TextField>().ToList())
+            {
+                if (field.isReadOnly || !IsVisible(field) || configuration.Count >= 128) continue;
+                var input = field.Q<VisualElement>(className: TextField.inputUssClassName);
+                if (input == null) continue;
+                Rect bounds = input.LocalToWorld(input.contentRect);
+                if (bounds.width <= 0 || bounds.height <= 0 || !panel.Overlaps(bounds)) continue;
+                Rect clip = Intersection(bounds, panel);
+                Rect hit = Intersection(input.worldBound, panel);
+                for (var ancestor = input.parent; ancestor != null; ancestor = ancestor.parent)
+                    if (ancestor.ClassListContains(ScrollView.viewportUssClassName))
+                    {
+                        clip = Intersection(clip, ancestor.worldBound);
+                        hit = Intersection(hit, ancestor.worldBound);
+                    }
+                if (clip.width <= 0 || clip.height <= 0 || ParentField(_root.panel.Pick(clip.center)) != field) continue;
+                found.Add(field);
+                if (!_ids.TryGetValue(field, out int id)) { id = ++_nextId; _ids.Add(field, id); _fields.Add(id, field); }
+                var text = input.Q<TextElement>();
+                var style = (text ?? input).resolvedStyle;
+                configuration.Add(new InputField
+                {
+                    Id = id, X = (bounds.x - panel.x) / panel.width, Y = (bounds.y - panel.y) / panel.height,
+                    Width = bounds.width / panel.width, Height = bounds.height / panel.height,
+                    ClipX = (clip.x - panel.x) / panel.width, ClipY = (clip.y - panel.y) / panel.height,
+                    ClipWidth = clip.width / panel.width, ClipHeight = clip.height / panel.height,
+                    HitX = (hit.x - panel.x) / panel.width, HitY = (hit.y - panel.y) / panel.height,
+                    HitWidth = hit.width / panel.width, HitHeight = hit.height / panel.height,
+                    FontSize = style.fontSize / panel.width, Color = "#" + ColorUtility.ToHtmlStringRGBA(style.color),
+                    Background = "#" + ColorUtility.ToHtmlStringRGBA(input.resolvedStyle.backgroundColor),
+                    Limit = field.maxLength >= 0 ? Math.Min(field.maxLength, 65536) : 65536,
+                    Value = field.value ?? "", Placeholder = field.textEdition.placeholder ?? "",
+                    Name = string.IsNullOrEmpty(field.name) ? field.label : field.name,
+                    Multiline = field.multiline, Password = field.isPasswordField,
+                    Keyboard = (int)field.textEdition.keyboardType, Correction = field.textEdition.autoCorrection,
+                    Rtl = IsRightToLeft(text ?? input)
+                });
+            }
+            if (_active != null && !found.Contains(_active)) Close(false);
+            var removed = new List<TextField>();
+            foreach (var field in _ids.Keys) if (!found.Contains(field)) removed.Add(field);
+            foreach (var field in removed) { _fields.Remove(_ids[field]); _ids.Remove(field); }
+            DrawBrowserInterop.DrawBrowserInputConfigure(JsonUtility.ToJson(new InputFields { Fields = configuration.ToArray() }));
+        }
+
+        private void OnFocusIn(FocusInEvent evt)
+        {
+            if (_disposed) return;
+            var field = ParentField(evt.target as VisualElement);
+            if (field == null || field.isReadOnly) return;
+            if (!_ids.ContainsKey(field)) RefreshFields();
+            if (_ids.TryGetValue(field, out int id)) Open(field, id);
+        }
+
+        private void Open(TextField field, int id)
+        {
+            if (_active == field) return;
+            Close(false);
+            _active = field; _activeId = id;
+            _knownValue = field.value;
+            field.RegisterValueChangedCallback(OnValueChanged);
+            _hideKeyboard = field.textEdition.hideSoftKeyboard;
+            field.textEdition.hideSoftKeyboard = true;
+            _captureKeyboard = WebGLInput.captureAllKeyboardInput;
+            WebGLInput.captureAllKeyboardInput = false;
+            var input = field.Q<VisualElement>(className: TextField.inputUssClassName);
+            _text = input?.Q<TextElement>();
+            if (_text != null) { _opacity = _text.style.opacity; _text.style.opacity = 0; }
+            if (DrawBrowserInterop.DrawBrowserInputOpen(id) != 1) Close(false);
+        }
+
+        private void OnFocusOut(FocusOutEvent evt)
+        {
+            if (ParentField(evt.target as VisualElement) != _active || _active == null) return;
+            if (ParentField(evt.relatedTarget as VisualElement) == _active) return;
+            Close(false);
+        }
+
+        private void OnKeyDown(KeyDownEvent evt)
+        {
+            if (_active != null && !_dispatching) evt.StopImmediatePropagation();
+        }
+
+        private void Poll()
+        {
+            if (_disposed) return;
+            int browserId = DrawBrowserInterop.DrawBrowserInputActive();
+            if (browserId != _activeId && _fields.TryGetValue(browserId, out var focused))
+            {
+                Open(focused, browserId);
+                focused.Focus();
+            }
+            if (_active != null)
+            {
+                SynchronizeValue();
+                int state = DrawBrowserInterop.DrawBrowserInputState(_activeId);
+                if ((state & 64) != 0) ReadValue(false);
+                if ((state & 1) != 0) { ReadValue(true); Dispatch(KeyCode.Return, EventModifiers.None); }
+                if ((state & 2) != 0) { ReadValue(true); Dispatch(KeyCode.Escape, EventModifiers.None); Close(true); }
+                else if ((state & 8) != 0) { ReadValue(true); MoveFocus((state & 16) != 0); }
+                else if ((state & 4) != 0) { var blurred = _active; Close(false); blurred?.Blur(); }
+                if (_active != null && !IsVisible(_active)) Close(false);
+                SynchronizeValue();
+            }
+            if (Time.unscaledTime >= _nextLayout) RefreshFields();
+        }
+
+        private void ReadValue(bool commit)
+        {
+            if (_active == null || _active.isDelayed && !commit) return;
+            string value = DrawBrowserInterop.DrawBrowserInputValue(_activeId);
+            if (value == null) return;
+            var field = _active;
+            _reading = true;
+            try { if (field.value != value) field.value = value; }
+            finally { _reading = false; }
+            if (_active != field) return;
+            _knownValue = field.value;
+            if (field.value != value) DrawBrowserInterop.DrawBrowserInputSetValue(_activeId, field.value ?? "");
+        }
+
+        private void OnValueChanged(ChangeEvent<string> evt)
+        {
+            if (!_reading && ReferenceEquals(evt.target, _active)) SynchronizeValue();
+        }
+
+        private void SynchronizeValue()
+        {
+            if (_active == null || _reading || _active.value == _knownValue) return;
+            _knownValue = _active.value;
+            DrawBrowserInterop.DrawBrowserInputSetValue(_activeId, _knownValue ?? "");
+        }
+
+        private void Dispatch(KeyCode key, EventModifiers modifiers)
+        {
+            if (_active == null) return;
+            var target = key == KeyCode.Return ? _active : (VisualElement)_text ?? _active;
+            using (var evt = KeyDownEvent.GetPooled('\0', key, modifiers))
+            {
+                evt.target = target;
+                _dispatching = true;
+                try { target.SendEvent(evt); }
+                finally { _dispatching = false; }
+            }
+        }
+
+        private void MoveFocus(bool backwards)
+        {
+            var previous = _active;
+            Dispatch(KeyCode.Tab, backwards ? EventModifiers.Shift : EventModifiers.None);
+            if (_active != previous || previous == null) return;
+            var controls = _root.Query<VisualElement>().ToList().FindAll(element => element.focusable && element.tabIndex >= 0
+                && IsVisible(element) && (element is TextField || element is Button || element is Toggle || element is DropdownField));
+            int index = controls.FindIndex(element => element == previous);
+            if (controls.Count == 0) return;
+            int next = (index + (backwards ? -1 : 1) + controls.Count) % controls.Count;
+            Close(true);
+            controls[next].Focus();
+        }
+
+        private void Close(bool focusCanvas)
+        {
+            if (_active == null) return;
+            SynchronizeValue();
+            var field = _active; var text = _text; int id = _activeId;
+            string value = DrawBrowserInterop.DrawBrowserInputValue(id);
+            _active = null; _text = null; _activeId = 0;
+            field.UnregisterValueChangedCallback(OnValueChanged);
+            if (text != null) text.style.opacity = _opacity;
+            field.textEdition.hideSoftKeyboard = _hideKeyboard;
+            WebGLInput.captureAllKeyboardInput = _captureKeyboard;
+            DrawBrowserInterop.DrawBrowserInputClose(id, focusCanvas ? 1 : 0);
+            if (value != null && field.value != value) field.value = value;
+            if (value != null && field.value != value) DrawBrowserInterop.DrawBrowserInputSetValue(id, field.value ?? "");
+            if (focusCanvas) field.Blur();
+        }
+
+        private void OnDetached(DetachFromPanelEvent evt) { if (ReferenceEquals(evt.target, _root)) Dispose(); }
+
+        public void Dispose()
+        {
+            if (_disposed) return;
+            Close(false); _disposed = true; _poller.Pause();
+            _root.UnregisterCallback<FocusInEvent>(OnFocusIn, TrickleDown.TrickleDown);
+            _root.UnregisterCallback<FocusOutEvent>(OnFocusOut, TrickleDown.TrickleDown);
+            _root.UnregisterCallback<KeyDownEvent>(OnKeyDown, TrickleDown.TrickleDown);
+            _root.UnregisterCallback<DetachFromPanelEvent>(OnDetached);
+            DrawBrowserInterop.DrawBrowserInputShutdown();
+            _fields.Clear(); _ids.Clear();
+        }
+    }
+}
+#endif
