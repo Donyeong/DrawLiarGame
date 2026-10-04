@@ -139,6 +139,7 @@ internal sealed class DedicatedRoom
                 _ => false
             };
             if (!accepted) NoticeLocked(connection, "지금은 이 요청을 처리할 수 없어요.");
+            else if (envelope.Kind == "configure") _statusChanged();
             RemoveUnusedPlayerIdsLocked();
             if (_dirty) BroadcastSnapshotsLocked(now);
         }

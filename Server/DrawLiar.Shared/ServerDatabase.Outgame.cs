@@ -6,12 +6,7 @@ public sealed record AdminAccountView(string AccountId, string DisplayName, int 
 
 public sealed partial class ServerDatabase
 {
-    public static ShopProduct[] ShopProducts { get; } =
-    [
-        new ShopProduct { Id = "beret", Name = "베레모", Price = 100, Accessory = 1 },
-        new ShopProduct { Id = "brush", Name = "붓", Price = 100, Accessory = 2 },
-        new ShopProduct { Id = "painter", Name = "화가 세트", Price = 180, Accessory = 3 }
-    ];
+    public static ShopProduct[] ShopProducts { get; } = AvatarParts.CreateShopProducts();
 
     public async Task<ProfileData> PurchaseAsync(Guid accountId, PurchaseRequest request)
     {

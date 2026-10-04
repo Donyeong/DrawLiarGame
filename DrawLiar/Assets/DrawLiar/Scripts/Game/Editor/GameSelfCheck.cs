@@ -202,8 +202,11 @@ namespace DrawLiar.Editor
             game.ReturnToLobby();
             foreach (var selection in new[] { Array.Empty<string>(), new[] { "삭제된 주제" } })
             {
+                var previousSettings = game.Settings;
+                var previousTopics = previousSettings.Topics.ToArray();
                 var invalid = game.Settings.Copy(); invalid.Topics = selection;
-                Check(game.Configure(invalid) && !game.Start(now), "Empty or missing topics cannot silently enable excluded topics.");
+                Check(!game.Configure(invalid) && ReferenceEquals(game.Settings, previousSettings)
+                    && game.Settings.Topics.SequenceEqual(previousTopics), "Invalid topics are rejected without replacing selected settings.");
             }
         }
 

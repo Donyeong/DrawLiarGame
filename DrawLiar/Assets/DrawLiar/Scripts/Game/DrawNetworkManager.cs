@@ -33,6 +33,7 @@ namespace DrawLiar
         private TaskCompletionSource<bool> _initialState;
         private int _generation, _pendingSends, _canvasVersion;
         private long _sequence;
+        private bool _configuringRoom;
 
         public RoomSnapshot State { get; private set; }
         public bool IsConnected => _socket != null && _socket.State == WebSocketState.Open && State != null;
@@ -78,13 +79,48 @@ namespace DrawLiar
             }
         }
 
-        public void ConfigureRoom(RoomSettings settings)
+        public async Task ConfigureRoomAsync(RoomSettings settings)
         {
-            if (settings == null || !IsConnected) return;
+            if (!CanConfigureRoom(State)) throw new InvalidOperationException(DrawLocalization.Text("방 옵션 변경 권한이 없습니다."));
+            if (settings == null || _configuringRoom) throw new InvalidOperationException(DrawLocalization.Text("방 옵션을 저장하지 못했습니다. 다시 시도하세요."));
             var valid = settings.Copy();
             valid.Validate();
-            Send(new GameplayEnvelope { Type = "request", Kind = "configure", Settings = valid });
+            if (valid.Topics == null || valid.Topics.Length == 0) throw new InvalidOperationException(DrawLocalization.Text("주제를 하나 이상 선택하세요."));
+            string expected = JsonUtility.ToJson(valid);
+            if (JsonUtility.ToJson(State.Settings) == expected) return;
+            var completion = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            void OnState(RoomSnapshot state)
+            {
+                if (!CanConfigureRoom(state)) completion.TrySetException(new InvalidOperationException(DrawLocalization.Text("방 옵션 변경 권한이 없습니다.")));
+                else if (JsonUtility.ToJson(state.Settings) == expected) completion.TrySetResult(true);
+            }
+            void OnNotice(string message) => completion.TrySetException(new InvalidOperationException(message));
+            _configuringRoom = true;
+            StateChanged += OnState;
+            Notice += OnNotice;
+            try
+            {
+                using (var timeout = CancellationTokenSource.CreateLinkedTokenSource(_lifetime.Token))
+                {
+                    timeout.CancelAfter(TimeSpan.FromSeconds(10));
+                    await SendAsync(new GameplayEnvelope { Type = "request", Kind = "configure", Settings = valid }, _generation, timeout.Token);
+                    using (timeout.Token.Register(() => completion.TrySetCanceled())) await completion.Task;
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                throw new InvalidOperationException(DrawLocalization.Text("방 옵션을 저장하지 못했습니다. 다시 시도하세요."));
+            }
+            finally
+            {
+                StateChanged -= OnState;
+                Notice -= OnNotice;
+                _configuringRoom = false;
+            }
         }
+
+        private bool CanConfigureRoom(RoomSnapshot state) => IsConnected && state != null && state.IsHost
+            && (state.Phase == GamePhase.Lobby || state.Phase == GamePhase.MatchResults);
 
         public void StartMatch() => Request("start");
         public void EndTurn() => Request("endTurn");

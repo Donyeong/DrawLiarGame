@@ -831,24 +831,24 @@ PlayerSettings:
   webWasm2023: 0
   webEnableSubmoduleStrippingCompatibility: 0
   scriptingDefineSymbols:
-    Android: DOTWEEN
-    EmbeddedLinux: DOTWEEN
-    GameCoreScarlett: DOTWEEN
-    GameCoreXboxOne: DOTWEEN
-    Kepler: DOTWEEN
-    LinuxHeadlessSimulation: DOTWEEN
-    Nintendo Switch: DOTWEEN
-    Nintendo Switch 2: DOTWEEN
-    PS4: DOTWEEN
-    PS5: DOTWEEN
-    QNX: DOTWEEN
-    Standalone: APP_UI_EDITOR_ONLY;MIRROR;MIRROR_89_OR_NEWER;MIRROR_90_OR_NEWER;MIRROR_93_OR_NEWER;MIRROR_96_OR_NEWER;EDGEGAP_PLUGIN_SERVERS;DOTWEEN;MOREMOUNTAINS_NICEVIBRATIONS_INSTALLED;STEAMWORKS_NET
-    VisionOS: DOTWEEN
-    WebGL: DOTWEEN
+    Android: DOTWEEN;TextMeshPro
+    EmbeddedLinux: DOTWEEN;TextMeshPro
+    GameCoreScarlett: DOTWEEN;TextMeshPro
+    GameCoreXboxOne: DOTWEEN;TextMeshPro
+    Kepler: DOTWEEN;TextMeshPro
+    LinuxHeadlessSimulation: DOTWEEN;TextMeshPro
+    Nintendo Switch: DOTWEEN;TextMeshPro
+    Nintendo Switch 2: DOTWEEN;TextMeshPro
+    PS4: DOTWEEN;TextMeshPro
+    PS5: DOTWEEN;TextMeshPro
+    QNX: DOTWEEN;TextMeshPro
+    Standalone: APP_UI_EDITOR_ONLY;MIRROR;MIRROR_89_OR_NEWER;MIRROR_90_OR_NEWER;MIRROR_93_OR_NEWER;MIRROR_96_OR_NEWER;EDGEGAP_PLUGIN_SERVERS;DOTWEEN;MOREMOUNTAINS_NICEVIBRATIONS_INSTALLED;STEAMWORKS_NET;TextMeshPro
+    VisionOS: DOTWEEN;TextMeshPro
+    WebGL: DOTWEEN;TextMeshPro
     Windows Store Apps: DOTWEEN
-    XboxOne: DOTWEEN
-    iPhone: DOTWEEN
-    tvOS: DOTWEEN
+    XboxOne: DOTWEEN;TextMeshPro
+    iPhone: DOTWEEN;TextMeshPro
+    tvOS: DOTWEEN;TextMeshPro
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:

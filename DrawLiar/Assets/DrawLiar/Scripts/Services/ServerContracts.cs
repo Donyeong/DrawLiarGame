@@ -88,4 +88,23 @@ namespace DrawLiar
     [Serializable] public sealed class SessionCheckRequest { public string SessionToken = ""; public string AccountId = ""; }
     [Serializable] public sealed class SessionCheckResponse { public bool Valid; }
     [Serializable] public sealed class AdminAccountAction { public bool IsBanned; }
+    [Serializable] public sealed class LobbyChatMessage
+    {
+        public long Id;
+        public string AccountId = "";
+        public string DisplayName = "";
+        public string Text = "";
+        public string SentAt = "";
+    }
+    [Serializable] public sealed class LobbyChatEnvelope
+    {
+        public string Type = "";
+        public string SessionToken = "";
+        public string RequestId = "";
+        public string Text = "";
+        public LobbyChatMessage Message = new LobbyChatMessage();
+        public LobbyChatMessage[] Messages = Array.Empty<LobbyChatMessage>();
+        public int MemberCount;
+        public string Code = "";
+    }
 }

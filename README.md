@@ -13,3 +13,5 @@ Unity 6000.3.20f1 기반 PC·Android 그림 라이어 게임입니다. Unity 프
 `dotnet run --project Server/DrawLiar.IntegrationTests -- <Main HTTPS URL> <Admin HTTPS URL>`로 계정·아웃게임·다중 참가·동기화를 검증합니다. 자체 서명 인증서는 환경 변수 `DRAWLIAR_CERT_PIN`에 공개 DER SHA-256을 설정합니다. Unity의 `DrawLiar > Run Game Checks`는 게임 규칙·커스텀 주제·Google PKCE와 콜백 검증을 실행합니다.
 
 주제·단어·득점은 `Assets/DrawLiar/Resources/DrawLiar/GameData.json`에서 설정합니다. 선택한 커스텀 주제는 방 생성 시 서버로 전송합니다. UI는 UI Toolkit과 Pretendard를 사용하며 폰트 라이선스는 해당 리소스에 포함되어 있습니다.
+
+현지화에는 구매한 I2 Localization을 `Assets/I2/Localization`에 설치해야 합니다. 구매 에셋 원본은 저장소에 포함하지 않습니다.

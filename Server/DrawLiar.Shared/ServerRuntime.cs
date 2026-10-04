@@ -60,7 +60,7 @@ public static class ServerRuntime
         {
             try
             {
-                if (context.Request.Path.StartsWithSegments("/api"))
+                if (context.Request.Path.StartsWithSegments("/api") || context.Request.Path.StartsWithSegments("/ws"))
                 {
                     context.Response.Headers.CacheControl = "no-store";
                     if (!app.Environment.IsDevelopment() && !context.Request.IsHttps) throw new ApiException("HttpsRequired", 403);
@@ -122,7 +122,7 @@ public static class ServerRuntime
     public static string DisplayName(string value)
     {
         value = (value ?? "").Trim();
-        if (value.Length < 2 || value.Length > 16 || value.Any(c => !char.IsLetterOrDigit(c) && c != '_')) throw new ApiException("InvalidDisplayName");
+        if (value.Length < 2 || value.Length > 16 || value.Any(c => !char.IsLetterOrDigit(c) && c != '_' && c != ' ')) throw new ApiException("InvalidDisplayName");
         return value;
     }
 

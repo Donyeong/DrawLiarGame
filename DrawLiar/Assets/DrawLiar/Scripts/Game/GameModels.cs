@@ -7,8 +7,6 @@ namespace DrawLiar
     public enum GamePhase { Lobby, RoleReveal, Drawing, Discussion, Rebuttal, Voting, LiarReveal, Guessing, RoundResults, MatchResults }
     public enum DrawingMode { Relay, Individual }
     public enum VictoryMode { RoundCount, TargetScore }
-    [Flags]
-    public enum AvatarAccessory { None = 0, Beret = 1, Brush = 2, Painter = Beret | Brush }
 
     [Serializable]
     public sealed class RoomSettings
@@ -97,6 +95,7 @@ namespace DrawLiar
         public int CanvasVersion;
         public float RemainingSeconds;
         public RoomSettings Settings = new RoomSettings();
+        public string[] AvailableTopics = Array.Empty<string>();
         public PlayerView[] Players = Array.Empty<PlayerView>();
         public int[] Winners = Array.Empty<int>();
         public string Summary = "";

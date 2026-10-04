@@ -1,0 +1,5342 @@
+{
+  "Terms": [
+    {
+      "Key": "{0} · 나",
+      "Values": [
+        "{0} · 나",
+        "{0} · Me",
+        "{0} · 我",
+        "{0} · 我",
+        "{0} · 自分",
+        "{0} · Yo",
+        "{0} · Eu",
+        "{0} · Moi",
+        "{0} · Ich",
+        "{0} · Saya",
+        "{0} · मैं",
+        "{0} · أنا"
+      ]
+    },
+    {
+      "Key": "{0} · 라이어",
+      "Values": [
+        "{0} · 라이어",
+        "{0} · Liar",
+        "{0} · 说谎者",
+        "{0} · 說謊者",
+        "{0} · ライアー",
+        "{0} · Mentiroso",
+        "{0} · Mentiroso",
+        "{0} · Menteur",
+        "{0} · Lügner",
+        "{0} · Pembohong",
+        "{0} · झूठा",
+        "{0} · الكاذب"
+      ]
+    },
+    {
+      "Key": "{0} · 수락 대기",
+      "Values": [
+        "{0} · 수락 대기",
+        "{0} · Pending",
+        "{0} · 等待接受",
+        "{0} · 等待接受",
+        "{0} · 承認待ち",
+        "{0} · Solicitud pendiente",
+        "{0} · Aguardando aceitação",
+        "{0} · Demande en attente",
+        "{0} · Anfrage ausstehend",
+        "{0} · Menunggu diterima",
+        "{0} · स्वीकृति की प्रतीक्षा",
+        "{0} · بانتظار القبول"
+      ]
+    },
+    {
+      "Key": "{0} · 시민",
+      "Values": [
+        "{0} · 시민",
+        "{0} · Citizen",
+        "{0} · 市民",
+        "{0} · 市民",
+        "{0} · 市民",
+        "{0} · Inocente",
+        "{0} · Inocente",
+        "{0} · Innocent",
+        "{0} · Unschuldiger",
+        "{0} · Pemain biasa",
+        "{0} · सामान्य खिलाड़ी",
+        "{0} · لاعب عادي"
+      ]
+    },
+    {
+      "Key": "{0} / {1}개 선택",
+      "Values": [
+        "{0} / {1}개 선택",
+        "{0} / {1} selected",
+        "已选 {0} / {1}项",
+        "已選 {0} / {1} 項",
+        "{0} / {1}個を選択",
+        "{0} / {1} seleccionados",
+        "{0} / {1} selecionados",
+        "{0} / {1} sélectionnés",
+        "{0} / {1} ausgewählt",
+        "{0} / {1} dipilih",
+        "{0} / {1} चुने गए",
+        "{0} / {1} محدد"
+      ]
+    },
+    {
+      "Key": "{0} / {1}명",
+      "Values": [
+        "{0} / {1}명",
+        "{0} / {1} players",
+        "{0} / {1}人",
+        "{0} / {1} 人",
+        "{0} / {1}人",
+        "{0} / {1} jugadores",
+        "{0} / {1} jogadores",
+        "{0} / {1} joueurs",
+        "{0} / {1} Spieler",
+        "{0} / {1} pemain",
+        "{0} / {1} खिलाड़ी",
+        "{0} / {1} لاعبين"
+      ]
+    },
+    {
+      "Key": "{0} / {1}명 · 관전 {2}명 · 대기 중",
+      "Values": [
+        "{0} / {1}명 · 관전 {2}명 · 대기 중",
+        "{0} / {1} players · {2} spectators · Waiting",
+        "{0} / {1}人 · 观战{2}人 · 等待中",
+        "{0} / {1} 人 · 觀戰 {2} 人 · 等待中",
+        "{0} / {1}人 · 観戦{2}人 · 待機中",
+        "{0} / {1} jugadores · {2} espectadores · En espera",
+        "{0} / {1} jogadores · {2} espectadores · Aguardando",
+        "{0} / {1} joueurs · {2} spectateurs · En attente",
+        "{0} / {1} Spieler · {2} Zuschauer · Wartet",
+        "{0} / {1} pemain · {2} penonton · Menunggu",
+        "{0} / {1} खिलाड़ी · {2} दर्शक · प्रतीक्षा में",
+        "{0} / {1} لاعبين · {2} مشاهدين · في الانتظار"
+      ]
+    },
+    {
+      "Key": "{0} / {1}명 · 관전 {2}명 · 진행 중",
+      "Values": [
+        "{0} / {1}명 · 관전 {2}명 · 진행 중",
+        "{0} / {1} players · {2} spectators · In progress",
+        "{0} / {1}人 · 观战{2}人 · 进行中",
+        "{0} / {1} 人 · 觀戰 {2} 人 · 進行中",
+        "{0} / {1}人 · 観戦{2}人 · 進行中",
+        "{0} / {1} jugadores · {2} espectadores · En juego",
+        "{0} / {1} jogadores · {2} espectadores · Em andamento",
+        "{0} / {1} joueurs · {2} spectateurs · En cours",
+        "{0} / {1} Spieler · {2} Zuschauer · Läuft",
+        "{0} / {1} pemain · {2} penonton · Berlangsung",
+        "{0} / {1} खिलाड़ी · {2} दर्शक · जारी",
+        "{0} / {1} لاعبين · {2} مشاهدين · جارية"
+      ]
+    },
+    {
+      "Key": "{0} 코인",
+      "Values": [
+        "{0} 코인",
+        "{0} coins",
+        "{0} 金币",
+        "{0} 金幣",
+        "{0} コイン",
+        "{0} monedas",
+        "{0} moedas",
+        "{0} pièces",
+        "{0} Münzen",
+        "{0} koin",
+        "{0} सिक्के",
+        "{0} عملات"
+      ]
+    },
+    {
+      "Key": "{0}라운드",
+      "Values": [
+        "{0}라운드",
+        "{0} rounds",
+        "{0}回合",
+        "{0} 回合",
+        "{0}ラウンド",
+        "{0} rondas",
+        "{0} rodadas",
+        "{0} manches",
+        "{0} Runden",
+        "{0} ronde",
+        "{0} राउंड",
+        "{0} جولات"
+      ]
+    },
+    {
+      "Key": "{0}에게 투표",
+      "Values": [
+        "{0}에게 투표",
+        "Vote for {0}",
+        "投票给{0}",
+        "投票給 {0}",
+        "{0}に投票",
+        "Votar a {0}",
+        "Votar em {0}",
+        "Voter contre {0}",
+        "Für {0} abstimmen",
+        "Beri suara untuk {0}",
+        "{0} को वोट दें",
+        "التصويت على {0}"
+      ]
+    },
+    {
+      "Key": "{0}점",
+      "Values": [
+        "{0}점",
+        "{0} pts",
+        "{0}分",
+        "{0} 分",
+        "{0}点",
+        "{0} puntos",
+        "{0} pontos",
+        "{0} points",
+        "{0} Punkte",
+        "{0} poin",
+        "{0} अंक",
+        "{0} نقاط"
+      ]
+    },
+    {
+      "Key": "{0}점 (+{1})",
+      "Values": [
+        "{0}점 (+{1})",
+        "{0} pts (+{1})",
+        "{0}分 (+{1})",
+        "{0} 分 (+{1})",
+        "{0}点 (+{1})",
+        "{0} puntos (+{1})",
+        "{0} pontos (+{1})",
+        "{0} points (+{1})",
+        "{0} Punkte (+{1})",
+        "{0} poin (+{1})",
+        "{0} अंक (+{1})",
+        "{0} نقاط (+{1})"
+      ]
+    },
+    {
+      "Key": "← 뒤로",
+      "Values": [
+        "← 뒤로",
+        "← Back",
+        "← 返回",
+        "← 返回",
+        "← 戻る",
+        "← Atrás",
+        "← Voltar",
+        "← Retour",
+        "← Zurück",
+        "← Kembali",
+        "← वापस",
+        "← رجوع"
+      ]
+    },
+    {
+      "Key": "★ {0} · 라이어",
+      "Values": [
+        "★ {0} · 라이어",
+        "★ {0} · Liar",
+        "★ {0} · 说谎者",
+        "★ {0} · 說謊者",
+        "★ {0} · ライアー",
+        "★ {0} · Mentiroso",
+        "★ {0} · Mentiroso",
+        "★ {0} · Menteur",
+        "★ {0} · Lügner",
+        "★ {0} · Pembohong",
+        "★ {0} · झूठा",
+        "★ {0} · الكاذب"
+      ]
+    },
+    {
+      "Key": "★ {0} · 시민",
+      "Values": [
+        "★ {0} · 시민",
+        "★ {0} · Citizen",
+        "★ {0} · 市民",
+        "★ {0} · 市民",
+        "★ {0} · 市民",
+        "★ {0} · Inocente",
+        "★ {0} · Inocente",
+        "★ {0} · Innocent",
+        "★ {0} · Unschuldiger",
+        "★ {0} · Pemain biasa",
+        "★ {0} · सामान्य खिलाड़ी",
+        "★ {0} · لاعب عادي"
+      ]
+    },
+    {
+      "Key": "6자리 방 코드를 입력하세요.",
+      "Values": [
+        "6자리 방 코드를 입력하세요.",
+        "Enter a 6-character room code.",
+        "请输入6位房间代码。",
+        "請輸入 6 位房間代碼。",
+        "6文字のルームコードを入力してください。",
+        "Introduce el código de sala de 6 caracteres.",
+        "Digite o código da sala com 6 caracteres.",
+        "Saisissez le code du salon à 6 caractères.",
+        "Gib den 6-stelligen Raumcode ein.",
+        "Masukkan kode ruang 6 karakter.",
+        "6 अक्षरों वाला रूम कोड डालें।",
+        "أدخل رمز الغرفة المكوّن من 6 أحرف."
+      ]
+    },
+    {
+      "Key": "가는 선",
+      "Values": [
+        "가는 선",
+        "Thin",
+        "细线",
+        "細線",
+        "細い線",
+        "Trazo fino",
+        "Traço fino",
+        "Trait fin",
+        "Dünner Strich",
+        "Garis tipis",
+        "पतली रेखा",
+        "خط رفيع"
+      ]
+    },
+    {
+      "Key": "거절",
+      "Values": [
+        "거절",
+        "Decline",
+        "拒绝",
+        "拒絕",
+        "拒否",
+        "Rechazar",
+        "Recusar",
+        "Refuser",
+        "Ablehnen",
+        "Tolak",
+        "अस्वीकार करें",
+        "رفض"
+      ]
+    },
+    {
+      "Key": "검색",
+      "Values": [
+        "검색",
+        "Search",
+        "搜索",
+        "搜尋",
+        "検索",
+        "Buscar",
+        "Buscar",
+        "Rechercher",
+        "Suchen",
+        "Cari",
+        "खोजें",
+        "بحث"
+      ]
+    },
+    {
+      "Key": "게스트",
+      "Values": [
+        "게스트",
+        "Guest",
+        "游客",
+        "訪客",
+        "ゲスト",
+        "Invitado",
+        "Visitante",
+        "Invité",
+        "Gast",
+        "Tamu",
+        "अतिथि",
+        "ضيف"
+      ]
+    },
+    {
+      "Key": "게스트 계정",
+      "Values": [
+        "게스트 계정",
+        "Guest account",
+        "游客账号",
+        "訪客帳號",
+        "ゲストアカウント",
+        "Cuenta de invitado",
+        "Conta de convidado",
+        "Compte invité",
+        "Gastkonto",
+        "Akun tamu",
+        "अतिथि खाता",
+        "حساب ضيف"
+      ]
+    },
+    {
+      "Key": "게스트 인증 정보를 확인할 수 없습니다. Google 연동 계정은 Google로 로그인하세요.",
+      "Values": [
+        "게스트 인증 정보를 확인할 수 없습니다. Google 연동 계정은 Google로 로그인하세요.",
+        "Guest credentials are unavailable. Use Google to sign in to a linked account.",
+        "无法获取游客认证信息。已关联Google的账号请使用Google登录。",
+        "無法取得訪客驗證資訊。已連結 Google 的帳號請使用 Google 登入。",
+        "ゲストの認証情報を確認できません。Google連携済みのアカウントはGoogleでログインしてください。",
+        "No se pudo verificar la cuenta de invitado. Si está vinculada a Google, inicia sesión con Google.",
+        "Não foi possível verificar a conta de visitante. Se ela estiver vinculada ao Google, entre com o Google.",
+        "Impossible de vérifier le compte invité. Si le compte est lié à Google, connectez-vous avec Google.",
+        "Das Gastkonto konnte nicht geprüft werden. Ist es mit Google verknüpft, melde dich mit Google an.",
+        "Akun tamu tidak dapat diverifikasi. Jika tertaut ke Google, masuk dengan Google.",
+        "अतिथि खाते की पुष्टि नहीं हो सकी। Google से जुड़ा खाता है तो Google से लॉग इन करें।",
+        "تعذّر التحقق من حساب الضيف. إذا كان مرتبطًا بـ Google، فسجّل الدخول باستخدام Google."
+      ]
+    },
+    {
+      "Key": "게스트로 시작",
+      "Values": [
+        "게스트로 시작",
+        "Play as guest",
+        "以游客开始",
+        "以訪客開始",
+        "ゲストで始める",
+        "Jugar como invitado",
+        "Jogar como convidado",
+        "Jouer en invité",
+        "Als Gast spielen",
+        "Main sebagai tamu",
+        "अतिथि के रूप में खेलें",
+        "اللعب كضيف"
+      ]
+    },
+    {
+      "Key": "게임 규칙",
+      "Values": [
+        "게임 규칙",
+        "Game rules",
+        "游戏规则",
+        "遊戲規則",
+        "ゲームのルール",
+        "Reglas del juego",
+        "Regras do jogo",
+        "Règles du jeu",
+        "Spielregeln",
+        "Aturan game",
+        "गेम के नियम",
+        "قواعد اللعبة"
+      ]
+    },
+    {
+      "Key": "게임 대기",
+      "Values": [
+        "게임 대기",
+        "Waiting",
+        "等待游戏",
+        "等待遊戲",
+        "ゲーム待機中",
+        "Esperando la partida",
+        "Aguardando partida",
+        "En attente de partie",
+        "Warten auf Spielstart",
+        "Menunggu permainan",
+        "खेल की प्रतीक्षा",
+        "بانتظار اللعبة"
+      ]
+    },
+    {
+      "Key": "게임 서버가 준비 중입니다. 잠시 후 다시 시도하세요.",
+      "Values": [
+        "게임 서버가 준비 중입니다. 잠시 후 다시 시도하세요.",
+        "The game server is getting ready. Please try again shortly.",
+        "游戏服务器准备中，请稍后重试。",
+        "遊戲伺服器準備中，請稍後重試。",
+        "ゲームサーバーの準備中です。少し待ってからもう一度お試しください。",
+        "El servidor de juego se está preparando. Inténtalo de nuevo en unos momentos.",
+        "O servidor de jogo está sendo preparado. Tente novamente em instantes.",
+        "Le serveur de jeu se prépare. Réessayez dans un instant.",
+        "Der Spielserver wird vorbereitet. Versuche es gleich erneut.",
+        "Server game sedang disiapkan. Coba lagi sebentar lagi.",
+        "गेम सर्वर तैयार हो रहा है। थोड़ी देर बाद फिर कोशिश करें।",
+        "يجري تجهيز خادم اللعبة. حاول مجددًا بعد قليل."
+      ]
+    },
+    {
+      "Key": "게임 서버에 연결하고 있습니다…",
+      "Values": [
+        "게임 서버에 연결하고 있습니다…",
+        "Connecting to the game server…",
+        "正在连接游戏服务器…",
+        "正在連線至遊戲伺服器…",
+        "ゲームサーバーに接続しています…",
+        "Conectando al servidor de juego…",
+        "Conectando ao servidor de jogo…",
+        "Connexion au serveur de jeu…",
+        "Verbindung zum Spielserver wird hergestellt…",
+        "Menghubungkan ke server game…",
+        "गेम सर्वर से जुड़ रहा है…",
+        "جارٍ الاتصال بخادم اللعبة…"
+      ]
+    },
+    {
+      "Key": "게임 시작",
+      "Values": [
+        "게임 시작",
+        "Start game",
+        "开始游戏",
+        "開始遊戲",
+        "ゲーム開始",
+        "Iniciar partida",
+        "Iniciar partida",
+        "Lancer la partie",
+        "Spiel starten",
+        "Mulai permainan",
+        "खेल शुरू करें",
+        "بدء اللعبة"
+      ]
+    },
+    {
+      "Key": "결과 보기",
+      "Values": [
+        "결과 보기",
+        "View results",
+        "查看结果",
+        "查看結果",
+        "結果を見る",
+        "Ver resultados",
+        "Ver resultados",
+        "Voir les résultats",
+        "Ergebnisse ansehen",
+        "Lihat hasil",
+        "नतीजे देखें",
+        "عرض النتائج"
+      ]
+    },
+    {
+      "Key": "계정 ID 복사",
+      "Values": [
+        "계정 ID 복사",
+        "Copy account ID",
+        "复制账号ID",
+        "複製帳號 ID",
+        "アカウントIDをコピー",
+        "Copiar ID de cuenta",
+        "Copiar ID da conta",
+        "Copier l’ID du compte",
+        "Konto-ID kopieren",
+        "Salin ID akun",
+        "खाता ID कॉपी करें",
+        "نسخ معرّف الحساب"
+      ]
+    },
+    {
+      "Key": "계정 ID: {0}",
+      "Values": [
+        "계정 ID: {0}",
+        "Account ID: {0}",
+        "账号ID：{0}",
+        "帳號 ID：{0}",
+        "アカウントID：{0}",
+        "ID de cuenta: {0}",
+        "ID da conta: {0}",
+        "ID du compte : {0}",
+        "Konto-ID: {0}",
+        "ID akun: {0}",
+        "खाता ID: {0}",
+        "معرّف الحساب: {0}"
+      ]
+    },
+    {
+      "Key": "계정 ID를 복사했습니다.",
+      "Values": [
+        "계정 ID를 복사했습니다.",
+        "Account ID copied.",
+        "已复制账号ID。",
+        "已複製帳號 ID。",
+        "アカウントIDをコピーしました。",
+        "ID de cuenta copiado.",
+        "ID da conta copiado.",
+        "ID du compte copié.",
+        "Konto-ID kopiert.",
+        "ID akun disalin.",
+        "खाता ID कॉपी हो गई।",
+        "تم نسخ معرّف الحساب."
+      ]
+    },
+    {
+      "Key": "계정 ID를 찾지 못했습니다.",
+      "Values": [
+        "계정 ID를 찾지 못했습니다.",
+        "Account ID not found.",
+        "未找到账号ID。",
+        "找不到帳號 ID。",
+        "アカウントIDが見つかりませんでした。",
+        "No se encontró el ID de la cuenta.",
+        "ID da conta não encontrado.",
+        "Identifiant du compte introuvable.",
+        "Die Konto-ID wurde nicht gefunden.",
+        "ID akun tidak ditemukan.",
+        "खाते की ID नहीं मिली।",
+        "لم يتم العثور على معرّف الحساب."
+      ]
+    },
+    {
+      "Key": "공개 방",
+      "Values": [
+        "공개 방",
+        "Public rooms",
+        "公开房间",
+        "公開房間",
+        "公開ルーム",
+        "Salas públicas",
+        "Salas públicas",
+        "Salons publics",
+        "Öffentliche Räume",
+        "Ruang publik",
+        "सार्वजनिक कमरे",
+        "الغرف العامة"
+      ]
+    },
+    {
+      "Key": "공개 방 {0}개를 찾았습니다.",
+      "Values": [
+        "공개 방 {0}개를 찾았습니다.",
+        "Found {0} public rooms.",
+        "找到{0}个公开房间。",
+        "找到 {0} 個公開房間。",
+        "公開ルームが{0}件見つかりました。",
+        "Se encontraron {0} salas públicas.",
+        "{0} salas públicas encontradas.",
+        "{0} salons publics trouvés.",
+        "{0} öffentliche Räume gefunden.",
+        "Ditemukan {0} ruang publik.",
+        "{0} सार्वजनिक रूम मिले।",
+        "تم العثور على {0} غرف عامة."
+      ]
+    },
+    {
+      "Key": "공개 방이 없습니다.",
+      "Values": [
+        "공개 방이 없습니다.",
+        "No public rooms found.",
+        "暂无公开房间。",
+        "目前沒有公開房間。",
+        "公開ルームがありません。",
+        "No hay salas públicas.",
+        "Não há salas públicas.",
+        "Aucun salon public disponible.",
+        "Keine öffentlichen Räume vorhanden.",
+        "Tidak ada ruang publik.",
+        "कोई सार्वजनिक रूम नहीं है।",
+        "لا توجد غرف عامة."
+      ]
+    },
+    {
+      "Key": "공개 설정",
+      "Values": [
+        "공개 설정",
+        "Visibility",
+        "公开设置",
+        "公開設定",
+        "公開設定",
+        "Visibilidad",
+        "Visibilidade",
+        "Visibilité",
+        "Sichtbarkeit",
+        "Visibilitas",
+        "दृश्यता",
+        "الظهور"
+      ]
+    },
+    {
+      "Key": "공개방 둘러보기",
+      "Values": [
+        "공개방 둘러보기",
+        "Browse public rooms",
+        "浏览公开房间",
+        "瀏覽公開房間",
+        "公開ルームを見る",
+        "Explorar salas públicas",
+        "Explorar salas públicas",
+        "Parcourir les salons publics",
+        "Öffentliche Räume ansehen",
+        "Jelajahi ruang publik",
+        "सार्वजनिक कमरे देखें",
+        "تصفّح الغرف العامة"
+      ]
+    },
+    {
+      "Key": "관전",
+      "Values": [
+        "관전",
+        "Spectate",
+        "观战",
+        "觀戰",
+        "観戦",
+        "Espectador",
+        "Espectador",
+        "Spectateur",
+        "Zuschauer",
+        "Penonton",
+        "दर्शक",
+        "مشاهد"
+      ]
+    },
+    {
+      "Key": "관전 {0}명",
+      "Values": [
+        "관전 {0}명",
+        "{0} spectators",
+        "观战 {0}人",
+        "觀戰 {0} 人",
+        "観戦 {0}人",
+        "Espectadores: {0}",
+        "Espectadores: {0}",
+        "Spectateurs : {0}",
+        "Zuschauer: {0}",
+        "Penonton: {0}",
+        "दर्शक: {0}",
+        "المشاهدون: {0}"
+      ]
+    },
+    {
+      "Key": "관전 중",
+      "Values": [
+        "관전 중",
+        "Spectating",
+        "观战中",
+        "觀戰中",
+        "観戦中",
+        "Observando",
+        "Assistindo",
+        "En spectateur",
+        "Zuschauen",
+        "Menonton",
+        "देख रहे हैं",
+        "يشاهد"
+      ]
+    },
+    {
+      "Key": "관전으로 참가",
+      "Values": [
+        "관전으로 참가",
+        "Join as spectator",
+        "以观战方式加入",
+        "以觀戰方式加入",
+        "観戦で参加",
+        "Unirse como espectador",
+        "Entrar como espectador",
+        "Rejoindre en spectateur",
+        "Als Zuschauer beitreten",
+        "Masuk sebagai penonton",
+        "दर्शक के रूप में जुड़ें",
+        "الانضمام كمشاهد"
+      ]
+    },
+    {
+      "Key": "구매",
+      "Values": [
+        "구매",
+        "Buy",
+        "购买",
+        "購買",
+        "購入",
+        "Comprar",
+        "Comprar",
+        "Acheter",
+        "Kaufen",
+        "Beli",
+        "खरीदें",
+        "شراء"
+      ]
+    },
+    {
+      "Key": "굵기",
+      "Values": [
+        "굵기",
+        "Thickness",
+        "粗细",
+        "粗細",
+        "太さ",
+        "Grosor",
+        "Espessura",
+        "Épaisseur",
+        "Strichstärke",
+        "Ketebalan",
+        "मोटाई",
+        "السُمك"
+      ]
+    },
+    {
+      "Key": "굵기 {0}",
+      "Values": [
+        "굵기 {0}",
+        "Thickness {0}",
+        "粗细 {0}",
+        "粗細 {0}",
+        "太さ {0}",
+        "Grosor {0}",
+        "Espessura {0}",
+        "Épaisseur {0}",
+        "Strichstärke {0}",
+        "Ketebalan {0}",
+        "मोटाई {0}",
+        "السُمك {0}"
+      ]
+    },
+    {
+      "Key": "굵은 선",
+      "Values": [
+        "굵은 선",
+        "Thick",
+        "粗线",
+        "粗線",
+        "太い線",
+        "Trazo grueso",
+        "Traço grosso",
+        "Trait épais",
+        "Dicker Strich",
+        "Garis tebal",
+        "मोटी रेखा",
+        "خط عريض"
+      ]
+    },
+    {
+      "Key": "그리기",
+      "Values": [
+        "그리기",
+        "Drawing",
+        "绘画",
+        "繪畫",
+        "描く",
+        "Dibujar",
+        "Desenhar",
+        "Dessiner",
+        "Zeichnen",
+        "Menggambar",
+        "चित्र बनाएँ",
+        "رسم"
+      ]
+    },
+    {
+      "Key": "그리기 방식",
+      "Values": [
+        "그리기 방식",
+        "Drawing mode",
+        "绘画方式",
+        "繪畫方式",
+        "描き方",
+        "Modo de dibujo",
+        "Modo de desenho",
+        "Mode de dessin",
+        "Zeichenmodus",
+        "Mode menggambar",
+        "चित्र बनाने का तरीका",
+        "طريقة الرسم"
+      ]
+    },
+    {
+      "Key": "그리기 완료",
+      "Values": [
+        "그리기 완료",
+        "Finish drawing",
+        "绘画完成",
+        "繪畫完成",
+        "描き終わり",
+        "Terminar dibujo",
+        "Concluir desenho",
+        "Terminer le dessin",
+        "Zeichnung fertig",
+        "Selesai menggambar",
+        "चित्र पूरा हुआ",
+        "إنهاء الرسم"
+      ]
+    },
+    {
+      "Key": "그리는 중",
+      "Values": [
+        "그리는 중",
+        "Drawing",
+        "绘画中",
+        "繪畫中",
+        "描いています",
+        "Dibujando",
+        "Desenhando",
+        "Dessin en cours",
+        "Zeichnet",
+        "Sedang menggambar",
+        "चित्र बना रहे हैं",
+        "يرسم الآن"
+      ]
+    },
+    {
+      "Key": "그림 {0}초 · 토론 {1}초",
+      "Values": [
+        "그림 {0}초 · 토론 {1}초",
+        "Drawing {0}s · Discussion {1}s",
+        "绘画 {0}秒 · 讨论 {1}秒",
+        "繪畫 {0} 秒 · 討論 {1} 秒",
+        "お絵描き {0}秒 · 話し合い {1}秒",
+        "Dibujo {0}s · Debate {1}s",
+        "Desenho {0}s · Discussão {1}s",
+        "Dessin {0} s · Discussion {1} s",
+        "Zeichnen {0} s · Diskussion {1} s",
+        "Menggambar {0} dtk · Diskusi {1} dtk",
+        "चित्रकारी {0} सेकंड · चर्चा {1} सेकंड",
+        "الرسم {0} ث · النقاش {1} ث"
+      ]
+    },
+    {
+      "Key": "그림 차례",
+      "Values": [
+        "그림 차례",
+        "Drawing turn",
+        "绘画回合",
+        "繪畫回合",
+        "描く順番",
+        "Turno de dibujo",
+        "Vez de desenhar",
+        "Tour de dessin",
+        "Zeichenrunde",
+        "Giliran menggambar",
+        "चित्र बनाने की बारी",
+        "دور الرسم"
+      ]
+    },
+    {
+      "Key": "기본 주제와 다른 이름을 입력하세요.",
+      "Values": [
+        "기본 주제와 다른 이름을 입력하세요.",
+        "Use a different name from the default topics.",
+        "请输入与默认主题不同的名称。",
+        "請輸入與預設主題不同的名稱。",
+        "標準のテーマとは違う名前を入力してください。",
+        "Elige un nombre distinto al de los temas predeterminados.",
+        "Escolha um nome diferente dos temas padrão.",
+        "Choisissez un nom différent des thèmes par défaut.",
+        "Wähle einen anderen Namen als die Standardthemen.",
+        "Pakai nama yang berbeda dari tema bawaan.",
+        "डिफ़ॉल्ट विषयों से अलग नाम चुनें।",
+        "اختر اسمًا مختلفًا عن المواضيع الافتراضية."
+      ]
+    },
+    {
+      "Key": "기존 계정",
+      "Values": [
+        "기존 계정",
+        "Existing account",
+        "已有账号",
+        "現有帳號",
+        "既存アカウント",
+        "Cuenta existente",
+        "Conta existente",
+        "Compte existant",
+        "Bestehendes Konto",
+        "Akun lama",
+        "मौजूदा खाता",
+        "حساب موجود"
+      ]
+    },
+    {
+      "Key": "꾸미기",
+      "Values": [
+        "꾸미기",
+        "Customize",
+        "装扮",
+        "裝扮",
+        "着せ替え",
+        "Personalizar",
+        "Personalizar",
+        "Personnaliser",
+        "Anpassen",
+        "Kustomisasi",
+        "सजाएँ",
+        "تخصيص"
+      ]
+    },
+    {
+      "Key": "나가기",
+      "Values": [
+        "나가기",
+        "Leave",
+        "退出",
+        "離開",
+        "退出",
+        "Salir",
+        "Sair",
+        "Quitter",
+        "Verlassen",
+        "Keluar",
+        "बाहर जाएँ",
+        "خروج"
+      ]
+    },
+    {
+      "Key": "나만의 주제",
+      "Values": [
+        "나만의 주제",
+        "My topics",
+        "自定义主题",
+        "自訂主題",
+        "自分のテーマ",
+        "Mis temas",
+        "Meus temas",
+        "Mes thèmes",
+        "Meine Themen",
+        "Tema saya",
+        "मेरे विषय",
+        "مواضيعي"
+      ]
+    },
+    {
+      "Key": "나만의 주제 만들기",
+      "Values": [
+        "나만의 주제 만들기",
+        "Create a topic",
+        "创建自定义主题",
+        "建立自訂主題",
+        "自分のテーマを作る",
+        "Crear un tema",
+        "Criar um tema",
+        "Créer un thème",
+        "Eigenes Thema erstellen",
+        "Buat tema sendiri",
+        "अपना विषय बनाएँ",
+        "إنشاء موضوع خاص"
+      ]
+    },
+    {
+      "Key": "내 계정",
+      "Values": [
+        "내 계정",
+        "My account",
+        "我的账号",
+        "我的帳號",
+        "自分のアカウント",
+        "Mi cuenta",
+        "Minha conta",
+        "Mon compte",
+        "Mein Konto",
+        "Akun saya",
+        "मेरा खाता",
+        "حسابي"
+      ]
+    },
+    {
+      "Key": "내 차례",
+      "Values": [
+        "내 차례",
+        "My turn",
+        "轮到我了",
+        "輪到我了",
+        "自分の番",
+        "Mi turno",
+        "Minha vez",
+        "Mon tour",
+        "Ich bin dran",
+        "Giliran saya",
+        "मेरी बारी",
+        "دوري"
+      ]
+    },
+    {
+      "Key": "네트워크가 초기화되지 않았습니다.",
+      "Values": [
+        "네트워크가 초기화되지 않았습니다.",
+        "The network is not initialized.",
+        "网络尚未初始化。",
+        "網路尚未初始化。",
+        "ネットワークが初期化されていません。",
+        "La conexión de red no se ha inicializado.",
+        "A conexão de rede não foi inicializada.",
+        "La connexion réseau n’est pas initialisée.",
+        "Die Netzwerkverbindung ist nicht initialisiert.",
+        "Koneksi jaringan belum diinisialisasi.",
+        "नेटवर्क कनेक्शन शुरू नहीं हुआ है।",
+        "لم تتم تهيئة اتصال الشبكة."
+      ]
+    },
+    {
+      "Key": "누구나 · 공개방",
+      "Values": [
+        "누구나 · 공개방",
+        "Everyone · Public room",
+        "所有人 · 公开房间",
+        "所有人 · 公開房間",
+        "誰でも · 公開ルーム",
+        "Todos · Sala pública",
+        "Todos · Sala pública",
+        "Tous · Salon public",
+        "Alle · Öffentlich",
+        "Semua · Ruang publik",
+        "सभी · सार्वजनिक कमरा",
+        "الجميع · غرفة عامة"
+      ]
+    },
+    {
+      "Key": "닉네임",
+      "Values": [
+        "닉네임",
+        "Nickname",
+        "昵称",
+        "暱稱",
+        "ニックネーム",
+        "Apodo",
+        "Apelido",
+        "Pseudo",
+        "Spitzname",
+        "Nama panggilan",
+        "नाम",
+        "الاسم المستعار"
+      ]
+    },
+    {
+      "Key": "닉네임은 2~16자의 글자, 숫자, 공백, 밑줄로 입력하세요.",
+      "Values": [
+        "닉네임은 2~16자의 글자, 숫자, 공백, 밑줄로 입력하세요.",
+        "Use 2–16 characters: letters, numbers, spaces, or underscores.",
+        "昵称须为2–16个字符，可使用文字、数字、空格和下划线。",
+        "暱稱須為 2–16 個字元，可使用文字、數字、空格與底線。",
+        "ニックネームは文字・数字・スペース・アンダースコアで2〜16文字にしてください。",
+        "El apodo debe tener entre 2 y 16 caracteres: letras, números, espacios o guiones bajos.",
+        "O apelido deve ter de 2 a 16 caracteres: letras, números, espaços ou sublinhados.",
+        "Le pseudo doit contenir 2 à 16 caractères : lettres, chiffres, espaces ou traits de soulignement.",
+        "Der Spitzname muss 2 bis 16 Zeichen enthalten: Buchstaben, Zahlen, Leerzeichen oder Unterstriche.",
+        "Nama panggilan harus terdiri dari 2–16 karakter: huruf, angka, spasi, atau garis bawah.",
+        "उपनाम में 2–16 वर्ण होने चाहिए: अक्षर, अंक, स्पेस या अंडरस्कोर।",
+        "يجب أن يتكوّن الاسم المستعار من 2 إلى 16 محرفًا: حروف أو أرقام أو مسافات أو شرطات سفلية."
+      ]
+    },
+    {
+      "Key": "다음",
+      "Values": [
+        "다음",
+        "Next",
+        "下一步",
+        "下一步",
+        "次へ",
+        "Siguiente",
+        "Próximo",
+        "Suivant",
+        "Weiter",
+        "Lanjut",
+        "आगे",
+        "التالي"
+      ]
+    },
+    {
+      "Key": "단위: 초 · 반론 0초는 건너뛰기",
+      "Values": [
+        "단위: 초 · 반론 0초는 건너뛰기",
+        "Seconds · Skip objections when set to 0",
+        "单位：秒 · 异议设为0则跳过",
+        "單位：秒 · 異議設為 0 則略過",
+        "単位：秒 · 反論が0秒ならスキップ",
+        "En segundos · 0 s de defensa para omitir",
+        "Em segundos · 0 s de defesa para pular",
+        "En secondes · 0 s de défense pour passer",
+        "In Sekunden · Verteidigung mit 0 s überspringen",
+        "Dalam detik · Pembelaan 0 dtk untuk dilewati",
+        "सेकंड में · सफ़ाई के लिए 0 सेकंड चुनने पर यह चरण छूटेगा",
+        "بالثواني · 0 ثانية للدفاع لتخطيه"
+      ]
+    },
+    {
+      "Key": "닫기",
+      "Values": [
+        "닫기",
+        "Close",
+        "关闭",
+        "關閉",
+        "閉じる",
+        "Cerrar",
+        "Fechar",
+        "Fermer",
+        "Schließen",
+        "Tutup",
+        "बंद करें",
+        "إغلاق"
+      ]
+    },
+    {
+      "Key": "대기 중",
+      "Values": [
+        "대기 중",
+        "Waiting",
+        "等待中",
+        "等待中",
+        "待機中",
+        "En espera",
+        "Aguardando",
+        "En attente",
+        "Warten",
+        "Menunggu",
+        "प्रतीक्षा में",
+        "بانتظار"
+      ]
+    },
+    {
+      "Key": "대기실",
+      "Values": [
+        "대기실",
+        "Waiting room",
+        "等候室",
+        "等待室",
+        "待機室",
+        "Sala de espera",
+        "Sala de espera",
+        "Salon d’attente",
+        "Warteraum",
+        "Ruang tunggu",
+        "प्रतीक्षा कक्ष",
+        "غرفة الانتظار"
+      ]
+    },
+    {
+      "Key": "대기실로",
+      "Values": [
+        "대기실로",
+        "Back to room",
+        "返回等候室",
+        "返回等待室",
+        "待機室へ",
+        "Volver a la sala",
+        "Voltar à sala",
+        "Retour au salon",
+        "Zum Warteraum",
+        "Ke ruang tunggu",
+        "प्रतीक्षा कक्ष में जाएँ",
+        "إلى غرفة الانتظار"
+      ]
+    },
+    {
+      "Key": "데디케이티드 주소가 올바르지 않습니다.",
+      "Values": [
+        "데디케이티드 주소가 올바르지 않습니다.",
+        "The dedicated server address is invalid.",
+        "专用服务器地址无效。",
+        "專用伺服器位址無效。",
+        "専用サーバーのアドレスが正しくありません。",
+        "La dirección del servidor dedicado no es válida.",
+        "O endereço do servidor dedicado é inválido.",
+        "L’adresse du serveur dédié est invalide.",
+        "Die Adresse des dedizierten Servers ist ungültig.",
+        "Alamat server khusus tidak valid.",
+        "डेडिकेटेड सर्वर का पता अमान्य है।",
+        "عنوان الخادم المخصص غير صالح."
+      ]
+    },
+    {
+      "Key": "뒤로",
+      "Values": [
+        "뒤로",
+        "Back",
+        "返回",
+        "返回",
+        "戻る",
+        "Atrás",
+        "Voltar",
+        "Retour",
+        "Zurück",
+        "Kembali",
+        "वापस",
+        "رجوع"
+      ]
+    },
+    {
+      "Key": "라운드",
+      "Values": [
+        "라운드",
+        "Round",
+        "回合",
+        "回合",
+        "ラウンド",
+        "Ronda",
+        "Rodada",
+        "Manche",
+        "Runde",
+        "Ronde",
+        "राउंड",
+        "جولة"
+      ]
+    },
+    {
+      "Key": "라운드 {0}",
+      "Values": [
+        "라운드 {0}",
+        "Round {0}",
+        "回合 {0}",
+        "回合 {0}",
+        "ラウンド {0}",
+        "Ronda {0}",
+        "Rodada {0}",
+        "Manche {0}",
+        "Runde {0}",
+        "Ronde {0}",
+        "राउंड {0}",
+        "الجولة {0}"
+      ]
+    },
+    {
+      "Key": "라운드 결과",
+      "Values": [
+        "라운드 결과",
+        "Round results",
+        "回合结果",
+        "回合結果",
+        "ラウンド結果",
+        "Resultados de la ronda",
+        "Resultado da rodada",
+        "Résultats de la manche",
+        "Rundenergebnis",
+        "Hasil ronde",
+        "राउंड के नतीजे",
+        "نتائج الجولة"
+      ]
+    },
+    {
+      "Key": "라이어",
+      "Values": [
+        "라이어",
+        "Liar",
+        "说谎者",
+        "說謊者",
+        "ライアー",
+        "Mentiroso",
+        "Mentiroso",
+        "Menteur",
+        "Lügner",
+        "Pembohong",
+        "झूठा",
+        "الكاذب"
+      ]
+    },
+    {
+      "Key": "라이어 {0}명",
+      "Values": [
+        "라이어 {0}명",
+        "{0} liars",
+        "{0}名说谎者",
+        "{0} 名說謊者",
+        "ライアー{0}人",
+        "{0} mentirosos",
+        "{0} mentirosos",
+        "{0} menteurs",
+        "{0} Lügner",
+        "{0} pembohong",
+        "{0} झूठे",
+        "{0} كاذبين"
+      ]
+    },
+    {
+      "Key": "라이어 {0}명 · {1}라운드",
+      "Values": [
+        "라이어 {0}명 · {1}라운드",
+        "{0} liars · {1} rounds",
+        "说谎者{0}人 · {1}回合",
+        "說謊者 {0} 人 · {1} 回合",
+        "ライアー{0}人 · {1}ラウンド",
+        "Mentirosos {0} · Rondas {1}",
+        "Mentirosos {0} · Rodadas {1}",
+        "Menteurs {0} · Manches {1}",
+        "Lügner {0} · Runden {1}",
+        "Pembohong {0} · Ronde {1}",
+        "झूठे {0} · राउंड {1}",
+        "الكاذبون {0} · الجولات {1}"
+      ]
+    },
+    {
+      "Key": "라이어 {0}명 · 목표 {1}점",
+      "Values": [
+        "라이어 {0}명 · 목표 {1}점",
+        "{0} liars · Target {1} pts",
+        "说谎者{0}人 · 目标{1}分",
+        "說謊者 {0} 人 · 目標 {1} 分",
+        "ライアー{0}人 · 目標{1}点",
+        "Mentirosos {0} · Objetivo {1} puntos",
+        "Mentirosos {0} · Meta {1} pontos",
+        "Menteurs {0} · Objectif {1} points",
+        "Lügner {0} · Ziel {1} Punkte",
+        "Pembohong {0} · Target {1} poin",
+        "झूठे {0} · लक्ष्य {1} अंक",
+        "الكاذبون {0} · الهدف {1} نقاط"
+      ]
+    },
+    {
+      "Key": "라이어 공개",
+      "Values": [
+        "라이어 공개",
+        "Reveal liar",
+        "公布说谎者",
+        "公布說謊者",
+        "ライアー公開",
+        "Revelar al mentiroso",
+        "Revelar o mentiroso",
+        "Révéler le menteur",
+        "Lügner aufdecken",
+        "Ungkap pembohong",
+        "झूठे की पहचान",
+        "كشف الكاذب"
+      ]
+    },
+    {
+      "Key": "라이어 답변 대기",
+      "Values": [
+        "라이어 답변 대기",
+        "Waiting for liar",
+        "等待说谎者回答",
+        "等待說謊者回答",
+        "ライアーの回答待ち",
+        "Esperando al mentiroso",
+        "Aguardando o mentiroso",
+        "En attente du menteur",
+        "Warten auf den Lügner",
+        "Menunggu pembohong",
+        "झूठे के जवाब की प्रतीक्षा",
+        "بانتظار جواب الكاذب"
+      ]
+    },
+    {
+      "Key": "라이어 수",
+      "Values": [
+        "라이어 수",
+        "Liars",
+        "说谎者人数",
+        "說謊者人數",
+        "ライアーの人数",
+        "Número de mentirosos",
+        "Número de mentirosos",
+        "Nombre de menteurs",
+        "Anzahl der Lügner",
+        "Jumlah pembohong",
+        "झूठों की संख्या",
+        "عدد الكاذبين"
+      ]
+    },
+    {
+      "Key": "로그아웃",
+      "Values": [
+        "로그아웃",
+        "Log out",
+        "退出登录",
+        "登出",
+        "ログアウト",
+        "Cerrar sesión",
+        "Sair da conta",
+        "Se déconnecter",
+        "Abmelden",
+        "Keluar akun",
+        "लॉग आउट",
+        "تسجيل الخروج"
+      ]
+    },
+    {
+      "Key": "로그아웃했습니다.",
+      "Values": [
+        "로그아웃했습니다.",
+        "Signed out.",
+        "已退出登录。",
+        "已登出。",
+        "ログアウトしました。",
+        "Sesión cerrada.",
+        "Você saiu da conta.",
+        "Vous êtes déconnecté.",
+        "Du wurdest abgemeldet.",
+        "Kamu telah keluar.",
+        "लॉग आउट हो गया।",
+        "تم تسجيل الخروج."
+      ]
+    },
+    {
+      "Key": "로그인이 만료되었습니다. 다시 로그인해 주세요.",
+      "Values": [
+        "로그인이 만료되었습니다. 다시 로그인해 주세요.",
+        "Your sign-in has expired. Please sign in again.",
+        "登录已过期，请重新登录。",
+        "登入已過期，請重新登入。",
+        "ログインの有効期限が切れました。もう一度ログインしてください。",
+        "La sesión ha caducado. Inicia sesión de nuevo.",
+        "Sua sessão expirou. Entre novamente.",
+        "Votre session a expiré. Reconnectez-vous.",
+        "Deine Sitzung ist abgelaufen. Melde dich erneut an.",
+        "Sesi telah berakhir. Silakan masuk lagi.",
+        "लॉगिन सत्र समाप्त हो गया है। फिर से लॉग इन करें।",
+        "انتهت صلاحية الجلسة. سجّل الدخول مجددًا."
+      ]
+    },
+    {
+      "Key": "로그인했습니다. 방을 만들거나 참가하세요.",
+      "Values": [
+        "로그인했습니다. 방을 만들거나 참가하세요.",
+        "Signed in. Create or join a room.",
+        "登录成功，请创建或加入房间。",
+        "登入成功，請建立或加入房間。",
+        "ログインしました。ルームを作成するか参加してください。",
+        "Sesión iniciada. Crea una sala o únete a una.",
+        "Você entrou. Crie uma sala ou entre em uma.",
+        "Vous êtes connecté. Créez ou rejoignez un salon.",
+        "Du bist angemeldet. Erstelle einen Raum oder tritt einem bei.",
+        "Berhasil masuk. Buat ruang atau bergabung ke ruang.",
+        "लॉग इन हो गया। रूम बनाएँ या किसी रूम में शामिल हों।",
+        "تم تسجيل الدخول. أنشئ غرفة أو انضم إلى غرفة."
+      ]
+    },
+    {
+      "Key": "로비",
+      "Values": [
+        "로비",
+        "Lobby",
+        "大厅",
+        "大廳",
+        "ロビー",
+        "Lobby",
+        "Lobby",
+        "Lobby",
+        "Lobby",
+        "Lobi",
+        "लॉबी",
+        "الردهة"
+      ]
+    },
+    {
+      "Key": "로비 서버가 준비 중입니다. 잠시 후 다시 시도하세요.",
+      "Values": [
+        "로비 서버가 준비 중입니다. 잠시 후 다시 시도하세요.",
+        "The lobby server is getting ready. Please try again shortly.",
+        "大厅服务器准备中，请稍后重试。",
+        "大廳伺服器準備中，請稍後重試。",
+        "ロビーサーバーの準備中です。少し待ってからもう一度お試しください。",
+        "El servidor del lobby se está preparando. Inténtalo de nuevo en unos momentos.",
+        "O servidor do lobby está sendo preparado. Tente novamente em instantes.",
+        "Le serveur du lobby se prépare. Réessayez dans un instant.",
+        "Der Lobbyserver wird vorbereitet. Versuche es gleich erneut.",
+        "Server lobi sedang disiapkan. Coba lagi sebentar lagi.",
+        "लॉबी सर्वर तैयार हो रहा है। थोड़ी देर बाद फिर कोशिश करें।",
+        "يجري تجهيز خادم الردهة. حاول مجددًا بعد قليل."
+      ]
+    },
+    {
+      "Key": "릴레이 그리기",
+      "Values": [
+        "릴레이 그리기",
+        "Relay drawing",
+        "接力绘画",
+        "接力繪畫",
+        "リレーで描く",
+        "Dibujo por relevos",
+        "Desenho em revezamento",
+        "Dessin en relais",
+        "Staffelzeichnen",
+        "Menggambar estafet",
+        "रिले चित्रकारी",
+        "الرسم بالتتابع"
+      ]
+    },
+    {
+      "Key": "먼저 로그인해 주세요.",
+      "Values": [
+        "먼저 로그인해 주세요.",
+        "Please sign in first.",
+        "请先登录。",
+        "請先登入。",
+        "先にログインしてください。",
+        "Inicia sesión primero.",
+        "Entre na conta primeiro.",
+        "Connectez-vous d’abord.",
+        "Melde dich zuerst an.",
+        "Silakan masuk terlebih dahulu.",
+        "पहले लॉग इन करें।",
+        "سجّل الدخول أولًا."
+      ]
+    },
+    {
+      "Key": "메뉴",
+      "Values": [
+        "메뉴",
+        "Menu",
+        "菜单",
+        "選單",
+        "メニュー",
+        "Menú",
+        "Menu",
+        "Menu",
+        "Menü",
+        "Menu",
+        "मेनू",
+        "القائمة"
+      ]
+    },
+    {
+      "Key": "모든 소리 끄기",
+      "Values": [
+        "모든 소리 끄기",
+        "Mute all",
+        "关闭所有声音",
+        "關閉所有聲音",
+        "すべての音をオフ",
+        "Silenciar todo",
+        "Silenciar tudo",
+        "Couper tous les sons",
+        "Alles stummschalten",
+        "Bisukan semua",
+        "सभी आवाज़ें बंद करें",
+        "كتم كل الأصوات"
+      ]
+    },
+    {
+      "Key": "목표 {0}점",
+      "Values": [
+        "목표 {0}점",
+        "Target: {0} points",
+        "目标{0}分",
+        "目標 {0} 分",
+        "目標{0}点",
+        "Objetivo: {0} puntos",
+        "Meta: {0} pontos",
+        "Objectif : {0} points",
+        "Ziel: {0} Punkte",
+        "Target: {0} poin",
+        "लक्ष्य: {0} अंक",
+        "الهدف: {0} نقاط"
+      ]
+    },
+    {
+      "Key": "목표 점수",
+      "Values": [
+        "목표 점수",
+        "Target score",
+        "目标分数",
+        "目標分數",
+        "目標得点",
+        "Puntuación objetivo",
+        "Pontuação alvo",
+        "Score cible",
+        "Zielpunktzahl",
+        "Target poin",
+        "लक्ष्य अंक",
+        "النقاط المستهدفة"
+      ]
+    },
+    {
+      "Key": "목표 점수 먼저 달성",
+      "Values": [
+        "목표 점수 먼저 달성",
+        "First to the target score",
+        "率先达到目标分数",
+        "率先達到目標分數",
+        "目標得点に先に到達",
+        "Primero en alcanzar el objetivo",
+        "Primeiro a atingir a meta",
+        "Premier à atteindre le score cible",
+        "Zielpunktzahl zuerst erreichen",
+        "Capai target poin lebih dulu",
+        "पहले लक्ष्य अंक तक पहुँचें",
+        "بلوغ النقاط المستهدفة أولًا"
+      ]
+    },
+    {
+      "Key": "몸 색상",
+      "Values": [
+        "몸 색상",
+        "Body color",
+        "身体颜色",
+        "身體顏色",
+        "体の色",
+        "Color del personaje",
+        "Cor do personagem",
+        "Couleur du personnage",
+        "Körperfarbe",
+        "Warna karakter",
+        "किरदार का रंग",
+        "لون الشخصية"
+      ]
+    },
+    {
+      "Key": "몸 색상 {0}",
+      "Values": [
+        "몸 색상 {0}",
+        "Body color {0}",
+        "身体颜色 {0}",
+        "身體顏色 {0}",
+        "体の色 {0}",
+        "Color del personaje {0}",
+        "Cor do personagem {0}",
+        "Couleur du personnage {0}",
+        "Körperfarbe {0}",
+        "Warna karakter {0}",
+        "किरदार का रंग {0}",
+        "لون الشخصية {0}"
+      ]
+    },
+    {
+      "Key": "미구매 아이템 착용 중",
+      "Values": [
+        "미구매 아이템 착용 중",
+        "Wearing an unowned item",
+        "正在试穿未购买的物品",
+        "正在試穿未購買的物品",
+        "未購入のアイテムを試着中",
+        "Probando un objeto sin comprar",
+        "Experimentando um item não comprado",
+        "Essai d’un objet non acheté",
+        "Nicht gekauften Gegenstand anprobieren",
+        "Mencoba item yang belum dibeli",
+        "बिना खरीदा आइटम आज़मा रहे हैं",
+        "تجربة عنصر غير مشترى"
+      ]
+    },
+    {
+      "Key": "미구매 아이템은 구매하거나 벗긴 뒤 저장해 주세요.",
+      "Values": [
+        "미구매 아이템은 구매하거나 벗긴 뒤 저장해 주세요.",
+        "Buy or remove unowned items before saving.",
+        "请购买或卸下未购买的服装后再保存。",
+        "請購買或卸下未購買的服裝後再儲存。",
+        "未購入の服は購入するか外してから保存してください。",
+        "Compra o quita los objetos que no tienes antes de guardar.",
+        "Compre ou remova os itens não adquiridos antes de salvar.",
+        "Achetez ou retirez les objets non possédés avant d’enregistrer.",
+        "Kaufe oder entferne nicht gekaufte Gegenstände vor dem Speichern.",
+        "Beli atau lepas item yang belum dimiliki sebelum menyimpan.",
+        "सेव करने से पहले न खरीदे गए आइटम खरीदें या हटाएँ।",
+        "اشترِ العناصر غير المملوكة أو أزلها قبل الحفظ."
+      ]
+    },
+    {
+      "Key": "미리보기 중",
+      "Values": [
+        "미리보기 중",
+        "Previewing",
+        "预览中",
+        "預覽中",
+        "プレビュー中",
+        "Vista previa",
+        "Prévia",
+        "Aperçu",
+        "Vorschau",
+        "Pratinjau",
+        "पूर्वावलोकन",
+        "معاينة"
+      ]
+    },
+    {
+      "Key": "반론",
+      "Values": [
+        "반론",
+        "Defense",
+        "异议",
+        "異議",
+        "反論",
+        "Defensa",
+        "Defesa",
+        "Défense",
+        "Verteidigung",
+        "Pembelaan",
+        "बचाव",
+        "الدفاع"
+      ]
+    },
+    {
+      "Key": "받은 요청",
+      "Values": [
+        "받은 요청",
+        "Received requests",
+        "收到的请求",
+        "收到的邀請",
+        "受信した申請",
+        "Solicitudes recibidas",
+        "Pedidos recebidos",
+        "Demandes reçues",
+        "Erhaltene Anfragen",
+        "Permintaan masuk",
+        "मिले अनुरोध",
+        "الطلبات الواردة"
+      ]
+    },
+    {
+      "Key": "방 검색",
+      "Values": [
+        "방 검색",
+        "Search rooms",
+        "搜索房间",
+        "搜尋房間",
+        "ルームを検索",
+        "Buscar sala",
+        "Buscar sala",
+        "Rechercher un salon",
+        "Raum suchen",
+        "Cari ruang",
+        "रूम खोजें",
+        "البحث عن غرفة"
+      ]
+    },
+    {
+      "Key": "방 만들고 입장",
+      "Values": [
+        "방 만들고 입장",
+        "Create and join",
+        "创建并加入",
+        "建立並加入",
+        "作成して入室",
+        "Crear y entrar",
+        "Criar e entrar",
+        "Créer et rejoindre",
+        "Erstellen und beitreten",
+        "Buat dan masuk",
+        "कमरा बनाकर जुड़ें",
+        "إنشاء وانضمام"
+      ]
+    },
+    {
+      "Key": "방 만들기",
+      "Values": [
+        "방 만들기",
+        "Create room",
+        "创建房间",
+        "建立房間",
+        "ルーム作成",
+        "Crear sala",
+        "Criar sala",
+        "Créer un salon",
+        "Raum erstellen",
+        "Buat ruang",
+        "कमरा बनाएँ",
+        "إنشاء غرفة"
+      ]
+    },
+    {
+      "Key": "방 목록",
+      "Values": [
+        "방 목록",
+        "Room list",
+        "房间列表",
+        "房間列表",
+        "ルーム一覧",
+        "Lista de salas",
+        "Lista de salas",
+        "Liste des salons",
+        "Raumliste",
+        "Daftar ruang",
+        "रूम सूची",
+        "قائمة الغرف"
+      ]
+    },
+    {
+      "Key": "방 상태를 받지 못했습니다.",
+      "Values": [
+        "방 상태를 받지 못했습니다.",
+        "Could not receive the room status.",
+        "未能获取房间状态。",
+        "無法取得房間狀態。",
+        "ルームの状態を取得できませんでした。",
+        "No se recibió el estado de la sala.",
+        "O estado da sala não foi recebido.",
+        "L’état du salon n’a pas été reçu.",
+        "Der Raumstatus wurde nicht empfangen.",
+        "Status ruang tidak diterima.",
+        "रूम की स्थिति नहीं मिली।",
+        "لم يتم استلام حالة الغرفة."
+      ]
+    },
+    {
+      "Key": "방 설정을 확인하세요.",
+      "Values": [
+        "방 설정을 확인하세요.",
+        "Check the room settings.",
+        "请检查房间设置。",
+        "請檢查房間設定。",
+        "ルームの設定を確認してください。",
+        "Revisa los ajustes de la sala.",
+        "Confira as configurações da sala.",
+        "Vérifiez les paramètres du salon.",
+        "Überprüfe die Raumeinstellungen.",
+        "Periksa pengaturan ruang.",
+        "रूम की सेटिंग जाँचें।",
+        "تحقّق من إعدادات الغرفة."
+      ]
+    },
+    {
+      "Key": "방 이름",
+      "Values": [
+        "방 이름",
+        "Room name",
+        "房间名称",
+        "房間名稱",
+        "ルーム名",
+        "Nombre de la sala",
+        "Nome da sala",
+        "Nom du salon",
+        "Raumname",
+        "Nama ruang",
+        "कमरे का नाम",
+        "اسم الغرفة"
+      ]
+    },
+    {
+      "Key": "방 입장권이 없습니다.",
+      "Values": [
+        "방 입장권이 없습니다.",
+        "You do not have a room entry ticket.",
+        "没有房间入场凭证。",
+        "沒有房間入場憑證。",
+        "ルームの入室許可がありません。",
+        "Falta el permiso de entrada a la sala.",
+        "A autorização de entrada na sala está ausente.",
+        "L’autorisation d’accès au salon est manquante.",
+        "Die Zugangsberechtigung für den Raum fehlt.",
+        "Izin masuk ruang tidak tersedia.",
+        "रूम में प्रवेश की अनुमति नहीं मिली।",
+        "تصريح دخول الغرفة غير موجود."
+      ]
+    },
+    {
+      "Key": "방 정보",
+      "Values": [
+        "방 정보",
+        "Room details",
+        "房间信息",
+        "房間資訊",
+        "ルーム情報",
+        "Información de la sala",
+        "Informações da sala",
+        "Informations du salon",
+        "Rauminformationen",
+        "Info ruang",
+        "रूम की जानकारी",
+        "معلومات الغرفة"
+      ]
+    },
+    {
+      "Key": "방 코드",
+      "Values": [
+        "방 코드",
+        "Room code",
+        "房间代码",
+        "房間代碼",
+        "ルームコード",
+        "Código de sala",
+        "Código da sala",
+        "Code du salon",
+        "Raumcode",
+        "Kode ruang",
+        "कमरे का कोड",
+        "رمز الغرفة"
+      ]
+    },
+    {
+      "Key": "방 코드 복사",
+      "Values": [
+        "방 코드 복사",
+        "Copy room code",
+        "复制房间代码",
+        "複製房間代碼",
+        "コードをコピー",
+        "Copiar código",
+        "Copiar código",
+        "Copier le code",
+        "Code kopieren",
+        "Salin kode",
+        "कोड कॉपी करें",
+        "نسخ الرمز"
+      ]
+    },
+    {
+      "Key": "방 코드로 입장",
+      "Values": [
+        "방 코드로 입장",
+        "Join by code",
+        "通过代码加入",
+        "透過代碼加入",
+        "コードで入室",
+        "Entrar con código",
+        "Entrar com código",
+        "Rejoindre avec un code",
+        "Mit Code beitreten",
+        "Masuk dengan kode",
+        "कोड से जुड़ें",
+        "الانضمام برمز"
+      ]
+    },
+    {
+      "Key": "방 코드를 복사했습니다.",
+      "Values": [
+        "방 코드를 복사했습니다.",
+        "Room code copied.",
+        "已复制房间代码。",
+        "已複製房間代碼。",
+        "ルームコードをコピーしました。",
+        "Código de sala copiado.",
+        "Código da sala copiado.",
+        "Code du salon copié.",
+        "Raumcode kopiert.",
+        "Kode ruang disalin.",
+        "कमरे का कोड कॉपी हो गया।",
+        "تم نسخ رمز الغرفة."
+      ]
+    },
+    {
+      "Key": "방 코드를 입력하세요.",
+      "Values": [
+        "방 코드를 입력하세요.",
+        "Enter a room code.",
+        "请输入房间代码。",
+        "請輸入房間代碼。",
+        "ルームコードを入力してください。",
+        "Introduce el código de la sala.",
+        "Digite o código da sala.",
+        "Saisissez le code du salon.",
+        "Gib den Raumcode ein.",
+        "Masukkan kode ruang.",
+        "रूम कोड डालें।",
+        "أدخل رمز الغرفة."
+      ]
+    },
+    {
+      "Key": "방에 연결했습니다. 방 코드: {0}",
+      "Values": [
+        "방에 연결했습니다. 방 코드: {0}",
+        "Joined the room. Room code: {0}",
+        "已加入房间。房间代码：{0}",
+        "已加入房間。房間代碼：{0}",
+        "ルームに接続しました。コード：{0}",
+        "Conectado a la sala. Código: {0}",
+        "Conectado à sala. Código: {0}",
+        "Connecté au salon. Code : {0}",
+        "Mit dem Raum verbunden. Raumcode: {0}",
+        "Terhubung ke ruang. Kode: {0}",
+        "रूम से जुड़ गए। कोड: {0}",
+        "تم الاتصال بالغرفة. الرمز: {0}"
+      ]
+    },
+    {
+      "Key": "방에서 나왔습니다.",
+      "Values": [
+        "방에서 나왔습니다.",
+        "Left the room.",
+        "已离开房间。",
+        "已離開房間。",
+        "ルームを退出しました。",
+        "Has salido de la sala.",
+        "Você saiu da sala.",
+        "Vous avez quitté le salon.",
+        "Du hast den Raum verlassen.",
+        "Kamu telah keluar dari ruang.",
+        "रूम छोड़ दिया।",
+        "لقد غادرت الغرفة."
+      ]
+    },
+    {
+      "Key": "방을 찾지 못했습니다. 방 코드를 확인하세요.",
+      "Values": [
+        "방을 찾지 못했습니다. 방 코드를 확인하세요.",
+        "Room not found. Check the room code.",
+        "未找到房间，请检查房间代码。",
+        "找不到房間，請檢查房間代碼。",
+        "ルームが見つかりません。コードを確認してください。",
+        "No se encontró la sala. Revisa el código.",
+        "Sala não encontrada. Confira o código.",
+        "Salon introuvable. Vérifiez le code.",
+        "Raum nicht gefunden. Überprüfe den Raumcode.",
+        "Ruang tidak ditemukan. Periksa kodenya.",
+        "रूम नहीं मिला। रूम कोड जाँचें।",
+        "لم يتم العثور على الغرفة. تحقّق من الرمز."
+      ]
+    },
+    {
+      "Key": "방장 시작 대기",
+      "Values": [
+        "방장 시작 대기",
+        "Waiting for host",
+        "等待房主开始",
+        "等待房主開始",
+        "ホストの開始待ち",
+        "Esperando al anfitrión",
+        "Aguardando o anfitrião",
+        "En attente de l’hôte",
+        "Warten auf den Gastgeber",
+        "Menunggu tuan rumah",
+        "मेज़बान के शुरू करने की प्रतीक्षा",
+        "بانتظار بدء المضيف"
+      ]
+    },
+    {
+      "Key": "배경 음악",
+      "Values": [
+        "배경 음악",
+        "Music",
+        "背景音乐",
+        "背景音樂",
+        "BGM",
+        "Música",
+        "Música de fundo",
+        "Musique",
+        "Hintergrundmusik",
+        "Musik latar",
+        "बैकग्राउंड संगीत",
+        "موسيقى الخلفية"
+      ]
+    },
+    {
+      "Key": "보내기",
+      "Values": [
+        "보내기",
+        "Send",
+        "发送",
+        "傳送",
+        "送信",
+        "Enviar",
+        "Enviar",
+        "Envoyer",
+        "Senden",
+        "Kirim",
+        "भेजें",
+        "إرسال"
+      ]
+    },
+    {
+      "Key": "보낸 요청",
+      "Values": [
+        "보낸 요청",
+        "Sent requests",
+        "发出的请求",
+        "送出的邀請",
+        "送信した申請",
+        "Solicitudes enviadas",
+        "Pedidos enviados",
+        "Demandes envoyées",
+        "Gesendete Anfragen",
+        "Permintaan terkirim",
+        "भेजे गए अनुरोध",
+        "الطلبات المرسلة"
+      ]
+    },
+    {
+      "Key": "보유 중",
+      "Values": [
+        "보유 중",
+        "Owned",
+        "已拥有",
+        "已擁有",
+        "所持中",
+        "Ya lo tienes",
+        "Já adquirido",
+        "Possédé",
+        "Im Besitz",
+        "Dimiliki",
+        "आपके पास है",
+        "مملوك"
+      ]
+    },
+    {
+      "Key": "보유한 아이템만 장착할 수 있습니다.",
+      "Values": [
+        "보유한 아이템만 장착할 수 있습니다.",
+        "You can only equip items you own.",
+        "只能装备已拥有的物品。",
+        "只能裝備已擁有的物品。",
+        "所持しているアイテムだけ装着できます。",
+        "Solo puedes equipar objetos que tengas.",
+        "Você só pode equipar itens que possui.",
+        "Vous ne pouvez équiper que les objets que vous possédez.",
+        "Du kannst nur Gegenstände ausrüsten, die du besitzt.",
+        "Kamu hanya dapat memakai item yang dimiliki.",
+        "केवल अपने खरीदे हुए आइटम पहन सकते हैं।",
+        "يمكنك تجهيز العناصر التي تملكها فقط."
+      ]
+    },
+    {
+      "Key": "보통 선",
+      "Values": [
+        "보통 선",
+        "Medium",
+        "标准线",
+        "標準線",
+        "普通の線",
+        "Trazo medio",
+        "Traço médio",
+        "Trait moyen",
+        "Mittlerer Strich",
+        "Garis sedang",
+        "सामान्य रेखा",
+        "خط متوسط"
+      ]
+    },
+    {
+      "Key": "붓",
+      "Values": [
+        "붓",
+        "Brush",
+        "画笔",
+        "畫筆",
+        "筆",
+        "Pincel",
+        "Pincel",
+        "Pinceau",
+        "Pinsel",
+        "Kuas",
+        "ब्रश",
+        "فرشاة"
+      ]
+    },
+    {
+      "Key": "붓 굵기",
+      "Values": [
+        "붓 굵기",
+        "Brush size",
+        "画笔粗细",
+        "畫筆粗細",
+        "筆の太さ",
+        "Grosor del pincel",
+        "Espessura do pincel",
+        "Épaisseur du pinceau",
+        "Pinselstärke",
+        "Ketebalan kuas",
+        "ब्रश की मोटाई",
+        "سُمك الفرشاة"
+      ]
+    },
+    {
+      "Key": "붙여넣기",
+      "Values": [
+        "붙여넣기",
+        "Paste",
+        "粘贴",
+        "貼上",
+        "貼り付け",
+        "Pegar",
+        "Colar",
+        "Coller",
+        "Einfügen",
+        "Tempel",
+        "पेस्ट करें",
+        "لصق"
+      ]
+    },
+    {
+      "Key": "비공개",
+      "Values": [
+        "비공개",
+        "Private",
+        "不公开",
+        "不公開",
+        "非公開",
+        "Privado",
+        "Privado",
+        "Privé",
+        "Privat",
+        "Privat",
+        "निजी",
+        "خاص"
+      ]
+    },
+    {
+      "Key": "사운드",
+      "Values": [
+        "사운드",
+        "Sound",
+        "声音",
+        "音效",
+        "サウンド",
+        "Sonido",
+        "Som",
+        "Son",
+        "Ton",
+        "Suara",
+        "आवाज़",
+        "الصوت"
+      ]
+    },
+    {
+      "Key": "삭제",
+      "Values": [
+        "삭제",
+        "Delete",
+        "删除",
+        "刪除",
+        "削除",
+        "Eliminar",
+        "Excluir",
+        "Supprimer",
+        "Löschen",
+        "Hapus",
+        "हटाएँ",
+        "حذف"
+      ]
+    },
+    {
+      "Key": "상점",
+      "Values": [
+        "상점",
+        "Shop",
+        "商店",
+        "商店",
+        "ショップ",
+        "Tienda",
+        "Loja",
+        "Boutique",
+        "Shop",
+        "Toko",
+        "दुकान",
+        "المتجر"
+      ]
+    },
+    {
+      "Key": "상점에서 구매",
+      "Values": [
+        "상점에서 구매",
+        "Buy in shop",
+        "前往商店购买",
+        "前往商店購買",
+        "ショップで購入",
+        "Comprar en la tienda",
+        "Comprar na loja",
+        "Acheter en boutique",
+        "Im Shop kaufen",
+        "Beli di toko",
+        "दुकान से खरीदें",
+        "الشراء من المتجر"
+      ]
+    },
+    {
+      "Key": "상점을 갱신했습니다.",
+      "Values": [
+        "상점을 갱신했습니다.",
+        "Shop refreshed.",
+        "商店已刷新。",
+        "商店已重新整理。",
+        "ショップを更新しました。",
+        "Tienda actualizada.",
+        "Loja atualizada.",
+        "Boutique actualisée.",
+        "Shop aktualisiert.",
+        "Toko diperbarui.",
+        "दुकान अपडेट हो गई।",
+        "تم تحديث المتجر."
+      ]
+    },
+    {
+      "Key": "새 주제를 저장했습니다.",
+      "Values": [
+        "새 주제를 저장했습니다.",
+        "Topic saved.",
+        "已保存新主题。",
+        "已儲存新主題。",
+        "新しいテーマを保存しました。",
+        "Nuevo tema guardado.",
+        "Novo tema salvo.",
+        "Nouveau thème enregistré.",
+        "Neues Thema gespeichert.",
+        "Tema baru disimpan.",
+        "नया विषय सेव हो गया।",
+        "تم حفظ الموضوع الجديد."
+      ]
+    },
+    {
+      "Key": "새로고침",
+      "Values": [
+        "새로고침",
+        "Refresh",
+        "刷新",
+        "重新整理",
+        "更新",
+        "Actualizar",
+        "Atualizar",
+        "Actualiser",
+        "Aktualisieren",
+        "Segarkan",
+        "रीफ़्रेश करें",
+        "تحديث"
+      ]
+    },
+    {
+      "Key": "색상 {0}",
+      "Values": [
+        "색상 {0}",
+        "Color {0}",
+        "颜色 {0}",
+        "顏色 {0}",
+        "色 {0}",
+        "Color {0}",
+        "Cor {0}",
+        "Couleur {0}",
+        "Farbe {0}",
+        "Warna {0}",
+        "रंग {0}",
+        "اللون {0}"
+      ]
+    },
+    {
+      "Key": "서버 로그인 응답을 확인할 수 없습니다.",
+      "Values": [
+        "서버 로그인 응답을 확인할 수 없습니다.",
+        "Could not verify the server's sign-in response.",
+        "无法验证服务器的登录响应。",
+        "無法驗證伺服器的登入回應。",
+        "サーバーのログイン応答を確認できませんでした。",
+        "No se pudo verificar la respuesta de inicio de sesión del servidor.",
+        "Não foi possível verificar a resposta de login do servidor.",
+        "Impossible de vérifier la réponse de connexion du serveur.",
+        "Die Anmeldeantwort des Servers konnte nicht geprüft werden.",
+        "Respons login server tidak dapat diverifikasi.",
+        "सर्वर के लॉगिन जवाब की पुष्टि नहीं हो सकी।",
+        "تعذّر التحقق من رد تسجيل الدخول من الخادم."
+      ]
+    },
+    {
+      "Key": "서버 메시지가 올바르지 않습니다.",
+      "Values": [
+        "서버 메시지가 올바르지 않습니다.",
+        "The server message is invalid.",
+        "服务器消息无效。",
+        "伺服器訊息無效。",
+        "サーバーのメッセージが正しくありません。",
+        "El mensaje del servidor no es válido.",
+        "A mensagem do servidor é inválida.",
+        "Le message du serveur est invalide.",
+        "Die Servernachricht ist ungültig.",
+        "Pesan server tidak valid.",
+        "सर्वर का संदेश अमान्य है।",
+        "رسالة الخادم غير صالحة."
+      ]
+    },
+    {
+      "Key": "서버 연결이 끊겼습니다.",
+      "Values": [
+        "서버 연결이 끊겼습니다.",
+        "Disconnected from the server.",
+        "服务器连接已断开。",
+        "伺服器連線已中斷。",
+        "サーバーとの接続が切れました。",
+        "Se perdió la conexión con el servidor.",
+        "A conexão com o servidor foi perdida.",
+        "La connexion au serveur a été perdue.",
+        "Die Verbindung zum Server wurde unterbrochen.",
+        "Koneksi ke server terputus.",
+        "सर्वर से कनेक्शन टूट गया।",
+        "انقطع الاتصال بالخادم."
+      ]
+    },
+    {
+      "Key": "서버 연결이 종료되었습니다. 로비에서 다시 참가할 수 있습니다.",
+      "Values": [
+        "서버 연결이 종료되었습니다. 로비에서 다시 참가할 수 있습니다.",
+        "The server connection ended. You can rejoin from the lobby.",
+        "服务器连接已结束，可从大厅重新加入。",
+        "伺服器連線已結束，可從大廳重新加入。",
+        "サーバーとの接続が終了しました。ロビーから再参加できます。",
+        "Se cerró la conexión con el servidor. Puedes volver a unirte desde el lobby.",
+        "A conexão com o servidor foi encerrada. Você pode entrar novamente pelo lobby.",
+        "La connexion au serveur a été fermée. Vous pouvez rejoindre à nouveau depuis le lobby.",
+        "Die Serververbindung wurde beendet. Du kannst über die Lobby erneut beitreten.",
+        "Koneksi server ditutup. Kamu dapat bergabung lagi dari lobi.",
+        "सर्वर कनेक्शन बंद हो गया। लॉबी से फिर शामिल हो सकते हैं।",
+        "انتهى الاتصال بالخادم. يمكنك الانضمام مجددًا من الردهة."
+      ]
+    },
+    {
+      "Key": "서버 응답을 확인할 수 없습니다.",
+      "Values": [
+        "서버 응답을 확인할 수 없습니다.",
+        "Could not verify the server response.",
+        "无法验证服务器响应。",
+        "無法驗證伺服器回應。",
+        "サーバーの応答を確認できませんでした。",
+        "No se pudo verificar la respuesta del servidor.",
+        "Não foi possível verificar a resposta do servidor.",
+        "Impossible de vérifier la réponse du serveur.",
+        "Die Serverantwort konnte nicht geprüft werden.",
+        "Respons server tidak dapat diverifikasi.",
+        "सर्वर के जवाब की पुष्टि नहीं हो सकी।",
+        "تعذّر التحقق من رد الخادم."
+      ]
+    },
+    {
+      "Key": "서버 프로필 응답을 확인할 수 없습니다.",
+      "Values": [
+        "서버 프로필 응답을 확인할 수 없습니다.",
+        "Could not verify the profile response from the server.",
+        "无法验证服务器的资料响应。",
+        "無法驗證伺服器的個人資料回應。",
+        "サーバーから届いたプロフィールを確認できませんでした。",
+        "No se pudo verificar la respuesta de perfil del servidor.",
+        "Não foi possível verificar a resposta de perfil do servidor.",
+        "Impossible de vérifier la réponse de profil du serveur.",
+        "Die Profilantwort des Servers konnte nicht geprüft werden.",
+        "Respons profil server tidak dapat diverifikasi.",
+        "सर्वर के प्रोफ़ाइल जवाब की पुष्टि नहीं हो सकी।",
+        "تعذّر التحقق من رد الملف الشخصي من الخادم."
+      ]
+    },
+    {
+      "Key": "서버가 연결을 종료했습니다.",
+      "Values": [
+        "서버가 연결을 종료했습니다.",
+        "The server closed the connection.",
+        "服务器已关闭连接。",
+        "伺服器已關閉連線。",
+        "サーバーが接続を終了しました。",
+        "El servidor cerró la conexión.",
+        "O servidor encerrou a conexão.",
+        "Le serveur a fermé la connexion.",
+        "Der Server hat die Verbindung beendet.",
+        "Server menutup koneksi.",
+        "सर्वर ने कनेक्शन बंद कर दिया।",
+        "أغلق الخادم الاتصال."
+      ]
+    },
+    {
+      "Key": "서버에 연결하지 못했습니다. 인터넷 연결을 확인하세요.",
+      "Values": [
+        "서버에 연결하지 못했습니다. 인터넷 연결을 확인하세요.",
+        "Could not connect to the server. Check your internet connection.",
+        "无法连接服务器，请检查网络连接。",
+        "無法連線至伺服器，請檢查網路連線。",
+        "サーバーに接続できませんでした。インターネット接続を確認してください。",
+        "No se pudo conectar al servidor. Revisa tu conexión a Internet.",
+        "Não foi possível conectar ao servidor. Confira sua conexão com a internet.",
+        "Impossible de se connecter au serveur. Vérifiez votre connexion Internet.",
+        "Verbindung zum Server fehlgeschlagen. Überprüfe deine Internetverbindung.",
+        "Tidak dapat terhubung ke server. Periksa koneksi internet.",
+        "सर्वर से नहीं जुड़ सके। इंटरनेट कनेक्शन जाँचें।",
+        "تعذّر الاتصال بالخادم. تحقّق من اتصالك بالإنترنت."
+      ]
+    },
+    {
+      "Key": "서버의 Google 로그인 설정을 확인해야 합니다.",
+      "Values": [
+        "서버의 Google 로그인 설정을 확인해야 합니다.",
+        "The server's Google sign-in settings need to be checked.",
+        "需要检查服务器的Google登录设置。",
+        "需要檢查伺服器的 Google 登入設定。",
+        "サーバーのGoogleログイン設定を確認する必要があります。",
+        "Hay que revisar la configuración de Google del servidor.",
+        "É necessário verificar a configuração de login do Google no servidor.",
+        "La configuration de connexion Google du serveur doit être vérifiée.",
+        "Die Google-Anmeldeeinstellungen des Servers müssen geprüft werden.",
+        "Pengaturan login Google pada server perlu diperiksa.",
+        "सर्वर की Google लॉगिन सेटिंग जाँचनी होगी।",
+        "يجب التحقق من إعدادات تسجيل الدخول باستخدام Google على الخادم."
+      ]
+    },
+    {
+      "Key": "선택 완료",
+      "Values": [
+        "선택 완료",
+        "Confirm selection",
+        "选择完成",
+        "選取完成",
+        "選択完了",
+        "Confirmar selección",
+        "Confirmar seleção",
+        "Valider la sélection",
+        "Auswahl bestätigen",
+        "Selesai memilih",
+        "चयन पूरा करें",
+        "تأكيد الاختيار"
+      ]
+    },
+    {
+      "Key": "선택됨",
+      "Values": [
+        "선택됨",
+        "Selected",
+        "已选中",
+        "已選取",
+        "選択中",
+        "Seleccionado",
+        "Selecionado",
+        "Sélectionné",
+        "Ausgewählt",
+        "Dipilih",
+        "चुना गया",
+        "محدد"
+      ]
+    },
+    {
+      "Key": "선택한 플레이어",
+      "Values": [
+        "선택한 플레이어",
+        "Selected player",
+        "选中的玩家",
+        "選取的玩家",
+        "選んだプレイヤー",
+        "Jugador seleccionado",
+        "Jogador selecionado",
+        "Joueur sélectionné",
+        "Ausgewählter Spieler",
+        "Pemain terpilih",
+        "चुना गया खिलाड़ी",
+        "اللاعب المحدد"
+      ]
+    },
+    {
+      "Key": "설정",
+      "Values": [
+        "설정",
+        "Settings",
+        "设置",
+        "設定",
+        "設定",
+        "Ajustes",
+        "Configurações",
+        "Paramètres",
+        "Einstellungen",
+        "Pengaturan",
+        "सेटिंग्स",
+        "الإعدادات"
+      ]
+    },
+    {
+      "Key": "송신 대기열이 가득 찼습니다.",
+      "Values": [
+        "송신 대기열이 가득 찼습니다.",
+        "The send queue is full.",
+        "发送队列已满。",
+        "傳送佇列已滿。",
+        "送信待ちのデータが上限に達しました。",
+        "La cola de envío está llena.",
+        "A fila de envio está cheia.",
+        "La file d’envoi est pleine.",
+        "Die Sendewarteschlange ist voll.",
+        "Antrean pengiriman penuh.",
+        "भेजने की कतार भर गई है।",
+        "قائمة انتظار الإرسال ممتلئة."
+      ]
+    },
+    {
+      "Key": "수락",
+      "Values": [
+        "수락",
+        "Accept",
+        "接受",
+        "接受",
+        "承認",
+        "Aceptar",
+        "Aceitar",
+        "Accepter",
+        "Annehmen",
+        "Terima",
+        "स्वीकार करें",
+        "قبول"
+      ]
+    },
+    {
+      "Key": "수신 대기열이 가득 차 연결을 종료했습니다.",
+      "Values": [
+        "수신 대기열이 가득 차 연결을 종료했습니다.",
+        "The connection closed because the receive queue was full.",
+        "接收队列已满，连接已关闭。",
+        "接收佇列已滿，連線已關閉。",
+        "受信待ちのデータが上限に達したため、接続を終了しました。",
+        "La cola de recepción estaba llena y se cerró la conexión.",
+        "A fila de recebimento estava cheia e a conexão foi encerrada.",
+        "La file de réception était pleine. La connexion a été fermée.",
+        "Die Empfangswarteschlange war voll. Die Verbindung wurde beendet.",
+        "Antrean penerimaan penuh dan koneksi ditutup.",
+        "प्राप्त करने की कतार भरने पर कनेक्शन बंद कर दिया गया।",
+        "أُغلق الاتصال لأن قائمة انتظار الاستلام ممتلئة."
+      ]
+    },
+    {
+      "Key": "수신 대기열이 가득 찼습니다.",
+      "Values": [
+        "수신 대기열이 가득 찼습니다.",
+        "The receive queue is full.",
+        "接收队列已满。",
+        "接收佇列已滿。",
+        "受信待ちのデータが上限に達しました。",
+        "La cola de recepción está llena.",
+        "A fila de recebimento está cheia.",
+        "La file de réception est pleine.",
+        "Die Empfangswarteschlange ist voll.",
+        "Antrean penerimaan penuh.",
+        "प्राप्त करने की कतार भर गई है।",
+        "قائمة انتظار الاستلام ممتلئة."
+      ]
+    },
+    {
+      "Key": "숨기기",
+      "Values": [
+        "숨기기",
+        "Hide",
+        "隐藏",
+        "隱藏",
+        "隠す",
+        "Ocultar",
+        "Ocultar",
+        "Masquer",
+        "Verbergen",
+        "Sembunyikan",
+        "छिपाएँ",
+        "إخفاء"
+      ]
+    },
+    {
+      "Key": "쉼표 또는 줄바꿈으로 구분",
+      "Values": [
+        "쉼표 또는 줄바꿈으로 구분",
+        "Separate with commas or new lines",
+        "用逗号或换行分隔",
+        "用逗號或換行分隔",
+        "カンマまたは改行で区切る",
+        "Separa con comas o saltos de línea",
+        "Separe com vírgulas ou quebras de linha",
+        "Séparez par des virgules ou des retours à la ligne",
+        "Mit Kommas oder Zeilenumbrüchen trennen",
+        "Pisahkan dengan koma atau baris baru",
+        "अल्पविराम या नई पंक्ति से अलग करें",
+        "افصل بفواصل أو أسطر جديدة"
+      ]
+    },
+    {
+      "Key": "승리 조건",
+      "Values": [
+        "승리 조건",
+        "Win condition",
+        "胜利条件",
+        "勝利條件",
+        "勝利条件",
+        "Condición de victoria",
+        "Condição de vitória",
+        "Condition de victoire",
+        "Siegbedingung",
+        "Syarat menang",
+        "जीत की शर्त",
+        "شرط الفوز"
+      ]
+    },
+    {
+      "Key": "시간 설정",
+      "Values": [
+        "시간 설정",
+        "Timers",
+        "时间设置",
+        "時間設定",
+        "時間設定",
+        "Tiempos",
+        "Configurar tempos",
+        "Durées",
+        "Zeiteinstellungen",
+        "Pengaturan waktu",
+        "समय सेटिंग्स",
+        "إعدادات الوقت"
+      ]
+    },
+    {
+      "Key": "시민",
+      "Values": [
+        "시민",
+        "Citizen",
+        "市民",
+        "市民",
+        "市民",
+        "Inocente",
+        "Inocente",
+        "Innocent",
+        "Unschuldiger",
+        "Pemain biasa",
+        "सामान्य खिलाड़ी",
+        "لاعب عادي"
+      ]
+    },
+    {
+      "Key": "시작하기",
+      "Values": [
+        "시작하기",
+        "Start",
+        "开始",
+        "開始",
+        "始める",
+        "Empezar",
+        "Começar",
+        "Commencer",
+        "Loslegen",
+        "Mulai",
+        "शुरू करें",
+        "ابدأ"
+      ]
+    },
+    {
+      "Key": "아이템",
+      "Values": [
+        "아이템",
+        "Items",
+        "物品",
+        "物品",
+        "アイテム",
+        "Objetos",
+        "Itens",
+        "Objets",
+        "Gegenstände",
+        "Item",
+        "आइटम",
+        "العناصر"
+      ]
+    },
+    {
+      "Key": "아이템을 구매했습니다.",
+      "Values": [
+        "아이템을 구매했습니다.",
+        "Item purchased.",
+        "物品购买成功。",
+        "物品購買成功。",
+        "アイテムを購入しました。",
+        "Objeto comprado.",
+        "Item comprado.",
+        "Objet acheté.",
+        "Gegenstand gekauft.",
+        "Item dibeli.",
+        "आइटम खरीद लिया।",
+        "تم شراء العنصر."
+      ]
+    },
+    {
+      "Key": "언어",
+      "Values": [
+        "언어",
+        "Language",
+        "语言",
+        "語言",
+        "言語",
+        "Idioma",
+        "Idioma",
+        "Langue",
+        "Sprache",
+        "Bahasa",
+        "भाषा",
+        "اللغة"
+      ]
+    },
+    {
+      "Key": "역할 확인",
+      "Values": [
+        "역할 확인",
+        "View role",
+        "确认角色",
+        "確認角色",
+        "役割を確認",
+        "Ver rol",
+        "Ver função",
+        "Voir son rôle",
+        "Rolle ansehen",
+        "Lihat peran",
+        "भूमिका देखें",
+        "عرض الدور"
+      ]
+    },
+    {
+      "Key": "연결 끊김",
+      "Values": [
+        "연결 끊김",
+        "Disconnected",
+        "连接已断开",
+        "連線中斷",
+        "接続が切れました",
+        "Desconectado",
+        "Desconectado",
+        "Déconnecté",
+        "Verbindung getrennt",
+        "Terputus",
+        "कनेक्शन टूट गया",
+        "انقطع الاتصال"
+      ]
+    },
+    {
+      "Key": "연결을 처리하고 있어요. 잠시 기다려 주세요.",
+      "Values": [
+        "연결을 처리하고 있어요. 잠시 기다려 주세요.",
+        "Connecting. Please wait.",
+        "正在连接，请稍候。",
+        "正在處理連線，請稍候。",
+        "接続を処理しています。しばらくお待ちください。",
+        "Conectando. Espera un momento.",
+        "Conectando. Aguarde um momento.",
+        "Connexion en cours. Patientez un instant.",
+        "Verbindung wird hergestellt. Bitte kurz warten.",
+        "Sedang terhubung. Tunggu sebentar.",
+        "कनेक्ट हो रहे हैं। थोड़ी देर रुकें।",
+        "جارٍ الاتصال. انتظر قليلًا."
+      ]
+    },
+    {
+      "Key": "열린 방이 없습니다.",
+      "Values": [
+        "열린 방이 없습니다.",
+        "No open rooms.",
+        "暂无开放房间。",
+        "目前沒有開放的房間。",
+        "開いているルームがありません。",
+        "No hay salas abiertas.",
+        "Não há salas abertas.",
+        "Aucun salon ouvert.",
+        "Keine offenen Räume vorhanden.",
+        "Tidak ada ruang terbuka.",
+        "कोई खुला रूम नहीं है।",
+        "لا توجد غرف مفتوحة."
+      ]
+    },
+    {
+      "Key": "영문·숫자 6자리 방 코드를 확인하세요.",
+      "Values": [
+        "영문·숫자 6자리 방 코드를 확인하세요.",
+        "Check the 6-character alphanumeric room code.",
+        "请检查6位字母和数字组成的房间代码。",
+        "請檢查由 6 位英文字母與數字組成的房間代碼。",
+        "英数字6文字のルームコードを確認してください。",
+        "Revisa el código de sala: 6 letras o números.",
+        "Confira o código da sala: 6 letras ou números.",
+        "Vérifiez le code du salon : 6 lettres ou chiffres.",
+        "Überprüfe den Raumcode: 6 Buchstaben oder Zahlen.",
+        "Periksa kode ruang: 6 huruf atau angka.",
+        "रूम कोड जाँचें: 6 अंग्रेज़ी अक्षर या अंक।",
+        "تحقّق من رمز الغرفة: 6 أحرف إنجليزية أو أرقام."
+      ]
+    },
+    {
+      "Key": "영문과 숫자로 된 6자리 방 코드를 입력하세요.",
+      "Values": [
+        "영문과 숫자로 된 6자리 방 코드를 입력하세요.",
+        "Enter a 6-character room code.",
+        "请输入6位字母和数字组成的房间代码。",
+        "請輸入由 6 位英文字母與數字組成的房間代碼。",
+        "英数字6文字のルームコードを入力してください。",
+        "Introduce el código de sala de 6 letras y números.",
+        "Digite o código da sala com 6 letras e números.",
+        "Entrez le code du salon de 6 lettres et chiffres.",
+        "Gib den Raumcode mit 6 Buchstaben und Ziffern ein.",
+        "Masukkan kode ruang 6 huruf dan angka.",
+        "कमरे का कोड 6 अंग्रेज़ी अक्षरों और अंकों में भरें।",
+        "أدخل رمز الغرفة المكوّن من 6 أحرف لاتينية وأرقام."
+      ]
+    },
+    {
+      "Key": "올바르지 않은 인증 요청입니다. 게임으로 돌아가 다시 시도하세요.",
+      "Values": [
+        "올바르지 않은 인증 요청입니다. 게임으로 돌아가 다시 시도하세요.",
+        "Invalid authentication request. Return to the game and try again.",
+        "认证请求无效，请返回游戏重试。",
+        "驗證請求無效，請返回遊戲重試。",
+        "認証リクエストが正しくありません。ゲームに戻ってもう一度お試しください。",
+        "La solicitud de autenticación no es válida. Vuelve al juego e inténtalo de nuevo.",
+        "A solicitação de autenticação é inválida. Volte ao jogo e tente novamente.",
+        "La demande d’authentification est invalide. Retournez au jeu et réessayez.",
+        "Ungültige Authentifizierungsanfrage. Kehre ins Spiel zurück und versuche es erneut.",
+        "Permintaan autentikasi tidak valid. Kembali ke game dan coba lagi.",
+        "प्रमाणीकरण अनुरोध अमान्य है। गेम में लौटकर फिर कोशिश करें।",
+        "طلب المصادقة غير صالح. عُد إلى اللعبة وحاول مجددًا."
+      ]
+    },
+    {
+      "Key": "옵션",
+      "Values": [
+        "옵션",
+        "Options",
+        "选项",
+        "選項",
+        "オプション",
+        "Opciones",
+        "Opções",
+        "Options",
+        "Optionen",
+        "Opsi",
+        "विकल्प",
+        "الخيارات"
+      ]
+    },
+    {
+      "Key": "완료",
+      "Values": [
+        "완료",
+        "Done",
+        "完成",
+        "完成",
+        "完了",
+        "Listo",
+        "Concluído",
+        "Terminé",
+        "Fertig",
+        "Selesai",
+        "पूरा हुआ",
+        "تم"
+      ]
+    },
+    {
+      "Key": "요청을 처리하고 있습니다. 잠시 기다려 주세요.",
+      "Values": [
+        "요청을 처리하고 있습니다. 잠시 기다려 주세요.",
+        "Processing your request. Please wait.",
+        "正在处理请求，请稍候。",
+        "正在處理請求，請稍候。",
+        "リクエストを処理しています。しばらくお待ちください。",
+        "Procesando la solicitud. Espera un momento.",
+        "Processando a solicitação. Aguarde um momento.",
+        "Traitement de la demande. Veuillez patienter.",
+        "Die Anfrage wird verarbeitet. Bitte warte kurz.",
+        "Permintaan sedang diproses. Harap tunggu.",
+        "अनुरोध पर काम हो रहा है। कृपया प्रतीक्षा करें।",
+        "جارٍ معالجة الطلب. انتظر قليلًا."
+      ]
+    },
+    {
+      "Key": "요청을 처리하지 못했습니다. 다시 시도하세요.",
+      "Values": [
+        "요청을 처리하지 못했습니다. 다시 시도하세요.",
+        "Could not process your request. Please try again.",
+        "未能处理请求，请重试。",
+        "無法處理請求，請重試。",
+        "リクエストを処理できませんでした。もう一度お試しください。",
+        "No se pudo procesar la solicitud. Inténtalo de nuevo.",
+        "Não foi possível processar a solicitação. Tente novamente.",
+        "Impossible de traiter la demande. Réessayez.",
+        "Die Anfrage konnte nicht verarbeitet werden. Versuche es erneut.",
+        "Permintaan tidak dapat diproses. Coba lagi.",
+        "अनुरोध पूरा नहीं हुआ। फिर कोशिश करें।",
+        "تعذّرت معالجة الطلب. حاول مجددًا."
+      ]
+    },
+    {
+      "Key": "요청을 취소했습니다.",
+      "Values": [
+        "요청을 취소했습니다.",
+        "Request canceled.",
+        "已取消请求。",
+        "已取消請求。",
+        "リクエストをキャンセルしました。",
+        "Solicitud cancelada.",
+        "Solicitação cancelada.",
+        "Demande annulée.",
+        "Anfrage abgebrochen.",
+        "Permintaan dibatalkan.",
+        "अनुरोध रद्द हो गया।",
+        "تم إلغاء الطلب."
+      ]
+    },
+    {
+      "Key": "요청이 많습니다. 잠시 후 다시 시도하세요.",
+      "Values": [
+        "요청이 많습니다. 잠시 후 다시 시도하세요.",
+        "Too many requests. Please try again shortly.",
+        "请求过于频繁，请稍后重试。",
+        "請求過於頻繁，請稍後重試。",
+        "リクエストが多すぎます。少し待ってからもう一度お試しください。",
+        "Demasiadas solicitudes. Inténtalo de nuevo en unos momentos.",
+        "Muitas solicitações. Tente novamente em instantes.",
+        "Trop de demandes. Réessayez dans un instant.",
+        "Zu viele Anfragen. Versuche es gleich erneut.",
+        "Terlalu banyak permintaan. Coba lagi sebentar lagi.",
+        "बहुत अधिक अनुरोध हैं। थोड़ी देर बाद फिर कोशिश करें।",
+        "طلبات كثيرة جدًا. حاول مجددًا بعد قليل."
+      ]
+    },
+    {
+      "Key": "원래 모습",
+      "Values": [
+        "원래 모습",
+        "Reset look",
+        "原本外观",
+        "原本外觀",
+        "元の見た目",
+        "Aspecto original",
+        "Visual original",
+        "Apparence initiale",
+        "Ursprüngliches Aussehen",
+        "Tampilan awal",
+        "मूल रूप",
+        "المظهر الأصلي"
+      ]
+    },
+    {
+      "Key": "이 플랫폼에서는 Google 로그인을 지원하지 않습니다.",
+      "Values": [
+        "이 플랫폼에서는 Google 로그인을 지원하지 않습니다.",
+        "Google sign-in is not supported on this platform.",
+        "此平台不支持Google登录。",
+        "此平台不支援 Google 登入。",
+        "このプラットフォームではGoogleログインに対応していません。",
+        "Esta plataforma no admite el inicio de sesión con Google.",
+        "O login com Google não é compatível com esta plataforma.",
+        "Cette plateforme ne prend pas en charge la connexion avec Google.",
+        "Die Google-Anmeldung wird auf dieser Plattform nicht unterstützt.",
+        "Platform ini tidak mendukung login Google.",
+        "इस प्लेटफ़ॉर्म पर Google लॉगिन उपलब्ध नहीं है।",
+        "تسجيل الدخول باستخدام Google غير مدعوم على هذه المنصة."
+      ]
+    },
+    {
+      "Key": "이미 만든 방에 다시 참가하거나 방을 닫은 뒤 새 방을 만드세요.",
+      "Values": [
+        "이미 만든 방에 다시 참가하거나 방을 닫은 뒤 새 방을 만드세요.",
+        "Rejoin your existing room, or close it before creating a new one.",
+        "请重新加入已创建的房间，或关闭后再创建新房间。",
+        "請重新加入已建立的房間，或關閉後再建立新房間。",
+        "作成済みのルームに再参加するか、閉じてから新しいルームを作ってください。",
+        "Vuelve a unirte a tu sala o ciérrala antes de crear una nueva.",
+        "Entre novamente na sala criada ou feche-a antes de criar outra.",
+        "Rejoignez votre salon ou fermez-le avant d’en créer un autre.",
+        "Tritt deinem vorhandenen Raum erneut bei oder schließe ihn, bevor du einen neuen erstellst.",
+        "Bergabung lagi ke ruang yang telah dibuat atau tutup sebelum membuat ruang baru.",
+        "नया रूम बनाने से पहले पुराने रूम में फिर शामिल हों या उसे बंद करें।",
+        "انضم مجددًا إلى غرفتك الحالية أو أغلقها قبل إنشاء غرفة جديدة."
+      ]
+    },
+    {
+      "Key": "이미 보유한 아이템입니다.",
+      "Values": [
+        "이미 보유한 아이템입니다.",
+        "You already own this item.",
+        "已拥有此物品。",
+        "已擁有此物品。",
+        "このアイテムはすでに所持しています。",
+        "Ya tienes este objeto.",
+        "Você já possui este item.",
+        "Vous possédez déjà cet objet.",
+        "Du besitzt diesen Gegenstand bereits.",
+        "Kamu sudah memiliki item ini.",
+        "यह आइटम आपके पास पहले से है।",
+        "أنت تملك هذا العنصر بالفعل."
+      ]
+    },
+    {
+      "Key": "이미 연동한 Google 계정입니다.",
+      "Values": [
+        "이미 연동한 Google 계정입니다.",
+        "This Google account is already linked.",
+        "此Google账号已关联。",
+        "此 Google 帳號已連結。",
+        "このGoogleアカウントはすでに連携済みです。",
+        "Esta cuenta de Google ya está vinculada.",
+        "Esta conta do Google já está vinculada.",
+        "Ce compte Google est déjà lié.",
+        "Dieses Google-Konto ist bereits verknüpft.",
+        "Akun Google ini sudah tertaut.",
+        "यह Google खाता पहले से जुड़ा है।",
+        "حساب Google هذا مرتبط بالفعل."
+      ]
+    },
+    {
+      "Key": "이미 추가한 항목입니다.",
+      "Values": [
+        "이미 추가한 항목입니다.",
+        "This entry has already been added.",
+        "此项目已添加。",
+        "此項目已新增。",
+        "この項目はすでに追加されています。",
+        "Este elemento ya se ha añadido.",
+        "Este item já foi adicionado.",
+        "Cet élément a déjà été ajouté.",
+        "Dieser Eintrag wurde bereits hinzugefügt.",
+        "Entri ini sudah ditambahkan.",
+        "यह प्रविष्टि पहले से जोड़ी गई है।",
+        "تمت إضافة هذا العنصر بالفعل."
+      ]
+    },
+    {
+      "Key": "인증 정보를 확인하세요.",
+      "Values": [
+        "인증 정보를 확인하세요.",
+        "Check your authentication details.",
+        "请检查认证信息。",
+        "請檢查驗證資訊。",
+        "認証情報を確認してください。",
+        "Revisa los datos de autenticación.",
+        "Confira os dados de autenticação.",
+        "Vérifiez les informations d’authentification.",
+        "Überprüfe die Anmeldedaten.",
+        "Periksa data autentikasi.",
+        "प्रमाणीकरण जानकारी जाँचें।",
+        "تحقّق من معلومات المصادقة."
+      ]
+    },
+    {
+      "Key": "입장하기",
+      "Values": [
+        "입장하기",
+        "Join",
+        "加入房间",
+        "加入房間",
+        "入室する",
+        "Entrar",
+        "Entrar",
+        "Rejoindre",
+        "Beitreten",
+        "Masuk",
+        "जुड़ें",
+        "انضمام"
+      ]
+    },
+    {
+      "Key": "입혀보기",
+      "Values": [
+        "입혀보기",
+        "Try on",
+        "试穿",
+        "試穿",
+        "試着",
+        "Probar",
+        "Experimentar",
+        "Essayer",
+        "Anprobieren",
+        "Coba",
+        "आज़माएँ",
+        "تجربة"
+      ]
+    },
+    {
+      "Key": "입혀보기 중",
+      "Values": [
+        "입혀보기 중",
+        "Trying on",
+        "试穿中",
+        "試穿中",
+        "試着中",
+        "Probando",
+        "Experimentando",
+        "Aperçu en cours",
+        "Wird anprobiert",
+        "Sedang dicoba",
+        "आज़मा रहे हैं",
+        "قيد التجربة"
+      ]
+    },
+    {
+      "Key": "자유 토론",
+      "Values": [
+        "자유 토론",
+        "Discussion",
+        "自由讨论",
+        "自由討論",
+        "自由討論",
+        "Debate libre",
+        "Discussão livre",
+        "Discussion libre",
+        "Freie Diskussion",
+        "Diskusi bebas",
+        "खुली चर्चा",
+        "نقاش حر"
+      ]
+    },
+    {
+      "Key": "장착 중",
+      "Values": [
+        "장착 중",
+        "Equipped",
+        "已装备",
+        "已裝備",
+        "装着中",
+        "Equipado",
+        "Equipado",
+        "Équipé",
+        "Angelegt",
+        "Dipakai",
+        "लगा हुआ",
+        "مجهّز"
+      ]
+    },
+    {
+      "Key": "장착하기",
+      "Values": [
+        "장착하기",
+        "Equip",
+        "装备",
+        "裝備",
+        "装着",
+        "Equipar",
+        "Equipar",
+        "Équiper",
+        "Anlegen",
+        "Pakai",
+        "लगाएँ",
+        "تجهيز"
+      ]
+    },
+    {
+      "Key": "저장",
+      "Values": [
+        "저장",
+        "Save",
+        "保存",
+        "儲存",
+        "保存",
+        "Guardar",
+        "Salvar",
+        "Enregistrer",
+        "Speichern",
+        "Simpan",
+        "सेव करें",
+        "حفظ"
+      ]
+    },
+    {
+      "Key": "전체 선택",
+      "Values": [
+        "전체 선택",
+        "Select all",
+        "全选",
+        "全選",
+        "すべて選択",
+        "Seleccionar todo",
+        "Selecionar tudo",
+        "Tout sélectionner",
+        "Alles auswählen",
+        "Pilih semua",
+        "सभी चुनें",
+        "تحديد الكل"
+      ]
+    },
+    {
+      "Key": "전체 음량",
+      "Values": [
+        "전체 음량",
+        "Master volume",
+        "总音量",
+        "整體音量",
+        "全体音量",
+        "Volumen general",
+        "Volume geral",
+        "Volume général",
+        "Gesamtlautstärke",
+        "Volume utama",
+        "कुल आवाज़",
+        "مستوى الصوت العام"
+      ]
+    },
+    {
+      "Key": "정답 · {0}",
+      "Values": [
+        "정답 · {0}",
+        "Answer · {0}",
+        "答案 · {0}",
+        "答案 · {0}",
+        "正解 · {0}",
+        "Respuesta · {0}",
+        "Resposta · {0}",
+        "Réponse · {0}",
+        "Antwort · {0}",
+        "Jawaban · {0}",
+        "जवाब · {0}",
+        "الإجابة · {0}"
+      ]
+    },
+    {
+      "Key": "정답 제출",
+      "Values": [
+        "정답 제출",
+        "Submit guess",
+        "提交答案",
+        "提交答案",
+        "正解を送信",
+        "Enviar respuesta",
+        "Enviar resposta",
+        "Envoyer la réponse",
+        "Antwort senden",
+        "Kirim jawaban",
+        "जवाब भेजें",
+        "إرسال الإجابة"
+      ]
+    },
+    {
+      "Key": "정답 추측",
+      "Values": [
+        "정답 추측",
+        "Guess word",
+        "猜答案",
+        "猜答案",
+        "正解を予想",
+        "Adivinar la palabra",
+        "Adivinhar a palavra",
+        "Deviner le mot",
+        "Wort erraten",
+        "Tebak kata",
+        "शब्द का अनुमान",
+        "تخمين الكلمة"
+      ]
+    },
+    {
+      "Key": "정해진 판수 후 최고점",
+      "Values": [
+        "정해진 판수 후 최고점",
+        "Highest score after all rounds",
+        "指定局数后最高分获胜",
+        "指定局數後最高分獲勝",
+        "規定のゲーム数で最高得点",
+        "Mayor puntuación tras las rondas",
+        "Maior pontuação após as rodadas",
+        "Meilleur score après les manches",
+        "Höchste Punktzahl nach den Runden",
+        "Poin tertinggi setelah semua ronde",
+        "तय राउंड के बाद सबसे अधिक अंक",
+        "أعلى نقاط بعد الجولات المحددة"
+      ]
+    },
+    {
+      "Key": "제시어",
+      "Values": [
+        "제시어",
+        "Word",
+        "关键词",
+        "關鍵詞",
+        "キーワード",
+        "Palabra",
+        "Palavra",
+        "Mot",
+        "Wort",
+        "Kata",
+        "शब्द",
+        "الكلمة"
+      ]
+    },
+    {
+      "Key": "제시어 · {0}",
+      "Values": [
+        "제시어 · {0}",
+        "Word · {0}",
+        "关键词 · {0}",
+        "關鍵詞 · {0}",
+        "キーワード · {0}",
+        "Palabra · {0}",
+        "Palavra · {0}",
+        "Mot · {0}",
+        "Wort · {0}",
+        "Kata · {0}",
+        "शब्द · {0}",
+        "الكلمة · {0}"
+      ]
+    },
+    {
+      "Key": "제시어 보기",
+      "Values": [
+        "제시어 보기",
+        "Show word",
+        "显示关键词",
+        "顯示關鍵詞",
+        "キーワードを見る",
+        "Mostrar palabra",
+        "Mostrar palavra",
+        "Afficher le mot",
+        "Wort anzeigen",
+        "Tampilkan kata",
+        "शब्द दिखाएँ",
+        "إظهار الكلمة"
+      ]
+    },
+    {
+      "Key": "제시어 숨기기",
+      "Values": [
+        "제시어 숨기기",
+        "Hide word",
+        "隐藏关键词",
+        "隱藏關鍵詞",
+        "キーワードを隠す",
+        "Ocultar palabra",
+        "Ocultar palavra",
+        "Masquer le mot",
+        "Wort verbergen",
+        "Sembunyikan kata",
+        "शब्द छिपाएँ",
+        "إخفاء الكلمة"
+      ]
+    },
+    {
+      "Key": "제시어 입력",
+      "Values": [
+        "제시어 입력",
+        "Enter word",
+        "输入关键词",
+        "輸入關鍵詞",
+        "キーワードを入力",
+        "Introduce la palabra",
+        "Digite a palavra",
+        "Entrez le mot",
+        "Wort eingeben",
+        "Masukkan kata",
+        "शब्द भरें",
+        "أدخل الكلمة"
+      ]
+    },
+    {
+      "Key": "제출 완료",
+      "Values": [
+        "제출 완료",
+        "Submitted",
+        "提交完成",
+        "提交完成",
+        "送信完了",
+        "Enviado",
+        "Enviado",
+        "Envoyé",
+        "Gesendet",
+        "Terkirim",
+        "भेज दिया गया",
+        "تم الإرسال"
+      ]
+    },
+    {
+      "Key": "제출 중",
+      "Values": [
+        "제출 중",
+        "Submitting",
+        "提交中",
+        "提交中",
+        "送信中",
+        "Enviando",
+        "Enviando",
+        "Envoi en cours",
+        "Wird gesendet",
+        "Mengirim",
+        "भेज रहे हैं",
+        "جارٍ الإرسال"
+      ]
+    },
+    {
+      "Key": "주제",
+      "Values": [
+        "주제",
+        "Topic",
+        "主题",
+        "主題",
+        "テーマ",
+        "Tema",
+        "Tema",
+        "Thème",
+        "Thema",
+        "Tema",
+        "विषय",
+        "الموضوع"
+      ]
+    },
+    {
+      "Key": "주제 · {0}",
+      "Values": [
+        "주제 · {0}",
+        "Topic · {0}",
+        "主题 · {0}",
+        "主題 · {0}",
+        "テーマ · {0}",
+        "Tema · {0}",
+        "Tema · {0}",
+        "Thème · {0}",
+        "Thema · {0}",
+        "Tema · {0}",
+        "विषय · {0}",
+        "الموضوع · {0}"
+      ]
+    },
+    {
+      "Key": "주제 {0}개",
+      "Values": [
+        "주제 {0}개",
+        "{0} topics",
+        "{0}个主题",
+        "{0} 個主題",
+        "テーマ {0}個",
+        "Temas: {0}",
+        "Temas: {0}",
+        "Thèmes : {0}",
+        "Themen: {0}",
+        "Tema: {0}",
+        "विषय: {0}",
+        "المواضيع: {0}"
+      ]
+    },
+    {
+      "Key": "주제 선택",
+      "Values": [
+        "주제 선택",
+        "Choose topics",
+        "选择主题",
+        "選擇主題",
+        "テーマを選択",
+        "Elegir temas",
+        "Escolher temas",
+        "Choisir les thèmes",
+        "Themen auswählen",
+        "Pilih tema",
+        "विषय चुनें",
+        "اختيار المواضيع"
+      ]
+    },
+    {
+      "Key": "주제 이름",
+      "Values": [
+        "주제 이름",
+        "Topic name",
+        "主题名称",
+        "主題名稱",
+        "テーマ名",
+        "Nombre del tema",
+        "Nome do tema",
+        "Nom du thème",
+        "Themenname",
+        "Nama tema",
+        "विषय का नाम",
+        "اسم الموضوع"
+      ]
+    },
+    {
+      "Key": "주제 이름과 제시어를 확인하세요.",
+      "Values": [
+        "주제 이름과 제시어를 확인하세요.",
+        "Check the topic name and words.",
+        "请检查主题名称和关键词。",
+        "請檢查主題名稱與關鍵詞。",
+        "テーマ名とキーワードを確認してください。",
+        "Revisa el nombre del tema y las palabras.",
+        "Confira o nome do tema e as palavras.",
+        "Vérifiez le nom du thème et les mots.",
+        "Überprüfe den Themennamen und die Wörter.",
+        "Periksa nama tema dan kata-katanya.",
+        "विषय का नाम और शब्द जाँचें।",
+        "تحقّق من اسم الموضوع والكلمات."
+      ]
+    },
+    {
+      "Key": "주제 저장",
+      "Values": [
+        "주제 저장",
+        "Save topic",
+        "保存主题",
+        "儲存主題",
+        "テーマを保存",
+        "Guardar tema",
+        "Salvar tema",
+        "Enregistrer le thème",
+        "Thema speichern",
+        "Simpan tema",
+        "विषय सेव करें",
+        "حفظ الموضوع"
+      ]
+    },
+    {
+      "Key": "주제를 하나 이상 선택하세요.",
+      "Values": [
+        "주제를 하나 이상 선택하세요.",
+        "Choose at least one topic.",
+        "请至少选择一个主题。",
+        "請至少選擇一個主題。",
+        "テーマを一つ以上選んでください。",
+        "Selecciona al menos un tema.",
+        "Selecione pelo menos um tema.",
+        "Choisissez au moins un thème.",
+        "Wähle mindestens ein Thema.",
+        "Pilih minimal satu tema.",
+        "कम से कम एक विषय चुनें।",
+        "اختر موضوعًا واحدًا على الأقل."
+      ]
+    },
+    {
+      "Key": "지목 안 됨",
+      "Values": [
+        "지목 안 됨",
+        "Not accused",
+        "未被指认",
+        "未被指認",
+        "指名されていません",
+        "Sin señalar",
+        "Não apontado",
+        "Non désigné",
+        "Nicht verdächtigt",
+        "Tidak ditunjuk",
+        "नहीं चुना गया",
+        "غير متهم"
+      ]
+    },
+    {
+      "Key": "지목됨",
+      "Values": [
+        "지목됨",
+        "Accused",
+        "被指认",
+        "被指認",
+        "指名されました",
+        "Señalado",
+        "Apontado",
+        "Désigné",
+        "Verdächtigt",
+        "Ditunjuk",
+        "चुना गया",
+        "متهم"
+      ]
+    },
+    {
+      "Key": "지우개",
+      "Values": [
+        "지우개",
+        "Eraser",
+        "橡皮擦",
+        "橡皮擦",
+        "消しゴム",
+        "Borrador",
+        "Borracha",
+        "Gomme",
+        "Radierer",
+        "Penghapus",
+        "रबर",
+        "ممحاة"
+      ]
+    },
+    {
+      "Key": "진행 중",
+      "Values": [
+        "진행 중",
+        "In progress",
+        "进行中",
+        "進行中",
+        "進行中",
+        "En curso",
+        "Em andamento",
+        "En cours",
+        "Läuft",
+        "Berlangsung",
+        "चल रहा है",
+        "جارٍ"
+      ]
+    },
+    {
+      "Key": "진행 판수",
+      "Values": [
+        "진행 판수",
+        "Rounds",
+        "游戏局数",
+        "遊戲局數",
+        "ゲーム数",
+        "Número de rondas",
+        "Número de rodadas",
+        "Nombre de manches",
+        "Rundenanzahl",
+        "Jumlah ronde",
+        "राउंड की संख्या",
+        "عدد الجولات"
+      ]
+    },
+    {
+      "Key": "착용 중",
+      "Values": [
+        "착용 중",
+        "Equipped",
+        "已装备",
+        "已裝備",
+        "装着中",
+        "Equipado",
+        "Equipado",
+        "Équipé",
+        "Ausgerüstet",
+        "Dipakai",
+        "पहना हुआ",
+        "مجهّز"
+      ]
+    },
+    {
+      "Key": "참가",
+      "Values": [
+        "참가",
+        "Join",
+        "参与",
+        "參加",
+        "参加",
+        "Unirse",
+        "Entrar",
+        "Rejoindre",
+        "Beitreten",
+        "Gabung",
+        "जुड़ें",
+        "انضمام"
+      ]
+    },
+    {
+      "Key": "참가 인원이 가득 찼습니다. 관전으로 참가할 수 있습니다.",
+      "Values": [
+        "참가 인원이 가득 찼습니다. 관전으로 참가할 수 있습니다.",
+        "The room is full. You can join as a spectator.",
+        "参与人数已满，可加入观战。",
+        "參加人數已滿，可加入觀戰。",
+        "参加者が満員です。観戦で参加できます。",
+        "La sala está llena. Puedes unirte como espectador.",
+        "A sala está cheia. Você pode entrar como espectador.",
+        "Le salon est complet. Vous pouvez rejoindre en spectateur.",
+        "Der Raum ist voll. Du kannst als Zuschauer beitreten.",
+        "Ruang sudah penuh. Kamu dapat bergabung sebagai penonton.",
+        "रूम भर गया है। दर्शक के रूप में शामिल हो सकते हैं।",
+        "الغرفة ممتلئة. يمكنك الانضمام كمشاهد."
+      ]
+    },
+    {
+      "Key": "참가자",
+      "Values": [
+        "참가자",
+        "Players",
+        "参与者",
+        "參加者",
+        "参加者",
+        "Jugadores",
+        "Jogadores",
+        "Joueurs",
+        "Spieler",
+        "Pemain",
+        "खिलाड़ी",
+        "اللاعبون"
+      ]
+    },
+    {
+      "Key": "참가자 {0}명 필요",
+      "Values": [
+        "참가자 {0}명 필요",
+        "{0} players needed",
+        "需要{0}名参与者",
+        "需要 {0} 名參加者",
+        "参加者{0}人が必要",
+        "Se necesitan {0} jugadores",
+        "É preciso ter {0} jogadores",
+        "{0} joueurs requis",
+        "{0} Spieler benötigt",
+        "Perlu {0} pemain",
+        "{0} खिलाड़ी चाहिए",
+        "يلزم {0} لاعبين"
+      ]
+    },
+    {
+      "Key": "참가하기",
+      "Values": [
+        "참가하기",
+        "Join",
+        "参与游戏",
+        "參加遊戲",
+        "参加する",
+        "Unirse",
+        "Entrar",
+        "Rejoindre",
+        "Beitreten",
+        "Gabung",
+        "जुड़ें",
+        "انضمام"
+      ]
+    },
+    {
+      "Key": "채팅",
+      "Values": [
+        "채팅",
+        "Chat",
+        "聊天",
+        "聊天",
+        "チャット",
+        "Chat",
+        "Chat",
+        "Chat",
+        "Chat",
+        "Chat",
+        "चैट",
+        "الدردشة"
+      ]
+    },
+    {
+      "Key": "채팅 열기",
+      "Values": [
+        "채팅 열기",
+        "Open chat",
+        "打开聊天",
+        "開啟聊天",
+        "チャットを開く",
+        "Abrir chat",
+        "Abrir chat",
+        "Ouvrir le chat",
+        "Chat öffnen",
+        "Buka chat",
+        "चैट खोलें",
+        "فتح الدردشة"
+      ]
+    },
+    {
+      "Key": "채팅 입력",
+      "Values": [
+        "채팅 입력",
+        "Message",
+        "输入聊天内容",
+        "輸入聊天內容",
+        "チャットを入力",
+        "Escribe un mensaje",
+        "Digite uma mensagem",
+        "Écrivez un message",
+        "Nachricht eingeben",
+        "Tulis pesan",
+        "संदेश लिखें",
+        "اكتب رسالة"
+      ]
+    },
+    {
+      "Key": "채팅으로 의견을 나눠 보세요.",
+      "Values": [
+        "채팅으로 의견을 나눠 보세요.",
+        "Discuss in chat.",
+        "在聊天中交流看法吧。",
+        "在聊天中交流想法吧。",
+        "チャットで意見を交わしましょう。",
+        "Comparte tu opinión en el chat.",
+        "Converse no chat.",
+        "Échangez vos idées dans le chat.",
+        "Tauscht euch im Chat aus.",
+        "Bagikan pendapatmu di chat.",
+        "चैट में अपनी राय रखें।",
+        "تبادلوا الآراء في الدردشة."
+      ]
+    },
+    {
+      "Key": "초기화",
+      "Values": [
+        "초기화",
+        "Reset",
+        "重置",
+        "重設",
+        "リセット",
+        "Restablecer",
+        "Redefinir",
+        "Réinitialiser",
+        "Zurücksetzen",
+        "Reset",
+        "रीसेट करें",
+        "إعادة ضبط"
+      ]
+    },
+    {
+      "Key": "최종 결과",
+      "Values": [
+        "최종 결과",
+        "Final results",
+        "最终结果",
+        "最終結果",
+        "最終結果",
+        "Resultados finales",
+        "Resultado final",
+        "Résultats finaux",
+        "Endergebnis",
+        "Hasil akhir",
+        "अंतिम नतीजे",
+        "النتائج النهائية"
+      ]
+    },
+    {
+      "Key": "친구",
+      "Values": [
+        "친구",
+        "Friends",
+        "好友",
+        "好友",
+        "フレンド",
+        "Amigos",
+        "Amigos",
+        "Amis",
+        "Freunde",
+        "Teman",
+        "दोस्त",
+        "الأصدقاء"
+      ]
+    },
+    {
+      "Key": "친구 계정 ID",
+      "Values": [
+        "친구 계정 ID",
+        "Friend's account ID",
+        "好友账号ID",
+        "好友帳號 ID",
+        "フレンドのアカウントID",
+        "ID de cuenta del amigo",
+        "ID da conta do amigo",
+        "ID du compte ami",
+        "Konto-ID des Freundes",
+        "ID akun teman",
+        "दोस्त की खाता ID",
+        "معرّف حساب الصديق"
+      ]
+    },
+    {
+      "Key": "친구 목록",
+      "Values": [
+        "친구 목록",
+        "Friends",
+        "好友列表",
+        "好友列表",
+        "フレンド一覧",
+        "Lista de amigos",
+        "Lista de amigos",
+        "Liste d’amis",
+        "Freundesliste",
+        "Daftar teman",
+        "दोस्तों की सूची",
+        "قائمة الأصدقاء"
+      ]
+    },
+    {
+      "Key": "친구 목록을 갱신했습니다.",
+      "Values": [
+        "친구 목록을 갱신했습니다.",
+        "Friends list refreshed.",
+        "好友列表已刷新。",
+        "好友列表已重新整理。",
+        "フレンド一覧を更新しました。",
+        "Lista de amigos actualizada.",
+        "Lista de amigos atualizada.",
+        "Liste d’amis actualisée.",
+        "Freundesliste aktualisiert.",
+        "Daftar teman diperbarui.",
+        "मित्रों की सूची अपडेट हो गई।",
+        "تم تحديث قائمة الأصدقاء."
+      ]
+    },
+    {
+      "Key": "친구 목록의 최대 인원에 도달했습니다.",
+      "Values": [
+        "친구 목록의 최대 인원에 도달했습니다.",
+        "You have reached the friend limit.",
+        "好友人数已达上限。",
+        "好友人數已達上限。",
+        "フレンドの人数が上限に達しました。",
+        "Has alcanzado el límite de amigos.",
+        "Você atingiu o limite de amigos.",
+        "Vous avez atteint la limite d’amis.",
+        "Du hast die maximale Anzahl an Freunden erreicht.",
+        "Batas jumlah teman telah tercapai.",
+        "मित्रों की अधिकतम संख्या पूरी हो गई है।",
+        "وصلت إلى الحد الأقصى لعدد الأصدقاء."
+      ]
+    },
+    {
+      "Key": "친구 요청",
+      "Values": [
+        "친구 요청",
+        "Friend requests",
+        "好友请求",
+        "好友邀請",
+        "フレンド申請",
+        "Solicitud de amistad",
+        "Pedido de amizade",
+        "Demande d’ami",
+        "Freundschaftsanfrage",
+        "Permintaan teman",
+        "दोस्ती का अनुरोध",
+        "طلب صداقة"
+      ]
+    },
+    {
+      "Key": "친구 요청을 거절했습니다.",
+      "Values": [
+        "친구 요청을 거절했습니다.",
+        "Friend request declined.",
+        "已拒绝好友请求。",
+        "已拒絕好友邀請。",
+        "フレンド申請を拒否しました。",
+        "Solicitud de amistad rechazada.",
+        "Pedido de amizade recusado.",
+        "Demande d’ami refusée.",
+        "Freundschaftsanfrage abgelehnt.",
+        "Permintaan pertemanan ditolak.",
+        "मित्र अनुरोध अस्वीकार कर दिया।",
+        "تم رفض طلب الصداقة."
+      ]
+    },
+    {
+      "Key": "친구 요청을 보냈습니다.",
+      "Values": [
+        "친구 요청을 보냈습니다.",
+        "Friend request sent.",
+        "已发送好友请求。",
+        "已傳送好友邀請。",
+        "フレンド申請を送信しました。",
+        "Solicitud de amistad enviada.",
+        "Pedido de amizade enviado.",
+        "Demande d’ami envoyée.",
+        "Freundschaftsanfrage gesendet.",
+        "Permintaan pertemanan dikirim.",
+        "मित्र अनुरोध भेज दिया।",
+        "تم إرسال طلب الصداقة."
+      ]
+    },
+    {
+      "Key": "친구 요청을 수락했습니다.",
+      "Values": [
+        "친구 요청을 수락했습니다.",
+        "Friend request accepted.",
+        "已接受好友请求。",
+        "已接受好友邀請。",
+        "フレンド申請を承認しました。",
+        "Solicitud de amistad aceptada.",
+        "Pedido de amizade aceito.",
+        "Demande d’ami acceptée.",
+        "Freundschaftsanfrage angenommen.",
+        "Permintaan pertemanan diterima.",
+        "मित्र अनुरोध स्वीकार कर लिया।",
+        "تم قبول طلب الصداقة."
+      ]
+    },
+    {
+      "Key": "친구 요청을 찾지 못했습니다. 목록을 갱신하세요.",
+      "Values": [
+        "친구 요청을 찾지 못했습니다. 목록을 갱신하세요.",
+        "Friend request not found. Refresh the list.",
+        "未找到好友请求，请刷新列表。",
+        "找不到好友邀請，請重新整理列表。",
+        "フレンド申請が見つかりません。一覧を更新してください。",
+        "No se encontró la solicitud de amistad. Actualiza la lista.",
+        "Pedido de amizade não encontrado. Atualize a lista.",
+        "Demande d’ami introuvable. Actualisez la liste.",
+        "Freundschaftsanfrage nicht gefunden. Aktualisiere die Liste.",
+        "Permintaan pertemanan tidak ditemukan. Perbarui daftar.",
+        "मित्र अनुरोध नहीं मिला। सूची अपडेट करें।",
+        "لم يتم العثور على طلب الصداقة. حدّث القائمة."
+      ]
+    },
+    {
+      "Key": "친구가 없습니다.",
+      "Values": [
+        "친구가 없습니다.",
+        "No friends yet.",
+        "暂无好友。",
+        "目前沒有好友。",
+        "フレンドがいません。",
+        "No tienes amigos añadidos.",
+        "Você não tem amigos adicionados.",
+        "Vous n’avez aucun ami ajouté.",
+        "Du hast noch keine Freunde hinzugefügt.",
+        "Belum ada teman ditambahkan.",
+        "अभी कोई मित्र नहीं है।",
+        "لم تضف أي أصدقاء بعد."
+      ]
+    },
+    {
+      "Key": "친구끼리 · 사설방",
+      "Values": [
+        "친구끼리 · 사설방",
+        "Friends · Private room",
+        "仅限好友 · 私人房间",
+        "好友限定 · 私人房間",
+        "友達同士 · 非公開ルーム",
+        "Amigos · Sala privada",
+        "Amigos · Sala privada",
+        "Amis · Salon privé",
+        "Freunde · Privat",
+        "Teman · Ruang privat",
+        "दोस्त · निजी कमरा",
+        "الأصدقاء · غرفة خاصة"
+      ]
+    },
+    {
+      "Key": "친구를 삭제했습니다.",
+      "Values": [
+        "친구를 삭제했습니다.",
+        "Friend removed.",
+        "已删除好友。",
+        "已刪除好友。",
+        "フレンドを削除しました。",
+        "Amigo eliminado.",
+        "Amigo removido.",
+        "Ami supprimé.",
+        "Freund entfernt.",
+        "Teman dihapus.",
+        "मित्र हटा दिया।",
+        "تم حذف الصديق."
+      ]
+    },
+    {
+      "Key": "캐릭터 꾸미기",
+      "Values": [
+        "캐릭터 꾸미기",
+        "Customize character",
+        "角色装扮",
+        "角色裝扮",
+        "キャラクターの着せ替え",
+        "Personalizar personaje",
+        "Personalizar personagem",
+        "Personnaliser le personnage",
+        "Charakter gestalten",
+        "Kustomisasi karakter",
+        "किरदार सजाएँ",
+        "تخصيص الشخصية"
+      ]
+    },
+    {
+      "Key": "캐릭터를 저장했습니다.",
+      "Values": [
+        "캐릭터를 저장했습니다.",
+        "Character saved.",
+        "角色已保存。",
+        "角色已儲存。",
+        "キャラクターを保存しました。",
+        "Personaje guardado.",
+        "Personagem salvo.",
+        "Personnage enregistré.",
+        "Charakter gespeichert.",
+        "Karakter disimpan.",
+        "पात्र सेव हो गया।",
+        "تم حفظ الشخصية."
+      ]
+    },
+    {
+      "Key": "커스터마이징",
+      "Values": [
+        "커스터마이징",
+        "Customize",
+        "自定义外观",
+        "自訂外觀",
+        "着せ替え",
+        "Personalizar",
+        "Personalizar",
+        "Personnaliser",
+        "Anpassen",
+        "Kustomisasi",
+        "कस्टमाइज़",
+        "تخصيص"
+      ]
+    },
+    {
+      "Key": "코드로 입장",
+      "Values": [
+        "코드로 입장",
+        "Join by code",
+        "通过代码加入",
+        "透過代碼加入",
+        "コードで入室",
+        "Unirse con código",
+        "Entrar com código",
+        "Rejoindre par code",
+        "Mit Code beitreten",
+        "Gabung dengan kode",
+        "कोड से जुड़ें",
+        "الانضمام برمز"
+      ]
+    },
+    {
+      "Key": "코드로 참가",
+      "Values": [
+        "코드로 참가",
+        "Join by code",
+        "通过代码参与",
+        "透過代碼參加",
+        "コードで参加",
+        "Unirse con código",
+        "Entrar com código",
+        "Rejoindre avec un code",
+        "Mit Code beitreten",
+        "Gabung dengan kode",
+        "कोड से जुड़ें",
+        "الانضمام برمز"
+      ]
+    },
+    {
+      "Key": "코인이 부족합니다.",
+      "Values": [
+        "코인이 부족합니다.",
+        "Not enough coins.",
+        "金币不足。",
+        "金幣不足。",
+        "コインが足りません。",
+        "No tienes suficientes monedas.",
+        "Você não tem moedas suficientes.",
+        "Vous n’avez pas assez de pièces.",
+        "Du hast nicht genug Münzen.",
+        "Koin tidak cukup.",
+        "पर्याप्त सिक्के नहीं हैं।",
+        "ليس لديك ما يكفي من العملات."
+      ]
+    },
+    {
+      "Key": "토론",
+      "Values": [
+        "토론",
+        "Discussion",
+        "讨论",
+        "討論",
+        "討論",
+        "Debate",
+        "Discussão",
+        "Discussion",
+        "Diskussion",
+        "Diskusi",
+        "चर्चा",
+        "النقاش"
+      ]
+    },
+    {
+      "Key": "투표",
+      "Values": [
+        "투표",
+        "Voting",
+        "投票",
+        "投票",
+        "投票",
+        "Votación",
+        "Votação",
+        "Vote",
+        "Abstimmung",
+        "Voting",
+        "वोटिंग",
+        "التصويت"
+      ]
+    },
+    {
+      "Key": "투표 {0}/{1}",
+      "Values": [
+        "투표 {0}/{1}",
+        "Votes {0}/{1}",
+        "投票 {0}/{1}",
+        "投票 {0}/{1}",
+        "投票 {0}/{1}",
+        "Votos {0}/{1}",
+        "Votos {0}/{1}",
+        "Votes {0}/{1}",
+        "Stimmen {0}/{1}",
+        "Suara {0}/{1}",
+        "वोट {0}/{1}",
+        "الأصوات {0}/{1}"
+      ]
+    },
+    {
+      "Key": "투표 완료",
+      "Values": [
+        "투표 완료",
+        "Voted",
+        "投票完成",
+        "投票完成",
+        "投票完了",
+        "Voto enviado",
+        "Voto enviado",
+        "Vote envoyé",
+        "Abgestimmt",
+        "Suara terkirim",
+        "वोट दिया गया",
+        "تم التصويت"
+      ]
+    },
+    {
+      "Key": "투표하기",
+      "Values": [
+        "투표하기",
+        "Vote",
+        "投票",
+        "投票",
+        "投票する",
+        "Votar",
+        "Votar",
+        "Voter",
+        "Abstimmen",
+        "Beri suara",
+        "वोट करें",
+        "تصويت"
+      ]
+    },
+    {
+      "Key": "투표할 플레이어를 선택하세요",
+      "Values": [
+        "투표할 플레이어를 선택하세요",
+        "Choose a player to vote for",
+        "请选择要投票的玩家",
+        "請選擇要投票的玩家",
+        "投票するプレイヤーを選んでください",
+        "Elige a quién votar",
+        "Escolha em quem votar",
+        "Choisissez pour qui voter",
+        "Wähle, für wen du abstimmst",
+        "Pilih pemain untuk diberi suara",
+        "वोट देने के लिए खिलाड़ी चुनें",
+        "اختر لاعبًا للتصويت عليه"
+      ]
+    },
+    {
+      "Key": "판매 중인 상품이 없습니다.",
+      "Values": [
+        "판매 중인 상품이 없습니다.",
+        "No items for sale.",
+        "暂无在售商品。",
+        "目前沒有販售中的商品。",
+        "販売中の商品がありません。",
+        "No hay objetos a la venta.",
+        "Não há itens à venda.",
+        "Aucun objet en vente.",
+        "Keine Gegenstände im Angebot.",
+        "Tidak ada item yang dijual.",
+        "कोई आइटम बिक्री के लिए नहीं है।",
+        "لا توجد عناصر للبيع."
+      ]
+    },
+    {
+      "Key": "펜",
+      "Values": [
+        "펜",
+        "Pen",
+        "笔",
+        "筆",
+        "ペン",
+        "Lápiz",
+        "Caneta",
+        "Crayon",
+        "Stift",
+        "Pena",
+        "पेन",
+        "قلم"
+      ]
+    },
+    {
+      "Key": "한 명씩 그리기",
+      "Values": [
+        "한 명씩 그리기",
+        "Take turns drawing",
+        "轮流绘画",
+        "輪流繪畫",
+        "一人ずつ描く",
+        "Dibujar por turnos",
+        "Desenhar por turnos",
+        "Dessiner à tour de rôle",
+        "Abwechselnd zeichnen",
+        "Menggambar bergiliran",
+        "एक-एक करके चित्र बनाएँ",
+        "الرسم بالتناوب"
+      ]
+    },
+    {
+      "Key": "한 사람 그림",
+      "Values": [
+        "한 사람 그림",
+        "Individual drawing",
+        "个人绘画",
+        "個人繪畫",
+        "一人ずつ描く",
+        "Dibujo por jugador",
+        "Desenho por jogador",
+        "Dessin par joueur",
+        "Zeichenzeit pro Spieler",
+        "Gambar per pemain",
+        "हर खिलाड़ी का चित्र",
+        "رسم كل لاعب"
+      ]
+    },
+    {
+      "Key": "함께 플레이",
+      "Values": [
+        "함께 플레이",
+        "Play together",
+        "一起游玩",
+        "一起遊玩",
+        "一緒にプレイ",
+        "Jugar juntos",
+        "Jogar juntos",
+        "Jouer ensemble",
+        "Zusammen spielen",
+        "Main bersama",
+        "साथ खेलें",
+        "العبوا معًا"
+      ]
+    },
+    {
+      "Key": "현재 방에서 나온 뒤 참가하세요.",
+      "Values": [
+        "현재 방에서 나온 뒤 참가하세요.",
+        "Leave your current room before joining another.",
+        "请先离开当前房间后再加入。",
+        "請先離開目前的房間後再加入。",
+        "現在のルームを退出してから参加してください。",
+        "Sal de tu sala actual antes de unirte.",
+        "Saia da sala atual antes de entrar em outra.",
+        "Quittez votre salon actuel avant de rejoindre.",
+        "Verlasse deinen aktuellen Raum, bevor du einem anderen beitrittst.",
+        "Keluar dari ruang saat ini sebelum bergabung.",
+        "शामिल होने से पहले मौजूदा रूम छोड़ें।",
+        "غادر غرفتك الحالية قبل الانضمام."
+      ]
+    },
+    {
+      "Key": "화가 모자",
+      "Values": [
+        "화가 모자",
+        "Artist's beret",
+        "画家帽",
+        "畫家帽",
+        "画家の帽子",
+        "Boina de pintor",
+        "Boina de pintor",
+        "Béret de peintre",
+        "Malerbarett",
+        "Baret pelukis",
+        "चित्रकार की टोपी",
+        "قبعة الرسّام"
+      ]
+    },
+    {
+      "Key": "화면 움직임 줄이기",
+      "Values": [
+        "화면 움직임 줄이기",
+        "Reduce motion",
+        "减少屏幕动态效果",
+        "減少畫面動態效果",
+        "画面の動きを減らす",
+        "Reducir movimiento",
+        "Reduzir movimento",
+        "Réduire les animations",
+        "Bewegung reduzieren",
+        "Kurangi gerakan",
+        "ऐनिमेशन कम करें",
+        "تقليل الحركة"
+      ]
+    },
+    {
+      "Key": "확인",
+      "Values": [
+        "확인",
+        "Confirm",
+        "确认",
+        "確認",
+        "確認",
+        "Confirmar",
+        "Confirmar",
+        "Confirmer",
+        "Bestätigen",
+        "Konfirmasi",
+        "पुष्टि करें",
+        "تأكيد"
+      ]
+    },
+    {
+      "Key": "효과음",
+      "Values": [
+        "효과음",
+        "Sound effects",
+        "音效",
+        "音效",
+        "効果音",
+        "Efectos de sonido",
+        "Efeitos sonoros",
+        "Effets sonores",
+        "Soundeffekte",
+        "Efek suara",
+        "ध्वनि प्रभाव",
+        "المؤثرات الصوتية"
+      ]
+    },
+    {
+      "Key": "Enter  채팅",
+      "Values": [
+        "Enter  채팅",
+        "Enter  Chat",
+        "Enter  聊天",
+        "Enter  聊天",
+        "Enter  チャット",
+        "Enter · Chat",
+        "Enter · Chat",
+        "Entrée · Chat",
+        "Enter · Chat",
+        "Enter · Chat",
+        "Enter · चैट",
+        "Enter · الدردشة"
+      ]
+    },
+    {
+      "Key": "Google 계정 연동",
+      "Values": [
+        "Google 계정 연동",
+        "Link Google",
+        "关联Google账号",
+        "連結 Google 帳號",
+        "Googleアカウントを連携",
+        "Vincular cuenta de Google",
+        "Vincular conta Google",
+        "Associer un compte Google",
+        "Google-Konto verknüpfen",
+        "Hubungkan akun Google",
+        "Google खाता जोड़ें",
+        "ربط حساب Google"
+      ]
+    },
+    {
+      "Key": "Google 계정 인증을 완료해 주세요.",
+      "Values": [
+        "Google 계정 인증을 완료해 주세요.",
+        "Complete Google account verification.",
+        "请完成Google账号认证。",
+        "請完成 Google 帳號驗證。",
+        "Googleアカウントの認証を完了してください。",
+        "Completa la verificación de tu cuenta de Google.",
+        "Conclua a verificação da conta do Google.",
+        "Terminez la vérification de votre compte Google.",
+        "Schließe die Bestätigung deines Google-Kontos ab.",
+        "Selesaikan verifikasi akun Google.",
+        "Google खाते की पुष्टि पूरी करें।",
+        "أكمل التحقق من حساب Google."
+      ]
+    },
+    {
+      "Key": "Google 계정을 연동하고 있습니다…",
+      "Values": [
+        "Google 계정을 연동하고 있습니다…",
+        "Linking your Google account…",
+        "正在关联Google账号…",
+        "正在連結 Google 帳號…",
+        "Googleアカウントを連携しています…",
+        "Vinculando la cuenta de Google…",
+        "Vinculando a conta do Google…",
+        "Association du compte Google…",
+        "Google-Konto wird verknüpft…",
+        "Menautkan akun Google…",
+        "Google खाता जोड़ा जा रहा है…",
+        "جارٍ ربط حساب Google…"
+      ]
+    },
+    {
+      "Key": "Google 계정을 연동했습니다.",
+      "Values": [
+        "Google 계정을 연동했습니다.",
+        "Google account linked.",
+        "Google账号关联成功。",
+        "Google 帳號連結成功。",
+        "Googleアカウントを連携しました。",
+        "Cuenta de Google vinculada.",
+        "Conta do Google vinculada.",
+        "Compte Google lié.",
+        "Google-Konto verknüpft.",
+        "Akun Google tertaut.",
+        "Google खाता जुड़ गया।",
+        "تم ربط حساب Google."
+      ]
+    },
+    {
+      "Key": "Google 로그인 서비스를 사용할 수 없습니다.",
+      "Values": [
+        "Google 로그인 서비스를 사용할 수 없습니다.",
+        "Google sign-in is unavailable.",
+        "无法使用Google登录服务。",
+        "無法使用 Google 登入服務。",
+        "Googleログインサービスを利用できません。",
+        "El servicio de inicio de sesión de Google no está disponible.",
+        "O serviço de login do Google está indisponível.",
+        "Le service de connexion Google est indisponible.",
+        "Der Google-Anmeldedienst ist nicht verfügbar.",
+        "Layanan login Google tidak tersedia.",
+        "Google लॉगिन सेवा उपलब्ध नहीं है।",
+        "خدمة تسجيل الدخول باستخدام Google غير متاحة."
+      ]
+    },
+    {
+      "Key": "Google 로그인 정보를 확인하고 있습니다…",
+      "Values": [
+        "Google 로그인 정보를 확인하고 있습니다…",
+        "Checking Google sign-in details…",
+        "正在验证Google登录信息…",
+        "正在驗證 Google 登入資訊…",
+        "Googleログイン情報を確認しています…",
+        "Verificando los datos de inicio de sesión de Google…",
+        "Verificando os dados de login do Google…",
+        "Vérification des informations de connexion Google…",
+        "Google-Anmeldedaten werden geprüft…",
+        "Memverifikasi data login Google…",
+        "Google लॉगिन जानकारी की जाँच हो रही है…",
+        "جارٍ التحقق من معلومات تسجيل الدخول باستخدام Google…"
+      ]
+    },
+    {
+      "Key": "Google 로그인은 게임 화면에서 실행하세요.",
+      "Values": [
+        "Google 로그인은 게임 화면에서 실행하세요.",
+        "Start Google sign-in from the game screen.",
+        "请在游戏画面中进行Google登录。",
+        "請在遊戲畫面中進行 Google 登入。",
+        "ゲーム画面からGoogleログインを開始してください。",
+        "Inicia sesión con Google desde el juego.",
+        "Faça login com Google pela tela do jogo.",
+        "Connectez-vous avec Google depuis le jeu.",
+        "Starte die Google-Anmeldung im Spiel.",
+        "Mulai login Google dari layar game.",
+        "गेम की स्क्रीन से Google लॉगिन शुरू करें।",
+        "ابدأ تسجيل الدخول باستخدام Google من شاشة اللعبة."
+      ]
+    },
+    {
+      "Key": "Google 연동 계정",
+      "Values": [
+        "Google 연동 계정",
+        "Google-linked account",
+        "已关联Google的账号",
+        "已連結 Google 的帳號",
+        "Google連携アカウント",
+        "Cuenta vinculada a Google",
+        "Conta vinculada ao Google",
+        "Compte associé à Google",
+        "Mit Google verknüpftes Konto",
+        "Akun terhubung ke Google",
+        "Google से जुड़ा खाता",
+        "حساب مرتبط بـ Google"
+      ]
+    },
+    {
+      "Key": "Google 인증 응답을 받았습니다. 이 창을 닫고 게임으로 돌아가 로그인 결과를 확인하세요.",
+      "Values": [
+        "Google 인증 응답을 받았습니다. 이 창을 닫고 게임으로 돌아가 로그인 결과를 확인하세요.",
+        "Google verification received. Close this window and return to the game to check your sign-in result.",
+        "已收到Google认证响应。请关闭此窗口，返回游戏查看登录结果。",
+        "已收到 Google 驗證回應。請關閉此視窗，返回遊戲查看登入結果。",
+        "Google認証の応答を受信しました。このウィンドウを閉じ、ゲームに戻ってログイン結果を確認してください。",
+        "Se recibió la respuesta de Google. Cierra esta ventana y vuelve al juego para comprobar el inicio de sesión.",
+        "A resposta do Google foi recebida. Feche esta janela e volte ao jogo para conferir o login.",
+        "La réponse de Google a été reçue. Fermez cette fenêtre et retournez au jeu pour vérifier la connexion.",
+        "Die Google-Antwort ist eingegangen. Schließe dieses Fenster und kehre ins Spiel zurück, um das Anmeldeergebnis zu prüfen.",
+        "Respons Google telah diterima. Tutup jendela ini dan kembali ke game untuk memeriksa hasil login.",
+        "Google का जवाब मिल गया। यह विंडो बंद करके गेम में लौटें और लॉगिन का परिणाम देखें।",
+        "تم استلام رد Google. أغلق هذه النافذة وعُد إلى اللعبة للتحقق من نتيجة تسجيل الدخول."
+      ]
+    },
+    {
+      "Key": "Google 인증 취소",
+      "Values": [
+        "Google 인증 취소",
+        "Cancel Google sign-in",
+        "取消Google验证",
+        "取消 Google 驗證",
+        "Google認証をキャンセル",
+        "Cancelar acceso con Google",
+        "Cancelar login do Google",
+        "Annuler la connexion Google",
+        "Google-Anmeldung abbrechen",
+        "Batalkan login Google",
+        "Google लॉगिन रद्द करें",
+        "إلغاء تسجيل الدخول عبر Google"
+      ]
+    },
+    {
+      "Key": "Google 인증에 실패했습니다. 다시 로그인해 주세요.",
+      "Values": [
+        "Google 인증에 실패했습니다. 다시 로그인해 주세요.",
+        "Google verification failed. Please sign in again.",
+        "Google认证失败，请重新登录。",
+        "Google 驗證失敗，請重新登入。",
+        "Google認証に失敗しました。もう一度ログインしてください。",
+        "La autenticación con Google falló. Inicia sesión de nuevo.",
+        "A autenticação com Google falhou. Entre novamente.",
+        "L’authentification Google a échoué. Reconnectez-vous.",
+        "Die Google-Authentifizierung ist fehlgeschlagen. Melde dich erneut an.",
+        "Autentikasi Google gagal. Silakan masuk lagi.",
+        "Google प्रमाणीकरण विफल रहा। फिर से लॉग इन करें।",
+        "فشلت المصادقة باستخدام Google. سجّل الدخول مجددًا."
+      ]
+    },
+    {
+      "Key": "Google로 계속하기",
+      "Values": [
+        "Google로 계속하기",
+        "Continue with Google",
+        "通过Google继续",
+        "使用 Google 繼續",
+        "Googleで続ける",
+        "Continuar con Google",
+        "Continuar com Google",
+        "Continuer avec Google",
+        "Mit Google fortfahren",
+        "Lanjutkan dengan Google",
+        "Google से जारी रखें",
+        "المتابعة عبر Google"
+      ]
+    },
+    {
+      "Key": "Google에 연동된 계정입니다. Google로 로그인해 주세요.",
+      "Values": [
+        "Google에 연동된 계정입니다. Google로 로그인해 주세요.",
+        "This account is linked to Google. Please sign in with Google.",
+        "此账号已关联Google，请使用Google登录。",
+        "此帳號已連結 Google，請使用 Google 登入。",
+        "このアカウントはGoogleに連携されています。Googleでログインしてください。",
+        "Esta cuenta está vinculada a Google. Inicia sesión con Google.",
+        "Esta conta está vinculada ao Google. Entre com o Google.",
+        "Ce compte est lié à Google. Connectez-vous avec Google.",
+        "Dieses Konto ist mit Google verknüpft. Melde dich mit Google an.",
+        "Akun ini tertaut ke Google. Silakan masuk dengan Google.",
+        "यह खाता Google से जुड़ा है। Google से लॉग इन करें।",
+        "هذا الحساب مرتبط بـ Google. سجّل الدخول باستخدام Google."
+      ]
+    },
+    {
+      "Key": "이 캔버스에 더 이상 선을 추가할 수 없어요. 차례를 마쳐 주세요.",
+      "Values": [
+        "이 캔버스에 더 이상 선을 추가할 수 없어요. 차례를 마쳐 주세요.",
+        "You can't add more strokes. Finish your turn.",
+        "此画布无法继续添加笔画。请结束回合。",
+        "此畫布無法繼續新增筆畫。請結束回合。",
+        "このキャンバスにはこれ以上描けません。ターンを終了してください。",
+        "No puedes añadir más trazos. Termina tu turno.",
+        "Você não pode adicionar mais traços. Termine seu turno.",
+        "Impossible d'ajouter des traits. Terminez votre tour.",
+        "Keine weiteren Striche möglich. Beende deinen Zug.",
+        "Tidak dapat menambah goresan. Selesaikan giliranmu.",
+        "इस कैनवास पर और रेखाएँ नहीं जोड़ सकते। अपनी बारी समाप्त करें।",
+        "لا يمكنك إضافة المزيد من الخطوط إلى هذه اللوحة. أنهِ دورك."
+      ]
+    },
+    {
+      "Key": "지금은 이 요청을 처리할 수 없어요.",
+      "Values": [
+        "지금은 이 요청을 처리할 수 없어요.",
+        "This action is unavailable right now.",
+        "现在无法执行此操作。",
+        "現在無法執行此操作。",
+        "今はこの操作を実行できません。",
+        "Esta acción no está disponible ahora.",
+        "Esta ação não está disponível agora.",
+        "Cette action n'est pas disponible pour le moment.",
+        "Diese Aktion ist gerade nicht verfügbar.",
+        "Tindakan ini belum tersedia saat ini.",
+        "अभी यह कार्रवाई उपलब्ध नहीं है।",
+        "هذا الإجراء غير متاح الآن."
+      ]
+    },
+    {
+      "Key": "베레모",
+      "Values": [
+        "베레모",
+        "Beret",
+        "贝雷帽",
+        "貝雷帽",
+        "ベレー帽",
+        "Boina",
+        "Boina",
+        "Béret",
+        "Baskenmütze",
+        "Baret",
+        "बेरेट",
+        "قبعة البيريه"
+      ]
+    },
+    {
+      "Key": "화가 세트",
+      "Values": [
+        "화가 세트",
+        "Painter set",
+        "画家套装",
+        "畫家套裝",
+        "画家セット",
+        "Conjunto de pintor",
+        "Kit de pintor",
+        "Kit de peintre",
+        "Malerset",
+        "Set pelukis",
+        "चित्रकार सेट",
+        "طقم الرسام"
+      ]
+    },
+    {
+      "Key": "별빛 왕관",
+      "Values": [
+        "별빛 왕관",
+        "Starlight Crown",
+        "星光王冠",
+        "星光王冠",
+        "星の王冠",
+        "Corona estelar",
+        "Coroa estrelada",
+        "Couronne étoilée",
+        "Sternenkrone",
+        "Mahkota bintang",
+        "तारों का मुकुट",
+        "تاج النجوم"
+      ]
+    },
+    {
+      "Key": "마법사 모자",
+      "Values": [
+        "마법사 모자",
+        "Wizard Hat",
+        "巫师帽",
+        "巫師帽",
+        "魔法使いの帽子",
+        "Sombrero de mago",
+        "Chapéu de mago",
+        "Chapeau de sorcier",
+        "Zaubererhut",
+        "Topi penyihir",
+        "जादूगर की टोपी",
+        "قبعة الساحر"
+      ]
+    },
+    {
+      "Key": "민트 헤드폰",
+      "Values": [
+        "민트 헤드폰",
+        "Mint Headphones",
+        "薄荷绿耳机",
+        "薄荷綠耳機",
+        "ミント色ヘッドホン",
+        "Auriculares menta",
+        "Fones verde-menta",
+        "Casque vert menthe",
+        "Mint-Kopfhörer",
+        "Headphone hijau mint",
+        "मिंट रंग के हेडफ़ोन",
+        "سماعات بلون النعناع"
+      ]
+    },
+    {
+      "Key": "동그란 안경",
+      "Values": [
+        "동그란 안경",
+        "Round Glasses",
+        "圆框眼镜",
+        "圓框眼鏡",
+        "丸メガネ",
+        "Gafas redondas",
+        "Óculos redondos",
+        "Lunettes rondes",
+        "Runde Brille",
+        "Kacamata bulat",
+        "गोल चश्मा",
+        "نظارة مستديرة"
+      ]
+    },
+    {
+      "Key": "선글라스",
+      "Values": [
+        "선글라스",
+        "Sunglasses",
+        "墨镜",
+        "太陽眼鏡",
+        "サングラス",
+        "Gafas de sol",
+        "Óculos de sol",
+        "Lunettes de soleil",
+        "Sonnenbrille",
+        "Kacamata hitam",
+        "धूप का चश्मा",
+        "نظارة شمسية"
+      ]
+    },
+    {
+      "Key": "포근한 머플러",
+      "Values": [
+        "포근한 머플러",
+        "Cozy Scarf",
+        "暖绒围巾",
+        "暖絨圍巾",
+        "あったかマフラー",
+        "Bufanda cálida",
+        "Cachecol aconchegante",
+        "Écharpe douillette",
+        "Kuschelschal",
+        "Syal hangat",
+        "गर्म मफलर",
+        "وشاح دافئ"
+      ]
+    },
+    {
+      "Key": "리본 나비넥타이",
+      "Values": [
+        "리본 나비넥타이",
+        "Ribbon Bow Tie",
+        "蝴蝶领结",
+        "蝴蝶領結",
+        "リボンの蝶ネクタイ",
+        "Pajarita de cinta",
+        "Gravata-borboleta",
+        "Nœud papillon",
+        "Schleifenfliege",
+        "Dasi kupu-kupu",
+        "रिबन बो टाई",
+        "ربطة عنق فراشية"
+      ]
+    },
+    {
+      "Key": "별빛 망토",
+      "Values": [
+        "별빛 망토",
+        "Starlight Cape",
+        "星光披风",
+        "星光披風",
+        "星のマント",
+        "Capa estelar",
+        "Capa estrelada",
+        "Cape étoilée",
+        "Sternenumhang",
+        "Jubah bintang",
+        "तारों वाला लबादा",
+        "عباءة النجوم"
+      ]
+    },
+    {
+      "Key": "별 마법봉",
+      "Values": [
+        "별 마법봉",
+        "Star Wand",
+        "星星魔杖",
+        "星星魔杖",
+        "星のステッキ",
+        "Varita estelar",
+        "Varinha de estrela",
+        "Baguette étoilée",
+        "Sternenstab",
+        "Tongkat bintang",
+        "तारे वाली जादुई छड़ी",
+        "عصا النجمة"
+      ]
+    },
+    {
+      "Key": "물감 팔레트",
+      "Values": [
+        "물감 팔레트",
+        "Paint Palette",
+        "调色盘",
+        "調色盤",
+        "絵の具パレット",
+        "Paleta de pintura",
+        "Paleta de pintura",
+        "Palette de peinture",
+        "Farbpalette",
+        "Palet cat",
+        "रंग पैलेट",
+        "لوحة الألوان"
+      ]
+    },
+    {
+      "Key": "머리",
+      "Values": [
+        "머리",
+        "Head",
+        "头部",
+        "頭部",
+        "頭",
+        "Cabeza",
+        "Cabeça",
+        "Tête",
+        "Kopf",
+        "Kepala",
+        "सिर",
+        "الرأس"
+      ]
+    },
+    {
+      "Key": "얼굴",
+      "Values": [
+        "얼굴",
+        "Face",
+        "脸部",
+        "臉部",
+        "顔",
+        "Cara",
+        "Rosto",
+        "Visage",
+        "Gesicht",
+        "Wajah",
+        "चेहरा",
+        "الوجه"
+      ]
+    },
+    {
+      "Key": "목",
+      "Values": [
+        "목",
+        "Neck",
+        "颈部",
+        "頸部",
+        "首",
+        "Cuello",
+        "Pescoço",
+        "Cou",
+        "Hals",
+        "Leher",
+        "गर्दन",
+        "الرقبة"
+      ]
+    },
+    {
+      "Key": "등",
+      "Values": [
+        "등",
+        "Back",
+        "背部",
+        "背部",
+        "背中",
+        "Espalda",
+        "Costas",
+        "Dos",
+        "Rücken",
+        "Punggung",
+        "पीठ",
+        "الظهر"
+      ]
+    },
+    {
+      "Key": "손",
+      "Values": [
+        "손",
+        "Hand",
+        "手部",
+        "手部",
+        "手",
+        "Mano",
+        "Mão",
+        "Main",
+        "Hand",
+        "Tangan",
+        "हाथ",
+        "اليد"
+      ]
+    },
+    {
+      "Key": "전체",
+      "Values": [
+        "전체",
+        "All",
+        "全部",
+        "全部",
+        "すべて",
+        "Todos",
+        "Todos",
+        "Tout",
+        "Alle",
+        "Semua",
+        "सभी",
+        "الكل"
+      ]
+    },
+    {
+      "Key": "없음",
+      "Values": [
+        "없음",
+        "None",
+        "无",
+        "無",
+        "なし",
+        "Ninguno",
+        "Nenhum",
+        "Aucun",
+        "Keine",
+        "Tidak ada",
+        "कोई नहीं",
+        "لا شيء"
+      ]
+    },
+    {
+      "Key": "방 옵션",
+      "Values": [
+        "방 옵션",
+        "Room options",
+        "房间选项",
+        "房間選項",
+        "ルーム設定",
+        "Opciones de sala",
+        "Opções da sala",
+        "Options du salon",
+        "Raumoptionen",
+        "Opsi ruang",
+        "रूम के विकल्प",
+        "خيارات الغرفة"
+      ]
+    },
+    {
+      "Key": "방 옵션을 변경했습니다.",
+      "Values": [
+        "방 옵션을 변경했습니다.",
+        "Room options updated.",
+        "房间选项已更新。",
+        "房間選項已更新。",
+        "ルーム設定を変更しました。",
+        "Se han actualizado las opciones de la sala.",
+        "As opções da sala foram atualizadas.",
+        "Les options du salon ont été mises à jour.",
+        "Die Raumoptionen wurden aktualisiert.",
+        "Opsi ruang telah diperbarui.",
+        "रूम के विकल्प अपडेट कर दिए गए हैं।",
+        "تم تحديث خيارات الغرفة."
+      ]
+    },
+    {
+      "Key": "방 옵션 변경 권한이 없습니다.",
+      "Values": [
+        "방 옵션 변경 권한이 없습니다.",
+        "You don't have permission to change room options.",
+        "你没有权限更改房间选项。",
+        "你沒有權限更改房間選項。",
+        "ルーム設定を変更する権限がありません。",
+        "No tienes permiso para cambiar las opciones de la sala.",
+        "Você não tem permissão para alterar as opções da sala.",
+        "Vous n'avez pas l'autorisation de modifier les options du salon.",
+        "Du hast keine Berechtigung, die Raumoptionen zu ändern.",
+        "Anda tidak memiliki izin untuk mengubah opsi ruang.",
+        "आपको रूम के विकल्प बदलने की अनुमति नहीं है।",
+        "ليس لديك إذن لتغيير خيارات الغرفة."
+      ]
+    },
+    {
+      "Key": "방 옵션을 저장하지 못했습니다. 다시 시도하세요.",
+      "Values": [
+        "방 옵션을 저장하지 못했습니다. 다시 시도하세요.",
+        "Could not save room options. Please try again.",
+        "无法保存房间选项，请重试。",
+        "無法儲存房間選項，請再試一次。",
+        "ルーム設定を保存できませんでした。もう一度お試しください。",
+        "No se pudieron guardar las opciones de la sala. Inténtalo de nuevo.",
+        "Não foi possível salvar as opções da sala. Tente novamente.",
+        "Impossible d'enregistrer les options du salon. Réessayez.",
+        "Die Raumoptionen konnten nicht gespeichert werden. Bitte versuche es erneut.",
+        "Opsi ruang tidak dapat disimpan. Silakan coba lagi.",
+        "रूम के विकल्प सेव नहीं हो सके। कृपया फिर से कोशिश करें।",
+        "تعذر حفظ خيارات الغرفة. يرجى المحاولة مجددًا."
+      ]
+    },
+    {
+      "Key": "로비 채팅",
+      "Values": [
+        "로비 채팅",
+        "Lobby chat",
+        "大厅聊天",
+        "大廳聊天",
+        "ロビーチャット",
+        "Chat del vestíbulo",
+        "Chat do lobby",
+        "Chat du salon",
+        "Lobby-Chat",
+        "Obrolan lobi",
+        "लॉबी चैट",
+        "دردشة الردهة"
+      ]
+    },
+    {
+      "Key": "접속 {0}명",
+      "Values": [
+        "접속 {0}명",
+        "{0} online",
+        "{0}人在线",
+        "{0}人在線",
+        "接続中 {0}人",
+        "{0} en línea",
+        "{0} online",
+        "{0} en ligne",
+        "{0} online",
+        "{0} daring",
+        "ऑनलाइन {0}",
+        "المتصلون: {0}"
+      ]
+    },
+    {
+      "Key": "메시지를 입력하세요",
+      "Values": [
+        "메시지를 입력하세요",
+        "Type a message",
+        "请输入消息",
+        "請輸入訊息",
+        "メッセージを入力",
+        "Escribe un mensaje",
+        "Digite uma mensagem",
+        "Entrez un message",
+        "Nachricht eingeben",
+        "Ketik pesan",
+        "संदेश लिखें",
+        "اكتب رسالة"
+      ]
+    },
+    {
+      "Key": "첫 메시지를 보내보세요.",
+      "Values": [
+        "첫 메시지를 보내보세요.",
+        "Be the first to send a message.",
+        "发送第一条消息吧。",
+        "傳送第一則訊息吧。",
+        "最初のメッセージを送ってみましょう。",
+        "Envía el primer mensaje.",
+        "Envie a primeira mensagem.",
+        "Envoyez le premier message.",
+        "Sende die erste Nachricht.",
+        "Kirim pesan pertama.",
+        "पहला संदेश भेजें।",
+        "كن أول من يرسل رسالة."
+      ]
+    },
+    {
+      "Key": "채팅에 연결하고 있습니다…",
+      "Values": [
+        "채팅에 연결하고 있습니다…",
+        "Connecting to chat…",
+        "正在连接聊天…",
+        "正在連線至聊天…",
+        "チャットに接続中…",
+        "Conectando al chat…",
+        "Conectando ao chat…",
+        "Connexion au chat…",
+        "Verbindung zum Chat wird hergestellt…",
+        "Menghubungkan ke obrolan…",
+        "चैट से कनेक्ट हो रहा है…",
+        "جارٍ الاتصال بالدردشة…"
+      ]
+    },
+    {
+      "Key": "채팅 연결이 끊겼습니다. 다시 연결 중…",
+      "Values": [
+        "채팅 연결이 끊겼습니다. 다시 연결 중…",
+        "Chat disconnected. Reconnecting…",
+        "聊天已断开，正在重新连接…",
+        "聊天已斷線，正在重新連線…",
+        "チャットが切断されました。再接続中…",
+        "Se perdió la conexión al chat. Reconectando…",
+        "Conexão com o chat perdida. Reconectando…",
+        "Connexion au chat perdue. Reconnexion…",
+        "Chatverbindung getrennt. Verbindung wird wiederhergestellt…",
+        "Koneksi obrolan terputus. Menghubungkan kembali…",
+        "चैट का कनेक्शन टूट गया है। फिर से कनेक्ट हो रहा है…",
+        "انقطع اتصال الدردشة. جارٍ إعادة الاتصال…"
+      ]
+    },
+    {
+      "Key": "채팅은 1~200자로 입력하세요.",
+      "Values": [
+        "채팅은 1~200자로 입력하세요.",
+        "Messages must be 1–200 characters.",
+        "消息长度须为1到200个字符。",
+        "訊息長度須為1到200個字元。",
+        "メッセージは1～200文字で入力してください。",
+        "Los mensajes deben tener entre 1 y 200 caracteres.",
+        "As mensagens devem ter entre 1 e 200 caracteres.",
+        "Les messages doivent contenir de 1 à 200 caractères.",
+        "Nachrichten müssen 1–200 Zeichen lang sein.",
+        "Pesan harus berisi 1–200 karakter.",
+        "संदेश 1 से 200 वर्णों का होना चाहिए।",
+        "يجب أن تكون الرسائل بين 1 و200 حرف."
+      ]
+    },
+    {
+      "Key": "메시지를 너무 빠르게 보내고 있습니다.",
+      "Values": [
+        "메시지를 너무 빠르게 보내고 있습니다.",
+        "You're sending messages too quickly.",
+        "你发送消息的速度太快了。",
+        "你傳送訊息的速度太快了。",
+        "メッセージの送信が速すぎます。",
+        "Estás enviando mensajes demasiado rápido.",
+        "Você está enviando mensagens rápido demais.",
+        "Vous envoyez des messages trop vite.",
+        "Du sendest Nachrichten zu schnell.",
+        "Anda mengirim pesan terlalu cepat.",
+        "आप बहुत तेज़ी से संदेश भेज रहे हैं।",
+        "أنت ترسل الرسائل بسرعة كبيرة."
+      ]
+    },
+    {
+      "Key": "채팅을 보내지 못했습니다. 다시 시도하세요.",
+      "Values": [
+        "채팅을 보내지 못했습니다. 다시 시도하세요.",
+        "Could not send your message. Please try again.",
+        "无法发送消息，请重试。",
+        "無法傳送訊息，請再試一次。",
+        "メッセージを送信できませんでした。もう一度お試しください。",
+        "No se pudo enviar el mensaje. Inténtalo de nuevo.",
+        "Não foi possível enviar a mensagem. Tente novamente.",
+        "Impossible d'envoyer le message. Réessayez.",
+        "Die Nachricht konnte nicht gesendet werden. Bitte versuche es erneut.",
+        "Pesan tidak dapat dikirim. Silakan coba lagi.",
+        "संदेश भेजा नहीं जा सका। कृपया फिर से कोशिश करें।",
+        "تعذر إرسال الرسالة. يرجى المحاولة مجددًا."
+      ]
+    },
+    {
+      "Key": "채팅에 연결된 뒤 다시 시도하세요.",
+      "Values": [
+        "채팅에 연결된 뒤 다시 시도하세요.",
+        "Please try again after chat connects.",
+        "请等待聊天连接后重试。",
+        "請等待聊天連線後再試一次。",
+        "チャット接続後にもう一度お試しください。",
+        "Inténtalo de nuevo cuando el chat se conecte.",
+        "Tente novamente após a conexão com o chat.",
+        "Attendez la connexion au chat, puis réessayez.",
+        "Bitte versuche es erneut, sobald der Chat verbunden ist.",
+        "Silakan coba lagi setelah obrolan terhubung.",
+        "चैट कनेक्ट होने के बाद फिर से कोशिश करें।",
+        "يرجى المحاولة مجددًا بعد اتصال الدردشة."
+      ]
+    }
+  ]
+}

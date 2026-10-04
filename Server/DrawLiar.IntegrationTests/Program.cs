@@ -21,13 +21,30 @@ internal static partial class Integration
     public static async Task RunAsync(string[] args)
     {
         DrawLiar.Editor.GameSelfCheck.Run();
+        VerifyAvatarPartRules();
         await VerifyRoomPolicyAsync();
         VerifyGuestCredentialRules();
+        if (args.Contains("--lobby-chat-only"))
+        {
+            await VerifyLobbyChatAsync();
+            return;
+        }
+        if (args.Contains("--lobby-chat-database-only"))
+        {
+            await VerifyLobbyChatDatabaseAsync();
+            return;
+        }
+        if (args.Contains("--avatar-database-only"))
+        {
+            await VerifyAvatarDatabaseAsync();
+            return;
+        }
         if (args.Contains("--guest-database-only"))
         {
             await VerifyGuestDatabaseAsync();
             return;
         }
+        await VerifyLobbyChatAsync();
         if (args.Contains("--rules-only")) return;
         string mainUrl = args.Length > 0 ? args[0] : "http://127.0.0.1:19050";
         string adminUrl = args.Length > 1 ? args[1] : "http://127.0.0.1:19080";

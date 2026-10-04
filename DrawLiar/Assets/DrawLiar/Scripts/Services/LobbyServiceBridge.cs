@@ -24,15 +24,20 @@ namespace DrawLiar
     public sealed class LobbyServiceBridge : MonoBehaviour
     {
         private readonly List<PublicRoomInfo> _publicRooms = new List<PublicRoomInfo>();
+        private readonly DrawLobbyChatClient _lobbyChat = new DrawLobbyChatClient();
         private DrawNetworkManager _manager;
         private OnlineServicesConfig _config;
         private string _mainSession = "", _gameSession = "", _gameServerUrl = "", _roomCode = "";
         private CancellationToken _lifetime;
         private CancellationTokenSource _googleCancellation;
+        private string _statusSource = "";
+        private object[] _statusArguments = Array.Empty<object>();
+        private bool _lobbyChatPaused;
+        private bool _loggingOut;
 
         public string RoomCode => _roomCode;
         public bool IsGoogleSigningIn => _googleCancellation != null;
-        public string Status { get; private set; } = "게스트 또는 Google 계정으로 시작하세요.";
+        public string Status => DrawLocalization.Format(_statusSource, _statusArguments);
         public bool IsBusy { get; private set; }
         public bool IsOnlineRoom => _manager != null && _manager.IsConnected;
         public bool IsAuthenticated => !string.IsNullOrEmpty(_gameSession);
@@ -40,8 +45,15 @@ namespace DrawLiar
         public FriendListResponse Friends { get; private set; } = new FriendListResponse();
         public ShopResponse Shop { get; private set; } = new ShopResponse();
         public IReadOnlyList<PublicRoomInfo> PublicRooms => _publicRooms;
+        public IReadOnlyList<LobbyChatMessage> LobbyMessages => _lobbyChat.Messages;
+        public bool IsLobbyChatConnected => _lobbyChat.IsConnected;
+        public bool IsLobbyChatSending => _lobbyChat.IsSending;
+        public int LobbyMemberCount => _lobbyChat.MemberCount;
+        public string LobbyChatStatus => _lobbyChat.Status;
         public event Action Changed;
         public event Action ProfileChanged;
+        public event Action LobbyChatChanged;
+        public event Action<string> LobbyChatNotice;
 
         public void Initialize(DrawNetworkManager manager)
         {
@@ -54,12 +66,38 @@ namespace DrawLiar
             if (index >= 0 && index + 1 < arguments.Length) _config.SetDevelopmentServer(arguments[index + 1]);
 #endif
             _manager.StateChanged += OnRoomState;
+            _lobbyChat.Changed += OnLobbyChatChanged;
+            _lobbyChat.Notice += OnLobbyChatNotice;
         }
 
         private void OnRoomState(RoomSnapshot state)
         {
             if (state == null) _roomCode = "";
+            if (IsOnlineRoom) StopLobbyChat(); else StartLobbyChat();
             Changed?.Invoke();
+        }
+
+        private void StartLobbyChat()
+        {
+            if (!_lobbyChatPaused && !_loggingOut && IsAuthenticated && !IsOnlineRoom)
+                _lobbyChat.Start(_gameServerUrl, _gameSession, _config, _lifetime);
+        }
+
+        private void StopLobbyChat(bool clearHistory = false) => _lobbyChat.Stop(clearHistory);
+        private void OnLobbyChatChanged() => LobbyChatChanged?.Invoke();
+        private void OnLobbyChatNotice(string message) => LobbyChatNotice?.Invoke(message);
+        private void Update() => _lobbyChat.Drain();
+        private void OnApplicationPause(bool paused)
+        {
+            _lobbyChatPaused = paused;
+            if (paused) StopLobbyChat(); else StartLobbyChat();
+        }
+
+        public Task SendLobbyChatAsync(string text)
+        {
+            RequireLogin();
+            if (IsOnlineRoom) throw new InvalidOperationException(DrawLocalization.Text("채팅에 연결된 뒤 다시 시도하세요."));
+            return _lobbyChat.SendAsync(text);
         }
 
         public Task GuestLoginAsync() => RunAsync(async () =>
@@ -86,10 +124,12 @@ namespace DrawLiar
                 new EnterGameRequest { AssignmentToken = login.AssignmentToken });
             if (string.IsNullOrEmpty(session.SessionToken) || session.Profile == null || session.Profile.AccountId != login.AccountId)
                 throw new InvalidOperationException("서버 로그인 응답을 확인할 수 없습니다.");
+            StopLobbyChat(true);
             _mainSession = login.SessionToken;
             _gameServerUrl = login.GameServerUrl.TrimEnd('/');
             _gameSession = session.SessionToken;
             SetProfile(session.Profile);
+            StartLobbyChat();
             SetStatus("로그인했습니다. 방을 만들거나 참가하세요.");
         }
 
@@ -197,7 +237,7 @@ namespace DrawLiar
             SetStatus("게임 서버에 연결하고 있습니다…");
             await _manager.ConnectAsync(assignment);
             _roomCode = string.IsNullOrEmpty(assignment.RoomCode) ? assignment.RoomId : assignment.RoomCode;
-            SetStatus("방에 연결했습니다. 방 코드: " + _roomCode);
+            SetStatus("방에 연결했습니다. 방 코드: {0}", _roomCode);
         }
 
         public Task RefreshAsync() => SearchRoomsAsync("");
@@ -209,7 +249,8 @@ namespace DrawLiar
             foreach (var room in response.Rooms)
                 _publicRooms.Add(new PublicRoomInfo { Id = room.RoomId, Code = room.RoomCode, Name = room.Name, Players = room.PlayerCount,
                     MaxPlayers = room.Settings.MaxPlayers, Spectators = room.SpectatorCount, IsInProgress = room.IsInProgress });
-            SetStatus(_publicRooms.Count == 0 ? "공개 방이 없습니다." : $"공개 방 {_publicRooms.Count}개를 찾았습니다.");
+            if (_publicRooms.Count == 0) SetStatus("공개 방이 없습니다.");
+            else SetStatus("공개 방 {0}개를 찾았습니다.", _publicRooms.Count);
         });
 
         public Task LeaveAsync() => RunAsync(async () =>
@@ -219,15 +260,19 @@ namespace DrawLiar
 
         public Task LogoutAsync() => RunAsync(async () =>
         {
-            await _manager.LeaveAsync();
+            _loggingOut = true;
+            StopLobbyChat(true);
             try
             {
+                await _manager.LeaveAsync();
                 if (!string.IsNullOrEmpty(_gameSession)) await SendGameAsync<ApiError>("/api/session/logout", "POST");
                 if (!string.IsNullOrEmpty(_mainSession)) await SendAsync<ApiError>(_config.MainServerUrl, "/api/session/logout", "POST", null, _mainSession);
             }
             finally
             {
                 _mainSession = _gameSession = _gameServerUrl = _roomCode = "";
+                StopLobbyChat(true);
+                _loggingOut = false;
                 Profile = null; Friends = new FriendListResponse(); Shop = new ShopResponse(); _publicRooms.Clear();
                 ProfileChanged?.Invoke(); SetStatus("로그아웃했습니다.");
             }
@@ -250,7 +295,12 @@ namespace DrawLiar
             Profile = profile;
             ProfileChanged?.Invoke();
         }
-        private void SetStatus(string status) { Status = status; Changed?.Invoke(); }
+        private void SetStatus(string source, params object[] args)
+        {
+            _statusSource = source;
+            _statusArguments = args;
+            Changed?.Invoke();
+        }
 
         private async Task RunAsync(Func<Task> operation)
         {
@@ -328,7 +378,7 @@ namespace DrawLiar
                 case "GoogleUnavailable": return "서버의 Google 로그인 설정을 확인해야 합니다.";
                 case "InvalidGoogleCredential": return "Google 인증에 실패했습니다. 다시 로그인해 주세요.";
                 case "GoogleAlreadyLinked": return "이미 연동한 Google 계정입니다.";
-                case "InvalidDisplayName": return "닉네임은 2~16자의 글자, 숫자, 밑줄로 입력하세요.";
+                case "InvalidDisplayName": return "닉네임은 2~16자의 글자, 숫자, 공백, 밑줄로 입력하세요.";
                 case "GameServerUnavailable": return "로비 서버가 준비 중입니다. 잠시 후 다시 시도하세요.";
                 case "DedicatedUnavailable": return "게임 서버가 준비 중입니다. 잠시 후 다시 시도하세요.";
                 case "InvalidTopics": return "주제 이름과 제시어를 확인하세요.";
@@ -342,13 +392,16 @@ namespace DrawLiar
             }
             if (status == 401) return "로그인이 만료되었습니다. 다시 로그인해 주세요.";
             if (status == 429) return "요청이 많습니다. 잠시 후 다시 시도하세요.";
-            return status == 0 ? "서버에 연결하지 못했습니다. 인터넷 연결을 확인하세요." : "요청을 처리하지 못했습니다: " + code;
+            return status == 0 ? "서버에 연결하지 못했습니다. 인터넷 연결을 확인하세요." : "요청을 처리하지 못했습니다. 다시 시도하세요.";
         }
 
         private void OnDestroy()
         {
             _googleCancellation?.Cancel();
             if (_manager != null) _manager.StateChanged -= OnRoomState;
+            _lobbyChat.Changed -= OnLobbyChatChanged;
+            _lobbyChat.Notice -= OnLobbyChatNotice;
+            _lobbyChat.Dispose();
         }
     }
 }

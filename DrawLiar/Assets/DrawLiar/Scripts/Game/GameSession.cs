@@ -68,7 +68,7 @@ namespace DrawLiar
             players[id] = new Participant
             {
                 Id = id, Name = GameRules.CleanText(name, 16, "그림친구"),
-                Color = Math.Max(0, Math.Min(7, color)), Accessory = Math.Max(0, Math.Min(3, accessory)),
+                Color = Math.Max(0, Math.Min(7, color)), Accessory = AvatarParts.Sanitize(accessory),
                 Spectator = spectator, SpectatorOnly = spectatorOnly
             };
             Changed?.Invoke();
@@ -82,7 +82,7 @@ namespace DrawLiar
             {
                 player.Name = GameRules.CleanText(name, 16, "그림친구");
                 player.Color = Math.Max(0, Math.Min(7, color));
-                player.Accessory = Math.Max(0, Math.Min(3, accessory));
+                player.Accessory = AvatarParts.Sanitize(accessory);
             }
             Changed?.Invoke();
         }
@@ -114,7 +114,9 @@ namespace DrawLiar
             if (Phase != GamePhase.Lobby && Phase != GamePhase.MatchResults) return false;
             var valid = settings.Copy();
             valid.Validate();
-            valid.Topics ??= (data?.Topics ?? Array.Empty<TopicData>()).Where(IsValidTopic).Select(entry => entry.Name).ToArray();
+            var knownTopics = KnownTopicNames();
+            valid.Topics ??= knownTopics.Take(128).ToArray();
+            if (valid.Topics.Length == 0 || valid.Topics.Any(value => !knownTopics.Contains(value))) return false;
             Settings = valid;
             Changed?.Invoke();
             return true;
@@ -229,7 +231,7 @@ namespace DrawLiar
                 LocalIsLiar = !spectator && local.Liar, LocalIsSpectator = spectator,
                 LocalPlayerId = id, IsHost = id == hostId, CanStart = CanStart, CanvasVersion = CanvasVersion,
                 RemainingSeconds = Phase == GamePhase.Lobby || Phase == GamePhase.MatchResults ? 0 : (float)Math.Max(0, deadline - now),
-                Settings = Settings.Copy(), Winners = winners.ToArray(), Summary = summary,
+                Settings = Settings.Copy(), AvailableTopics = KnownTopicNames(), Winners = winners.ToArray(), Summary = summary,
                 Players = players.Values.OrderBy(player => player.Id).Select(player => new PlayerView
                 {
                     Id = player.Id, Name = player.Name, Score = player.Score, RoundPoints = result ? player.RoundPoints : 0,
@@ -254,6 +256,9 @@ namespace DrawLiar
         private bool IsActive(int id) => players.TryGetValue(id, out var player) && player.Connected && !player.Spectator;
         private static bool IsValidTopic(TopicData entry) => entry != null && !string.IsNullOrWhiteSpace(entry.Name)
             && entry.Words != null && entry.Words.Any(value => !string.IsNullOrWhiteSpace(value));
+
+        private string[] KnownTopicNames() => (data?.Topics ?? Array.Empty<TopicData>()).Where(IsValidTopic)
+            .Select(entry => entry.Name).Distinct().ToArray();
 
         private IEnumerable<TopicData> AvailableTopics() => (data?.Topics ?? Array.Empty<TopicData>())
             .Where(entry => IsValidTopic(entry) && (Settings.Topics == null || Settings.Topics.Contains(entry.Name)));

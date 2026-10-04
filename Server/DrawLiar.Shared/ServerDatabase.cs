@@ -113,7 +113,8 @@ public sealed partial class ServerDatabase : IDisposable
         return await AuthenticateHash(connection, null, ServerRuntime.Hash(token), scope);
     }
 
-    private static async Task<ServerSession> AuthenticateHash(NpgsqlConnection connection, NpgsqlTransaction? transaction, string hash, string scope)
+    private static async Task<ServerSession> AuthenticateHash(NpgsqlConnection connection, NpgsqlTransaction? transaction, string hash, string scope,
+        CancellationToken cancellationToken = default)
     {
         const string sql = """
             SELECT s."AccountId",s."Scope",s."ExpiresAt" FROM "Session" s JOIN "Account" a ON a."Id"=s."AccountId"
@@ -123,9 +124,18 @@ public sealed partial class ServerDatabase : IDisposable
               SELECT 1 FROM parents WHERE "ExpiresAt"<=now())
             """;
         await using var command = Command(connection, transaction, sql, hash, scope);
-        await using var reader = await command.ExecuteReaderAsync();
-        if (!await reader.ReadAsync()) throw new ApiException("Unauthorized", 401);
+        await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+        if (!await reader.ReadAsync(cancellationToken)) throw new ApiException("Unauthorized", 401);
         return new ServerSession(reader.GetGuid(0), hash, reader.GetString(1), reader.GetFieldValue<DateTimeOffset>(2));
+    }
+
+    public async Task<(ServerSession Session, string DisplayName)> AuthenticateLobbyAsync(string token, string scope, CancellationToken cancellationToken)
+    {
+        await using var connection = await _source.OpenConnectionAsync(cancellationToken);
+        var session = await AuthenticateHash(connection, null, ServerRuntime.Hash(token), scope, cancellationToken);
+        await using var command = Command(connection, null, "SELECT \"DisplayName\" FROM \"Account\" WHERE \"Id\"=$1 AND NOT \"IsBanned\"", session.AccountId);
+        string name = await command.ExecuteScalarAsync(cancellationToken) as string ?? throw new ApiException("Unauthorized", 401);
+        return (session, name);
     }
 
     public async Task LogoutAsync(ServerSession session)
@@ -170,7 +180,7 @@ public sealed partial class ServerDatabase : IDisposable
     public async Task<ProfileData> UpdateProfileAsync(Guid id, UpdateProfileRequest request)
     {
         string name = ServerRuntime.DisplayName(request.DisplayName);
-        if (request.AvatarColor < 0 || request.AvatarColor > 5 || request.Accessory < 0 || request.Accessory > 3) throw new ApiException("InvalidAvatar");
+        if (request.AvatarColor < 0 || request.AvatarColor > 5 || !AvatarParts.IsValid(request.Accessory)) throw new ApiException("InvalidAvatar");
         await using var connection = await _source.OpenConnectionAsync();
         await using var transaction = await connection.BeginTransactionAsync();
         if (request.Accessory != 0)

@@ -31,7 +31,7 @@ public sealed partial class ServerDatabase
             accountId = Guid.NewGuid();
             await using var create = Command(connection, transaction,
                 "INSERT INTO \"Account\" (\"Id\",\"DisplayName\",\"GuestId\",\"GuestSecretHash\") VALUES ($1,$2,$3,$4)",
-                accountId, "화가_" + accountId.ToString("N")[..8], guestId, GuestCredential.Hash(request.GuestSecret));
+                accountId, GuestNicknameGenerator.Create(), guestId, GuestCredential.Hash(request.GuestSecret));
             await create.ExecuteNonQueryAsync(cancellationToken);
         }
         else

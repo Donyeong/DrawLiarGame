@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UIElements;
+using L = DrawLiar.DrawLocalization;
 
 namespace DrawLiar
 {
@@ -25,7 +27,7 @@ namespace DrawLiar
         private string lastServiceStatus="";
         private string nickname;
         private int avatarColor, accessory;
-        private enum LobbyScreen { Login, Main, Join, JoinCode, Browse, CreateMode, CreateRules, CreateDetails, Time, TopicSelection, Topics, Options, Customize, Account, Friends, Shop }
+        private enum LobbyScreen { Login, Main, JoinCode, CreateRoom, Topics, Options, Customize, Account, Friends, Shop }
         private LobbyScreen lobbyScreen = LobbyScreen.Login;
         private bool inRoom;
         private bool runningAction;
@@ -36,8 +38,14 @@ namespace DrawLiar
         private readonly Dictionary<int,Label> playerStatuses=new Dictionary<int,Label>();
         private readonly List<DrawStroke> pendingStrokes=new List<DrawStroke>();
         private RoomSettings draft=new RoomSettings();
-        private ScrollView friendList, shopList;
-        private string _shopPreviewProductId="";
+        private ScrollView _createRoomScroll;
+        private Vector2 _createRoomScrollOffset;
+        private bool _createRulesExpanded, _createTimeExpanded, _createTopicsExpanded;
+        private VisualElement friendList;
+        private VisualElement shopList;
+        private readonly Dictionary<AvatarPartSlot,int> _shopPreviewParts=new Dictionary<AvatarPartSlot,int>();
+        private int _shopPartFilter=-1;
+        private AvatarPartSlot _customizePartSlot=AvatarPartSlot.Head;
         private Label _shopPreviewStatus;
         private Button _shopPreviewReset;
         private MobileUILayout _mobileLayout;
@@ -50,8 +58,55 @@ namespace DrawLiar
         private int _chatTransitionVersion;
         private bool _backgroundRoomRefresh = true, _roomRefreshRunning;
         private string _roomSearch = "";
+        private string _roomSearchDraft = "";
+        private TextField _roomSearchField;
+        private bool _roomSearchPending;
         private float _nextRoomRefresh;
+        private VisualElement _roomOptionsEditor;
+        private RoomSettings _roomOptionsDraft;
+        private bool _roomOptionsSaving;
+        private VisualElement _lobbyChatPanel;
+        private ScrollView _lobbyChatHistory;
+        private TextField _lobbyChatInput;
+        private Button _lobbyChatSend, _mobileLobbyChatButton;
+        private Label _lobbyChatStatus, _lobbyChatCount;
+        private LobbyScreen? _utilityPopupScreen;
+        private VisualElement _popupReturnFocus;
+        private string _lobbyChatDraft="";
+        private int _lobbyChatDraftVersion;
+#if ENABLE_INPUT_SYSTEM
+        private UnityEngine.InputSystem.Keyboard _lobbyChatKeyboard;
+        private bool _lobbyChatComposing;
+        private int _lobbyChatCompositionFrame=-1;
+#endif
+        private readonly Dictionary<long,VisualElement> _lobbyChatLines=new Dictionary<long,VisualElement>();
         private bool IsMobile => _mobileLayout != null && _mobileLayout.IsMobile;
+        private sealed class LocalizedValue
+        {
+            public string Source;
+            public object[] Arguments;
+            public string Resolve()=>Arguments.Length==0?L.Text(Source):L.Format(Source,Arguments);
+            public bool Matches(string source,object[] args)=>Source==source&&Arguments.SequenceEqual(args);
+        }
+        private static readonly ConditionalWeakTable<TextElement,LocalizedValue> LOCALIZED_TEXT = new ConditionalWeakTable<TextElement,LocalizedValue>();
+        private static readonly ConditionalWeakTable<VisualElement,LocalizedValue> LOCALIZED_TOOLTIPS = new ConditionalWeakTable<VisualElement,LocalizedValue>();
+        private static readonly ConditionalWeakTable<TextField,LocalizedValue> LOCALIZED_PLACEHOLDERS = new ConditionalWeakTable<TextField,LocalizedValue>();
+        private static readonly ConditionalWeakTable<DropdownField,string[]> LOCALIZED_CHOICES = new ConditionalWeakTable<DropdownField,string[]>();
+
+        private void OnEnable()
+        {
+            L.LanguageChanged+=OnLanguageChanged;
+#if ENABLE_INPUT_SYSTEM
+            if(_lobbyChatPanel!=null)AttachLobbyChatKeyboard();
+#endif
+        }
+        private void OnDisable()
+        {
+            L.LanguageChanged-=OnLanguageChanged;
+#if ENABLE_INPUT_SYSTEM
+            DetachLobbyChatKeyboard();
+#endif
+        }
 
         private void Start()
         {
@@ -61,7 +116,7 @@ namespace DrawLiar
             draft.Topics=GameDataStore.Load().Topics.Select(t=>t.Name).ToArray();
             nickname=PlayerPrefs.GetString("DrawLiar.Name","동글이"+UnityEngine.Random.Range(10,99));
             avatarColor=Mathf.Clamp(PlayerPrefs.GetInt("DrawLiar.Color",0),0,AvatarElement.Colors.Length-1);
-            accessory=Mathf.Clamp(PlayerPrefs.GetInt("DrawLiar.Equipment",(int)AvatarAccessory.Painter),0,(int)AvatarAccessory.Painter);
+            accessory=AvatarParts.Sanitize(PlayerPrefs.GetInt("DrawLiar.Equipment",(int)AvatarAccessory.Painter));
             var panel=panelSettings=ScriptableObject.CreateInstance<PanelSettings>();
             panel.themeStyleSheet=Resources.Load<ThemeStyleSheet>("DrawLiar/DrawLiarTheme");
             panel.scaleMode=PanelScaleMode.ScaleWithScreenSize;panel.referenceResolution=new Vector2Int(1600,1000);
@@ -70,6 +125,7 @@ namespace DrawLiar
             root=document.rootVisualElement;root.AddToClassList("app");
             root.styleSheets.Add(Resources.Load<StyleSheet>("DrawLiar/DrawLiar"));
             root.styleSheets.Add(Resources.Load<StyleSheet>("DrawLiar/DrawLiarMobile"));
+            DrawLocalizedTypography.Apply(root);root.EnableInClassList("rtl",L.IsRightToLeft);
             _mobileLayout=new MobileUILayout(root,panelSettings);
             _mobileLayout.LayoutChanged+=OnMobileLayoutChanged;
             reducedMotion=PlayerPrefs.GetInt("DrawLiar.ReduceMotion",0)==1;
@@ -87,6 +143,8 @@ namespace DrawLiar
             network.ChatReceived+=OnChat;
             lobby.Changed+=RefreshServiceStatus;
             lobby.ProfileChanged+=OnProfileChanged;
+            lobby.LobbyChatChanged+=RefreshLobbyChat;
+            lobby.LobbyChatNotice+=Toast;
             content=Box(root,"grow app-content");Home();
             root.schedule.Execute(Tick).Every(100);
             root.schedule.Execute(RefreshRoomsInBackground).Every(1000);
@@ -116,43 +174,45 @@ namespace DrawLiar
 
         private void Home()
         {
-            inRoom=false;surface=null;publicRoomList=null;friendList=null;shopList=null;avatarStage=null;serviceNotice=null;_shopPreviewStatus=null;_shopPreviewReset=null;chatHistory=null;chatInput=null;content.Clear();playerCards.Clear();playerStatuses.Clear();previousPhase=(GamePhase)(-1);
+            if(_createRoomScroll!=null)
+            {
+                root.focusController?.focusedElement?.Blur();_createRoomScrollOffset=_createRoomScroll.scrollOffset;_createRoomScroll=null;
+            }
+            CloseModal();
+            SyncProfile();
+            ResetLobbyChatView();_mobileLobbyChatButton=null;
+            inRoom=false;surface=null;publicRoomList=null;_roomSearchField=null;friendList=null;shopList=null;avatarStage=null;serviceNotice=null;_shopPreviewStatus=null;_shopPreviewReset=null;chatHistory=null;chatInput=null;content.Clear();playerCards.Clear();playerStatuses.Clear();previousPhase=(GamePhase)(-1);
             if(!lobby.IsAuthenticated)lobbyScreen=LobbyScreen.Login;
-            if(lobbyScreen!=LobbyScreen.Shop)_shopPreviewProductId="";
+            if(!lobby.IsAuthenticated)_lobbyChatDraft="";
+            if(lobbyScreen!=LobbyScreen.Shop)_shopPreviewParts.Clear();
+            if(lobbyScreen==LobbyScreen.Main)_nextRoomRefresh=0;
             root.RemoveFromClassList("in-game");content.RemoveFromClassList("room-layout");root.AddToClassList("at-home");
             if(!IsMobile)panelSettings.referenceResolution=new Vector2Int(1600,1000);
             _mobileLayout.Refresh();
+            if(lobbyScreen==LobbyScreen.CreateRoom){CreateRoomPage();HideMobileScrollers();return;}
+            if(lobbyScreen==LobbyScreen.Shop){ShopPage();HideMobileScrollers();return;}
             if(IsMobile){MobileHome();HideMobileScrollers();return;}
+            if(lobbyScreen==LobbyScreen.Main){MainLobby(content);return;}
             var home=Box(content,"home");
             var layout=Box(home,"home-layout");var character=Box(layout,"character-side");
-            BrandLogo(character,"game-logo");
-            avatarStage=Box(character,"character-stage");UpdateLobbyAvatar(avatarColor,accessory);
-            Text(character,nickname,"character-name");
-            var customize=Button(character,"커스터마이징",()=>Navigate(LobbyScreen.Customize),"customize-button");
-            customize.SetEnabled(lobby.IsAuthenticated);
-            if(lobbyScreen==LobbyScreen.Customize)customize.style.visibility=UnityEngine.UIElements.Visibility.Hidden;
-            var panel=Box(layout,"home-panel");
-            serviceNotice=null;
-            if(lobbyScreen==LobbyScreen.Main)
+            if(lobbyScreen==LobbyScreen.Login)
             {
-                panel.AddToClassList("main-menu");
-                Button(panel,"방 만들기",()=>Navigate(LobbyScreen.CreateMode),"menu-button menu-orange");
-                Button(panel,"참가하기",()=>Navigate(LobbyScreen.Join),"menu-button menu-mint");
-                Button(panel,"옵션",()=>Navigate(LobbyScreen.Options),"menu-button menu-purple");
-                var services=Box(panel,"row");
-                Button(services,"친구",()=>{Navigate(LobbyScreen.Friends);Run(lobby.RefreshFriendsAsync);},"secondary grow");
-                Button(services,"상점",()=>{Navigate(LobbyScreen.Shop);Run(lobby.RefreshShopAsync);},"secondary grow");
-                Button(panel,"내 계정",()=>Navigate(LobbyScreen.Account),"secondary");
-                Text(panel,"친구 3–8명과 함께하는 그림 추리","menu-caption");
+                BrandLogo(character,"game-logo");
             }
             else
             {
-                var top=Box(panel,"screen-heading");
-                if(lobbyScreen!=LobbyScreen.Login)Button(top,"← 뒤로",Back,"back-button",DrawSound.UiCancel);
-                var body=Box(panel,"screen-body");
-                BuildLobbyScreen(body);
-                serviceNotice=Text(body,lobby.Status,"notice");
+                avatarStage=Box(character,"character-stage");UpdateLobbyAvatar(avatarColor,accessory);
+                RawText(character,nickname,"character-name");
+                var customize=Button(character,"꾸미기",()=>Navigate(LobbyScreen.Customize),"customize-button");
+                if(lobbyScreen==LobbyScreen.Customize)customize.style.visibility=UnityEngine.UIElements.Visibility.Hidden;
             }
+            var panel=Box(layout,"home-panel");
+            serviceNotice=null;
+            var top=Box(panel,"screen-heading");
+            if(lobbyScreen!=LobbyScreen.Login)Button(top,"← 뒤로",Back,"back-button",DrawSound.UiCancel);
+            var body=Box(panel,"screen-body");
+            BuildLobbyScreen(body);
+            if(lobbyScreen==LobbyScreen.Login)CreateServiceNotice(body);
             Enter(panel,260,14);
         }
 
@@ -161,100 +221,262 @@ namespace DrawLiar
                 switch(lobbyScreen)
                 {
                     case LobbyScreen.Login:Text(body,"시작하기","screen-title");LoginForm(body);break;
-                    case LobbyScreen.Join:
-                        Text(body,"참가하기","screen-title");
-                        Button(body,"코드로 참가",()=>Navigate(LobbyScreen.JoinCode),"menu-button menu-orange");
-                        Button(body,"공개방 둘러보기",EnterBrowse,"menu-button menu-mint");break;
                     case LobbyScreen.JoinCode:Text(body,"코드로 참가","screen-title");JoinForm(body);break;
-                    case LobbyScreen.Browse:Text(body,"공개방 둘러보기","screen-title");BrowseForm(body);break;
-                    case LobbyScreen.CreateMode:CreateMode(body);break;
-                    case LobbyScreen.CreateRules:CreateRules(body);break;
-                    case LobbyScreen.CreateDetails:CreateDetails(body);break;
-                    case LobbyScreen.Time:Text(body,"시간 설정","screen-title");TimeForm(body);break;
-                    case LobbyScreen.TopicSelection:Text(body,"주제 선택","screen-title");TopicSelectionForm(body);break;
                     case LobbyScreen.Topics:Text(body,"나만의 주제","screen-title");TopicsForm(body);break;
-                    case LobbyScreen.Options:Text(body,"옵션","screen-title");OptionsForm(body);break;
                     case LobbyScreen.Customize:Text(body,"커스터마이징","screen-title");ProfileForm(body);break;
-                    case LobbyScreen.Account:Text(body,"내 계정","screen-title");AccountForm(body);break;
-                    case LobbyScreen.Friends:Text(body,"친구","screen-title");FriendsForm(body);break;
-                    case LobbyScreen.Shop:Text(body,"상점","screen-title");ShopForm(body);break;
                 }
         }
 
         private void MobileHome()
         {
             bool signingIn=lobbyScreen==LobbyScreen.Login;
-            if(!signingIn)MobileTopbar();
-            if(lobbyScreen==LobbyScreen.Shop||lobbyScreen==LobbyScreen.Customize)MobileProfilePreview();
-            var scroll=new ScrollView(ScrollViewMode.Vertical);scroll.AddToClassList("mobile-home-scroll");content.Add(scroll);
-            var home=Box(scroll,"mobile-home");
             if(signingIn)
             {
-                BrandLogo(home,"mobile-logo mobile-login-logo");
-                var welcome=Box(home,"mobile-welcome row");
-                var mascot=new AvatarElement(avatarColor,accessory);mascot.AddToClassList("mobile-welcome-mascot");welcome.Add(mascot);
-                var copy=Box(welcome,"grow");Text(copy,"그림으로 속여볼까요?","mobile-welcome-title");Text(copy,"가입 없이 바로 한 판 시작해요","muted mobile-small");
-                var card=Box(home,"home-panel mobile-card");BuildLobbyScreen(card);serviceNotice=Text(card,lobby.Status,"notice");
+                var screen=Box(content,"mobile-login-screen");var visual=Box(screen,"mobile-login-visual");
+                BrandLogo(visual,"mobile-login-logo");
+                var actions=Box(screen,"mobile-login-actions");LoginForm(actions);LanguageSelector(actions);CreateServiceNotice(actions);
+                DrawUIMotion.Stagger(screen,28,220,8);return;
             }
-            else if(lobbyScreen==LobbyScreen.Main)
-            {
-                var profile=Box(home,"mobile-card mobile-hero");var identity=Box(profile,"mobile-profile-row row");
-                var avatar=new AvatarElement(avatarColor,accessory);avatar.AddToClassList("mobile-profile-mascot");identity.Add(avatar);
-                var detail=Box(identity,"grow");Text(detail,nickname,"mobile-welcome-title");
-                Text(detail,lobby.Profile?.HasGoogleAccount==true?"Google 연동 계정":"게스트 · 이 기기에서 플레이","muted mobile-small");
-                Button(detail,"캐릭터 꾸미기",()=>Navigate(LobbyScreen.Customize),"secondary");
-                var actions=Box(home,"mobile-section mobile-actions");Text(actions,"어떻게 함께할까요?","mobile-section-header");
-                Button(actions,"공개 방 찾기",EnterBrowse,"primary");
-                Button(actions,"친구의 방 코드로 입장",()=>Navigate(LobbyScreen.JoinCode),"secondary");
-                Button(actions,"새 방 만들기",()=>Navigate(LobbyScreen.CreateMode),"secondary");
-                var hint=Box(home,"mobile-card mobile-section");Text(hint,"3명부터 함께 그려요","mobile-card-title");
-                Text(hint,"최대 8명 · PC와 모바일 함께 참여\n진행 중인 방은 관전으로 들어갈 수 있어요.","muted mobile-small");
-            }
-            else
-            {
-                var body=Box(home,lobbyScreen==LobbyScreen.JoinCode||lobbyScreen==LobbyScreen.Browse||lobbyScreen==LobbyScreen.Shop?"home-panel mobile-page-body":"home-panel mobile-card mobile-page-body");
-                BuildLobbyScreen(body);serviceNotice=Text(body,lobby.Status,"notice");
-            }
-            Text(home,"Liar’s Canvas · RascalLab","mobile-footer muted");
-            if(!signingIn)MobileNavigation();
+            if(!signingIn)MobileTopbar();
+            if(lobbyScreen==LobbyScreen.Main){MobileLobby();MobileNavigation();return;}
+            if(lobbyScreen==LobbyScreen.Customize)MobileProfilePreview();
+            var scroll=DrawSmoothScroll.Create(ScrollViewMode.Vertical);scroll.AddToClassList("mobile-home-scroll");content.Add(scroll);
+            var home=Box(scroll,"mobile-home");
+            var body=Box(home,"home-panel mobile-page-body");BuildLobbyScreen(body);
+            MobileNavigation();
             DrawUIMotion.Stagger(home,28,220,8);
+        }
+
+        private void MobileLobby()
+        {
+            var page=Box(content,"mobile-lobby");var profile=Box(page,"mobile-lobby-profile row");
+            avatarStage=Box(profile,"mobile-lobby-avatar");UpdateLobbyAvatar(avatarColor,accessory);
+            var identity=Box(profile,"mobile-lobby-identity grow");RawText(identity,nickname,"mobile-lobby-name");
+            Text(identity,lobby.Profile?.HasGoogleAccount==true?"Google":"게스트","mobile-account-state");
+            Button(identity,"꾸미기",()=>Navigate(LobbyScreen.Customize),"secondary mobile-customize");
+            LobbyRoomActions(page,"mobile-lobby-actions row");
+            var heading=Box(page,"mobile-room-list-heading row");Text(heading,"공개 방","mobile-card-title grow");
+            IconButton(heading,"새로고침",DrawUIIcon.Kind.Refresh,()=>SearchRooms(_roomSearchDraft),"room-refresh");
+            RoomSearch(page);
+            publicRoomList=DrawSmoothScroll.Create(ScrollViewMode.Vertical);Classes(publicRoomList,"room-list lobby-room-list mobile-lobby-room-list");page.Add(publicRoomList);RefreshPublicRooms();
+            _mobileLobbyChatButton=Button(page,"로비 채팅",OpenLobbyChat,"secondary mobile-lobby-chat-open");_mobileLobbyChatButton.name="mobile-lobby-chat-open";
+            DrawUIMotion.Stagger(page,28,220,8);
+        }
+
+        private void MainLobby(VisualElement panel)
+        {
+            panelSettings.referenceResolution=new Vector2Int(1600,900);
+            var screen=Box(panel,"pc-lobby");screen.name="pc-lobby";
+            var header=Box(screen,"row pc-lobby-header");Text(header,"로비","lobby-title grow");
+            Text(header,"{0} 코인","mobile-status-pill lobby-coins",lobby.Profile?.Coins??0);
+            IconButton(header,"설정",DrawUIIcon.Kind.Settings,()=>Navigate(LobbyScreen.Options),"lobby-settings");
+            var workspace=Box(screen,"row pc-lobby-workspace grow");
+            var sidebar=Box(workspace,"pc-lobby-sidebar");sidebar.name="pc-lobby-sidebar";
+            var profile=Box(sidebar,"pc-lobby-card pc-lobby-profile");
+            avatarStage=Box(profile,"pc-lobby-avatar");UpdateLobbyAvatar(avatarColor,accessory);
+            RawText(profile,nickname,"pc-lobby-name");Text(profile,lobby.Profile?.HasGoogleAccount==true?"Google":"게스트","pc-lobby-account");
+            Button(profile,"꾸미기",()=>Navigate(LobbyScreen.Customize),"secondary pc-lobby-customize");
+            var services=Box(sidebar,"pc-lobby-card pc-lobby-services");
+            Button(services,"상점",()=>{Navigate(LobbyScreen.Shop);Run(lobby.RefreshShopAsync);},"secondary");
+            Button(services,"친구",()=>Navigate(LobbyScreen.Friends),"secondary");
+            Button(services,"내 계정",()=>Navigate(LobbyScreen.Account),"secondary pc-lobby-service-last");
+            var main=Box(workspace,"pc-lobby-main grow");main.name="pc-lobby-main";
+            var rooms=Box(main,"pc-lobby-card pc-lobby-rooms grow");rooms.name="pc-lobby-rooms";
+            var heading=Box(rooms,"row pc-lobby-room-heading");Text(heading,"공개 방","section-title grow");
+            Button(heading,"코드로 입장",()=>Navigate(LobbyScreen.JoinCode),"secondary").name="lobby-join-code";
+            Button(heading,"방 만들기",()=>Navigate(LobbyScreen.CreateRoom),"primary").name="lobby-create";
+            RoomSearch(rooms);
+            IconButton(rooms.Q<VisualElement>(className:"room-search"),"새로고침",DrawUIIcon.Kind.Refresh,()=>SearchRooms(_roomSearchDraft),"room-refresh");
+            publicRoomList=DrawSmoothScroll.Create(ScrollViewMode.Vertical);Classes(publicRoomList,"room-list lobby-room-list pc-lobby-room-list grow");rooms.Add(publicRoomList);RefreshPublicRooms();
+            BuildLobbyChat(main,false);
+            DrawUIMotion.Stagger(screen,28,220,8);
+        }
+
+        private void LobbyRoomActions(VisualElement parent,string classes)
+        {
+            var actions=Box(parent,classes);
+            Button(actions,"방 만들기",()=>Navigate(LobbyScreen.CreateRoom),"primary menu-orange grow").name="lobby-create";
+            Button(actions,"코드로 입장",()=>Navigate(LobbyScreen.JoinCode),"secondary grow mobile-last").name="lobby-join-code";
+        }
+
+        private void OpenLobbyChat()
+        {
+            if(inRoom||!lobby.IsAuthenticated)return;
+            var modal=Modal("로비 채팅",false);modal.AddToClassList("lobby-chat-modal");
+            BuildLobbyChat(modal,true);
+            Button(modal,"닫기",CloseModal,"secondary lobby-chat-close",DrawSound.UiCancel);
+            HideMobileScrollers();
+        }
+
+        private void BuildLobbyChat(VisualElement parent,bool modal)
+        {
+            ResetLobbyChatView();
+            var panel=_lobbyChatPanel=Box(parent,modal?"lobby-chat-panel lobby-chat-in-modal grow":"pc-lobby-card lobby-chat-panel");
+            var heading=Box(panel,"row lobby-chat-heading");
+            if(!modal)Text(heading,"로비 채팅","section-title grow");
+            _lobbyChatCount=Text(heading,"접속 {0}명","muted lobby-chat-count",lobby.LobbyMemberCount);_lobbyChatCount.name="lobby-chat-count";
+            _lobbyChatStatus=RawText(panel,lobby.LobbyChatStatus,"muted lobby-chat-status");_lobbyChatStatus.name="lobby-chat-status";
+            _lobbyChatHistory=DrawSmoothScroll.Create(ScrollViewMode.Vertical);_lobbyChatHistory.name="lobby-chat-history";_lobbyChatHistory.AddToClassList("lobby-chat-history");panel.Add(_lobbyChatHistory);
+            var composer=Box(panel,"row lobby-chat-composer");
+            var input=_lobbyChatInput=new TextField{maxLength=DrawLobbyChatClient.MAXIMUM_TEXT_LENGTH,value=_lobbyChatDraft};
+            input.name="lobby-chat-input";Classes(input,"field lobby-chat-input grow");Placeholder(input,"메시지를 입력하세요");SetTooltip(input,"메시지를 입력하세요");composer.Add(input);
+            input.textEdition.autoCorrection=false;
+            input.RegisterValueChangedCallback(e=>{if(!ReferenceEquals(e.target,input))return;_lobbyChatDraft=e.newValue;_lobbyChatDraftVersion++;RefreshLobbyChatComposer();});
+#if ENABLE_INPUT_SYSTEM
+            AttachLobbyChatKeyboard();
+#endif
+            input.RegisterCallback<KeyDownEvent>(e=>
+            {
+                if(e.keyCode!=KeyCode.Return&&e.keyCode!=KeyCode.KeypadEnter)return;
+#if ENABLE_INPUT_SYSTEM
+                if(!_lobbyChatComposing&&Time.frameCount!=_lobbyChatCompositionFrame)_=SendLobbyChatAsync();
+#else
+                if(string.IsNullOrEmpty(Input.compositionString))_=SendLobbyChatAsync();
+#endif
+                e.StopPropagation();
+            },TrickleDown.TrickleDown);
+            _lobbyChatSend=Button(composer,"보내기",()=>_=SendLobbyChatAsync(),"primary lobby-chat-send",DrawSound.UiConfirm);_lobbyChatSend.name="lobby-chat-send";
+            RefreshLobbyChat();
+        }
+
+        private void ResetLobbyChatView()
+        {
+#if ENABLE_INPUT_SYSTEM
+            DetachLobbyChatKeyboard();
+#endif
+            _lobbyChatPanel=null;_lobbyChatHistory=null;_lobbyChatInput=null;_lobbyChatSend=null;_lobbyChatCount=null;_lobbyChatStatus=null;_lobbyChatLines.Clear();
+        }
+
+#if ENABLE_INPUT_SYSTEM
+        private void AttachLobbyChatKeyboard()
+        {
+            if(_lobbyChatKeyboard!=null)return;
+            _lobbyChatKeyboard=UnityEngine.InputSystem.Keyboard.current;
+            if(_lobbyChatKeyboard==null)return;
+            _lobbyChatKeyboard.onIMECompositionChange+=OnLobbyChatComposition;
+            _lobbyChatKeyboard.onTextInput+=OnLobbyChatTextInput;
+        }
+        private void DetachLobbyChatKeyboard()
+        {
+            if(_lobbyChatKeyboard!=null)
+            {
+                _lobbyChatKeyboard.onIMECompositionChange-=OnLobbyChatComposition;
+                _lobbyChatKeyboard.onTextInput-=OnLobbyChatTextInput;
+            }
+            _lobbyChatKeyboard=null;_lobbyChatComposing=false;_lobbyChatCompositionFrame=-1;
+        }
+        private void OnLobbyChatComposition(UnityEngine.InputSystem.LowLevel.IMECompositionString composition)
+        {
+            _lobbyChatComposing=composition.Count>0;_lobbyChatCompositionFrame=Time.frameCount;
+        }
+        private void OnLobbyChatTextInput(char character)
+        {
+            if(!_lobbyChatComposing)return;
+            _lobbyChatComposing=false;_lobbyChatCompositionFrame=Time.frameCount;
+        }
+#endif
+
+        private void RefreshLobbyChatComposer()
+        {
+            _lobbyChatSend?.SetEnabled(lobby.IsLobbyChatConnected&&!lobby.IsLobbyChatSending&&!string.IsNullOrWhiteSpace(_lobbyChatInput?.value));
+        }
+
+        private void RefreshLobbyChat()
+        {
+            if(_lobbyChatPanel?.panel==null)return;
+            SetText(_lobbyChatCount,"접속 {0}명",lobby.LobbyMemberCount);
+            SetRawText(_lobbyChatStatus,lobby.LobbyChatStatus);
+            _lobbyChatStatus.style.display=string.IsNullOrEmpty(lobby.LobbyChatStatus)?DisplayStyle.None:DisplayStyle.Flex;
+            RefreshLobbyChatComposer();
+            var history=_lobbyChatHistory;var messages=lobby.LobbyMessages;
+            bool atBottom=_lobbyChatLines.Count==0||history.scrollOffset.y>=history.verticalScroller.highValue-24;
+            var ids=new HashSet<long>(messages.Select(message=>message.Id));
+            if(messages.Count>0&&_lobbyChatLines.Count>0&&messages[0].Id<_lobbyChatLines.Keys.Min())
+            {
+                history.Clear();_lobbyChatLines.Clear();atBottom=true;
+            }
+            foreach(var id in _lobbyChatLines.Keys.Where(id=>!ids.Contains(id)).ToArray()){_lobbyChatLines[id].RemoveFromHierarchy();_lobbyChatLines.Remove(id);}
+            bool added=false;
+            foreach(var message in messages)
+            {
+                if(_lobbyChatLines.TryGetValue(message.Id,out var existing))
+                {
+                    var previous=existing.userData as LobbyChatMessage;
+                    if(previous?.DisplayName!=message.DisplayName||previous?.Text!=message.Text)
+                    {
+                        var name=existing.Q<Label>(className:"lobby-chat-name");var body=existing.Q<Label>(className:"lobby-chat-message");
+                        SetRawText(name,message.DisplayName);name.tooltip=message.DisplayName;SetRawText(body,message.Text);body.tooltip=message.Text;existing.userData=message;
+                    }
+                    continue;
+                }
+                var entry=Box(history,"lobby-chat-line");entry.name="lobby-chat-message-"+message.Id;
+                RawText(entry,message.DisplayName,"lobby-chat-name").tooltip=message.DisplayName;
+                var text=RawText(entry,message.Text,"lobby-chat-message");text.tooltip=message.Text;
+                entry.userData=message;_lobbyChatLines[message.Id]=entry;added=true;
+            }
+            var empty=history.contentViewport.Q<VisualElement>("lobby-chat-empty");
+            if(messages.Count==0&&empty==null){empty=Box(history.contentViewport,"room-list-empty-state");empty.name="lobby-chat-empty";empty.pickingMode=PickingMode.Ignore;Text(empty,"첫 메시지를 보내보세요.","muted").pickingMode=PickingMode.Ignore;}
+            else if(messages.Count>0)empty?.RemoveFromHierarchy();
+            if(added&&atBottom)history.schedule.Execute(()=>{if(history==_lobbyChatHistory&&history.panel!=null)history.scrollOffset=new Vector2(0,Mathf.Max(0,history.verticalScroller.highValue));}).StartingIn(20);
+        }
+
+        private async Task SendLobbyChatAsync()
+        {
+            var input=_lobbyChatInput;
+            if(input?.panel==null||lobby.IsLobbyChatSending||string.IsNullOrWhiteSpace(input.value))return;
+            string text=input.value;
+            int version=_lobbyChatDraftVersion;
+            try
+            {
+                await lobby.SendLobbyChatAsync(text);
+                if(_lobbyChatDraftVersion==version&&_lobbyChatDraft==text)
+                {
+                    _lobbyChatDraft="";
+                    if(_lobbyChatInput?.value==text)_lobbyChatInput.SetValueWithoutNotify("");
+                }
+            }
+            catch(Exception ex){DrawAudio.Instance?.Play(DrawSound.UiError);Toast(ex.Message);}
+            finally{RefreshLobbyChatComposer();}
+        }
+
+        private void RoomSearch(VisualElement parent)
+        {
+            var row=Box(parent,"room-search row");
+            var search=_roomSearchField=Field(row,"",_roomSearchDraft);search.name="room-search-input";search.maxLength=30;Classes(search,"room-search-input grow");
+            search.labelElement.style.display=DisplayStyle.None;Placeholder(search,"방 검색");SetTooltip(search,"방 검색");
+            search.RegisterValueChangedCallback(e=>{if(ReferenceEquals(e.target,search))_roomSearchDraft=e.newValue;});
+            void Submit(){SearchRooms(search.value);search.Blur();}
+            search.RegisterCallback<KeyDownEvent>(e=>{if(e.keyCode==KeyCode.Return||e.keyCode==KeyCode.KeypadEnter){Submit();e.StopPropagation();}},TrickleDown.TrickleDown);
+            Button(row,"검색",Submit,"secondary room-search-submit").name="room-search-submit";
         }
 
         private void MobileTopbar()
         {
             var header=Box(content,"mobile-topbar row");
-            if(lobbyScreen==LobbyScreen.Main)BrandLogo(header,"mobile-topbar-logo");
+            if(lobbyScreen==LobbyScreen.Main)Text(header,"로비","mobile-workspace-title mobile-lobby-title grow");
             else
             {
-                Button(header,"‹",Back,"secondary mobile-back",DrawSound.UiCancel).tooltip="뒤로";
+                SetTooltip(Button(header,"‹",Back,"secondary mobile-back",DrawSound.UiCancel),"뒤로");
                 Text(header,LobbyTitle(lobbyScreen),"mobile-workspace-title grow");
             }
             if(lobbyScreen==LobbyScreen.Main||lobbyScreen==LobbyScreen.Shop)
-                Text(header,$"{lobby.Profile?.Coins??0} 코인","mobile-status-pill");
-            if(lobbyScreen==LobbyScreen.Main)Button(header,"설정",()=>Navigate(LobbyScreen.Options),"secondary mobile-back");
+                Text(header,"{0} 코인","mobile-status-pill",lobby.Profile?.Coins??0);
+            if(lobbyScreen==LobbyScreen.Main)IconButton(header,"설정",DrawUIIcon.Kind.Settings,()=>Navigate(LobbyScreen.Options),"lobby-settings");
         }
 
         private void MobileProfilePreview()
         {
             var hero=Box(content,"mobile-profile-hero row");
             avatarStage=Box(hero,"mobile-profile-preview");UpdateLobbyAvatar(avatarColor,accessory);
-            var detail=Box(hero,"grow");Text(detail,nickname,"mobile-card-title");
-            if(lobbyScreen==LobbyScreen.Shop)
-            {
-                _shopPreviewStatus=Text(detail,"현재 장착한 모습","shop-preview-status mobile-small");
-                _shopPreviewStatus.name="shop-preview-status";
-                Text(detail,"미리보기는 장착 상태를 바꾸지 않아요","muted mobile-small");
-            }
-            else Text(detail,"나만의 캐릭터를 꾸며보세요","muted mobile-small");
+            var detail=Box(hero,"grow");RawText(detail,nickname,"mobile-card-title");
         }
 
         private void MobileNavigation()
         {
             var navigation=Box(content,"mobile-bottom-nav row");
-            MobileTab(navigation,"플레이",LobbyScreen.Main,lobbyScreen!=LobbyScreen.Friends&&lobbyScreen!=LobbyScreen.Shop&&lobbyScreen!=LobbyScreen.Account);
-            MobileTab(navigation,"친구",LobbyScreen.Friends,lobbyScreen==LobbyScreen.Friends);
+            MobileTab(navigation,"로비",LobbyScreen.Main,lobbyScreen!=LobbyScreen.Friends&&lobbyScreen!=LobbyScreen.Shop);
             MobileTab(navigation,"상점",LobbyScreen.Shop,lobbyScreen==LobbyScreen.Shop);
-            MobileTab(navigation,"계정",LobbyScreen.Account,lobbyScreen==LobbyScreen.Account);
+            MobileTab(navigation,"친구",LobbyScreen.Friends,lobbyScreen==LobbyScreen.Friends);
         }
 
         private void MobileTab(VisualElement parent,string title,LobbyScreen destination,bool selected)
@@ -263,15 +485,15 @@ namespace DrawLiar
             {
                 if(lobbyScreen==destination)return;
                 Navigate(destination);
-                if(destination==LobbyScreen.Friends)Run(lobby.RefreshFriendsAsync);
-                else if(destination==LobbyScreen.Shop)Run(lobby.RefreshShopAsync);
+                if(destination==LobbyScreen.Shop)Run(lobby.RefreshShopAsync);
             },"mobile-nav-item grow");
+            button.name="lobby-nav-"+destination.ToString().ToLowerInvariant();
             button.EnableInClassList("mobile-nav-selected",selected);
         }
 
         private static string LobbyTitle(LobbyScreen screen)
         {
-            switch(screen){case LobbyScreen.JoinCode:return "방 코드로 입장";case LobbyScreen.Browse:return "공개 방";case LobbyScreen.CreateMode:case LobbyScreen.CreateRules:case LobbyScreen.CreateDetails:return "방 만들기";case LobbyScreen.Friends:return "친구";case LobbyScreen.Shop:return "상점";case LobbyScreen.Customize:return "캐릭터 꾸미기";case LobbyScreen.Account:return "내 계정";case LobbyScreen.Options:return "옵션";case LobbyScreen.Time:return "시간 설정";case LobbyScreen.TopicSelection:return "주제 선택";case LobbyScreen.Topics:return "나만의 주제";default:return "함께 플레이";}
+            switch(screen){case LobbyScreen.JoinCode:return "방 코드로 입장";case LobbyScreen.CreateRoom:return "방 만들기";case LobbyScreen.Friends:return "친구";case LobbyScreen.Shop:return "상점";case LobbyScreen.Customize:return "캐릭터 꾸미기";case LobbyScreen.Account:return "내 계정";case LobbyScreen.Options:return "옵션";case LobbyScreen.Topics:return "나만의 주제";default:return "함께 플레이";}
         }
 
         private void UpdateLobbyAvatar(int color,int decoration)
@@ -284,39 +506,50 @@ namespace DrawLiar
             if(IsMobile&&avatarStage?.panel!=null)avatarStage.GetFirstAncestorOfType<ScrollView>()?.ScrollTo(avatarStage);
         }
 
-        private void OnProfileChanged()
+        private void SyncProfile()
         {
             var profile=lobby.Profile;
-            if(profile!=null)
+            if(profile==null)return;
+            nickname=profile.DisplayName;avatarColor=profile.AvatarColor;accessory=profile.Accessory;
+        }
+
+        private void OnProfileChanged()
+        {
+            var popup=_utilityPopupScreen;
+            string friendDraft=popup==LobbyScreen.Friends?overlay?.Q<TextField>("friend-request-id")?.value:null;
+            SyncProfile();
+            if(lobby.Profile!=null)
             {
-                nickname=profile.DisplayName;avatarColor=profile.AvatarColor;accessory=profile.Accessory;
                 PlayerPrefs.SetString("DrawLiar.Name",nickname);PlayerPrefs.SetInt("DrawLiar.Color",avatarColor);PlayerPrefs.SetInt("DrawLiar.Equipment",accessory);
                 PlayerPrefs.Save();
             }
-            if(!inRoom&&content!=null)Home();
+            if(!inRoom&&content!=null)
+            {
+                Home();
+                if(popup.HasValue&&lobby.IsAuthenticated)OpenUtilityPopup(popup.Value);
+                if(friendDraft!=null)overlay?.Q<TextField>("friend-request-id")?.SetValueWithoutNotify(friendDraft);
+            }
         }
 
         private void LoginForm(VisualElement panel)
         {
-            if(!IsMobile)Text(panel,"가입 없이 바로 플레이할 수 있어요.","subtitle");
-            var guest=Button(panel,"게스트로 시작",()=>Run(async()=>{await lobby.GuestLoginAsync();Navigate(LobbyScreen.Main);}),"primary next-button guest-login");
+            var guest=Button(panel,"게스트로 시작",()=>Run(async()=>{await lobby.GuestLoginAsync();Navigate(LobbyScreen.Main);}),"primary guest-login");
             guest.SetEnabled(DrawGuestCredentialStore.IsSupported&&!lobby.IsBusy);
             var google=Button(panel,"Google로 계속하기",()=>Run(async()=>{await lobby.GoogleLoginAsync();Navigate(LobbyScreen.Main);}),"secondary google-login");
             google.SetEnabled(GoogleAccountProvider.IsSupported&&!lobby.IsBusy);
-            Text(panel,"게스트는 이 기기에서 이어서 플레이해요. Google을 연동하면 PC와 모바일에서 같은 계정으로 즐길 수 있어요.","rules");
             var cancel=Button(panel,"Google 인증 취소",lobby.CancelGoogleLogin,"secondary google-cancel");cancel.style.display=lobby.IsGoogleSigningIn?DisplayStyle.Flex:DisplayStyle.None;
+            if(!IsMobile)LanguageSelector(panel);
         }
 
         private void AccountForm(VisualElement panel)
         {
             if(lobby.Profile==null)return;
-            Text(panel,lobby.Profile.DisplayName,"section-title");
+            RawText(panel,lobby.Profile.DisplayName,"section-title");
             Text(panel,lobby.Profile.HasGoogleAccount?"Google 연동 계정":lobby.Profile.IsGuest?"게스트 계정":"기존 계정","muted");
-            Text(panel,"계정 ID: "+lobby.Profile.AccountId,"rules");
+            Text(panel,"계정 ID: {0}","rules",lobby.Profile.AccountId);
             Button(panel,"계정 ID 복사",()=>{GUIUtility.systemCopyBuffer=lobby.Profile.AccountId;Toast("계정 ID를 복사했습니다.");},"secondary");
             if(!lobby.Profile.HasGoogleAccount)
             {
-                Text(panel,"Google을 연동하면 현재 캐릭터와 재화를 다른 기기에서도 이어서 사용할 수 있어요.","rules");
                 var link=Button(panel,"Google 계정 연동",()=>Run(()=>lobby.GoogleLoginAsync(true)),"primary google-link");link.SetEnabled(GoogleAccountProvider.IsSupported&&!lobby.IsBusy);
             }
             var cancel=Button(panel,"Google 인증 취소",lobby.CancelGoogleLogin,"secondary google-cancel");cancel.style.display=lobby.IsGoogleSigningIn?DisplayStyle.Flex:DisplayStyle.None;
@@ -325,11 +558,11 @@ namespace DrawLiar
 
         private void FriendsForm(VisualElement panel)
         {
-            var account=Field(panel,"친구 계정 ID","");account.maxLength=64;
-            var actions=Box(panel,"row");
-            Button(actions,"친구 요청",()=>Run(()=>lobby.RequestFriendAsync(account.value)),"primary");
-            Button(actions,"새로고침",()=>Run(lobby.RefreshFriendsAsync),"secondary");
-            friendList=new ScrollView();friendList.AddToClassList("room-list");panel.Add(friendList);RefreshFriends();
+            var account=Field(panel,"친구 계정 ID","");account.maxLength=64;account.name="friend-request-id";
+            var actions=Box(panel,"row friend-actions");
+            Button(actions,"친구 요청",()=>Run(()=>lobby.RequestFriendAsync(account.value)),"primary").name="friend-request-send";
+            IconButton(actions,"새로고침",DrawUIIcon.Kind.Refresh,()=>Run(lobby.RefreshFriendsAsync),"friends-refresh");
+            friendList=Box(panel,"utility-friend-list");friendList.name="friends-list";RefreshFriends();
         }
 
         private void RefreshFriends()
@@ -339,196 +572,343 @@ namespace DrawLiar
             if(lobby.Friends.Incoming.Length>0)Text(friendList,"받은 요청","section-title");
             foreach(var friend in lobby.Friends.Incoming)
             {
-                var row=Box(friendList,"room-entry");Text(row,friend.DisplayName,"player-name");
-                Button(row,"수락",()=>Run(()=>lobby.RespondFriendAsync(friend.AccountId,true)),"primary");
-                Button(row,"거절",()=>Run(()=>lobby.RespondFriendAsync(friend.AccountId,false)),"secondary");
+                var row=Box(friendList,"room-entry");RawText(row,friend.DisplayName,"player-name grow");
+                Button(row,"수락",()=>Run(()=>lobby.RespondFriendAsync(friend.AccountId,true)),"primary").name="friend-accept-"+friend.AccountId;
+                Button(row,"거절",()=>Run(()=>lobby.RespondFriendAsync(friend.AccountId,false)),"secondary").name="friend-reject-"+friend.AccountId;
             }
             Text(friendList,"친구 목록","section-title");
-            if(lobby.Friends.Friends.Length==0)Text(friendList,"계정 ID로 친구를 추가해 보세요.","muted");
+            if(lobby.Friends.Friends.Length==0)Text(friendList,"친구가 없습니다.","muted");
             foreach(var friend in lobby.Friends.Friends)
             {
-                var row=Box(friendList,"room-entry");row.Add(new AvatarElement(friend.AvatarColor,friend.Accessory));Text(row,friend.DisplayName,"player-name");
-                Button(row,"삭제",()=>Run(()=>lobby.RemoveFriendAsync(friend.AccountId)),"secondary");
+                var row=Box(friendList,"room-entry");row.Add(new AvatarElement(friend.AvatarColor,friend.Accessory));RawText(row,friend.DisplayName,"player-name grow");
+                Button(row,"삭제",()=>Run(()=>lobby.RemoveFriendAsync(friend.AccountId)),"secondary").name="friend-remove-"+friend.AccountId;
             }
             if(lobby.Friends.Outgoing.Length>0)Text(friendList,"보낸 요청","section-title");
-            foreach(var friend in lobby.Friends.Outgoing)Text(friendList,friend.DisplayName+" · 수락 대기","muted");
+            foreach(var friend in lobby.Friends.Outgoing)Text(friendList,"{0} · 수락 대기","muted",friend.DisplayName);
         }
 
-        private void ShopForm(VisualElement panel)
+        private void ShopPage()
         {
-            var preview=Box(panel,"shop-preview-heading");
-            if(!IsMobile){_shopPreviewStatus=Text(preview,"현재 장착한 모습","shop-preview-status");_shopPreviewStatus.name="shop-preview-status";}
-            Text(preview,"구매 전에도 입혀볼 수 있어요. 구매한 아이템은 꾸미기에서 장착하세요.","rules");
-            var controls=Box(panel,"row shop-controls");
-            _shopPreviewReset=Button(controls,"원래 모습",()=>{_shopPreviewProductId="";UpdateShopPreview();RevealAvatarPreview();},"secondary grow",DrawSound.UiCancel);_shopPreviewReset.name="shop-preview-reset";
-            Button(controls,"새로고침",()=>Run(lobby.RefreshShopAsync),"secondary grow mobile-last");
-            shopList=new ScrollView(){name="shop-list"};shopList.AddToClassList("shop-list");
-            if(IsMobile)shopList.contentContainer.AddToClassList("mobile-shop-grid");
-            panel.Add(shopList);RefreshShop();
+            if(!IsMobile)panelSettings.referenceResolution=new Vector2Int(1600,900);
+            var page=Box(content,"shop-page grow");page.name="shop-page";
+            var header=Box(page,"row shop-header");
+            Button(header,"로비",()=>Navigate(LobbyScreen.Main),"secondary shop-back",DrawSound.UiCancel).name="shop-back";
+            Text(header,"상점","shop-title grow");
+            Text(header,"{0} 코인","shop-coins",lobby.Profile?.Coins??0);
+            Button(header,"친구",()=>Navigate(LobbyScreen.Friends),"secondary shop-friends").name="shop-friends";
+            if(IsMobile)IconButton(header,"설정",DrawUIIcon.Kind.Settings,()=>Navigate(LobbyScreen.Options),"shop-settings");
+            else Button(header,"설정",()=>Navigate(LobbyScreen.Options),"secondary shop-settings").name="shop-settings";
+            var workspace=Box(page,"row shop-workspace grow");
+            var preview=Box(workspace,"shop-panel shop-preview-panel");preview.name="shop-preview-panel";
+            var profileName=RawText(preview,nickname,"shop-profile-name");
+            avatarStage=Box(preview,"shop-preview-stage");avatarStage.name="shop-preview-stage";UpdateLobbyAvatar(avatarColor,CurrentShopPreview());
+            var previewControls=Box(preview,"shop-preview-controls");
+            if(IsMobile)previewControls.Add(profileName);
+            _shopPreviewStatus=Text(previewControls,"착용 중","shop-preview-status");_shopPreviewStatus.name="shop-preview-status";
+            var previewActions=Box(previewControls,"shop-preview-actions");
+            _shopPreviewReset=Button(previewActions,"초기화",ResetShopPreview,"secondary shop-preview-reset",DrawSound.UiCancel);_shopPreviewReset.name="shop-preview-reset";
+            Button(previewActions,"꾸미기",()=>Navigate(LobbyScreen.Customize),"secondary shop-customize").name="shop-customize";
+            var catalog=Box(workspace,"shop-panel shop-catalog grow");catalog.name="shop-catalog";
+            var filters=Box(catalog,"row shop-filters");
+            PartTabs(filters,_shopPartFilter,slot=>{_shopPartFilter=slot;RefreshShop();},true);
+            IconButton(filters,"새로고침",DrawUIIcon.Kind.Refresh,()=>Run(lobby.RefreshShopAsync),"shop-refresh");
+            var scroll=DrawSmoothScroll.Create();scroll.name="shop-scroll";scroll.AddToClassList("shop-scroll");catalog.Add(scroll);
+            shopList=Box(scroll,"shop-grid");shopList.name="shop-list";
+            var grid=shopList;
+            scroll.contentViewport.RegisterCallback<GeometryChangedEvent>(_=>SizeShopGrid(grid,scroll.contentViewport.contentRect.width));
+            RefreshShop();
+            if(IsMobile)MobileNavigation();
+            DrawUIMotion.Stagger(page,28,220,8);
+        }
+
+        private void SizeShopGrid(VisualElement grid,float width)
+        {
+            if(grid?.panel==null||width<=0)return;
+            float gap=IsMobile?12:16;
+            int columns=IsMobile?Mathf.Clamp(Mathf.FloorToInt((width+gap)/180),2,4):Mathf.Clamp(Mathf.FloorToInt((width+gap)/226),3,4);
+            float cardWidth=Mathf.Floor((width-gap*(columns-1))/columns);
+            int index=0;
+            foreach(var card in grid.Children())
+            {
+                if(!card.ClassListContains("shop-entry"))continue;
+                card.style.width=cardWidth;card.style.marginRight=index++%columns==columns-1?0:gap;
+            }
+        }
+
+        private static void SizeShopActions(VisualElement card,VisualElement actions)
+        {
+            if(actions?.panel==null||actions.contentRect.width<=0)return;
+            float buttonWidth=(actions.contentRect.width-8)/2;
+            bool stacked=actions.Query<Button>().ToList().Any(button=>
+                button.MeasureTextSize(button.text,0,VisualElement.MeasureMode.Undefined,0,VisualElement.MeasureMode.Undefined).x>
+                buttonWidth-button.resolvedStyle.paddingLeft-button.resolvedStyle.paddingRight-button.resolvedStyle.borderLeftWidth-button.resolvedStyle.borderRightWidth);
+            card.EnableInClassList("shop-actions-stacked",stacked);actions.EnableInClassList("shop-actions-stacked",stacked);
         }
 
         private void RefreshShop()
         {
             if(shopList?.panel==null)return;
-            shopList.Clear();if(!IsMobile)Text(shopList,$"보유 코인: {lobby.Profile?.Coins??0}","section-title");
+            shopList.Clear();
             int ownedMask=lobby.Profile?.OwnedAccessories?.Aggregate(0,(mask,item)=>mask|item)??0;
-            foreach(var product in lobby.Shop.Products)
+            var serverProducts=(lobby.Shop.Products??Array.Empty<ShopProduct>()).Where(item=>item!=null).ToArray();
+            int displayed=0;
+            var products=AvatarParts.CreateShopProducts().Select(product=>serverProducts.FirstOrDefault(item=>item.Id==product.Id&&item.Accessory==product.Accessory)??product)
+                .Where(item=>_shopPartFilter<0||(item.Accessory&AvatarParts.Mask((AvatarPartSlot)_shopPartFilter))!=0)
+                .OrderBy(item=>(ownedMask&item.Accessory)==item.Accessory);
+            foreach(var product in products)
             {
+                displayed++;
                 bool owned=(ownedMask&product.Accessory)==product.Accessory;
-                var row=Box(shopList,"shop-entry");row.userData=product.Id;
-                if(IsMobile)row.AddToClassList("mobile-shop-entry");
-                var summary=Box(row,"row shop-product");
-                if(IsMobile)summary.AddToClassList("mobile-shop-product");
-                var image=new AvatarElement(avatarColor,product.Accessory){tooltip=product.Name};image.AddToClassList("shop-item-image");summary.Add(image);
-                if(IsMobile)image.AddToClassList("mobile-shop-image");
-                var info=Box(summary,"grow shop-item-info");Text(info,product.Name,"shop-item-name");Text(info,product.Price+" 코인","muted");
-                if(IsMobile)info.AddToClassList("mobile-shop-info");
+                var row=Box(shopList,"shop-entry");row.userData=product;
+                row.EnableInClassList("shop-owned",owned);
+                var summary=Box(row,"shop-product");
+                var image=new AvatarElement(avatarColor,product.Accessory);SetTooltip(image,product.Name);image.AddToClassList("shop-item-image");summary.Add(image);
+                var info=Box(summary,"shop-item-info");Text(info,product.Name,"shop-item-name");
+                if(owned)Text(info,"보유 중","shop-item-price muted");else Text(info,"{0} 코인","shop-item-price muted",product.Price);
                 var actions=Box(row,"row shop-actions");
-                if(IsMobile)actions.AddToClassList("mobile-shop-actions");
-                var tryOn=Button(actions,"입혀보기",()=>{_shopPreviewProductId=product.Id;UpdateShopPreview();RevealAvatarPreview();},"secondary grow shop-try-on");tryOn.name="shop-preview-"+product.Id;
-                var buy=Button(actions,owned?"보유 중":"구매",()=>Run(()=>lobby.PurchaseAsync(product.Id)),"primary grow mobile-last",DrawSound.UiConfirm);buy.name="shop-buy-"+product.Id;
-                buy.SetEnabled(!owned&&(lobby.Profile?.Coins??0)>=product.Price);
+                actions.RegisterCallback<GeometryChangedEvent>(_=>SizeShopActions(row,actions));
+                var tryOn=Button(actions,"입혀보기",()=>PreviewShopProduct(product),"secondary grow shop-try-on");tryOn.name="shop-preview-"+product.Id;
+                bool equipped=owned&&AvatarParts.IsEquipped(lobby.Profile?.Accessory??0,product.Accessory);
+                var apply=Button(actions,owned?(equipped?"장착 중":"장착하기"):"구매",()=>Run(async()=>
+                {
+                    if(!owned){await lobby.PurchaseAsync(product.Id);return;}
+                    var profile=lobby.Profile;
+                    await lobby.SaveProfileAsync(profile.DisplayName,profile.AvatarColor,AvatarParts.Equip(profile.Accessory,product.Accessory));
+                    foreach(var slot in AvatarParts.Slots)if((product.Accessory&AvatarParts.Mask(slot))!=0)_shopPreviewParts.Remove(slot);
+                    UpdateShopPreview();
+                }),"primary grow mobile-last",DrawSound.UiConfirm);apply.name="shop-buy-"+product.Id;
+                bool available=serverProducts.Any(item=>item.Id==product.Id&&item.Accessory==product.Accessory);
+                apply.SetEnabled(!lobby.IsBusy&&(owned?!equipped:available&&(lobby.Profile?.Coins??0)>=product.Price));
             }
-            if(lobby.Shop.Products.Length==0)Text(shopList,"판매 중인 상품이 없습니다.","muted");
+            if(displayed==0)Text(shopList,"판매 중인 상품이 없습니다.","muted");
+            var viewport=shopList.GetFirstAncestorOfType<ScrollView>()?.contentViewport;
+            if(viewport!=null)SizeShopGrid(shopList,viewport.contentRect.width);
             UpdateShopPreview();
+        }
+
+        private void PreviewShopProduct(ShopProduct product)
+        {
+            foreach(var slot in AvatarParts.Slots)
+            {
+                int part=product.Accessory&AvatarParts.Mask(slot);
+                if(part!=0)_shopPreviewParts[slot]=part;
+            }
+            UpdateShopPreview();RevealAvatarPreview();
+        }
+
+        private void ResetShopPreview()
+        {
+            _shopPreviewParts.Clear();UpdateShopPreview();RevealAvatarPreview();
+        }
+
+        private int CurrentShopPreview()
+        {
+            int result=accessory;
+            foreach(var part in _shopPreviewParts.Values)result=AvatarParts.Equip(result,part);
+            return result;
         }
 
         private void UpdateShopPreview()
         {
-            var product=lobby.Shop.Products.FirstOrDefault(item=>item.Id==_shopPreviewProductId);
-            if(product==null)_shopPreviewProductId="";
-            if(avatarStage!=null)UpdateLobbyAvatar(avatarColor,accessory|(product?.Accessory??0));
-            if(_shopPreviewStatus!=null)_shopPreviewStatus.text=product==null?"현재 장착한 모습":product.Name+" · 입혀보기 중";
-            _shopPreviewReset?.SetEnabled(product!=null);
+            int preview=CurrentShopPreview();
+            if(avatarStage!=null)UpdateLobbyAvatar(avatarColor,preview);
+            SetText(_shopPreviewStatus,_shopPreviewParts.Count==0?"착용 중":"입혀보기 중");
+            _shopPreviewReset?.SetEnabled(_shopPreviewParts.Count!=0);
             shopList?.Query<VisualElement>(className:"shop-entry").ForEach(row=>
             {
-                bool selected=product!=null&&(string)row.userData==product.Id;
+                var product=(ShopProduct)row.userData;
+                bool selected=AvatarParts.IsEquipped(preview,product.Accessory)&&AvatarParts.Slots.Any(slot=>(product.Accessory&AvatarParts.Mask(slot))!=0&&_shopPreviewParts.ContainsKey(slot));
                 row.EnableInClassList("shop-selected",selected);
-                row.Q<Button>(className:"shop-try-on").text=selected?"입혀보기 중":"입혀보기";
+                var tryOn=row.Q<Button>(className:"shop-try-on");
+                SetText(tryOn,selected&&!IsMobile?"미리보기 중":"입혀보기");SetTooltip(tryOn,selected?"미리보기 중":"입혀보기");
+                SizeShopActions(row,row.Q<VisualElement>(className:"shop-actions"));
             });
         }
 
         private static void BrandLogo(VisualElement parent,string styleClass)
         {
-            var logo=new Image{image=Resources.Load<Texture2D>("DrawLiar/Brand/LiarsCanvasLogo"),scaleMode=ScaleMode.ScaleToFit,tooltip="Liar’s Canvas",pickingMode=PickingMode.Ignore};
-            Classes(logo,styleClass);parent.Add(logo);
+            var logo=new Image{image=L.LoadLogo(),scaleMode=ScaleMode.ScaleToFit,pickingMode=PickingMode.Ignore};
+            logo.AddToClassList("brand-logo");Classes(logo,styleClass);parent.Add(logo);
         }
 
         private void Navigate(LobbyScreen screen)
         {
-            if(screen!=LobbyScreen.Shop||lobbyScreen!=LobbyScreen.Shop)_shopPreviewProductId="";
+            if(screen==LobbyScreen.Options||screen==LobbyScreen.Friends||screen==LobbyScreen.Account)
+            {
+                OpenUtilityPopup(screen);return;
+            }
+            if(screen==LobbyScreen.CreateRoom&&lobbyScreen!=LobbyScreen.CreateRoom&&lobbyScreen!=LobbyScreen.Topics)
+            {_createRulesExpanded=false;_createTimeExpanded=false;_createTopicsExpanded=false;_createRoomScrollOffset=Vector2.zero;}
+            if(screen!=LobbyScreen.Shop||lobbyScreen!=LobbyScreen.Shop)_shopPreviewParts.Clear();
             lobbyScreen=screen;Home();
         }
         private void Back()
         {
-            var destination=LobbyScreen.Main;
-            if(!IsMobile&&(lobbyScreen==LobbyScreen.JoinCode||lobbyScreen==LobbyScreen.Browse))destination=LobbyScreen.Join;
-            if(lobbyScreen==LobbyScreen.CreateRules)destination=LobbyScreen.CreateMode;
-            if(lobbyScreen==LobbyScreen.CreateDetails||lobbyScreen==LobbyScreen.Time)destination=LobbyScreen.CreateRules;
-            if(lobbyScreen==LobbyScreen.TopicSelection)destination=LobbyScreen.CreateDetails;
-            if(lobbyScreen==LobbyScreen.Topics)destination=LobbyScreen.TopicSelection;
+            var destination=lobbyScreen==LobbyScreen.Topics?LobbyScreen.CreateRoom:LobbyScreen.Main;
             Navigate(destination);
         }
-        private static void CreateHeading(VisualElement panel,string title,int step)
+        private void CreateRoomPage()
         {
-            Text(panel,$"방 만들기   {step} / 3","step-caption");Text(panel,title,"screen-title create-title");
+            var page=Box(content,"create-room-page");page.name="create-room-page";
+            var panel=Box(page,"create-room-panel");
+            var heading=Box(panel,"row create-room-heading");
+            Button(heading,"← 뒤로",Back,"secondary create-back",DrawSound.UiCancel).name="create-back";
+            Text(heading,"방 만들기","lobby-title grow");
+            var scroll=_createRoomScroll=DrawSmoothScroll.Create(ScrollViewMode.Vertical);scroll.name="create-scroll";scroll.AddToClassList("create-scroll");panel.Add(scroll);
+            var form=Box(scroll,"create-room-form");form.name="create-room-form";
+            var footer=Box(panel,"create-footer");footer.name="create-footer";
+            var topicError=Text(footer,"주제를 하나 이상 선택하세요.","rules create-topic-error");topicError.name="create-topic-error";
+            var create=Button(footer,"방 만들고 입장",()=>Run(async()=>
+            {
+                root.focusController?.focusedElement?.Blur();
+                if(draft.Topics==null||draft.Topics.Length==0)return;
+                draft.Validate();await lobby.HostAsync(draft.Copy());
+            }),"primary create-submit",DrawSound.UiConfirm);create.name="create-submit";
+
+            var basic=Box(form,"row create-basic-fields");
+            var roomName=Field(basic,"방 이름",draft.RoomName);roomName.name="create-room-name";roomName.maxLength=30;roomName.AddToClassList("grow");
+            roomName.RegisterValueChangedCallback(e=>{if(ReferenceEquals(e.target,roomName))draft.RoomName=e.newValue;});
+            Choice(basic,"공개 설정",new[]{"누구나 · 공개방","친구끼리 · 사설방"},draft.IsPrivate?1:0,i=>draft.IsPrivate=i==1).name="create-privacy";
+            var mode=Box(form,"create-mode");Text(mode,"그리기 방식","create-label");
+            var modes=Box(mode,"row create-modes");var modeButtons=new List<Button>();
+            void SelectMode(int index)
+            {
+                draft.Mode=(DrawingMode)Mathf.Clamp(index,0,1);
+                for(int i=0;i<modeButtons.Count;i++)modeButtons[i].EnableInClassList("create-mode-selected",i==(int)draft.Mode);
+            }
+            modeButtons.Add(Button(modes,"릴레이 그리기",()=>SelectMode(0),"secondary grow create-mode-button"));modeButtons[0].name="create-mode-relay";
+            modeButtons.Add(Button(modes,"한 명씩 그리기",()=>SelectMode(1),"secondary grow create-mode-button"));modeButtons[1].name="create-mode-individual";
+            SelectMode((int)draft.Mode);
+
+            var rules=CreateRoomSection(form,"게임 규칙","create-rules",_createRulesExpanded,value=>_createRulesExpanded=value,out var rulesSummary);
+            var time=CreateRoomSection(form,"시간 설정","create-time",_createTimeExpanded,value=>_createTimeExpanded=value,out var timeSummary);
+            var topics=CreateRoomSection(form,"주제 선택","create-topics",_createTopicsExpanded,value=>_createTopicsExpanded=value,out var topicSummary);
+            var names=GameDataStore.Load().Topics.Select(entry=>entry.Name).Distinct().ToArray();
+            var selected=new HashSet<string>((draft.Topics??names).Intersect(names));var topicButtons=new Dictionary<string,Button>();
+            void RefreshSummaries()
+            {
+                SetText(rulesSummary,draft.Victory==VictoryMode.RoundCount?"라이어 {0}명 · {1}라운드":"라이어 {0}명 · 목표 {1}점",draft.LiarCount,draft.Victory==VictoryMode.RoundCount?draft.RoundCount:draft.TargetScore);
+                SetText(timeSummary,"그림 {0}초 · 토론 {1}초",draft.DrawSeconds,draft.DiscussionSeconds);
+                SetText(topicSummary,"{0} / {1}개 선택",selected.Count,names.Length);
+                create.SetEnabled(selected.Count>0);topicError.style.display=selected.Count>0?DisplayStyle.None:DisplayStyle.Flex;
+            }
+            Int(rules.contentContainer,"라이어 수",draft.LiarCount,1,GameRules.MAX_PLAYERS-1,value=>{draft.LiarCount=value;RefreshSummaries();}).name="create-liars";
+            VisualElement victoryLimit=null;
+            void BuildVictoryLimit()
+            {
+                victoryLimit.Clear();
+                if(draft.Victory==VictoryMode.RoundCount)Int(victoryLimit,"진행 판수",draft.RoundCount,1,30,value=>{draft.RoundCount=value;RefreshSummaries();}).name="create-rounds";
+                else Int(victoryLimit,"목표 점수",draft.TargetScore,1,1000,value=>{draft.TargetScore=value;RefreshSummaries();}).name="create-target-score";
+            }
+            Choice(rules.contentContainer,"승리 조건",new[]{"정해진 판수 후 최고점","목표 점수 먼저 달성"},(int)draft.Victory,index=>{draft.Victory=(VictoryMode)index;BuildVictoryLimit();RefreshSummaries();}).name="create-victory";
+            victoryLimit=Box(rules.contentContainer,"create-victory-limit");BuildVictoryLimit();
+            var timeGrid=Box(time.contentContainer,"create-time-grid");TimeFields(timeGrid,draft);
+            timeGrid.RegisterCallback<ChangeEvent<int>>(_=>RefreshSummaries());
+            var bulk=Box(topics.contentContainer,"row create-topic-actions");
+            void RefreshTopics()
+            {
+                draft.Topics=names.Where(selected.Contains).ToArray();
+                foreach(var entry in topicButtons)
+                {
+                    bool chosen=selected.Contains(entry.Key);SetRawText(entry.Value,(chosen?"✓  ":"")+entry.Key);entry.Value.EnableInClassList("topic-selected",chosen);
+                }
+                RefreshSummaries();
+            }
+            Button(bulk,"전체 선택",()=>{selected.UnionWith(names);RefreshTopics();},"secondary grow").name="create-topics-all";
+            Button(bulk,"초기화",()=>{selected.Clear();RefreshTopics();},"secondary grow").name="create-topics-clear";
+            var grid=Box(topics.contentContainer,"create-topic-grid");int topicIndex=0;
+            foreach(string name in names)
+            {
+                string key=name;var button=Button(grid,"",()=>{if(!selected.Add(key))selected.Remove(key);RefreshTopics();},"topic-toggle");
+                button.name="create-topic-"+topicIndex++;button.tooltip=key;button.userData=key;topicButtons[key]=button;
+            }
+            Button(topics.contentContainer,"나만의 주제 만들기",()=>Navigate(LobbyScreen.Topics),"secondary create-custom-topics").name="create-custom-topics";
+            RefreshTopics();
+            scroll.schedule.Execute(()=>{if(scroll==_createRoomScroll&&scroll.panel!=null)scroll.scrollOffset=_createRoomScrollOffset;}).StartingIn(20);
+            Enter(panel,220,8);
         }
-        private void CreateMode(VisualElement panel)
+        private Foldout CreateRoomSection(VisualElement parent,string title,string name,bool expanded,Action<bool> changed,out Label summary)
         {
-            CreateHeading(panel,"어떻게 그릴까요?",1);
-            var modes=Box(panel,"mode-options");var modeButtons=new List<Button>();
-            void SelectMode(int index){draft.Mode=(DrawingMode)index;for(var i=0;i<modeButtons.Count;i++)modeButtons[i].EnableInClassList("mode-selected",i==index);}
-            modeButtons.Add(Button(modes,"릴레이 그리기\n한 도화지에 이어 그려요",()=>SelectMode(0),"mode-option"));
-            modeButtons.Add(Button(modes,"한 명씩 그리기\n차례마다 새 도화지",()=>SelectMode(1),"mode-option"));SelectMode((int)draft.Mode);
-            Button(panel,"다음",()=>Navigate(LobbyScreen.CreateRules),"primary next-button");
-        }
-        private void CreateRules(VisualElement panel)
-        {
-            CreateHeading(panel,"우리 방의 규칙",2);
-            Text(panel,$"{GameRules.MIN_START_PLAYERS}명부터 방장이 시작할 수 있어요. 최대 {GameRules.MAX_PLAYERS}명까지 참가해요.","rules");
-            Int(panel,"라이어 수",draft.LiarCount,1,GameRules.MAX_PLAYERS-1,v=>draft.LiarCount=v);
-            Text(panel,"참가 인원이 적으면 라이어 수를 자동으로 줄여요.","rules");
-            Choice(panel,"승리 조건",new[]{"정해진 판수 후 최고점","목표 점수 먼저 달성"},(int)draft.Victory,v=>{draft.Victory=(VictoryMode)v;Home();});
-            if(draft.Victory==VictoryMode.RoundCount)Int(panel,"진행 판수",draft.RoundCount,1,30,v=>draft.RoundCount=v);else Int(panel,"목표 점수",draft.TargetScore,1,1000,v=>draft.TargetScore=v);
-            Button(panel,"시간 설정",()=>Navigate(LobbyScreen.Time),"secondary");
-            Button(panel,"다음",()=>Navigate(LobbyScreen.CreateDetails),"primary next-button");
-        }
-        private void CreateDetails(VisualElement panel)
-        {
-            CreateHeading(panel,"방 이름을 정해요",3);
-            var roomName=Field(panel,"방 이름",draft.RoomName);roomName.RegisterValueChangedCallback(e=>draft.RoomName=e.newValue);
-            var topics=GameDataStore.Load().Topics.Select(t=>t.Name).ToArray();
-            draft.Topics=(draft.Topics??topics).Intersect(topics).ToArray();
-            Button(panel,$"주제 선택   ·   {draft.Topics.Length}개 선택   →",()=>Navigate(LobbyScreen.TopicSelection),"secondary topic-selection-button");
-            Choice(panel,"공개 설정",new[]{"누구나 · 공개방","친구끼리 · 사설방"},draft.IsPrivate?1:0,i=>draft.IsPrivate=i==1);
-            var create=Button(panel,"방 만들고 입장",()=>Run(async()=> {draft.Validate();await lobby.HostAsync(draft.Copy());}),"primary next-button");
-            create.SetEnabled(draft.Topics.Length>0);
-            if(draft.Topics.Length==0)Text(panel,"주제를 하나 이상 선택하세요.","rules");
+            var foldout=new Foldout{value=expanded};foldout.name=name;foldout.AddToClassList("create-foldout");parent.Add(foldout);
+            var toggle=foldout.Q<Toggle>();toggle.name=name+"-toggle";toggle.AddToClassList("create-foldout-toggle");
+            var heading=Box(toggle,"create-section-heading grow");heading.pickingMode=PickingMode.Ignore;
+            Text(heading,title,"create-section-title").pickingMode=PickingMode.Ignore;
+            summary=Text(heading,"","create-section-summary");summary.name=name+"-summary";summary.pickingMode=PickingMode.Ignore;
+            foldout.contentContainer.AddToClassList("create-section-fields");
+            foldout.RegisterValueChangedCallback(e=>
+            {
+                if(!ReferenceEquals(e.target,foldout))return;
+                changed(e.newValue);if(e.newValue)Enter(foldout.contentContainer,160,4);
+            });
+            return foldout;
         }
 
         private void JoinForm(VisualElement panel)
         {
             if(IsMobile)
             {
-                Text(panel,"친구가 알려준\n6자리 코드를 입력하세요","mobile-intro");Text(panel,"영문과 숫자 6자리 · 대소문자 구분 없음","muted mobile-small");
-                var card=Box(panel,"mobile-card");var input=Field(card,"방 코드","");input.maxLength=16;input.AddToClassList("mobile-code-input");input.textEdition.placeholder="ABC 234";
+                var codeRow=Box(panel,"mobile-join-code-row row");var input=Field(codeRow,"방 코드","");input.maxLength=16;Classes(input,"mobile-code-input grow");input.textEdition.placeholder="ABC 234";
+                LeftToRightInput(input);
                 input.textEdition.keyboardType=TouchScreenKeyboardType.ASCIICapable;input.textEdition.autoCorrection=false;
-                input.RegisterValueChangedCallback(e=>input.SetValueWithoutNotify(NormalizeRoomCodeInput(e.newValue)));
-                Button(card,"붙여넣기",()=>{input.value=NormalizeRoomCodeInput(GUIUtility.systemCopyBuffer);},"secondary");
-                Text(card,"공백이나 하이픈 없이 입력해도 돼요.","muted mobile-small");
+                input.RegisterValueChangedCallback(e=>{if(ReferenceEquals(e.target,input))input.SetValueWithoutNotify(NormalizeRoomCodeInput(e.newValue));});
+                Button(codeRow,"붙여넣기",()=>{input.value=NormalizeRoomCodeInput(GUIUtility.systemCopyBuffer);},"secondary mobile-code-paste");
                 void Join(bool watch)=>Run(()=>lobby.JoinCodeAsync(RequireMobileRoomCode(input.value),watch));
-                Button(panel,"참가하기",()=>Join(false),"primary");Button(panel,"관전하기",()=>Join(true),"secondary");
-                Text(panel,"게임이 진행 중이면 관전으로 입장합니다.","muted mobile-small");return;
+                var actions=Box(panel,"mobile-join-actions row");Button(actions,"참가하기",()=>Join(false),"primary grow");Button(actions,"관전",()=>Join(true),"secondary grow mobile-last");return;
             }
-            Text(panel,"친구에게 받은 코드를 입력하세요.","subtitle");
-            var code=Field(panel,"방 코드","");code.maxLength=64;
-            var spectator=new Toggle("관전으로 참가");spectator.AddToClassList("field");panel.Add(spectator);
+            var code=Field(panel,"방 코드","");code.maxLength=64;LeftToRightInput(code);
+            var spectator=new Toggle(L.Text("관전으로 참가"));SetText(spectator.labelElement,"관전으로 참가");spectator.AddToClassList("field");panel.Add(spectator);
             Button(panel,"입장하기",()=>Run(()=>lobby.JoinCodeAsync(code.value,spectator.value)),"primary next-button");
         }
 
-        private void BrowseForm(VisualElement panel)
-        {
-            if(IsMobile)Text(panel,"지금 같이 그릴 사람들","mobile-page-title");
-            var search=Field(panel,"방 이름 검색",_roomSearch);
-            var controls=IsMobile?Box(panel,"mobile-list-actions row"):panel;
-            Button(controls,"검색 / 새로고침",()=>SearchRooms(search.value),"secondary grow");
-            if(IsMobile)Button(controls,"방 만들기",()=>Navigate(LobbyScreen.CreateMode),"primary grow mobile-last");
-            publicRoomList=new ScrollView();publicRoomList.AddToClassList("room-list");panel.Add(publicRoomList);RefreshPublicRooms();
-        }
         private void RefreshPublicRooms()
         {
             if(publicRoomList?.panel==null)return;
-            var list=publicRoomList;var offset=list.scrollOffset;
+            var list=publicRoomList;bool empty=lobby.PublicRooms.Count==0;var offset=empty?Vector2.zero:list.scrollOffset;
             publicRoomList.Clear();
-            if(lobby.PublicRooms.Count==0)Text(publicRoomList,"공개방이 없습니다. 새 방을 만들어 보세요.","muted");
+            var emptyState=list.contentViewport.Q<VisualElement>("rooms-empty-state");
+            if(empty)
+            {
+                if(emptyState==null)
+                {
+                    emptyState=Box(list.contentViewport,"room-list-empty-state");emptyState.name="rooms-empty-state";emptyState.pickingMode=PickingMode.Ignore;
+                    Text(emptyState,"열린 방이 없습니다.","muted room-list-empty-message").pickingMode=PickingMode.Ignore;
+                }
+                list.scrollOffset=Vector2.zero;
+            }
+            else emptyState?.RemoveFromHierarchy();
             foreach(var room in lobby.PublicRooms)
             {
                 var entry=Box(publicRoomList,IsMobile?"room-entry mobile-room-item":"room-entry");var info=Box(entry,"grow");
                 if(IsMobile)
                 {
-                    var heading=Box(info,"mobile-room-top row");Text(heading,room.Name,"player-name grow");Text(heading,room.IsInProgress?"진행 중":"대기 중","mobile-status-pill");
-                    Text(info,$"{room.Players}/{room.MaxPlayers}명 · 관전 {room.Spectators}명","muted mobile-small mobile-room-meta");
+                    var heading=Box(info,"mobile-room-top row");RawText(heading,room.Name,"player-name grow");Text(heading,room.IsInProgress?"진행 중":"대기 중","mobile-room-state");
+                    var metadata=Box(info,"mobile-room-metadata row");Text(metadata,"{0} / {1}명","muted mobile-small mobile-room-meta",room.Players,room.MaxPlayers);
+                    if(room.Spectators>0)Text(metadata,"관전 {0}명","muted mobile-small mobile-room-meta",room.Spectators);
                 }
-                else{Text(info,room.Name,"player-name");Text(info,$"{room.Players} / {room.MaxPlayers} 명 · 관전 {room.Spectators}명 · "+(room.IsInProgress?"진행 중":"대기 중"),"muted mobile-small");}
+                else{RawText(info,room.Name,"player-name");Text(info,room.IsInProgress?"{0} / {1}명 · 관전 {2}명 · 진행 중":"{0} / {1}명 · 관전 {2}명 · 대기 중","muted mobile-small",room.Players,room.MaxPlayers,room.Spectators);}
                 var actions=IsMobile?Box(entry,"mobile-room-entry-actions mobile-room-action row"):entry;
-                if(IsMobile)Text(actions,DisplayRoomCode(room.Code),"mobile-card-title grow");
-                var enter=Button(actions,room.IsInProgress&&IsMobile?"입장":"참가",()=>Run(()=>lobby.JoinLobbyAsync(room.Id)),"primary");enter.SetEnabled(room.Players<room.MaxPlayers);
-                Button(actions,"관전",()=>Run(()=>lobby.JoinLobbyAsync(room.Id,true)),"secondary");
+                if(!IsMobile||!room.IsInProgress)
+                {
+                    var enter=Button(actions,"참가",()=>Run(()=>lobby.JoinLobbyAsync(room.Id)),"primary");enter.SetEnabled(room.Players<room.MaxPlayers);
+                }
+                Button(actions,"관전",()=>Run(()=>lobby.JoinLobbyAsync(room.Id,true)),IsMobile&&room.IsInProgress?"primary":"secondary");
+                if(IsMobile)actions.ElementAt(0).AddToClassList("mobile-room-entry-first");
             }
             list.schedule.Execute(()=>{if(list==publicRoomList&&list.panel!=null)list.scrollOffset=offset;}).StartingIn(20);
         }
-        private void EnterBrowse(){Navigate(LobbyScreen.Browse);SearchRooms(_roomSearch);}
         private void SearchRooms(string query)
         {
-            if(runningAction||lobby.IsBusy)return;
-            bool changed=_roomSearch!=(query??"");_roomSearch=query??"";_nextRoomRefresh=Time.unscaledTime+5;
+            string value=(query??"").Trim();if(value.Length>30)value=value.Substring(0,30);
+            bool changed=_roomSearch!=value;_roomSearch=_roomSearchDraft=value;_roomSearchField?.SetValueWithoutNotify(value);
+            _roomSearchPending=true;_nextRoomRefresh=Time.unscaledTime+5;
             if(changed&&publicRoomList!=null)publicRoomList.scrollOffset=Vector2.zero;
-            Run(()=>lobby.SearchRoomsAsync(_roomSearch));
+            RefreshRoomsInBackground();
         }
         private void RefreshRoomsInBackground()
         {
-            if(!_backgroundRoomRefresh||_roomRefreshRunning||inRoom||lobbyScreen!=LobbyScreen.Browse||!lobby.IsAuthenticated
-                ||lobby.IsBusy||runningAction||Time.unscaledTime<_nextRoomRefresh)return;
+            if((!_backgroundRoomRefresh&&!_roomSearchPending)||_roomRefreshRunning||inRoom||lobbyScreen!=LobbyScreen.Main||!lobby.IsAuthenticated
+                ||lobby.IsBusy||runningAction||(!_roomSearchPending&&Time.unscaledTime<_nextRoomRefresh))return;
+            if(_roomSearchPending){_roomSearchPending=false;string query=_roomSearch;Run(()=>lobby.SearchRoomsAsync(query));return;}
             _=RefreshRoomsAsync();
         }
         private async Task RefreshRoomsAsync()
@@ -545,6 +925,7 @@ namespace DrawLiar
 
         private void Room()
         {
+            ResetLobbyChatView();_mobileLobbyChatButton=null;
             inRoom=true;content.Clear();publicRoomList=null;serviceNotice=null;playerKey="";actionKey="";contextKey="";
             playerCards.Clear();playerStatuses.Clear();selectedPlayerId=-1;secretHidden=false;voteSubmitted=false;
             root.RemoveFromClassList("at-home");root.AddToClassList("in-game");content.AddToClassList("room-layout");lobbyScreen=LobbyScreen.Main;
@@ -554,6 +935,7 @@ namespace DrawLiar
             roomBadge=Text(round,"—","round-number");roundCaption=Text(round,"대기실","muted round-caption");
             phaseBanner=Box(hud,"phase-bar");phaseTitle=Text(phaseBanner,"대기실","phase-title");phaseDetail=Text(phaseBanner,"","phase-detail");
             var menu=Box(hud,"room-menu");timer=Text(menu,"","timer");Button(menu,"메뉴",RoomMenu,"secondary");
+            timer.languageDirection=LanguageDirection.LTR;roomBadge.languageDirection=LanguageDirection.LTR;
             var numeralFont=Resources.Load<Font>("DrawLiar/Fonts/BarlowCondensed-SemiBold");
             if(numeralFont!=null){timer.style.unityFontDefinition=FontDefinition.FromFont(numeralFont);roomBadge.style.unityFontDefinition=FontDefinition.FromFont(numeralFont);}
             var workspace=Box(content,"workspace");var sidebar=Box(workspace,"game-sidebar");
@@ -561,10 +943,10 @@ namespace DrawLiar
             role=Text(secret,"","role");Text(secret,"제시어","secret-label");word=Text(secret,"—","word");
             secretToggle=Button(secret,"숨기기",()=>{secretHidden=!secretHidden;RefreshSecret(network.State);},"secret-toggle");
             Box(sidebar,"grow");
-            chatHistory=new ScrollView(ScrollViewMode.Vertical);chatHistory.AddToClassList("chat-history");sidebar.Add(chatHistory);
+            chatHistory=DrawSmoothScroll.Create(ScrollViewMode.Vertical);chatHistory.AddToClassList("chat-history");sidebar.Add(chatHistory);
             chatOpen=Button(sidebar,"Enter  채팅",OpenChat,"chat-open");
             chatbar=Box(sidebar,"chatbar");chatbar.style.display=DisplayStyle.None;
-            chatInput=new TextField(){maxLength=160};chatInput.textEdition.placeholder="채팅 입력";chatInput.AddToClassList("chat-input");chatbar.Add(chatInput);
+            chatInput=new TextField(){maxLength=160};Placeholder(chatInput,"채팅 입력");chatInput.AddToClassList("chat-input");chatbar.Add(chatInput);
             chatInput.RegisterCallback<KeyDownEvent>(e=>
             {
                 if(e.keyCode==KeyCode.Return||e.keyCode==KeyCode.KeypadEnter){if(!string.IsNullOrWhiteSpace(chatInput.value))DrawAudio.Instance?.Play(DrawSound.UiConfirm);SendChat();e.StopPropagation();}
@@ -589,7 +971,7 @@ namespace DrawLiar
             var toolRow=Box(drawingTools,"tool-row");var brush=Button(toolRow,"펜",()=>surface.Eraser=false,"secondary");var eraser=Button(toolRow,"지우개",()=>surface.Eraser=true,"secondary");
             if(IsMobile)Button(toolRow,"굵기",BrushOptions,"secondary mobile-last");
             VisualElement paletteParent=drawingTools;
-            if(IsMobile){var scroll=new ScrollView(ScrollViewMode.Horizontal);scroll.AddToClassList("mobile-palette-scroll");drawingTools.Add(scroll);paletteParent=scroll;}
+            if(IsMobile){var scroll=DrawSmoothScroll.Create(ScrollViewMode.Horizontal);scroll.AddToClassList("mobile-palette-scroll");drawingTools.Add(scroll);paletteParent=scroll;}
             var palette=Box(paletteParent,"palette");
             var colors=new[]{new Color32(40,43,39,255),new Color32(225,127,103,255),new Color32(228,182,107,255),DrawingSurface.PaperColor,
                 new Color32(83,110,130,255),new Color32(166,171,159,255),new Color32(35,124,98,255),new Color32(157,147,219,255)};
@@ -599,14 +981,14 @@ namespace DrawLiar
                 Button swatch=null;swatch=Button(palette,"",()=>{surface.BrushColor=color;surface.Eraser=false;foreach(var item in swatches)item.RemoveFromClassList("selected");swatch.AddToClassList("selected");},"swatch");
                 if(IsMobile){swatch.style.backgroundColor=Color.clear;var dot=Box(swatch,"mobile-swatch-dot");dot.pickingMode=PickingMode.Ignore;dot.style.backgroundColor=(Color)color;}
                 else swatch.style.backgroundColor=(Color)color;
-                swatch.tooltip="색상 "+(swatches.Count+1);swatch.EnableInClassList("palette-row-end",swatches.Count%4==3);swatches.Add(swatch);
+                SetTooltip(swatch,"색상 {0}",swatches.Count+1);swatch.EnableInClassList("palette-row-end",swatches.Count%4==3);swatches.Add(swatch);
             }
             swatches[0].AddToClassList("selected");
             Text(drawingTools,"굵기","secret-label");var sizes=Box(drawingTools,"brush-sizes");var sizeButtons=new List<Button>();
             foreach(var width in new[]{5,11,24})
             {
                 Button choice=null;choice=Button(sizes,"●",()=>{surface.BrushSize=width/1200f;foreach(var item in sizeButtons)item.RemoveFromClassList("selected");choice.AddToClassList("selected");},"brush-size-option secondary");
-                choice.userData=width/1200f;choice.tooltip="굵기 "+width;choice.style.fontSize=width==5?8:width==11?12:18;
+                choice.userData=width/1200f;SetTooltip(choice,"굵기 {0}",width);choice.style.fontSize=width==5?8:width==11?12:18;
                 choice.EnableInClassList("selected",width==11);sizeButtons.Add(choice);
             }
             surface.BrushSize=11/1200f;
@@ -630,23 +1012,27 @@ namespace DrawLiar
             _mobileRoomStack=Box(content,"mobile-room");
             var hud=Box(_mobileRoomStack,"room-hud");phaseBanner=Box(hud,"phase-bar");phaseTitle=Text(phaseBanner,"대기실","phase-title");phaseDetail=Text(phaseBanner,"","phase-detail");
             timer=Text(hud,"","timer");Button(hud,"메뉴",RoomMenu,"secondary mobile-back");
+            timer.languageDirection=LanguageDirection.LTR;
             var metadata=Box(_mobileRoomStack,"mobile-round-card row");var round=Box(metadata,"grow");
             _mobileRoundInfo=Text(round,"","mobile-card-title");_mobileRoundHint=Text(round,"","muted mobile-small");
             roomBadge=Text(round,"","mobile-hidden");roundCaption=Text(round,"","mobile-hidden");
-            _mobileRoomCode=Button(metadata,DisplayRoomCode(lobby.RoomCode),()=>{GUIUtility.systemCopyBuffer=lobby.RoomCode;Toast("방 코드를 복사했습니다.");},"secondary mobile-code-copy");
+            roomBadge.languageDirection=LanguageDirection.LTR;
+            _mobileRoomCode=Button(metadata,"",()=>{GUIUtility.systemCopyBuffer=lobby.RoomCode;Toast("방 코드를 복사했습니다.");},"secondary mobile-code-copy");SetRawText(_mobileRoomCode,DisplayRoomCode(lobby.RoomCode));
+            _mobileRoomCode.languageDirection=LanguageDirection.LTR;
             _mobileSecret=Box(_mobileRoomStack,"secret-bar mobile-secret");topic=Text(_mobileSecret,"","topic");
             var identity=Box(_mobileSecret,"mobile-role-line row");role=Text(identity,"","role");word=Text(identity,"","word grow");secretToggle=Button(identity,"숨기기",()=>{secretHidden=!secretHidden;RefreshSecret(network.State);},"secret-toggle");
             _mobileWorkspace=Box(_mobileRoomStack,"mobile-workspace");_mobileCanvas=Box(_mobileWorkspace,"canvas-frame");
             surface=new DrawingSurface(network);_mobileCanvas.Add(surface);_mobileCanvas.RegisterCallback<GeometryChangedEvent>(_=>SizeMobileCanvas());
-            _mobileRoomScroll=new ScrollView(ScrollViewMode.Vertical);_mobileRoomScroll.AddToClassList("mobile-controls-scroll");_mobileWorkspace.Add(_mobileRoomScroll);
+            _mobileRoomScroll=DrawSmoothScroll.Create(ScrollViewMode.Vertical);_mobileRoomScroll.AddToClassList("mobile-controls-scroll");_mobileWorkspace.Add(_mobileRoomScroll);
             _mobileControls=Box(_mobileRoomScroll,"mobile-controls");CreateDrawingTools(_mobileControls);contextInfo=Box(_mobileControls,"context-info");
-            _mobileRoster=Box(_mobileControls,"mobile-roster");_mobileRosterTitle=Text(_mobileRoster,"참가자 · 좌우로 넘겨 보기","muted mobile-small");
-            _mobileRosterScroll=new ScrollView(ScrollViewMode.Horizontal);_mobileRosterScroll.AddToClassList("mobile-roster-scroll");_mobileRoster.Add(_mobileRosterScroll);playerStrip=Box(_mobileRosterScroll,"players players-strip");
+            _mobileRoster=Box(_mobileControls,"mobile-roster");_mobileRosterTitle=Text(_mobileRoster,"참가자","muted mobile-small");
+            _mobileRosterScroll=DrawSmoothScroll.Create(ScrollViewMode.Horizontal);_mobileRosterScroll.AddToClassList("mobile-roster-scroll");_mobileRoster.Add(_mobileRosterScroll);playerStrip=Box(_mobileRosterScroll,"players players-strip");
+            _mobileRosterScroll.contentViewport.RegisterCallback<GeometryChangedEvent>(_=>SizeMobileWaitingPlayers());
             _mobileActions=Box(_mobileWorkspace,"mobile-bottom-actions");phaseActions=Box(_mobileActions,"phase-actions");chatOpen=Button(_mobileActions,"채팅 열기",OpenChat,"secondary chat-open");
             _mobileChatSheet=Box(content,"overlay mobile-chat-layer");_mobileChatSheet.style.display=DisplayStyle.None;
             var sheet=Box(_mobileChatSheet,"modal mobile-chat-sheet");var chatHeading=Box(sheet,"row mobile-page-heading");Text(chatHeading,"채팅","title grow");Button(chatHeading,"닫기",CloseChat,"secondary mobile-back",DrawSound.UiCancel);
-            chatHistory=new ScrollView(ScrollViewMode.Vertical);chatHistory.AddToClassList("chat-history");sheet.Add(chatHistory);
-            chatbar=Box(sheet,"chatbar");chatbar.style.display=DisplayStyle.None;chatInput=new TextField{maxLength=160};chatInput.textEdition.placeholder="채팅 입력";chatInput.AddToClassList("chat-input");chatbar.Add(chatInput);
+            chatHistory=DrawSmoothScroll.Create(ScrollViewMode.Vertical);chatHistory.AddToClassList("chat-history");sheet.Add(chatHistory);
+            chatbar=Box(sheet,"chatbar");chatbar.style.display=DisplayStyle.None;chatInput=new TextField{maxLength=160};Placeholder(chatInput,"채팅 입력");chatInput.AddToClassList("chat-input");chatbar.Add(chatInput);
             chatInput.RegisterCallback<KeyDownEvent>(e=>{if(e.keyCode==KeyCode.Return||e.keyCode==KeyCode.KeypadEnter){if(!string.IsNullOrWhiteSpace(chatInput.value))DrawAudio.Instance?.Play(DrawSound.UiConfirm);SendChat();e.StopPropagation();}});
             Button(chatbar,"보내기",SendChat,"primary",DrawSound.UiConfirm);
             OnMobileLayoutChanged();
@@ -667,6 +1053,26 @@ namespace DrawLiar
                 if(_mobileActions.parent!=_mobileControls)_mobileControls.Add(_mobileActions);
             }
             SizeMobileCanvas();
+            SizeMobileWaitingPlayers();
+        }
+
+        private void SizeMobileWaitingPlayers()
+        {
+            if(!IsMobile||_mobileRoomStack==null||!_mobileRoomStack.ClassListContains("mobile-waiting")||playerStrip?.panel==null)return;
+            float width=_mobileRosterScroll.contentViewport.contentRect.width;
+            if(width<=0)return;
+            const float GAP=12;
+            int columns=Mathf.Clamp(Mathf.FloorToInt((width+GAP)/180),2,4);
+            float cardWidth=Mathf.Floor((width-GAP*(columns-1))/columns);
+            float avatarSize=Mathf.Min(Mathf.Clamp(cardWidth-62,96,144),Mathf.Max(0,cardWidth-26));
+            int index=0;
+            foreach(var card in playerStrip.Children())
+            {
+                card.style.width=cardWidth;card.style.height=Mathf.Max(cardWidth+24,avatarSize+76);
+                card.style.marginRight=++index%columns==0?0:GAP;
+                var avatar=card.Q<AvatarElement>();
+                if(avatar!=null){avatar.style.width=avatarSize;avatar.style.height=avatarSize;}
+            }
         }
 
         private void SizeMobileCanvas()
@@ -724,7 +1130,9 @@ namespace DrawLiar
         }
         private void RoomShortcut(KeyDownEvent e)
         {
+            if(!inRoom&&e.keyCode==KeyCode.Escape&&overlay!=null){CloseModal();e.StopPropagation();return;}
             if(!inRoom)return;
+            if(e.keyCode==KeyCode.Escape&&_roomOptionsSaving){e.StopPropagation();return;}
             if(e.keyCode==KeyCode.Escape){if(overlay!=null)CloseModal();else if(chatbar.resolvedStyle.display!=DisplayStyle.None)CloseChat();else RoomMenu();e.StopPropagation();}
             else if((e.keyCode==KeyCode.Return||e.keyCode==KeyCode.KeypadEnter)&&overlay==null&&chatbar.resolvedStyle.display==DisplayStyle.None
                 &&!(e.target is TextField)&&!((e.target as VisualElement)?.GetFirstAncestorOfType<TextField>()!=null))
@@ -733,44 +1141,120 @@ namespace DrawLiar
         private void RoomMenu()
         {
             var state=network.State;if(state==null)return;
-            CloseChat();var modal=Modal("메뉴");Text(modal,state.Settings.RoomName,"subtitle");
+            CloseChat();var modal=Modal("메뉴");RawText(modal,state.Settings.RoomName,"subtitle");
+            if(CanEditRoomOptions(state))Button(modal,"방 옵션",RoomOptions,"secondary").name="room-options-menu";
             Button(modal,"방 코드 복사",()=>{GUIUtility.systemCopyBuffer=lobby.RoomCode;Toast("방 코드를 복사했습니다.");},"secondary");
             if(IsMobile&&state.Phase!=GamePhase.Lobby&&!string.IsNullOrEmpty(state.Word))
                 Button(modal,secretHidden?"제시어 보기":"제시어 숨기기",()=>{secretHidden=!secretHidden;RefreshSecret(network.State);CloseModal();},"secondary");
             Button(modal,"옵션",Options,"secondary");
             Button(modal,"나가기",()=>Run(Leave),"danger",DrawSound.UiCancel);Button(modal,"닫기",CloseModal,"secondary",DrawSound.UiCancel);
         }
+        private static bool CanEditRoomOptions(RoomSnapshot state) => state!=null&&state.IsHost
+            &&(state.Phase==GamePhase.Lobby||state.Phase==GamePhase.MatchResults);
+
+        private void RoomOptions()
+        {
+            var state=network.State;if(!CanEditRoomOptions(state))return;
+            var settings=state.Settings.Copy();
+            var names=state.AvailableTopics??Array.Empty<string>();
+            if(names.Length==0)
+            {
+                var asset=Resources.Load<TextAsset>("DrawLiar/GameData");
+                var data=asset!=null?JsonUtility.FromJson<GameData>(asset.text):new GameData();
+                names=(data.Topics??Array.Empty<TopicData>()).Select(entry=>entry.Name).Concat(settings.Topics??Array.Empty<string>()).Distinct().ToArray();
+            }
+            names=names.Where(name=>!string.IsNullOrWhiteSpace(name)).Distinct().Take(128).ToArray();
+            var editor=Modal("방 옵션",false);editor.name="room-options-editor";editor.AddToClassList("room-options-editor");
+            _roomOptionsEditor=editor;_roomOptionsDraft=settings;
+            var tabs=Box(editor,"row room-options-tabs");
+            var scroll=DrawSmoothScroll.Create(ScrollViewMode.Vertical);scroll.name="room-options-scroll";scroll.AddToClassList("room-options-scroll");editor.Add(scroll);
+            var body=Box(scroll,"room-options-body");
+            var footer=Box(editor,"row room-options-footer");
+            var cancel=Button(footer,"닫기",CloseModal,"secondary grow",DrawSound.UiCancel);cancel.name="room-options-cancel";
+            Button save=null;save=Button(footer,"저장",()=>Run(async()=>
+            {
+                root.focusController?.focusedElement?.Blur();
+                if(!CanEditRoomOptions(network.State)){CloseModal();Toast("방 옵션 변경 권한이 없습니다.");return;}
+                _roomOptionsSaving=true;editor.SetEnabled(false);
+                try
+                {
+                    await network.ConfigureRoomAsync(_roomOptionsDraft);
+                    if(_roomOptionsEditor==editor){CloseModal();Toast("방 옵션을 변경했습니다.");}
+                }
+                finally
+                {
+                    if(_roomOptionsEditor==editor){_roomOptionsSaving=false;editor.SetEnabled(true);save.SetEnabled(settings.Topics?.Length>0);}
+                }
+            }),"primary grow");save.name="room-options-save";
+            var buttons=new List<Button>();
+            void SelectTab(int index)
+            {
+                body.Clear();for(int i=0;i<buttons.Count;i++)buttons[i].EnableInClassList("room-options-selected",i==index);
+                if(index==0)
+                {
+                    var name=Field(body,"방 이름",settings.RoomName);name.name="room-options-name";name.maxLength=30;
+                    name.RegisterValueChangedCallback(e=>{if(ReferenceEquals(e.target,name))settings.RoomName=e.newValue;});
+                    Choice(body,"공개 설정",new[]{"누구나 · 공개방","친구끼리 · 사설방"},settings.IsPrivate?1:0,i=>settings.IsPrivate=i==1);
+                }
+                else if(index==1)
+                {
+                    Choice(body,"그리기 방식",new[]{"릴레이 그리기","한 명씩 그리기"},(int)settings.Mode,i=>settings.Mode=(DrawingMode)i);
+                    Int(body,"라이어 수",settings.LiarCount,1,GameRules.MAX_PLAYERS-1,v=>settings.LiarCount=v);
+                    Choice(body,"승리 조건",new[]{"정해진 판수 후 최고점","목표 점수 먼저 달성"},(int)settings.Victory,i=>{settings.Victory=(VictoryMode)i;SelectTab(1);});
+                    if(settings.Victory==VictoryMode.RoundCount)Int(body,"진행 판수",settings.RoundCount,1,30,v=>settings.RoundCount=v);
+                    else Int(body,"목표 점수",settings.TargetScore,1,1000,v=>settings.TargetScore=v);
+                }
+                else if(index==2)TimeFields(body,settings);
+                else
+                {
+                    var selected=new HashSet<string>((settings.Topics??names).Intersect(names));var controls=Box(body,"row spread");
+                    var count=Text(controls,"","topic-count");var bulk=Box(controls,"row");
+                    var grid=Box(body,"topic-grid");var topics=new Dictionary<string,Button>();
+                    void Refresh()
+                    {
+                        settings.Topics=names.Where(selected.Contains).ToArray();save.SetEnabled(settings.Topics.Length>0);
+                        SetText(count,"{0} / {1}개 선택",selected.Count,names.Length);
+                        foreach(var entry in topics){bool chosen=selected.Contains(entry.Key);SetRawText(entry.Value,(chosen?"✓  ":"")+entry.Key);entry.Value.EnableInClassList("topic-selected",chosen);}
+                    }
+                    Button(bulk,"전체 선택",()=>{selected.UnionWith(names);Refresh();},"secondary");
+                    Button(bulk,"초기화",()=>{selected.Clear();Refresh();},"secondary");
+                    foreach(string name in names){string key=name;var button=topics[key]=Button(grid,"",()=>{if(!selected.Add(key))selected.Remove(key);Refresh();},"topic-toggle");button.tooltip=key;button.userData=key;}
+                    Refresh();
+                }
+                scroll.scrollOffset=Vector2.zero;HideMobileScrollers();
+            }
+            var titles=new[]{"방 정보","게임 규칙","시간 설정","주제"};var ids=new[]{"info","rules","time","topics"};
+            for(int i=0;i<titles.Length;i++){int index=i;var button=Button(tabs,titles[i],()=>SelectTab(index),"secondary grow");button.name="room-options-"+ids[i];buttons.Add(button);}
+            save.SetEnabled(settings.Topics?.Length>0);SelectTab(0);
+        }
         private void RefreshSecret(RoomSnapshot state)
         {
             if(state==null)return;
-            topic.text=state.Phase==GamePhase.Lobby?"게임 대기":state.Topic;
-            role.text=state.Phase==GamePhase.Lobby?"":state.LocalIsSpectator?"관전":state.LocalIsLiar?"라이어":"시민";
-            word.text=state.Phase==GamePhase.Lobby?"—":string.IsNullOrEmpty(state.Word)?"비공개":secretHidden?"•••":state.Word;
+            if(state.Phase==GamePhase.Lobby)SetText(topic,"게임 대기");else if(IsMobile)SetText(topic,"주제 · {0}",state.Topic);else SetRawText(topic,state.Topic);
+            SetText(role,state.Phase==GamePhase.Lobby?"":state.LocalIsSpectator?"관전":state.LocalIsLiar?"라이어":"시민");
+            if(state.Phase==GamePhase.Lobby)SetRawText(word,"—");
+            else if(string.IsNullOrEmpty(state.Word))SetText(word,"비공개");
+            else SetRawText(word,secretHidden?"•••":state.Word);
             word.EnableInClassList("word-hidden",string.IsNullOrEmpty(state.Word)||secretHidden);
             secretToggle.style.display=state.Phase==GamePhase.Lobby||string.IsNullOrEmpty(state.Word)?DisplayStyle.None:DisplayStyle.Flex;
-            secretToggle.text=secretHidden?"제시어 보기":"숨기기";
-            if(IsMobile)
-            {
-                topic.text="주제 · "+(state.Phase==GamePhase.Lobby?"게임 대기":state.Topic);
-                word.text=state.Phase==GamePhase.Lobby?"게임이 시작되면 단어가 공개돼요":"제시어 "+(string.IsNullOrEmpty(state.Word)?"비공개":secretHidden?"•••":state.Word);
-            }
+            SetText(secretToggle,secretHidden?"제시어 보기":"숨기기");
         }
         private void RefreshState(RoomSnapshot state)
         {
+            if(_roomOptionsEditor!=null&&!CanEditRoomOptions(state))CloseModal();
             if(state==null){if(inRoom){CloseModal();Home();}return;}
             if(!inRoom)Room();
             bool phaseChanged=previousPhase!=state.Phase;
             if(phaseChanged){selectedPlayerId=-1;voteSubmitted=false;contextKey="";}
             if(selectedPlayerId>=0&&!state.Players.Any(p=>p.Id==selectedPlayerId&&p.IsConnected&&!p.IsSpectator))
             {selectedPlayerId=-1;voteSubmitted=false;}
-            roomBadge.text=state.Phase==GamePhase.Lobby?"—":state.Settings.Victory==VictoryMode.RoundCount?$"{state.Round:00} / {state.Settings.RoundCount:00}":$"{state.Round:00}";
-            roundCaption.text=state.Phase==GamePhase.Lobby?"대기실":"라운드";
+            SetRawText(roomBadge,state.Phase==GamePhase.Lobby?"—":state.Settings.Victory==VictoryMode.RoundCount?$"{state.Round:00} / {state.Settings.RoundCount:00}":$"{state.Round:00}");
+            SetText(roundCaption,state.Phase==GamePhase.Lobby?"대기실":"라운드");
             RefreshSecret(state);
             int remaining=Mathf.Max(0,Mathf.CeilToInt(state.RemainingSeconds));
-            timer.text=state.Phase==GamePhase.Lobby||state.Phase==GamePhase.MatchResults?"":$"{remaining/60:00}:{remaining%60:00}";
+            SetRawText(timer,state.Phase==GamePhase.Lobby||state.Phase==GamePhase.MatchResults?"":$"{remaining/60:00}:{remaining%60:00}");
             timer.EnableInClassList("timer-urgent",remaining<=5&&remaining>0);
-            phaseTitle.text=PhaseName(state.Phase);
-            if(IsMobile&&state.Phase==GamePhase.Drawing)phaseTitle.text="그림 차례";
+            SetText(phaseTitle,IsMobile&&state.Phase==GamePhase.Drawing?"그림 차례":PhaseName(state.Phase));
             if(IsMobile&&_mobileRoundInfo!=null)
             {
                 bool waiting=state.Phase==GamePhase.Lobby;
@@ -778,14 +1262,30 @@ namespace DrawLiar
                 _mobileCanvas.style.display=waiting?DisplayStyle.None:DisplayStyle.Flex;
                 _mobileSecret.style.display=waiting?DisplayStyle.None:DisplayStyle.Flex;
                 var rosterMode=waiting?ScrollViewMode.Vertical:ScrollViewMode.Horizontal;
-                if(_mobileRosterScroll.mode!=rosterMode)_mobileRosterScroll.mode=rosterMode;
-                _mobileRosterTitle.text=waiting?"참가자":"참가자 · 좌우로 넘겨 보기";
-                _mobileRoundInfo.text=state.Phase==GamePhase.Lobby?$"{state.Players.Count(p=>!p.IsSpectator&&p.IsConnected)} / {state.Settings.MaxPlayers}명 · 게임 대기":$"{state.Round}라운드 · "+(state.Phase==GamePhase.Drawing?(network.CanDraw?"내 차례":"그림 관전"):PhaseName(state.Phase));
-                _mobileRoundHint.text=state.Phase==GamePhase.Lobby?$"라이어 {state.Settings.LiarCount}명 · "+(state.Settings.Victory==VictoryMode.RoundCount?$"{state.Settings.RoundCount}라운드":$"목표 {state.Settings.TargetScore}점"):MobilePhaseHint(state);
-                _mobileRoomCode.text=DisplayRoomCode(lobby.RoomCode);
+                if(_mobileRosterScroll.mode!=rosterMode)
+                {
+                    _mobileRosterScroll.mode=rosterMode;
+                    _mobileRosterScroll.scrollOffset=Vector2.zero;_mobileRoomScroll.scrollOffset=Vector2.zero;
+                }
+                SetText(_mobileRosterTitle,"참가자");
+                if(waiting)
+                {
+                    SetText(_mobileRoundInfo,"{0} / {1}명",state.Players.Count(p=>!p.IsSpectator&&p.IsConnected),state.Settings.MaxPlayers);
+                    if(state.Settings.Victory==VictoryMode.RoundCount)SetText(_mobileRoundHint,"라이어 {0}명 · {1}라운드",state.Settings.LiarCount,state.Settings.RoundCount);
+                    else SetText(_mobileRoundHint,"라이어 {0}명 · 목표 {1}점",state.Settings.LiarCount,state.Settings.TargetScore);
+                }
+                else
+                {
+                    SetText(_mobileRoundInfo,"라운드 {0}",state.Round);
+                    if(state.Phase==GamePhase.Drawing&&network.CanDraw)SetText(_mobileRoundHint,"내 차례");
+                    else if(state.Phase==GamePhase.Drawing)SetRawText(_mobileRoundHint,state.Players.FirstOrDefault(p=>p.Id==state.ArtistId)?.Name);
+                    else SetText(_mobileRoundHint,PhaseName(state.Phase));
+                }
+                SetRawText(_mobileRoomCode,DisplayRoomCode(lobby.RoomCode));
             }
             var artist=state.Players.FirstOrDefault(p=>p.Id==state.ArtistId);
-            phaseDetail.text=state.Phase==GamePhase.Drawing?(network.CanDraw?"—  내 차례":"—  "+artist?.Name):"";
+            if(state.Phase==GamePhase.Drawing&&network.CanDraw)SetText(phaseDetail,"내 차례");
+            else SetRawText(phaseDetail,state.Phase==GamePhase.Drawing?artist?.Name:"");
             phaseDetail.style.display=IsMobile||string.IsNullOrEmpty(phaseDetail.text)?DisplayStyle.None:DisplayStyle.Flex;
             bool toolsWereVisible=drawingTools.resolvedStyle.display!=DisplayStyle.None;
             drawingTools.style.display=network.CanDraw?DisplayStyle.Flex:DisplayStyle.None;drawingTools.SetEnabled(network.CanDraw);
@@ -814,6 +1314,7 @@ namespace DrawLiar
         }
         private void Players(RoomSnapshot state)
         {
+            int previousCount=playerCards.Count;
             playerStrip.Clear();playerCards.Clear();playerStatuses.Clear();
             var players=state.Players.Where(p=>!p.IsSpectator).ToArray();
             playerStrip.EnableInClassList("crowded",players.Length>8);
@@ -822,7 +1323,7 @@ namespace DrawLiar
                 var p=players[i];var card=Box(playerStrip,"player");card.userData=p.Id;card.focusable=true;card.tabIndex=0;
                 card.EnableInClassList("last-player",i==players.Length-1);playerCards[p.Id]=card;
                 var row=Box(card,"row");row.Add(new AvatarElement(p.AvatarColor,p.Accessory));var info=Box(row,"grow");
-                Text(info,p.Name+(p.Id==state.LocalPlayerId?" · 나":""),"player-name");card.tooltip=p.Name;
+                if(p.Id==state.LocalPlayerId)Text(info,"{0} · 나","player-name",p.Name);else RawText(info,p.Name,"player-name");card.tooltip=p.Name;
                 playerStatuses[p.Id]=Text(info,"","player-status");
                 void Activate()
                 {
@@ -836,6 +1337,12 @@ namespace DrawLiar
                 card.RegisterCallback<ClickEvent>(_=>Activate());
                 card.RegisterCallback<KeyDownEvent>(e=>{if(e.keyCode==KeyCode.Return||e.keyCode==KeyCode.Space){Activate();e.StopPropagation();}});
             }
+            if(IsMobile)
+            {
+                SizeMobileWaitingPlayers();
+                if(state.Phase==GamePhase.Lobby&&players.Length!=previousCount)
+                {_mobileRosterScroll.scrollOffset=Vector2.zero;_mobileRoomScroll.scrollOffset=Vector2.zero;}
+            }
         }
         private void RefreshPlayerStates(RoomSnapshot state)
         {
@@ -846,16 +1353,16 @@ namespace DrawLiar
                 card.EnableInClassList("selected-player",state.Phase==GamePhase.Voting&&player.Id==selectedPlayerId);
                 card.EnableInClassList("vote-selectable",CanSelectVote(state,player));
                 var label=playerStatuses[player.Id];
-                label.text=!player.IsConnected?"연결 끊김":state.Phase==GamePhase.Voting?(player.HasVoted?"투표 완료":player.Id==selectedPlayerId?"선택됨":""):
-                    player.IsLiar?"라이어":state.Phase==GamePhase.Drawing?(player.Id==state.ArtistId?"그리는 중":""):
-                    state.Phase==GamePhase.Lobby||state.Phase==GamePhase.RoundResults||state.Phase==GamePhase.MatchResults?player.Score+"점":"";
+                if(player.IsConnected&&!player.IsLiar&&(state.Phase==GamePhase.Lobby||state.Phase==GamePhase.RoundResults||state.Phase==GamePhase.MatchResults))SetText(label,"{0}점",player.Score);
+                else SetText(label,!player.IsConnected?"연결 끊김":state.Phase==GamePhase.Voting?(player.HasVoted?"투표 완료":player.Id==selectedPlayerId?"선택됨":""):
+                    player.IsLiar?"라이어":state.Phase==GamePhase.Drawing?(player.Id==state.ArtistId?"그리는 중":""):"");
             }
         }
         private void RefreshContext(RoomSnapshot state)
         {
             var target=state.Players.FirstOrDefault(p=>p.Id==selectedPlayerId);
             string key=state.Phase+"/"+selectedPlayerId;
-            if(state.Phase==GamePhase.Lobby)key+="/"+state.Players.Length+"/"+state.CanStart;
+            if(state.Phase==GamePhase.Lobby)key+="/"+state.Players.Length+"/"+state.CanStart+"/"+state.Settings.LiarCount+"/"+state.Settings.Victory+"/"+state.Settings.RoundCount+"/"+state.Settings.TargetScore;
             if(key!=contextKey)
             {
                 contextKey=key;contextInfo.Clear();voteProgress=null;
@@ -864,31 +1371,29 @@ namespace DrawLiar
                     if(!IsMobile)
                     {
                         Text(contextInfo,target==null?"투표할 플레이어를 선택하세요":"선택한 플레이어","muted");
-                        if(target!=null){var avatar=new AvatarElement(target.AvatarColor,target.Accessory);avatar.AddToClassList("vote-avatar");contextInfo.Add(avatar);Text(contextInfo,target.Name,"context-name");}
+                        if(target!=null){var avatar=new AvatarElement(target.AvatarColor,target.Accessory);avatar.AddToClassList("vote-avatar");contextInfo.Add(avatar);RawText(contextInfo,target.Name,"context-name");}
                     }
                     voteProgress=Text(contextInfo,"","muted mobile-small");
                 }
                 else if(state.Phase==GamePhase.Discussion||state.Phase==GamePhase.Rebuttal)
                 {
-                    Text(contextInfo,"채팅으로 의견을 나눠 보세요.","muted");
+                    if(!IsMobile)Text(contextInfo,"채팅으로 의견을 나눠 보세요.","muted");
                 }
                 else if(state.Phase==GamePhase.Lobby)
                 {
-                    string startHint=state.CanStart?"준비됐어요. 방장이 게임을 시작할 수 있어요.":$"참가자 {GameRules.MIN_START_PLAYERS}명부터 방장이 시작할 수 있어요.";
-                    if(IsMobile)Text(contextInfo,startHint,"muted mobile-small");
-                    else
+                    if(!IsMobile)
                     {
-                        Text(contextInfo,$"{state.Players.Count(p=>!p.IsSpectator&&p.IsConnected)} / {state.Settings.MaxPlayers}명","context-name");
-                        Text(contextInfo,startHint,"muted");
-                        Text(contextInfo,$"라이어 {state.Settings.LiarCount}명","muted");
-                        Text(contextInfo,state.Settings.Victory==VictoryMode.RoundCount?$"{state.Settings.RoundCount}라운드":$"목표 {state.Settings.TargetScore}점","muted");
+                        Text(contextInfo,"{0} / {1}명","context-name",state.Players.Count(p=>!p.IsSpectator&&p.IsConnected),state.Settings.MaxPlayers);
+                        Text(contextInfo,"라이어 {0}명","muted",state.Settings.LiarCount);
+                        if(state.Settings.Victory==VictoryMode.RoundCount)Text(contextInfo,"{0}라운드","muted",state.Settings.RoundCount);
+                        else Text(contextInfo,"목표 {0}점","muted",state.Settings.TargetScore);
                     }
                 }
             }
             if(voteProgress!=null)
             {
                 int voted=state.Players.Count(p=>p.HasVoted&&!p.IsSpectator&&p.IsConnected), total=state.Players.Count(p=>!p.IsSpectator&&p.IsConnected);
-                voteProgress.text=IsMobile?(target==null?"플레이어를 선택하세요":target.Name+" 선택")+$" · {voted}/{total}명 투표 완료":$"{voted} / {total}명 투표 완료";
+                SetText(voteProgress,"투표 {0}/{1}",voted,total);
             }
             if(IsMobile)contextInfo.style.display=contextInfo.childCount==0?DisplayStyle.None:DisplayStyle.Flex;
         }
@@ -905,20 +1410,23 @@ namespace DrawLiar
             {
                 case GamePhase.Lobby:
                     if(state.IsHost){var b=Button(phaseActions,"게임 시작",network.StartMatch,"primary",DrawSound.UiConfirm);b.SetEnabled(state.CanStart);}else Text(phaseActions,"방장 시작 대기","muted");
+                    if(state.IsHost)Button(phaseActions,"방 옵션",RoomOptions,"secondary").name="room-options-open";
+                    if(state.IsHost&&!state.CanStart)Text(phaseActions,"참가자 {0}명 필요","rules",GameRules.MIN_START_PLAYERS);
                     if(!IsMobile)Button(phaseActions,"방 코드 복사",()=>{GUIUtility.systemCopyBuffer=lobby.RoomCode;Toast("방 코드를 복사했습니다.");},"secondary");break;
                 case GamePhase.Drawing:if(network.CanDraw)Button(phaseActions,"그리기 완료",network.EndTurn,"primary",DrawSound.UiConfirm);break;
                 case GamePhase.Voting:
                     if(state.LocalIsSpectator){Text(phaseActions,"관전 중","muted");break;}
                     if(local!=null&&local.HasVoted){Text(phaseActions,"투표 완료","muted");break;}
                     var selected=state.Players.FirstOrDefault(p=>p.Id==selectedPlayerId);
-                    var vote=Button(phaseActions,voteSubmitted?"제출 중":IsMobile&&selected!=null?selected.Name+"에게 투표":"투표하기",SubmitVote,"primary vote-submit",DrawSound.UiConfirm);vote.SetEnabled(selectedPlayerId>=0&&!voteSubmitted);
-                    Text(phaseActions,"제출 후에는 바꿀 수 없습니다.","rules");break;
+                    var vote=Button(phaseActions,voteSubmitted?"제출 중":"투표하기",SubmitVote,"primary vote-submit",DrawSound.UiConfirm);
+                    if(IsMobile&&selected!=null&&!voteSubmitted)SetText(vote,"{0}에게 투표",selected.Name);
+                    vote.SetEnabled(selectedPlayerId>=0&&!voteSubmitted);break;
                 case GamePhase.Guessing:
                     if(state.LocalIsLiar&&local!=null&&!local.HasGuessed)
                     {
-                        var guess=new TextField(){maxLength=40};guess.textEdition.placeholder="제시어 입력";guess.AddToClassList("guess-input");phaseActions.Add(guess);
+                        var guess=new TextField(){maxLength=40};Placeholder(guess,"제시어 입력");guess.AddToClassList("guess-input");phaseActions.Add(guess);
                         var submit=Button(phaseActions,"정답 제출",()=>{if(!string.IsNullOrWhiteSpace(guess.value))network.Guess(guess.value);},"primary",DrawSound.UiConfirm);
-                        submit.SetEnabled(false);guess.RegisterValueChangedCallback(e=>submit.SetEnabled(!string.IsNullOrWhiteSpace(e.newValue)));
+                        submit.SetEnabled(false);guess.RegisterValueChangedCallback(e=>{if(ReferenceEquals(e.target,guess))submit.SetEnabled(!string.IsNullOrWhiteSpace(e.newValue));});
                     }
                     else Text(phaseActions,local!=null&&local.HasGuessed?"제출 완료":"라이어 답변 대기","muted");break;
                 case GamePhase.RoundResults:Button(phaseActions,"결과 보기",()=>Results(state),"secondary");break;
@@ -930,38 +1438,26 @@ namespace DrawLiar
             switch(phase){case GamePhase.Lobby:return "대기실";case GamePhase.RoleReveal:return "역할 확인";case GamePhase.Drawing:return "그리기";case GamePhase.Discussion:return "토론";case GamePhase.Rebuttal:return "반론";case GamePhase.Voting:return "투표";case GamePhase.LiarReveal:return "라이어 공개";case GamePhase.Guessing:return "정답 추측";case GamePhase.RoundResults:return "라운드 결과";default:return "최종 결과";}
         }
 
-        private string MobilePhaseHint(RoomSnapshot state)
-        {
-            switch(state.Phase)
-            {
-                case GamePhase.Drawing:return network.CanDraw?"힌트를 그림으로 표현하세요":state.Players.FirstOrDefault(p=>p.Id==state.ArtistId)?.Name+" 님이 그리는 중";
-                case GamePhase.Voting:return "의심되는 참가자를 선택하고 투표하세요";
-                case GamePhase.Discussion:case GamePhase.Rebuttal:return "그림을 보고 채팅으로 의견을 나눠요";
-                case GamePhase.Guessing:return "라이어가 제시어를 추측하는 중이에요";
-                case GamePhase.RoundResults:case GamePhase.MatchResults:return "결과와 획득한 점수를 확인하세요";
-                default:return "역할과 제시어를 확인하세요";
-            }
-        }
-
         private void RoleReveal(RoomSnapshot state)
         {
             var modal=Modal(state.LocalIsSpectator?"관전":state.LocalIsLiar?"라이어":"시민");
             var avatar=new AvatarElement(avatarColor,accessory);avatar.AddToClassList("avatar-preview");modal.Add(avatar);
-            Text(modal,"주제  "+state.Topic,"subtitle");Text(modal,string.IsNullOrEmpty(state.Word)?"다른 사람의 그림에서 제시어를 추리하세요.":"제시어  "+state.Word,"section-title");
-            if(!state.LocalIsSpectator)Text(modal,state.LocalIsLiar?"다른 사람의 그림을 보고 제시어를 추측하세요.":"제시어를 그림으로 표현하세요.","rules");Button(modal,"확인",CloseModal,"primary");
+            Text(modal,"주제 · {0}","subtitle",state.Topic);
+            if(!string.IsNullOrEmpty(state.Word))Text(modal,"제시어 · {0}","section-title",state.Word);
+            Button(modal,"확인",CloseModal,"primary");
         }
         private void Results(RoomSnapshot state)
         {
             var modal=Modal(state.Phase==GamePhase.MatchResults?"최종 결과":"라운드 결과");
-            Text(modal,"정답은  "+state.Word,"subtitle");
-            var list=new ScrollView();list.style.maxHeight=380;modal.Add(list);
+            Text(modal,"정답 · {0}","subtitle",state.Word);
+            var list=DrawSmoothScroll.Create();list.style.maxHeight=380;modal.Add(list);
             foreach(var p in state.Players.Where(p=>!p.IsSpectator).OrderByDescending(p=>p.Score))
             {
                 var row=Box(list,"score-row");var identity=Box(row,"row");identity.Add(new AvatarElement(p.AvatarColor,p.Accessory));
-                Text(identity,(state.Winners.Contains(p.Id)?"★ ":"")+p.Name+(p.IsLiar?" · 라이어":" · 시민"),"");
-                Text(row,$"{p.Score}점  (+{p.RoundPoints})","player-score");
+                string template=state.Winners.Contains(p.Id)?(p.IsLiar?"★ {0} · 라이어":"★ {0} · 시민"):(p.IsLiar?"{0} · 라이어":"{0} · 시민");
+                Text(identity,template,"",p.Name);Text(row,"{0}점 (+{1})","player-score",p.Score,p.RoundPoints);
             }
-            Text(modal,state.Summary,"rules");Button(modal,"닫기",CloseModal,"primary",DrawSound.UiCancel);
+            Button(modal,"닫기",CloseModal,"primary",DrawSound.UiCancel);
             HideMobileScrollers();
         }
         private void RevealLiars(RoomSnapshot state)
@@ -971,136 +1467,175 @@ namespace DrawLiar
             foreach(var player in state.Players.Where(p=>p.IsLiar))
             {
                 var identity=Box(identities,"reveal-liar");var avatar=new AvatarElement(player.AvatarColor,player.Accessory);avatar.AddToClassList("avatar-preview");identity.Add(avatar);
-                Text(identity,player.Name,"player-name");Text(identity,player.IsCaught?"지목됨":"지목 안 됨","rules");
+                RawText(identity,player.Name,"player-name");Text(identity,player.IsCaught?"지목됨":"지목 안 됨","rules");
             }
             Enter(identities,120,0,reducedMotion?0:400);
-            Text(modal,"다음은 라이어의 정답 추측입니다.","rules");
             Button(modal,"확인",CloseModal,"primary",DrawSound.UiConfirm);
         }
         private void Options()
         {
-            var modal=Modal("옵션");OptionsForm(modal);Button(modal,"완료",CloseModal,"primary",DrawSound.UiConfirm);
+            OpenUtilityPopup(LobbyScreen.Options);
+        }
+
+        private void OpenUtilityPopup(LobbyScreen screen)
+        {
+            if(screen!=LobbyScreen.Options&&!lobby.IsAuthenticated)return;
+            var returnFocus=_popupReturnFocus??root.focusController?.focusedElement as VisualElement;
+            var modal=Modal("",false);modal.name=screen==LobbyScreen.Options?"settings-popup":screen==LobbyScreen.Friends?"friends-popup":"account-popup";
+            modal.AddToClassList("utility-popup");_utilityPopupScreen=screen;_popupReturnFocus=returnFocus;
+            var popupOverlay=overlay;popupOverlay.AddToClassList("utility-overlay");
+            var header=Box(modal,"row utility-popup-header");Text(header,screen==LobbyScreen.Options?"설정":screen==LobbyScreen.Friends?"친구":"내 계정","utility-popup-title grow");
+            IconButton(header,"닫기",DrawUIIcon.Kind.Close,CloseModal,"utility-popup-x");
+            var body=Box(modal,"utility-popup-body grow");
+            var scroll=DrawSmoothScroll.Create();scroll.name="utility-popup-scroll";scroll.AddToClassList("utility-popup-scroll");body.Add(scroll);
+            var form=Box(scroll,"utility-popup-form");
+            if(screen==LobbyScreen.Friends)FriendsForm(form);
+            else if(screen==LobbyScreen.Options)OptionsForm(form);
+            else AccountForm(form);
+            Button(modal,"닫기",CloseModal,"secondary utility-popup-close",DrawSound.UiCancel).name="utility-popup-close";
+            popupOverlay.focusable=true;popupOverlay.Focus();
+            popupOverlay.RegisterCallback<PointerDownEvent>(e=>{if(overlay==popupOverlay&&ReferenceEquals(e.target,popupOverlay))CloseModal();});
+            popupOverlay.RegisterCallback<KeyDownEvent>(e=>
+            {
+                if(e.keyCode!=KeyCode.Tab)return;
+                var controls=modal.Query<VisualElement>().ToList().Where(control=>control.canGrabFocus&&control.enabledInHierarchy&&control.tabIndex>=0&&control.resolvedStyle.visibility==Visibility.Visible&&IsVisible(control)).ToList();
+                if(controls.Count==0)return;
+                int index=controls.IndexOf(root.focusController?.focusedElement as VisualElement);
+                int next=index<0?(e.shiftKey?controls.Count-1:0):(index+(e.shiftKey?-1:1)+controls.Count)%controls.Count;
+                root.focusController?.IgnoreEvent(e);controls[next].Focus();e.StopPropagation();
+            },TrickleDown.TrickleDown);
+            HideMobileScrollers();
+            if(screen==LobbyScreen.Friends&&!lobby.IsBusy)Run(lobby.RefreshFriendsAsync);
+        }
+
+        private static bool IsVisible(VisualElement element)
+        {
+            for(var current=element;current!=null;current=current.parent)
+                if(current.resolvedStyle.display==DisplayStyle.None)return false;
+            return true;
         }
         private void OptionsForm(VisualElement modal)
         {
+            LanguageSelector(modal);
             var audio=DrawAudio.Instance;
             if(audio!=null)
             {
                 var sound=Box(modal,"audio-options");Text(sound,"사운드","section-title");
-                var mute=new Toggle("모든 소리 끄기"){value=audio.Muted};mute.name="audio-mute";mute.AddToClassList("field");
-                mute.RegisterValueChangedCallback(e=>audio.SetMuted(e.newValue));sound.Add(mute);
+                var mute=new Toggle(L.Text("모든 소리 끄기")){value=audio.Muted};SetText(mute.labelElement,"모든 소리 끄기");mute.name="audio-mute";mute.AddToClassList("field");
+                mute.RegisterValueChangedCallback(e=>{if(ReferenceEquals(e.target,mute))audio.SetMuted(e.newValue);});sound.Add(mute);
                 AudioVolume(sound,"전체 음량","audio-master",audio.MasterVolume,v=>audio.SetVolumes(v,audio.MusicVolume,audio.EffectsVolume));
                 AudioVolume(sound,"배경 음악","audio-music",audio.MusicVolume,v=>audio.SetVolumes(audio.MasterVolume,v,audio.EffectsVolume));
                 AudioVolume(sound,"효과음","audio-effects",audio.EffectsVolume,v=>audio.SetVolumes(audio.MasterVolume,audio.MusicVolume,v));
             }
-            var motion=new Toggle("화면 움직임 줄이기"){value=reducedMotion};motion.AddToClassList("field");motion.RegisterValueChangedCallback(e=>{reducedMotion=e.newValue;root.EnableInClassList("reduce-motion",reducedMotion);DrawButtonScale.ResetAll(root);PlayerPrefs.SetInt("DrawLiar.ReduceMotion",reducedMotion?1:0);PlayerPrefs.Save();});modal.Add(motion);
+            var motion=new Toggle(L.Text("화면 움직임 줄이기")){value=reducedMotion};SetText(motion.labelElement,"화면 움직임 줄이기");motion.AddToClassList("field");motion.RegisterValueChangedCallback(e=>{if(!ReferenceEquals(e.target,motion))return;reducedMotion=e.newValue;root.EnableInClassList("reduce-motion",reducedMotion);DrawButtonScale.ResetAll(root);DrawSmoothScroll.RefreshAll(root);PlayerPrefs.SetInt("DrawLiar.ReduceMotion",reducedMotion?1:0);PlayerPrefs.Save();});modal.Add(motion);
+            if(!inRoom&&lobby.IsAuthenticated)Button(modal,"내 계정",()=>Navigate(LobbyScreen.Account),"secondary");
         }
         private static void AudioVolume(VisualElement parent,string label,string name,float value,Action<float> changed)
         {
             var row=Box(parent,"audio-volume");var heading=Box(row,"row spread");Text(heading,label,"audio-label");
-            var percentage=Text(heading,Mathf.RoundToInt(value*100)+"%","audio-percentage");
+            var percentage=RawText(heading,Mathf.RoundToInt(value*100)+"%","audio-percentage");
             var slider=new Slider(0,1){value=value,name=name};slider.AddToClassList("audio-slider");row.Add(slider);
-            slider.RegisterValueChangedCallback(e=>{percentage.text=Mathf.RoundToInt(e.newValue*100)+"%";changed(e.newValue);});
+            var fill=new VisualElement{pickingMode=PickingMode.Ignore};fill.AddToClassList("audio-slider-fill");fill.style.width=Length.Percent(value*100);
+            slider.Q<VisualElement>(className:"unity-base-slider__tracker")?.Add(fill);
+            slider.RegisterValueChangedCallback(e=>{if(!ReferenceEquals(e.target,slider))return;fill.style.width=Length.Percent(e.newValue*100);SetRawText(percentage,Mathf.RoundToInt(e.newValue*100)+"%");changed(e.newValue);});
             slider.RegisterCallback<PointerUpEvent>(_=>DrawAudio.Instance?.Play(DrawSound.UiClick));
         }
         private void ProfileForm(VisualElement panel)
         {
-            var selectedColor=avatarColor;var selectedAccessory=accessory;
+            var selectedColor=avatarColor;
             int ownedMask=lobby.Profile?.OwnedAccessories?.Aggregate(0,(mask,item)=>mask|item)??0;
+            var selectedAccessory=AvatarParts.Sanitize(accessory&ownedMask);
             var preview=avatarStage;
             var equipmentButtons=new Dictionary<AvatarAccessory,Button>();
-            Button save=null, purchase=null;
-            Label previewNotice=null;
+            var form=panel;
+            if(!IsMobile)
+            {
+                var scroll=DrawSmoothScroll.Create();scroll.AddToClassList("customize-scroll");panel.Add(scroll);form=scroll;
+            }
+            Button save=null;
             void UpdateAvatar()
             {
                 preview.Clear();var a=new AvatarElement(selectedColor,selectedAccessory);a.AddToClassList("lobby-avatar");preview.Add(a);
                 foreach(var item in equipmentButtons)
                 {
-                    bool equipped=(selectedAccessory & (int)item.Key)!=0;
+                    bool equipped=item.Key==AvatarAccessory.None?(selectedAccessory&AvatarParts.Mask(_customizePartSlot))==0:AvatarParts.IsEquipped(selectedAccessory,(int)item.Key);
                     item.Value.EnableInClassList("equipped",equipped);
-                    bool owned=(ownedMask&(int)item.Key)==(int)item.Key;
-                    item.Value.Q<Label>(className:"equipment-state").text=equipped?(owned?"장착 중":"입혀보기 중"):owned?"장착하기":"입혀보기";
-                    item.Value.tooltip=(item.Key==AvatarAccessory.Beret?"화가 모자":"붓")+(equipped?" · 클릭하면 해제":owned?" · 클릭하면 장착":" · 구매 전 입혀보기");
+                    SetText(item.Value.Q<Label>(className:"equipment-state"),equipped?"장착 중":item.Key==AvatarAccessory.None?"":"장착하기");
                 }
                 bool canSave=(selectedAccessory&~ownedMask)==0;
-                save?.SetEnabled(canSave);
-                if(previewNotice!=null)previewNotice.style.display=canSave?DisplayStyle.None:DisplayStyle.Flex;
-                if(purchase!=null)purchase.style.display=canSave?DisplayStyle.None:DisplayStyle.Flex;
+                if(save!=null){save.userData=canSave;save.SetEnabled(canSave&&!lobby.IsBusy);}
             }
-            UpdateAvatar();var nameField=Field(panel,"닉네임",nickname);nameField.maxLength=16;
-            Text(panel,"몸 색상","section-title");var colors=Box(panel,"row avatar-colors");var swatches=new List<Button>();
+            UpdateAvatar();var nameField=Field(form,"닉네임",nickname);nameField.maxLength=16;
+            Text(form,"몸 색상","section-title");var colors=Box(form,"row avatar-colors");var swatches=new List<Button>();
             void SelectColor(int color){selectedColor=color;for(var i=0;i<swatches.Count;i++)swatches[i].EnableInClassList("selected",i==color);UpdateAvatar();}
-            foreach(var color in Enumerable.Range(0,AvatarElement.Colors.Length)){var b=Button(colors,"",()=>SelectColor(color),"swatch");b.style.backgroundColor=AvatarElement.Colors[color];b.tooltip="몸 색상 "+(color+1);swatches.Add(b);}
+            foreach(var color in Enumerable.Range(0,AvatarElement.Colors.Length)){var b=Button(colors,"",()=>SelectColor(color),"swatch");b.style.backgroundColor=AvatarElement.Colors[color];SetTooltip(b,"몸 색상 {0}",color+1);swatches.Add(b);}
             SelectColor(selectedColor);
-            var heading=Box(panel,"row spread");Text(heading,"아이템","section-title");Text(heading,"구매 전 입혀보기 가능","muted");
-            var equipment=Box(panel,"row equipment-options");
-            void AddEquipment(AvatarAccessory item,string name)
+            Text(form,"아이템","section-title");
+            VisualElement equipment=null;
+            void RenderEquipment()
             {
-                var button=Button(equipment,"",()=>{selectedAccessory^=(int)item;UpdateAvatar();RevealAvatarPreview();},"equipment-option");
-                button.name=item==AvatarAccessory.Beret?"beret-option":"brush-option";
-                var icon=new AvatarElement(0,(int)item);icon.AddToClassList("equipment-preview");button.Add(icon);
-                Text(button,name,"equipment-name");Text(button,"","equipment-state");equipmentButtons[item]=button;
+                equipment.Clear();equipmentButtons.Clear();
+                void AddEquipment(AvatarAccessory item,string name,string id)
+                {
+                    var button=Button(equipment,"",()=>
+                    {
+                        selectedAccessory=item==AvatarAccessory.None?AvatarParts.Remove(selectedAccessory,_customizePartSlot):AvatarParts.Equip(selectedAccessory,(int)item);
+                        UpdateAvatar();RevealAvatarPreview();
+                    },"equipment-option");
+                    button.name=id+"-option";SetTooltip(button,name);
+                    var icon=new AvatarElement(selectedColor,(int)item);icon.AddToClassList("equipment-preview");button.Add(icon);
+                    Text(button,name,"equipment-name");Text(button,"","equipment-state");equipmentButtons[item]=button;
+                }
+                AddEquipment(AvatarAccessory.None,"없음","none");
+                foreach(var item in AvatarParts.Items.Where(part=>part.Slot==_customizePartSlot&&(ownedMask&(int)part.Accessory)==(int)part.Accessory))AddEquipment(item.Accessory,item.Name,item.Id);
+                UpdateAvatar();
             }
-            AddEquipment(AvatarAccessory.Beret,"화가 모자");AddEquipment(AvatarAccessory.Brush,"붓");
-            previewNotice=Text(panel,"미구매 아이템을 입혀보고 있어요. 구매하거나 벗긴 뒤 저장할 수 있어요.","rules");previewNotice.name="customize-preview-status";
-            purchase=Button(panel,"상점에서 구매",()=>{Navigate(LobbyScreen.Shop);Run(lobby.RefreshShopAsync);},"secondary");
-            var reset=Button(panel,"원래 모습",()=>{selectedAccessory=accessory;SelectColor(avatarColor);RevealAvatarPreview();},"secondary",DrawSound.UiCancel);reset.name="customize-reset";
-            save=Button(panel,"이 모습으로 저장",()=>Run(async()=>
+            PartTabs(form,(int)_customizePartSlot,slot=>{_customizePartSlot=(AvatarPartSlot)slot;RenderEquipment();},false);
+            equipment=Box(form,"row equipment-options");RenderEquipment();
+            var reset=Button(form,"원래 모습",()=>{selectedAccessory=AvatarParts.Sanitize(accessory&ownedMask);SelectColor(avatarColor);RevealAvatarPreview();},"secondary",DrawSound.UiCancel);reset.name="customize-reset";
+            save=Button(panel,"저장",()=>Run(async()=>
             {
                 if((selectedAccessory&~ownedMask)!=0){Toast("미구매 아이템은 구매하거나 벗긴 뒤 저장해 주세요.");return;}
                 await lobby.SaveProfileAsync(nameField.value,selectedColor,selectedAccessory);
                 Navigate(LobbyScreen.Main);
             }),"primary next-button",DrawSound.UiConfirm);save.name="customize-save";UpdateAvatar();
         }
-        private void TimeForm(VisualElement panel)
+
+        private static void PartTabs(VisualElement parent,int selected,Action<int> changed,bool all)
+        {
+            var scroll=DrawSmoothScroll.Create(ScrollViewMode.Horizontal);scroll.AddToClassList("part-tabs");
+            scroll.horizontalScrollerVisibility=ScrollerVisibility.Hidden;scroll.verticalScrollerVisibility=ScrollerVisibility.Hidden;parent.Add(scroll);
+            var buttons=new Dictionary<int,Button>();
+            void AddTab(int index,string title,string name)
+            {
+                var button=Button(scroll,title,()=>
+                {
+                    if(selected==index)return;
+                    selected=index;foreach(var entry in buttons)entry.Value.EnableInClassList("part-selected",entry.Key==index);
+                    changed(index);
+                },"secondary part-tab");
+                button.name="part-filter-"+name;button.EnableInClassList("part-selected",selected==index);buttons[index]=button;
+            }
+            if(all)AddTab(-1,"전체","all");
+            foreach(var slot in AvatarParts.Slots)AddTab((int)slot,AvatarParts.Name(slot),slot.ToString().ToLowerInvariant());
+        }
+        private static void TimeFields(VisualElement panel,RoomSettings settings)
         {
             panel.AddToClassList("time-form");
-            Int(panel,"역할 확인",draft.RoleSeconds,3,30,v=>draft.RoleSeconds=v);Int(panel,"한 사람 그림",draft.DrawSeconds,5,180,v=>draft.DrawSeconds=v);
-            Int(panel,"자유 토론",draft.DiscussionSeconds,5,300,v=>draft.DiscussionSeconds=v);
-            Int(panel,"반론",draft.RebuttalSeconds,0,180,v=>draft.RebuttalSeconds=v);
-            Int(panel,"투표",draft.VoteSeconds,5,120,v=>draft.VoteSeconds=v);
-            Int(panel,"라이어 공개",draft.RevealSeconds,3,30,v=>draft.RevealSeconds=v);
-            Int(panel,"정답 추측",draft.GuessSeconds,5,120,v=>draft.GuessSeconds=v);
-            Int(panel,"라운드 결과",draft.ResultSeconds,5,60,v=>draft.ResultSeconds=v);
-            Text(panel,"단위: 초 · 반론 0초는 건너뛰기\n그림은 완료 버튼으로 일찍 넘길 수 있습니다.","rules");
-            Button(panel,"완료",()=>Navigate(LobbyScreen.CreateRules),"primary next-button");
-        }
-        private void TopicSelectionForm(VisualElement panel)
-        {
-            Text(panel,"선택한 주제 중에서 매 라운드 무작위로 출제됩니다.","subtitle");
-            var names=GameDataStore.Load().Topics.Select(t=>t.Name).ToArray();
-            var selected=new HashSet<string>((draft.Topics??names).Intersect(names));
-            var controls=Box(panel,"row spread");var count=Text(controls,"","topic-count");var bulk=Box(controls,"row");
-            var list=new ScrollView(ScrollViewMode.Vertical);list.AddToClassList("topic-list");panel.Add(list);
-            var grid=Box(list,"topic-grid");var buttons=new Dictionary<string,Button>();
-            Button(panel,"나만의 주제 만들기",()=>Navigate(LobbyScreen.Topics),"secondary");
-            var done=Button(panel,"선택 완료",()=>Navigate(LobbyScreen.CreateDetails),"primary next-button");
-            void Refresh()
-            {
-                draft.Topics=names.Where(selected.Contains).ToArray();
-                count.text=$"{selected.Count} / {names.Length}개 선택";done.SetEnabled(selected.Count>0);
-                foreach(var entry in buttons)
-                {
-                    bool enabled=selected.Contains(entry.Key);
-                    entry.Value.text=(enabled?"✓  ":"")+entry.Key;
-                    entry.Value.EnableInClassList("topic-selected",enabled);
-                    entry.Value.tooltip=entry.Key+(enabled?" · 선택됨 · 클릭하면 제외":" · 제외됨 · 클릭하면 선택");
-                }
-            }
-            Button(bulk,"전체 선택",()=>{selected.UnionWith(names);Refresh();},"secondary");
-            Button(bulk,"초기화",()=>{selected.Clear();Refresh();},"secondary");
-            foreach(var name in names)
-            {
-                var key=name;
-                buttons[key]=Button(grid,key,()=>{if(!selected.Add(key))selected.Remove(key);Refresh();},"topic-toggle");
-            }
-            Refresh();
+            Int(panel,"역할 확인",settings.RoleSeconds,3,30,v=>settings.RoleSeconds=v);Int(panel,"한 사람 그림",settings.DrawSeconds,5,180,v=>settings.DrawSeconds=v);
+            Int(panel,"자유 토론",settings.DiscussionSeconds,5,300,v=>settings.DiscussionSeconds=v);
+            Int(panel,"반론",settings.RebuttalSeconds,0,180,v=>settings.RebuttalSeconds=v);
+            Int(panel,"투표",settings.VoteSeconds,5,120,v=>settings.VoteSeconds=v);
+            Int(panel,"라이어 공개",settings.RevealSeconds,3,30,v=>settings.RevealSeconds=v);
+            Int(panel,"정답 추측",settings.GuessSeconds,5,120,v=>settings.GuessSeconds=v);
+            Int(panel,"라운드 결과",settings.ResultSeconds,5,60,v=>settings.ResultSeconds=v);
+            Text(panel,"단위: 초 · 반론 0초는 건너뛰기","rules");
         }
         private void TopicsForm(VisualElement panel)
         {
             var nameField=Field(panel,"주제 이름","");nameField.maxLength=40;
-            var words=new TextField("제시어"){multiline=true};words.AddToClassList("field");words.style.height=130;panel.Add(words);
-            Text(panel,"쉼표나 줄바꿈으로 구분해요. 예: 사과, 바나나, 수박","rules");
+            var words=new TextField(L.Text("제시어")){multiline=true};SetText(words.labelElement,"제시어");words.AddToClassList("field");words.style.height=130;panel.Add(words);
+            Text(panel,"쉼표 또는 줄바꿈으로 구분","rules");
             Button(panel,"주제 저장",()=>
             {
                 try
@@ -1110,22 +1645,22 @@ namespace DrawLiar
                         throw new ArgumentException("기본 주제와 다른 이름을 입력하세요.");
                     GameDataStore.UpsertCustomTopic(nameField.value,words.value);
                     draft.Topics=(draft.Topics??Array.Empty<string>()).Append(GameRules.CleanText(nameField.value,40)).Distinct().ToArray();
-                    Navigate(LobbyScreen.TopicSelection);Toast("새 주제를 저장했습니다.");
+                    Navigate(LobbyScreen.CreateRoom);Toast("새 주제를 저장했습니다.");
                 }
                 catch(Exception exception){DrawAudio.Instance?.Play(DrawSound.UiError);Toast(exception.Message);}
             },"primary");
-            var list=new ScrollView();list.style.maxHeight=150;panel.Add(list);
+            var list=DrawSmoothScroll.Create();list.style.maxHeight=150;panel.Add(list);
             foreach(var customTopic in GameDataStore.LoadCustomTopics())
             {
                 var row=Box(list,"room-entry");
-                Button(row,customTopic.Name,()=>{nameField.value=customTopic.Name;words.value=string.Join("\n",customTopic.Words);},"secondary");
+                var edit=Button(row,"",()=>{nameField.value=customTopic.Name;words.value=string.Join("\n",customTopic.Words);},"secondary");SetRawText(edit,customTopic.Name);
                 Button(row,"삭제",()=>{GameDataStore.DeleteCustomTopic(customTopic.Name);draft.Topics=draft.Topics?.Where(name=>name!=customTopic.Name).ToArray();Home();},"danger");
             }
         }
         private void OnChat(ChatLine line)
         {
             if(chatHistory==null)return;
-            var entry=Box(chatHistory,"chat-entry");Text(entry,line.Name,"chat-name");var message=Text(entry,line.Text,"chat-message");message.tooltip=line.Text;
+            var entry=Box(chatHistory,"chat-entry");RawText(entry,line.Name,"chat-name");var message=RawText(entry,line.Text,"chat-message");message.tooltip=line.Text;
             while(chatHistory.contentContainer.childCount>6)chatHistory.contentContainer.ElementAt(0).RemoveFromHierarchy();
             Enter(entry,140,2);chatHistory.schedule.Execute(()=>{if(entry.panel!=null)chatHistory?.ScrollTo(entry);}).StartingIn(20);
         }
@@ -1136,11 +1671,13 @@ namespace DrawLiar
         }
         private void RefreshServiceStatus()
         {
+            var save=root.Q<Button>("customize-save");if(save!=null)save.SetEnabled(save.userData is bool canSave&&canSave&&!lobby.IsBusy);
+            shopList?.Query<Button>().ForEach(button=>{if(lobby.IsBusy)button.SetEnabled(false);});
             root.Query<Button>(className:"guest-login").ForEach(button=>button.SetEnabled(DrawGuestCredentialStore.IsSupported&&!lobby.IsBusy));
             root.Query<Button>(className:"google-login").ForEach(button=>button.SetEnabled(GoogleAccountProvider.IsSupported&&!lobby.IsBusy));
             root.Query<Button>(className:"google-link").ForEach(button=>button.SetEnabled(GoogleAccountProvider.IsSupported&&!lobby.IsBusy));
             root.Query<Button>(className:"google-cancel").ForEach(button=>button.style.display=lobby.IsGoogleSigningIn?DisplayStyle.Flex:DisplayStyle.None);
-            if(serviceNotice!=null)serviceNotice.text=lobby.Status;
+            if(serviceNotice!=null){SetRawText(serviceNotice,lobby.Status);serviceNotice.style.display=string.IsNullOrWhiteSpace(lobby.Status)?DisplayStyle.None:DisplayStyle.Flex;}
             else if(!_roomRefreshRunning&&lastServiceStatus!=lobby.Status)Toast(lobby.Status);
             lastServiceStatus=lobby.Status;
             if(!lobby.IsBusy){RefreshPublicRooms();RefreshFriends();RefreshShop();}
@@ -1152,13 +1689,13 @@ namespace DrawLiar
             try{await action();}catch(Exception ex){DrawAudio.Instance?.Play(DrawSound.UiError);Toast(ex.Message);Debug.LogWarning(ex.Message);}
             finally{runningAction=false;}
         }
-        private VisualElement Modal(string title)
+        private VisualElement Modal(string title,bool mobileScroll=true)
         {
             if(IsMobile)CloseChat();
             CloseModal();overlay=Box(IsMobile?content:root,"overlay enter");var modal=Box(overlay,"modal");
             VisualElement body=modal;
-            if(IsMobile){var scroll=new ScrollView(ScrollViewMode.Vertical);scroll.AddToClassList("mobile-modal-scroll");modal.Add(scroll);body=Box(scroll,"mobile-modal-body");}
-            Text(body,title,"title");HideMobileScrollers();DrawUIMotion.ShowModal(overlay,modal);return body;
+            if(IsMobile&&mobileScroll){var scroll=DrawSmoothScroll.Create(ScrollViewMode.Vertical);scroll.AddToClassList("mobile-modal-scroll");modal.Add(scroll);body=Box(scroll,"mobile-modal-body");}
+            if(!string.IsNullOrEmpty(title))Text(body,title,"title");HideMobileScrollers();DrawUIMotion.ShowModal(overlay,modal);return body;
         }
         private void HideMobileScrollers()
         {
@@ -1167,8 +1704,14 @@ namespace DrawLiar
         }
         private void CloseModal()
         {
+            var returnFocus=_popupReturnFocus;_popupReturnFocus=null;
+            if(_utilityPopupScreen.HasValue)friendList=null;
+            _utilityPopupScreen=null;
+            if(_lobbyChatPanel?.ClassListContains("lobby-chat-in-modal")==true)ResetLobbyChatView();
+            _roomOptionsEditor=null;_roomOptionsDraft=null;_roomOptionsSaving=false;
             DrawAudio.Instance?.FlushSettings();
             if(overlay!=null){var previous=overlay;overlay=null;DrawUIMotion.HideModal(previous,previous.Q<VisualElement>(className:"modal"));}
+            if(returnFocus!=null)root.schedule.Execute(()=>{if(overlay==null&&returnFocus.panel!=null)returnFocus.Focus();}).StartingIn(180);
         }
         private void Enter(VisualElement element,int duration,float offset,int delay=0)
         {
@@ -1178,25 +1721,92 @@ namespace DrawLiar
         {
             if(string.IsNullOrWhiteSpace(message))return;root.Q<Label>("toast")?.RemoveFromHierarchy();var label=Text(root,message,"toast");label.name="toast";DrawUIMotion.ShowToast(label,4200);
         }
+
+        private void CreateServiceNotice(VisualElement parent)
+        {
+            serviceNotice=Text(parent,"","notice");serviceNotice.style.display=DisplayStyle.None;
+        }
+
+        private static void LanguageSelector(VisualElement parent)
+        {
+            var languages=L.AvailableLanguages;int index=languages.ToList().FindIndex(language=>language.Code==L.CurrentLanguageCode);
+            var field=new DropdownField(L.Text("언어"),languages.Select(language=>language.DisplayName).ToList(),Mathf.Max(0,index));
+            field.AddToClassList("field");field.AddToClassList("language-selection");SetText(field.labelElement,"언어");parent.Add(field);
+            field.RegisterValueChangedCallback(e=>{if(ReferenceEquals(e.target,field)&&field.index>=0&&field.index<languages.Count)L.SetLanguage(languages[field.index].Code);});
+        }
+
+        private void OnLanguageChanged()
+        {
+            if(root==null)return;
+            root.EnableInClassList("rtl",L.IsRightToLeft);
+            root.Query<TextElement>().ForEach(element=>{if(LOCALIZED_TEXT.TryGetValue(element,out var value))element.text=value.Resolve();});
+            root.Query<VisualElement>().ForEach(element=>{if(LOCALIZED_TOOLTIPS.TryGetValue(element,out var value))element.tooltip=value.Resolve();});
+            root.Query<TextField>().ForEach(field=>{if(LOCALIZED_PLACEHOLDERS.TryGetValue(field,out var value))field.textEdition.placeholder=value.Resolve();});
+            root.Query<DropdownField>().ForEach(field=>
+            {
+                if(LOCALIZED_CHOICES.TryGetValue(field,out var choices))
+                {
+                    int index=Mathf.Clamp(field.index,0,choices.Length-1);field.choices=choices.Select(L.Text).ToList();
+                    if(choices.Length>0)field.SetValueWithoutNotify(field.choices[index]);
+                }
+                else if(field.ClassListContains("language-selection"))
+                {
+                    var selected=L.AvailableLanguages.First(language=>language.Code==L.CurrentLanguageCode);field.SetValueWithoutNotify(selected.DisplayName);
+                }
+            });
+            root.Query<Image>(className:"brand-logo").ForEach(logo=>logo.image=L.LoadLogo());
+            if(inRoom&&network.State!=null)RefreshState(network.State);
+            lastServiceStatus=lobby.Status;if(serviceNotice!=null)SetRawText(serviceNotice,lastServiceStatus);
+            RefreshLobbyChat();
+            DrawLocalizedTypography.Apply(root);
+            shopList?.schedule.Execute(()=>shopList?.Query<VisualElement>(className:"shop-entry").ForEach(card=>SizeShopActions(card,card.Q<VisualElement>(className:"shop-actions")))).StartingIn(1);
+        }
         private void OnDestroy()
         {
+            ResetLobbyChatView();
             if(network!=null){network.StateChanged-=RefreshState;network.ChatReceived-=OnChat;}
-            if(lobby!=null){lobby.Changed-=RefreshServiceStatus;lobby.ProfileChanged-=OnProfileChanged;}
+            if(lobby!=null){lobby.Changed-=RefreshServiceStatus;lobby.ProfileChanged-=OnProfileChanged;lobby.LobbyChatChanged-=RefreshLobbyChat;lobby.LobbyChatNotice-=Toast;}
             if(panelSettings!=null)Destroy(panelSettings);
             if(_mobileLayout!=null){_mobileLayout.LayoutChanged-=OnMobileLayoutChanged;_mobileLayout.Dispose();}
         }
         private static VisualElement Box(VisualElement parent,string classes){var e=new VisualElement();Classes(e,classes);parent.Add(e);return e;}
-        private static Label Text(VisualElement parent,string text,string classes){var e=new Label(text);e.enableRichText=false;Classes(e,classes);parent.Add(e);return e;}
-        private static Button Button(VisualElement parent,string text,Action clicked,string classes,DrawSound sound=DrawSound.UiClick){var cue=sound==DrawSound.UiClick&&classes.Split(' ').Contains("danger")?DrawSound.UiCancel:sound;var e=new Button(()=>{DrawAudio.Instance?.Play(cue);clicked?.Invoke();}){text=text};e.AddToClassList("button");Classes(e,classes);parent.Add(e);DrawButtonScale.Bind(e);return e;}
-        private static void Classes(VisualElement e,string classes){foreach(var c in classes.Split(' '))if(c.Length>0)e.AddToClassList(c);}
-        private static TextField Field(VisualElement parent,string label,string value){var e=new TextField(label){value=value};e.AddToClassList("field");parent.Add(e);return e;}
-        private static void Int(VisualElement parent,string label,int value,int min,int max,Action<int> changed)
+        private static Label Text(VisualElement parent,string source,string classes,params object[] args){var e=new Label();e.enableRichText=false;SetText(e,source,args);Classes(e,classes);parent.Add(e);return e;}
+        private static Label RawText(VisualElement parent,string value,string classes){var e=new Label(L.Raw(value));e.enableRichText=false;Classes(e,classes);parent.Add(e);return e;}
+        private static void SetText(TextElement element,string source,params object[] args)
         {
-            var field=new IntegerField(label){value=value,isDelayed=true};field.AddToClassList("field");field.RegisterValueChangedCallback(e=>{var v=Mathf.Clamp(e.newValue,min,max);field.SetValueWithoutNotify(v);changed(v);});parent.Add(field);
+            if(element==null)return;
+            if(LOCALIZED_TEXT.TryGetValue(element,out var previous)&&previous.Matches(source,args))return;
+            var binding=new LocalizedValue{Source=source,Arguments=args};
+            LOCALIZED_TEXT.Remove(element);LOCALIZED_TEXT.Add(element,binding);element.text=binding.Resolve();
         }
-        private static void Choice(VisualElement parent,string label,string[] options,int index,Action<int> changed)
+        private static void SetRawText(TextElement element,string value){if(element==null)return;LOCALIZED_TEXT.Remove(element);element.text=L.Raw(value);}
+        private static void SetTooltip(VisualElement element,string source,params object[] args)
         {
-            var field=new DropdownField(label,options.ToList(),Mathf.Clamp(index,0,options.Length-1));field.AddToClassList("field");field.RegisterValueChangedCallback(_=>changed(field.index));parent.Add(field);
+            var binding=new LocalizedValue{Source=source,Arguments=args};
+            LOCALIZED_TOOLTIPS.Remove(element);LOCALIZED_TOOLTIPS.Add(element,binding);element.tooltip=binding.Resolve();
+        }
+        private static void Placeholder(TextField field,string source)
+        {
+            var binding=new LocalizedValue{Source=source,Arguments=Array.Empty<object>()};LOCALIZED_PLACEHOLDERS.Remove(field);LOCALIZED_PLACEHOLDERS.Add(field,binding);field.textEdition.placeholder=binding.Resolve();
+        }
+        private static void LeftToRightInput(TextField field)
+        {
+            var input=field.Q<VisualElement>(className:"unity-base-text-field__input");if(input!=null)input.languageDirection=LanguageDirection.LTR;
+        }
+        private static Button Button(VisualElement parent,string source,Action clicked,string classes,DrawSound sound=DrawSound.UiClick){var cue=sound==DrawSound.UiClick&&classes.Split(' ').Contains("danger")?DrawSound.UiCancel:sound;var e=new Button(()=>{DrawAudio.Instance?.Play(cue);clicked?.Invoke();});e.enableRichText=false;SetText(e,source);e.AddToClassList("button");Classes(e,classes);parent.Add(e);DrawButtonScale.Bind(e);return e;}
+        private static Button IconButton(VisualElement parent,string title,DrawUIIcon.Kind icon,Action clicked,string name)
+        {
+            var button=Button(parent,"",clicked,"secondary icon-button");button.name=name;button.AddToClassList(name);SetTooltip(button,title);button.Add(new DrawUIIcon(icon));return button;
+        }
+        private static void Classes(VisualElement e,string classes){foreach(var c in classes.Split(' '))if(c.Length>0)e.AddToClassList(c);}
+        private static TextField Field(VisualElement parent,string label,string value){var e=new TextField(L.Text(label)){value=L.Raw(value)};SetText(e.labelElement,label);e.AddToClassList("field");parent.Add(e);return e;}
+        private static IntegerField Int(VisualElement parent,string label,int value,int min,int max,Action<int> changed)
+        {
+            var field=new IntegerField(L.Text(label)){value=value,isDelayed=true};SetText(field.labelElement,label);field.AddToClassList("field");field.RegisterValueChangedCallback(e=>{if(!ReferenceEquals(e.target,field))return;var v=Mathf.Clamp(e.newValue,min,max);field.SetValueWithoutNotify(v);changed(v);});parent.Add(field);return field;
+        }
+        private static DropdownField Choice(VisualElement parent,string label,string[] options,int index,Action<int> changed)
+        {
+            var field=new DropdownField(L.Text(label),options.Select(L.Text).ToList(),Mathf.Clamp(index,0,options.Length-1));SetText(field.labelElement,label);LOCALIZED_CHOICES.Add(field,options);field.AddToClassList("field");field.RegisterValueChangedCallback(e=>{if(ReferenceEquals(e.target,field))changed(field.index);});parent.Add(field);return field;
         }
     }
 }

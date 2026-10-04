@@ -1,73 +1,82 @@
 .app.mobile { padding: 0; background-color: #F7F3EA; color: #34304B; font-size: 16px; --ink: #34304B; --muted: #817A87; --brand: #78679E; --border: #E3DDD4; --mint: #537F70; }
+ .app.mobile .mobile-lobby-chat-open { min-height: 48px; flex-shrink: 0; margin-top: 12px; }
+ .app.mobile .modal.lobby-chat-modal { height: 82%; max-height: 760px; min-height: 220px; padding: 20px; }
+ .mobile .lobby-chat-modal > .title { flex-shrink: 0; margin-bottom: 12px; font-size: 24px; }
+ .app.mobile .lobby-chat-panel.lobby-chat-in-modal { height: auto; min-height: 0; flex-basis: 0; flex-grow: 1; flex-shrink: 1; }
+ .mobile .lobby-chat-heading { min-height: 22px; margin-bottom: 8px; justify-content: flex-end; }
+.mobile .lobby-chat-name { width: 96px; min-width: 96px; font-size: 14px; }
+ .mobile .lobby-chat-message { font-size: 14px; }
+ .app.mobile .lobby-chat-close { flex-shrink: 0; min-height: 48px; margin-top: 12px; }
 .mobile .app-content { min-height: 0; min-width: 0; flex-basis: 0; position: relative; }
 .mobile .mobile-hidden { display: none; }
 .mobile .mobile-home-scroll, .mobile .mobile-controls-scroll { flex-grow: 1; flex-basis: 0; min-height: 0; min-width: 0; }
 .mobile .mobile-home { padding: 16px 20px 20px; min-width: 0; }
 .mobile .mobile-home > * { flex-shrink: 0; margin-bottom: 12px; }
-.mobile .mobile-home > .mobile-section { margin-bottom: 16px; }
-.mobile .mobile-logo { flex-shrink: 0; }
-.mobile .mobile-login-logo { width: 200px; height: 86px; margin-bottom: 8px; }
-.mobile .mobile-home-logo { width: 132px; height: 57px; }
-.mobile .mobile-welcome { align-items: center; }
-.mobile .mobile-welcome-mascot { width: 64px; height: 64px; flex-shrink: 0; margin-right: 12px; }
-.mobile .mobile-profile-mascot { width: 48px; height: 48px; flex-shrink: 0; margin-right: 12px; }
-.mobile .mobile-welcome-title { font-size: 22px; -unity-font-style: bold; white-space: normal; margin-bottom: 6px; }
+.mobile .mobile-login-screen { flex-grow: 1; min-height: 0; justify-content: center; padding: 24px 28px; }
+.mobile .mobile-login-visual { flex-shrink: 0; align-items: center; margin-bottom: 32px; }
+.mobile .mobile-login-logo { width: 320px; max-width: 100%; height: 128px; flex-shrink: 0; margin: 0; }
+.mobile .mobile-login-actions { width: 100%; max-width: 420px; align-self: center; flex-shrink: 0; }
+.mobile .mobile-login-actions .guest-login { min-height: 56px; font-size: 19px; margin: 0 0 12px; }
+.mobile .mobile-login-actions .google-login { min-height: 52px; background-color: #FFFFFF; margin: 0 0 12px; }
+.mobile .mobile-login-actions .google-cancel { margin-bottom: 12px; }
+.mobile .mobile-login-actions .language-selection { margin: 8px 0 0; }
+.mobile .mobile-login-actions .notice { margin-top: 8px; }
 .mobile .mobile-small { font-size: 13px; white-space: normal; }
-.mobile .mobile-page-title { font-size: 24px; -unity-font-style: bold; white-space: normal; }
 .mobile .mobile-card-title { font-size: 16px; -unity-font-style: bold; white-space: normal; }
-.mobile .mobile-card { width: 100%; max-width: none; background-color: #FFFFFF; border-width: 1px; border-color: #E3DDD4; border-radius: 16px; padding: 16px; }
-.mobile .mobile-card > * { margin-bottom: 10px; flex-shrink: 0; }
 .mobile .mobile-topbar { min-height: 60px; height: 60px; flex-shrink: 0; flex-direction: row; align-items: center; padding: 6px 20px; background-color: #F7F3EA; }
-.mobile .mobile-topbar .mobile-page-title { font-size: 20px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.mobile .mobile-topbar .mobile-logo { width: 118px; height: 44px; margin: 0; }
-.mobile .mobile-topbar-logo { width: 132px; height: 44px; flex-grow: 1; flex-shrink: 1; min-width: 0; margin-right: 12px; }
-.mobile .mobile-topbar .mobile-back { width: 48px; min-width: 48px; font-size: 14px; padding: 8px 4px; }
+.mobile .mobile-topbar .mobile-back { width: 72px; min-width: 48px; font-size: 14px; padding: 8px 4px; }
 .mobile .mobile-topbar .mobile-status-pill { align-self: center; margin-right: 8px; }
-.mobile .mobile-topbar .mobile-workspace-title { font-size: 20px; -unity-font-style: bold; margin-left: 12px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mobile .mobile-topbar .mobile-workspace-title { font-size: 22px; -unity-font-style: bold; margin: 0 8px; padding: 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mobile .mobile-topbar .mobile-lobby-title { margin-left: 0; }
 .mobile .mobile-bottom-nav { min-height: 68px; height: 68px; flex-shrink: 0; flex-direction: row; align-items: stretch; justify-content: space-between; padding: 8px 12px; background-color: #FFFFFF; border-top-width: 1px; border-top-color: #E3DDD4; }
-.mobile .mobile-bottom-nav .mobile-nav-item { flex-grow: 1; flex-basis: 0; min-width: 0; min-height: 48px; height: 48px; padding: 6px 4px; margin: 0 3px; border-width: 0; border-radius: 12px; color: #817A87; background-color: transparent; font-size: 13px; -unity-font-style: normal; -unity-text-align: middle-center; }
-.mobile .mobile-bottom-nav .mobile-nav-selected { background-color: #E9E4F3; color: #34304B; -unity-font-style: bold; }
-.mobile .mobile-hero { background-color: #EDE7F3; border-width: 1px; border-color: #DED5EA; border-radius: 20px; padding: 14px; margin-bottom: 16px; }
-.mobile .mobile-hero .mobile-welcome-mascot { width: 88px; height: 88px; }
-.mobile .mobile-hero .mobile-profile-mascot { width: 88px; height: 88px; }
-.mobile .mobile-hero .mobile-intro { font-size: 26px; }
-.mobile .mobile-actions { width: 100%; }
-.mobile .mobile-actions > .button { width: 100%; min-height: 52px; margin-bottom: 10px; }
-.mobile .mobile-section { width: 100%; min-width: 0; }
+.mobile .mobile-bottom-nav .mobile-nav-item { flex-grow: 1; flex-basis: 0; min-width: 0; min-height: 48px; height: 48px; padding: 6px 4px; margin: 0 3px; border-width: 0; border-radius: 8px; color: #736957; background-color: transparent; font-size: 14px; -unity-font-style: normal; -unity-text-align: middle-center; }
+.mobile .mobile-bottom-nav .mobile-nav-selected { background-color: #F9E6BE; color: #34304B; border-width: 0 0 3px; border-color: #34304B; -unity-font-style: bold; }
+.mobile .mobile-lobby { flex-grow: 1; flex-basis: 0; min-height: 0; padding: 4px 20px 12px; }
+.mobile .mobile-lobby-profile { height: auto; min-height: 144px; flex-shrink: 0; margin-bottom: 16px; background-color: #FFFFFF; border-width: 2px; border-color: #34304B; border-radius: 12px; padding: 12px 16px; }
+.mobile .mobile-lobby-avatar { width: 104px; height: 104px; flex-shrink: 0; margin-right: 16px; align-items: center; justify-content: center; }
+.mobile .mobile-lobby-avatar .lobby-avatar { width: 104px; height: 104px; }
+.mobile .mobile-lobby-identity { flex-basis: 0; min-width: 0; align-items: flex-start; justify-content: center; }
+.mobile .mobile-lobby-name { font-size: 22px; -unity-font-style: bold; max-width: 100%; margin: 0; padding: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mobile .mobile-account-state { font-size: 12px; color: #736957; margin: 4px 0 8px; padding: 0; }
+.mobile .button.mobile-customize { min-width: 112px; max-width: 100%; height: 48px; min-height: 48px; flex-shrink: 0; margin: 0; padding: 8px 12px; font-size: 14px; white-space: nowrap; }
+.mobile .mobile-lobby-actions { flex-shrink: 0; align-items: stretch; margin-bottom: 12px; }
+.mobile .mobile-lobby-actions .button { flex-basis: 0; min-width: 0; min-height: 64px; font-size: 20px; border-width: 2px 2px 5px 2px; margin-right: 12px; }
+.mobile .mobile-lobby-actions .mobile-last { margin-right: 0; }
+.mobile .button.menu-mint { background-color: #78BBA4; }
+.mobile .button.menu-mint:hover { background-color: #93D0B9; }
+.mobile .button.menu-mint:active { background-color: #66A68F; }
+.mobile .button.menu-orange { background-color: #F5B553; }
+.mobile .button.menu-orange:hover { background-color: #FFCB7B; }
+.mobile .button.menu-orange:active { background-color: #EAA843; }
+.mobile .button.menu-purple { background-color: #9D93DB; }
+.mobile .mobile-room-list-heading { flex-shrink: 0; height: 48px; min-height: 48px; margin-bottom: 12px; }
+.mobile .mobile-room-list-heading .mobile-card-title { margin: 0; padding: 0; }
+.mobile .mobile-lobby-room-list { flex-grow: 1; flex-basis: 0; min-height: 0; height: auto; margin-top: 0; }
+.mobile .room-list-empty-message { font-size: 14px; }
+.mobile .friend-actions .button.icon-button { margin-left: 8px; }
 .mobile .mobile-section-header { flex-direction: row; align-items: center; justify-content: space-between; font-size: 16px; -unity-font-style: bold; margin: 4px 0 12px; }
-.mobile .mobile-section-header .mobile-page-title { font-size: 18px; }
-.mobile .mobile-status-pill { align-self: flex-start; background-color: #EDE7F3; color: #78679E; padding: 5px 10px; border-radius: 12px; font-size: 12px; -unity-font-style: bold; white-space: nowrap; }
+.mobile .mobile-status-pill { align-self: flex-start; background-color: #F9E6BE; color: #736957; padding: 5px 10px; border-radius: 8px; font-size: 12px; -unity-font-style: bold; white-space: nowrap; }
 .mobile .mobile-profile-hero { flex-direction: row; align-items: center; min-height: 124px; flex-shrink: 0; margin: 0 20px 12px; padding: 12px; background-color: #FFFFFF; border-width: 1px; border-color: #E3DDD4; border-radius: 16px; }
-.mobile .mobile-profile-preview { width: 104px; height: 104px; flex-shrink: 0; margin-right: 12px; align-items: center; justify-content: center; background-color: #EEE8F5; border-radius: 14px; }
+.mobile .mobile-profile-preview { width: 104px; height: 104px; flex-shrink: 0; margin-right: 12px; align-items: center; justify-content: center; background-color: #FFF3D8; border-radius: 12px; }
 .mobile .mobile-profile-preview .lobby-avatar { width: 104px; height: 104px; }
 .mobile .mobile-profile-hero .grow { min-width: 0; }
-.mobile .mobile-profile-hero .shop-preview-status { font-size: 16px; margin-bottom: 8px; }
 .mobile .mobile-profile-hero .rules { font-size: 12px; margin: 0 0 8px; }
 .mobile .mobile-profile-hero .button { min-height: 48px; padding: 8px 10px; font-size: 14px; }
 .mobile .home-panel { width: 100%; max-width: none; flex-shrink: 0; }
 .mobile .mobile-page-body > * { margin-bottom: 12px; }
 .mobile .mobile-page-body > .screen-title { display: none; }
-.mobile .mobile-page-body > .screen-title.mobile-create-title, .mobile .mobile-page-body > .screen-title.create-title { display: flex; font-size: 20px; margin-bottom: 12px; }
 .mobile .screen-title { font-size: 24px; margin-bottom: 12px; }
 .mobile .mobile-page-heading { align-items: center; margin-bottom: 12px; }
-.mobile .mobile-page-heading .mobile-page-title { font-size: 22px; }
 .mobile .mobile-back { width: 64px; min-width: 64px; flex-shrink: 0; margin: 0; }
-.mobile .mobile-intro { font-size: 26px; -unity-font-style: bold; white-space: normal; }
-.mobile .mobile-navigation, .mobile .mobile-list-actions { width: 100%; }
-.mobile .mobile-navigation .button, .mobile .mobile-list-actions .button { flex-basis: 0; min-width: 0; margin-right: 8px; }
-.mobile .mobile-navigation .button.mobile-last, .mobile .mobile-list-actions .button.mobile-last { margin-right: 0; }
-.mobile .mobile-profile-row { margin-bottom: 8px; }
-.mobile .mobile-footer { font-size: 12px; margin-top: 8px; -unity-text-align: middle-center; }
-.mobile .button { min-height: 48px; height: auto; font-size: 16px; border-radius: 12px; padding: 10px 14px; border-width: 1px; border-color: #DED5EA; color: #34304B; background-color: #E9E4F3; margin: 0; white-space: normal; transition-property: background-color, border-color; transition-duration: .12s; }
-.mobile .button:hover { background-color: #E2DBEE; border-color: #CDC1DD; }
-.mobile .button:active { background-color: #DCD2EA; border-color: #BFAED6; }
-.mobile .button:focus { border-color: #78679E; }
+.mobile .button { min-height: 48px; height: auto; font-size: 16px; border-radius: 10px; padding: 10px 14px; border-width: 2px 2px 4px 2px; border-color: #34304B; color: #34304B; background-color: #FFF9ED; margin: 0; white-space: normal; transition-property: background-color, border-color; transition-duration: .12s; }
+.mobile .button:hover { background-color: #FFF0C7; border-color: #34304B; }
+.mobile .button:active { background-color: #F2E6CA; border-color: #34304B; }
+.mobile .button:focus { border-color: #645797; }
 .mobile .mobile-home > .button, .mobile .mobile-page-body > .button { margin-bottom: 12px; }
-.mobile .mobile-card > .button { margin-bottom: 10px; }
-.mobile .primary { background-color: #F5B553; border-color: #F5B553; color: #34304B; }
-.mobile .primary:hover { background-color: #F8C36F; border-color: #F8C36F; }
-.mobile .primary:active { background-color: #EAA843; border-color: #EAA843; }
-.mobile .secondary { background-color: #E9E4F3; border-color: #DED5EA; color: #34304B; }
+.mobile .primary { background-color: #F5B553; border-color: #34304B; color: #34304B; }
+.mobile .primary:hover { background-color: #F8C36F; border-color: #34304B; }
+.mobile .primary:active { background-color: #EAA843; border-color: #34304B; }
+.mobile .secondary { background-color: #FFF9ED; border-color: #34304B; color: #34304B; }
 .mobile .danger { color: #9B4A54; background-color: #FAE9E5; border-color: #EBD1CB; }
 .mobile .next-button { margin-top: 12px; height: 48px; }
 .mobile .field { flex-direction: column; align-items: stretch; min-height: 72px; margin: 0 0 12px; font-size: 16px; }
@@ -77,7 +86,7 @@
 .mobile .audio-slider { height: 48px; min-height: 48px; }
 .mobile .audio-slider .unity-base-slider__tracker { background-color: #D8D0DF; }
 .mobile .audio-slider .unity-base-slider__dragger { width: 24px; height: 24px; border-radius: 12px; background-color: #78679E; }
-.mobile .unity-base-text-field__input, .mobile .unity-base-popup-field__input { min-height: 48px; border-width: 1px; border-color: #DED5EA; border-radius: 12px; padding: 10px 14px; background-color: #FFFFFF; color: #34304B; font-size: 16px; }
+.mobile .unity-base-text-field__input, .mobile .unity-base-popup-field__input { min-height: 48px; border-width: 2px; border-color: #B7A88B; border-radius: 8px; padding: 10px 14px; background-color: #FFFDF6; color: #34304B; font-size: 16px; }
 .mobile .unity-base-text-field__input:focus, .mobile .unity-base-popup-field__input:focus { border-color: #78679E; }
 .mobile .unity-toggle { min-height: 48px; flex-direction: row; align-items: center; }
 .mobile .unity-toggle > .unity-base-field__label { align-self: center; margin: 0 12px 0 0; flex-grow: 1; }
@@ -90,45 +99,40 @@
 .mobile .room-entry > *, .mobile .mobile-room-item > * { flex-shrink: 0; margin-bottom: 8px; }
 .mobile .room-entry .player-name, .mobile .mobile-room-item .player-name { font-size: 18px; white-space: normal; }
 .mobile .mobile-room-top { flex-direction: row; align-items: center; min-width: 0; }
-.mobile .mobile-room-top .grow { min-width: 0; margin-right: 8px; }
+.mobile .mobile-room-top .grow { flex-basis: 0; flex-shrink: 1; min-width: 0; margin-right: 8px; }
 .mobile .mobile-room-meta { font-size: 13px; color: #817A87; white-space: normal; }
+.mobile .mobile-room-metadata { justify-content: flex-start; }
+.mobile .mobile-room-metadata .mobile-small { margin-right: 12px; }
+.mobile .mobile-room-state { color: #537F70; background-color: #E6F1EB; padding: 4px 8px; border-radius: 6px; font-size: 12px; flex-shrink: 0; }
 .mobile .mobile-room-action { flex-direction: row; align-items: center; margin-bottom: 0; }
 .mobile .mobile-room-action .primary { flex-grow: 1; flex-basis: 0; }
 .mobile .mobile-room-action .secondary { width: 76px; flex-shrink: 0; margin-left: 8px; }
-.mobile .mobile-room-entry-actions { align-items: center; margin-bottom: 0; }
-.mobile .mobile-room-entry-actions .button { min-width: 72px; margin-left: 8px; }
+.mobile .mobile-room-entry-actions { align-items: stretch; margin-bottom: 0; }
+.mobile .mobile-room-entry-actions .button { min-width: 72px; margin: 0 0 0 8px; white-space: nowrap; }
+.mobile .mobile-room-entry-actions .mobile-room-entry-first { margin-left: 0; }
+.mobile .mobile-room-entry-actions .secondary { width: auto; min-width: 88px; padding: 8px 12px; font-size: 14px; }
 .mobile .mobile-code-input .unity-base-text-field__input { -unity-font-style: bold; font-size: 24px; -unity-text-align: middle-center; }
-.mobile .shop-list { height: 360px; margin-top: 8px; }
-.mobile .shop-entry { padding: 12px; margin-bottom: 12px; background-color: #FFFFFF; border-width: 1px; border-color: #E3DDD4; border-radius: 16px; }
-.mobile .shop-entry.shop-selected { border-color: #78679E; background-color: #F2EDF8; }
+.mobile .mobile-join-code-row { align-items: flex-end; margin-bottom: 12px; }
+.mobile .mobile-join-code-row .field { margin: 0 12px 0 0; min-width: 0; flex-basis: 0; }
+.mobile .mobile-code-paste { width: 96px; min-height: 48px; flex-shrink: 0; font-size: 14px; padding: 8px; }
+.mobile .mobile-join-actions .button { flex-basis: 0; min-width: 0; min-height: 52px; margin-right: 12px; }
+.mobile .mobile-join-actions .mobile-last { margin-right: 0; }
 .mobile .shop-entry, .mobile .room-entry, .mobile .mobile-room-item { transition-property: background-color, border-color; transition-duration: .12s; }
-.mobile .shop-item-image { width: 88px; height: 88px; min-width: 88px; min-height: 88px; }
-.mobile .shop-controls .button, .mobile .shop-actions .button { margin-right: 8px; padding: 10px 8px; }
-.mobile .shop-controls .button.mobile-last, .mobile .shop-actions .button.mobile-last { margin-right: 0; }
-.mobile .mobile-shop-grid { width: 100%; align-self: stretch; flex-direction: row; flex-wrap: wrap; align-items: stretch; min-width: 0; }
-.mobile .mobile-shop-entry { width: 48%; flex-basis: 48%; min-width: 0; margin: 0 2% 12px 0; padding: 10px; }
-.mobile .mobile-shop-product { flex-direction: column; align-items: center; margin-bottom: 8px; }
-.mobile .mobile-shop-image { width: 96px; height: 96px; min-width: 96px; min-height: 96px; margin: 0 0 8px; }
-.mobile .mobile-shop-info { width: 100%; min-width: 0; font-size: 12px; }
-.mobile .shop-item-name { font-size: 15px; margin-bottom: 4px; }
-.mobile .mobile-shop-actions { flex-direction: column; align-items: stretch; }
-.mobile-shop-actions .button { flex-basis: auto; width: 100%; min-height: 48px; font-size: 14px; margin: 0 0 6px; padding: 8px 4px; }
-.mobile-shop-actions .button.mobile-last { margin-bottom: 0; }
 .mobile .topic-list { height: 280px; }
 .mobile .topic-toggle { width: 46%; min-height: 48px; font-size: 16px; background-color: #FFFFFF; border-color: #DED5EA; color: #817A87; }
 .mobile .topic-toggle.topic-selected { background-color: #E9E4F3; border-color: #78679E; color: #34304B; }
-.mobile .mode-option { min-height: 80px; margin-bottom: 10px; }
-.mobile .mobile-customize-preview { align-items: center; height: 144px; }
-.mobile .mobile-customize-preview .lobby-avatar { width: 144px; height: 144px; }
 .mobile .avatar-colors { flex-wrap: wrap; }
 .mobile .avatar-colors .swatch { width: 48px; height: 48px; min-height: 48px; margin: 0 8px 8px 0; padding: 0; }
-.mobile .equipment-option { min-height: 136px; font-size: 16px; background-color: #FFFFFF; border-color: #E3DDD4; }
+.mobile .equipment-option { min-height: 136px; margin: 0 2% 8px 0; padding: 8px; font-size: 16px; background-color: #FFFFFF; border-color: #E3DDD4; }
+.mobile .part-tabs { height: 56px; min-height: 56px; }
+.mobile .part-tabs .part-tab { min-width: 52px; height: 48px; min-height: 48px; margin: 0 6px 0 0; padding: 6px 10px; font-size: 14px; }
 .mobile .equipment-option.equipped { background-color: #E9E4F3; border-color: #78679E; }
 .mobile .equipment-state { white-space: normal; }
 .mobile .rules, .mobile .notice { font-size: 13px; color: #817A87; white-space: normal; }
 .mobile .overlay { justify-content: flex-end; align-items: stretch; background-color: rgba(52,48,75,.38); }
 .mobile .modal { width: 100%; max-width: 100%; max-height: 90%; padding: 0; background-color: #FFFFFF; color: #34304B; border-width: 1px; border-color: #E3DDD4; border-radius: 20px 20px 0 0; }
 .mobile .mobile-modal-scroll { min-height: 0; flex-shrink: 1; }
+.app.mobile .modal.room-options-editor { padding: 20px; }
 .mobile .mobile-modal-body { padding: 20px; }
 .mobile .mobile-modal-body > * { flex-shrink: 0; margin-bottom: 10px; }
 .mobile .mobile-modal-body .title { font-size: 24px; }
@@ -137,6 +141,7 @@
 .app.mobile.in-game { padding: 0; background-color: #F7F3EA; color: #34304B; --ink: #34304B; --muted: #817A87; --brand: #78679E; --border: #E3DDD4; --mint: #537F70; }
 .mobile.in-game .mobile-room { flex-grow: 1; min-height: 0; padding: 12px 16px; }
 .mobile.in-game .room-hud { height: 48px; min-height: 48px; margin-bottom: 8px; align-items: center; }
+.mobile.in-game .room-hud .mobile-back { width: auto; min-width: 64px; white-space: nowrap; }
 .mobile.in-game .phase-bar { justify-content: flex-start; min-height: 48px; }
 .mobile.in-game .phase-title { font-size: 20px; }
 .mobile.in-game .phase-detail { display: none; }
@@ -158,13 +163,13 @@
 .mobile.in-game .mobile-controls { min-width: 0; padding-bottom: 0; }
 .mobile.in-game .mobile-controls > * { flex-shrink: 0; margin-bottom: 8px; }
 .mobile.in-game .mobile-bottom-actions { flex-shrink: 0; padding-top: 4px; }
-.mobile.in-game .button { min-height: 48px; height: auto; padding: 8px 12px; border-radius: 12px; font-size: 16px; background-color: #E9E4F3; border-color: #DED5EA; color: #34304B; }
-.mobile.in-game .button:hover { background-color: #E2DBEE; border-color: #CDC1DD; }
-.mobile.in-game .button:active { background-color: #DCD2EA; border-color: #BFAED6; }
-.mobile.in-game .primary, .mobile.in-game .tool-selected { background-color: #F5B553; border-color: #F5B553; color: #34304B; }
-.mobile.in-game .primary:hover, .mobile.in-game .tool-selected:hover { background-color: #F8C36F; border-color: #F8C36F; }
-.mobile.in-game .primary:active { background-color: #EAA843; border-color: #EAA843; }
-.mobile.in-game .secondary { background-color: #E9E4F3; border-color: #DED5EA; color: #34304B; }
+.mobile.in-game .button { min-height: 48px; height: auto; padding: 8px 12px; border-radius: 10px; border-width: 2px 2px 4px 2px; font-size: 16px; background-color: #FFF9ED; border-color: #34304B; color: #34304B; }
+.mobile.in-game .button:hover { background-color: #FFF0C7; border-color: #34304B; }
+.mobile.in-game .button:active { background-color: #F2E6CA; border-color: #34304B; }
+.mobile.in-game .primary, .mobile.in-game .tool-selected { background-color: #F5B553; border-color: #34304B; color: #34304B; }
+.mobile.in-game .primary:hover, .mobile.in-game .tool-selected:hover { background-color: #F8C36F; border-color: #34304B; }
+.mobile.in-game .primary:active { background-color: #EAA843; border-color: #34304B; }
+.mobile.in-game .secondary { background-color: #FFF9ED; border-color: #34304B; color: #34304B; }
 .mobile.in-game .danger { color: #9B4A54; background-color: #FAE9E5; border-color: #EBD1CB; }
 .mobile.in-game .tool-row { margin-bottom: 8px; }
 .mobile.in-game .tool-row .button { width: auto; flex-basis: 0; flex-grow: 1; margin-right: 8px; }
@@ -214,7 +219,21 @@
 .mobile-landscape .mobile-topbar { height: 52px; min-height: 52px; padding-top: 2px; padding-bottom: 2px; }
 .mobile-landscape .mobile-bottom-nav { height: 60px; min-height: 60px; padding-top: 6px; padding-bottom: 6px; }
 .mobile-landscape .mobile-home { padding-top: 12px; max-width: 760px; width: 100%; align-self: center; }
-.mobile-landscape .mobile-hero { padding: 14px; }
+.mobile-landscape .mobile-login-screen { flex-direction: row; align-items: center; justify-content: space-between; padding: 20px 32px; }
+.mobile-landscape .mobile-login-visual { width: 48%; margin: 0; flex-shrink: 0; }
+.mobile-landscape .mobile-login-logo { width: 300px; height: 120px; }
+.mobile-landscape .mobile-login-actions { width: 46%; max-width: 420px; }
+.mobile-landscape .mobile-lobby { padding: 4px 20px 8px; }
+.mobile-landscape .mobile-lobby-profile { height: auto; min-height: 104px; margin-bottom: 8px; padding: 8px 12px; }
+.mobile-landscape .mobile-lobby-avatar, .mobile-landscape .mobile-lobby-avatar .lobby-avatar { width: 80px; height: 80px; }
+.mobile-landscape .mobile-lobby-name { font-size: 20px; }
+.mobile-landscape .mobile-account-state { display: none; }
+.mobile-landscape .mobile-lobby-actions { position: absolute; top: 16px; right: 32px; width: 44%; margin: 0; }
+.mobile-landscape .mobile-lobby-actions .button { min-height: 64px; font-size: 18px; }
+.mobile-landscape .mobile-lobby-identity { max-width: 40%; }
+.mobile-landscape .mobile-room-list-heading { position: absolute; top: 116px; left: 20px; width: 44%; margin: 0; }
+.mobile-landscape .room-search { position: absolute; top: 116px; right: 32px; width: 44%; margin: 0; }
+.mobile-landscape .mobile-lobby-room-list { margin-top: 60px; }
 .mobile-landscape .mobile-profile-hero { min-height: 104px; margin-bottom: 8px; max-width: 760px; width: 94%; align-self: center; }
 .mobile-landscape .mobile-profile-preview, .mobile-landscape .mobile-profile-preview .lobby-avatar { width: 80px; height: 80px; }
 .mobile-landscape.in-game .mobile-room { padding: 8px 16px; }
@@ -245,14 +264,81 @@
 .mobile.in-game .mobile-waiting .mobile-controls-scroll { width: 100%; flex-grow: 1; flex-basis: 0; min-height: 0; }
 .mobile.in-game .mobile-waiting .mobile-roster-scroll { height: auto; min-height: 0; }
 .mobile.in-game .mobile-waiting .players-strip { width: 100%; height: auto; min-height: 0; flex-direction: row; flex-wrap: wrap; }
-.mobile.in-game .mobile-waiting .player, .mobile.in-game .mobile-waiting .crowded .player { width: 48%; height: 88px; min-height: 88px; margin: 0 2% 8px 0; padding: 12px; }
+.mobile.in-game .mobile-waiting .player, .mobile.in-game .mobile-waiting .crowded .player { width: 48%; height: 218px; min-height: 0; margin: 0 12px 12px 0; padding: 12px; border-radius: 16px; }
+.mobile.in-game .mobile-waiting .player > .row { flex-direction: column; align-items: center; justify-content: center; }
+.mobile.in-game .mobile-waiting .player .avatar, .mobile.in-game .mobile-waiting .crowded .player .avatar { width: 132px; height: 132px; margin: 0 0 8px; }
+.mobile.in-game .mobile-waiting .player .grow { width: 100%; flex-grow: 0; flex-shrink: 0; }
+.mobile.in-game .mobile-waiting .player .player-name, .mobile.in-game .mobile-waiting .crowded .player .player-name { height: 20px; flex-shrink: 0; font-size: 14px; -unity-font-style: normal; -unity-text-align: middle-center; white-space: nowrap; }
+.mobile.in-game .mobile-waiting .player-status, .mobile.in-game .mobile-waiting .crowded .player-status { height: 18px; flex-shrink: 0; font-size: 12px; margin-top: 4px; -unity-text-align: middle-center; }
 .mobile.in-game .mobile-waiting .mobile-roster > .mobile-small { display: flex; font-size: 15px; -unity-font-style: bold; color: #34304B; margin-bottom: 8px; }
 .mobile.in-game .mobile-waiting .mobile-bottom-actions { flex-direction: column; flex-shrink: 0; padding-top: 8px; }
 .mobile.in-game .mobile-waiting .phase-actions { width: 100%; margin-right: 0; }
 .mobile.in-game .mobile-waiting .phase-actions .button { margin-bottom: 8px; }
 .mobile.in-game .mobile-waiting .chat-open { width: 100%; }
 .mobile-landscape.in-game .mobile-waiting .mobile-round-card { display: flex; }
+.mobile-landscape.in-game .mobile-waiting .mobile-workspace { flex-direction: row; align-items: stretch; }
+.mobile-landscape.in-game .mobile-waiting .mobile-controls-scroll { width: auto; flex-grow: 1; flex-basis: 0; margin-right: 12px; }
+.mobile-landscape.in-game .mobile-waiting .mobile-bottom-actions { width: 200px; padding-top: 26px; }
 .mobile .draw-button-scale { scale: 1 1; translate: 0 0; transition-property: background-color, border-color, scale, opacity; transition-duration: .10s; }
-.mobile .draw-button-scale.draw-pressed { scale: .94 .94; transition-duration: .08s; }
+.mobile .draw-button-scale.draw-pressed { scale: 0.94 0.94; transition-duration: .08s; }
 .mobile .draw-button-scale.draw-released { scale: 1.03 1.03; transition-duration: .07s; }
 .mobile .draw-button-scale:disabled, .mobile.reduce-motion .draw-button-scale, .mobile.reduce-motion .draw-button-scale.draw-pressed, .mobile.reduce-motion .draw-button-scale.draw-released { scale: 1 1; translate: 0 0; }
+.app.mobile .shop-page { padding: 16px; background-color: #FFF3D8; }
+.app.mobile .shop-header { height: 56px; min-height: 56px; margin-bottom: 12px; }
+.app.mobile .shop-title { font-size: 20px; margin: 0 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.app.mobile .shop-coins { width: 96px; min-width: 96px; height: 36px; margin-right: 0; padding: 6px; font-size: 14px; }
+.app.mobile .shop-header .shop-back, .app.mobile .shop-header .shop-friends { width: auto; min-width: 56px; padding: 3px 8px; font-size: 14px; white-space: nowrap; }
+.app.mobile .shop-header .shop-settings { width: 48px; min-width: 48px; margin-left: 8px; }
+.app.mobile .shop-workspace { flex-direction: column; align-items: stretch; }
+.app.mobile .shop-panel { padding: 12px; }
+.app.mobile .shop-preview-panel { width: 100%; height: 140px; min-height: 140px; flex-direction: row; align-items: center; margin: 0 0 12px; }
+.app.mobile .shop-preview-stage { width: 104px; height: 104px; flex-shrink: 0; margin: 0 12px 0 0; background-color: transparent; }
+.app.mobile .shop-preview-stage .lobby-avatar { width: 104px; height: 104px; }
+.app.mobile .shop-preview-controls { flex-grow: 1; flex-basis: 0; min-width: 0; }
+.app.mobile .shop-profile-name { height: 24px; margin: 0 0 8px; font-size: 20px; -unity-text-align: middle-left; }
+.app.mobile .shop-preview-controls .shop-preview-status { margin-bottom: 8px; -unity-text-align: middle-left; }
+.app.mobile .shop-preview-actions { flex-direction: row; align-items: stretch; }
+.app.mobile .shop-preview-actions .button { flex-grow: 1; flex-basis: auto; min-width: 0; margin: 0; padding: 3px 8px; font-size: 14px; white-space: nowrap; }
+.app.mobile .shop-preview-actions .shop-preview-reset { margin: 0 12px 0 0; }
+.app.mobile .shop-filters { margin-bottom: 12px; }
+.app.mobile .shop-filters .part-tab { width: auto; min-width: 64px; padding: 3px 8px; font-size: 14px; }
+.app.mobile .shop-grid .shop-entry { height: 230px; min-height: 230px; padding: 12px; margin-bottom: 12px; }
+.app.mobile .shop-grid .shop-item-name { font-size: 16px; margin-bottom: 8px; }
+.app.mobile .shop-grid .shop-actions .button { padding: 3px 6px; font-size: 14px; }
+.app.mobile .shop-grid .shop-actions .shop-try-on { white-space: nowrap; }
+.app.mobile .shop-grid .shop-entry.shop-actions-stacked { height: 286px; min-height: 286px; }
+.app.mobile-landscape .shop-page { padding: 12px 16px; }
+.app.mobile-landscape .shop-workspace { flex-direction: row; }
+.app.mobile-landscape .shop-preview-panel { width: 208px; height: auto; min-height: 0; flex-direction: column; align-items: stretch; margin: 0 12px 0 0; }
+.app.mobile-landscape .shop-preview-stage { width: 70px; height: 70px; align-self: center; margin: 0 0 8px; }
+.app.mobile-landscape .shop-preview-stage .lobby-avatar { width: 70px; height: 70px; }
+.app.mobile-landscape .shop-preview-controls { flex-grow: 0; flex-basis: auto; }
+.app.mobile-landscape .shop-preview-actions { flex-direction: column; }
+.app.mobile-landscape .shop-preview-actions .button { flex-grow: 0; width: 100%; }
+.app.mobile-landscape .shop-preview-actions .shop-preview-reset { margin: 0 0 8px; }
+.app.mobile-landscape .shop-profile-name, .app.mobile-landscape .shop-preview-controls .shop-preview-status { -unity-text-align: middle-center; }
+.app.mobile-landscape .shop-profile-name { height: 20px; margin-bottom: 6px; font-size: 16px; }
+.app.mobile-landscape .shop-preview-controls .shop-preview-status { min-height: 18px; margin-bottom: 6px; font-size: 13px; }
+.app.mobile .modal.utility-popup { width: 100%; max-width: 100%; height: 88%; max-height: 704px; min-height: 0; padding: 16px; border-width: 2px; border-color: #34304B; border-radius: 20px 20px 0 0; background-color: #FFFFFF; }
+.app.mobile .utility-popup-header { margin-bottom: 12px; }
+.app.mobile .utility-popup .utility-popup-close { margin-top: 12px; }
+.app.mobile .utility-popup-form { padding-right: 0; }
+.app.mobile .create-room-page { padding: 12px 16px; }
+.app.mobile .create-room-panel { height: 100%; padding: 16px; }
+.app.mobile .create-room-heading { margin-bottom: 12px; }
+.app.mobile .create-room-heading .lobby-title { font-size: 22px; margin-left: 12px; }
+.app.mobile .create-room-panel .create-back { font-size: 14px; }
+.app.mobile .create-basic-fields { flex-direction: column; align-items: stretch; }
+.app.mobile #create-room-name { flex-basis: auto; }
+.app.mobile #create-privacy { width: 100%; margin-left: 0; }
+.app.mobile .create-room-panel .field { margin-bottom: 12px; }
+.app.mobile .create-mode { margin-bottom: 16px; }
+.app.mobile .create-modes .button { font-size: 14px; }
+.app.mobile .create-section-fields { padding: 12px 10px 0; }
+.app.mobile .create-time-grid .field { margin-right: 2%; }
+.app.mobile .create-footer { padding-top: 12px; }
+.app.mobile-landscape .create-room-page { padding: 8px 16px; }
+.app.mobile-landscape .create-room-panel { width: 760px; padding: 12px 20px; }
+.app.mobile-landscape .create-basic-fields { flex-direction: row; align-items: flex-start; }
+.app.mobile-landscape #create-room-name { flex-basis: 0; }
+.app.mobile-landscape #create-privacy { width: 240px; margin-left: 16px; }

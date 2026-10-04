@@ -10,10 +10,17 @@ builder.Services.AddSingleton<MainRegistration>();
 builder.Services.AddHostedService(services => services.GetRequiredService<MainRegistration>());
 var app = builder.Build();
 await ServerRuntime.InitializeAsync(app, false);
+app.UseWebSockets(new WebSocketOptions { KeepAliveInterval = TimeSpan.FromSeconds(15), KeepAliveTimeout = TimeSpan.FromSeconds(15) });
 app.MapGet("/health", (MainRegistration registration) => registration.IsReady ? Results.Ok(new { Status = "Ready" }) : Results.StatusCode(503));
 var database = app.Services.GetRequiredService<ServerDatabase>();
 string nodeId = app.Configuration["GameServer:NodeId"] ?? throw new InvalidOperationException("GameServer:NodeId가 필요합니다.");
 Task<ServerSession> Authenticate(HttpContext context) => database.AuthenticateAsync(ServerRuntime.Bearer(context), "game:" + nodeId);
+var lobbyChat = new LobbyChatHub(async (token, cancellation) =>
+{
+    var identity = await database.AuthenticateLobbyAsync(token, "game:" + nodeId, cancellation);
+    return new LobbyChatIdentity(identity.Session.AccountId, identity.DisplayName, identity.Session.ExpiresAt);
+});
+app.Map("/ws/lobby", lobbyChat.HandleAsync);
 
 app.MapPost("/api/session/enter", (EnterGameRequest request) => database.EnterGameAsync(request.AssignmentToken, nodeId));
 app.MapPost("/api/session/logout", (Func<HttpContext, Task<IResult>>)(async context => { await database.LogoutAsync(await Authenticate(context)); return Results.NoContent(); }));
