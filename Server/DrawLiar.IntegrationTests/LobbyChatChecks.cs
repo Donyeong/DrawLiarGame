@@ -121,6 +121,7 @@ internal static partial class Integration
         identities.TryRemove(secondToken, out _);
         Check((await second.WaitAsync(message => message.Type == "notice" && message.Code == "InvalidSession")).Code == "InvalidSession",
             "로그아웃·차단된 연결은 재검증으로 종료해야 합니다.");
+        await second.WaitClosedAsync();
         await using var last = await LobbyPeer.OpenAsync(address, firstToken);
         Check((await last.WaitAsync(message => message.Type == "history")).MemberCount == 1, "인증 해제된 세션은 접속 인원에서 제거해야 합니다.");
         await last.SendBytesAsync(new byte[4096], WebSocketMessageType.Binary);
@@ -245,6 +246,7 @@ internal static partial class Integration
             else await SendBytesAsync(bytes, WebSocketMessageType.Text);
         }
         public Task SendBytesAsync(byte[] bytes, WebSocketMessageType type) => _socket.SendAsync(new ArraySegment<byte>(bytes), type, true, _lifetime.Token);
+        public Task WaitClosedAsync() => _reader.WaitAsync(TimeSpan.FromSeconds(5));
         public async Task<LobbyChatEnvelope> WaitAsync(Func<LobbyChatEnvelope, bool> predicate)
         {
             using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(5));

@@ -136,7 +136,7 @@ public sealed partial class ServerDatabase
                 || player.Score < 0 || player.Rank < 1 || player.Rank > request.Players.Length
                 || player.RoundsPlayed < 1 || player.RoundsPlayed > request.RoundCount || player.CitizenRounds < 0 || player.LiarRounds < 0
                 || (long)player.CitizenRounds + player.LiarRounds != player.RoundsPlayed
-                || player.CorrectVotes < 0 || player.CorrectVotes > player.CitizenRounds
+                || player.CorrectVotes < 0 || player.CorrectVotes > player.RoundsPlayed
                 || player.CorrectGuesses < 0 || player.CorrectGuesses > player.LiarRounds)
                 throw new ApiException("InvalidMatchResult");
             players.Add(new MatchPlayerResult

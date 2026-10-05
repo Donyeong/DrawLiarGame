@@ -5,7 +5,7 @@ namespace DrawLiar
 {
     public sealed class DrawUIIcon : VisualElement
     {
-        public enum Kind { Refresh, Settings, Close }
+        public enum Kind { Refresh, Settings, Close, Bell }
         private readonly Kind _kind;
 
         public DrawUIIcon(Kind kind)
@@ -49,6 +49,28 @@ namespace DrawLiar
             {
                 painter.BeginPath();painter.MoveTo(Point(.25f,.25f));painter.LineTo(Point(.75f,.75f));painter.Stroke();
                 painter.BeginPath();painter.MoveTo(Point(.75f,.25f));painter.LineTo(Point(.25f,.75f));painter.Stroke();return;
+            }
+
+            if (_kind == Kind.Bell)
+            {
+                painter.BeginPath();
+                painter.MoveTo(Point(.23f, .67f));
+                painter.BezierCurveTo(Point(.29f, .60f), Point(.29f, .53f), Point(.29f, .40f));
+                painter.BezierCurveTo(Point(.29f, .27f), Point(.37f, .19f), Point(.50f, .19f));
+                painter.BezierCurveTo(Point(.63f, .19f), Point(.71f, .27f), Point(.71f, .40f));
+                painter.BezierCurveTo(Point(.71f, .53f), Point(.71f, .60f), Point(.77f, .67f));
+                painter.LineTo(Point(.23f, .67f));
+                painter.ClosePath();
+                painter.Stroke();
+                painter.BeginPath();
+                painter.MoveTo(Point(.40f, .79f));
+                painter.BezierCurveTo(Point(.42f, .89f), Point(.58f, .89f), Point(.60f, .79f));
+                painter.Stroke();
+                painter.BeginPath();
+                painter.MoveTo(Point(.50f, .10f));
+                painter.LineTo(Point(.50f, .19f));
+                painter.Stroke();
+                return;
             }
 
             painter.BeginPath();

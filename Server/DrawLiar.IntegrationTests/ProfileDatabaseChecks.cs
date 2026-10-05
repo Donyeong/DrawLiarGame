@@ -22,10 +22,13 @@ internal static partial class Integration
             Guid[] accounts = Enumerable.Range(0, 4).Select(_ => Guid.NewGuid()).ToArray();
             Guid legacyRoom = Guid.NewGuid();
             await SeedProfilePreviousSchemaAsync(owner, accounts, legacyRoom);
+            await SeedProfileSixAsync(owner);
+            var previousChecks = await ProfileChecksAsync(owner);
             using var database = new ServerDatabase(new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
             { ["ConnectionStrings:DrawLiarDatabase"] = scoped.ConnectionString }).Build());
             await database.InitializeAsync();
             await database.InitializeAsync();
+            await VerifyJudgmentMigrationAsync(owner, previousChecks);
             var legacy = await database.PublicProfileAsync(accounts[0], accounts[0]);
             Check(legacy.Friendship == "Self" && legacy.AccountId == accounts[0].ToString()
                 && legacy.DisplayName == "기존프로필0" && legacy.AvatarColor == 2 && legacy.Accessory == 1
@@ -87,8 +90,9 @@ internal static partial class Integration
                 "최근 경기는 최신 10건만 내림차순으로 표시하고 동점·모드·인원·라운드를 보존해야 합니다.");
             Check((await database.PublicProfileAsync(accounts[0], accounts[1])).RecentMatches.All(match => match.Rank == 1 && match.Won)
                 && (await database.PublicProfileAsync(accounts[0], accounts[2])).RecentMatches.All(match => match.Rank == 3 && !match.Won)
+                && (await database.PublicProfileAsync(accounts[0], accounts[2])).Stats.CorrectVotes == 26
                 && StatsZero((await database.PublicProfileAsync(accounts[0], accounts[3])).Stats),
-                "동점 공동 우승은 두 계정에 반영하고 보고서에 없는 관전자의 전적은 0이어야 합니다.");
+                "동점 우승과 라이어 역할의 올바른 찬반을 기록하며 보고서에 없는 관전자는 제외해야 합니다.");
             CheckPublicProfileFields(recorded);
             Report("전적 병렬 멱등 저장·동점 순위·실제 누적 통계·최근 10경기·방 삭제 후 보고/재시도 검증");
 
@@ -98,7 +102,7 @@ internal static partial class Integration
             AddInvalid(request => request.Players[0].Score = -1);
             AddInvalid(request => request.Players[0].RoundsPlayed = 0);
             AddInvalid(request => request.Players[0].CitizenRounds = 2);
-            AddInvalid(request => request.Players[0].CorrectVotes = 2);
+            AddInvalid(request => request.Players[0].CorrectVotes = 3);
             AddInvalid(request => request.Players[0].CorrectGuesses = 2);
             AddInvalid(request => request.Players[0].Rank = 2);
             AddInvalid(request => request.Players[1].AccountId = request.Players[0].AccountId);
@@ -130,6 +134,84 @@ internal static partial class Integration
             await using var drop = new NpgsqlCommand($"DROP SCHEMA \"{schema}\" CASCADE", owner);
             await drop.ExecuteNonQueryAsync();
             Report("프로필 검증 임시 스키마 삭제");
+        }
+        await VerifyFreshJudgmentSchemaAsync(connectionString);
+    }
+
+    private static string ProfileMigration(string suffix)
+    {
+        var assembly = typeof(ServerDatabase).Assembly;
+        string resource = assembly.GetManifestResourceNames().Single(name => name.EndsWith(suffix, StringComparison.Ordinal));
+        using var stream = assembly.GetManifestResourceStream(resource)!;
+        using var reader = new StreamReader(stream);
+        return reader.ReadToEnd();
+    }
+
+    private static async Task SeedProfileSixAsync(NpgsqlConnection owner)
+    {
+        await using (var migrate = new NpgsqlCommand(ProfileMigration("006_ProfileMatches.sql"), owner)) await migrate.ExecuteNonQueryAsync();
+        await using (var version = new NpgsqlCommand("INSERT INTO \"SchemaVersion\" (\"Version\") VALUES (6)", owner)) await version.ExecuteNonQueryAsync();
+        var checks = await ProfileChecksAsync(owner);
+        string legacy = checks.Single(pair => pair.Value == "\"CorrectVotes\"<=\"CitizenRounds\"AND\"CorrectGuesses\"<=\"LiarRounds\"").Key;
+        Check(legacy.All(character => char.IsAsciiLetterOrDigit(character) || character == '_'), "초기 CHECK 이름은 안전한 PostgreSQL 식별자여야 합니다.");
+        await using (var rename = new NpgsqlCommand("ALTER TABLE \"AccountMatch\" RENAME CONSTRAINT \"" + legacy
+            + "\" TO \"ProfileTest_LegacyRenamed\"", owner)) await rename.ExecuteNonQueryAsync();
+        await using (var unrelated = new NpgsqlCommand("ALTER TABLE \"AccountMatch\" ADD CONSTRAINT \"ProfileTest_Unrelated\" CHECK (\"Score\" < 100000)", owner))
+            await unrelated.ExecuteNonQueryAsync();
+    }
+
+    private static async Task<Dictionary<string, string>> ProfileChecksAsync(NpgsqlConnection owner)
+    {
+        var checks = new Dictionary<string, string>(StringComparer.Ordinal);
+        await using var command = new NpgsqlCommand("""
+            SELECT "conname",regexp_replace(pg_get_expr("conbin","conrelid"),'[[:space:]()]','','g')
+            FROM "pg_constraint" WHERE "conrelid"='"AccountMatch"'::regclass AND "contype"='c'
+            """, owner);
+        await using var reader = await command.ExecuteReaderAsync();
+        while (await reader.ReadAsync()) checks.Add(reader.GetString(0), reader.GetString(1));
+        return checks;
+    }
+
+    private static async Task VerifyJudgmentMigrationAsync(NpgsqlConnection owner, Dictionary<string, string> previous)
+    {
+        for (int attempt = 0; attempt < 2; attempt++)
+        {
+            await using var command = new NpgsqlCommand(ProfileMigration("007_JudgmentBounds.sql"), owner);
+            await command.ExecuteNonQueryAsync();
+        }
+        var current = await ProfileChecksAsync(owner);
+        Check(!current.ContainsKey("ProfileTest_LegacyRenamed")
+            && current["AccountMatch_JudgmentBounds"] == "\"CorrectVotes\"<=\"RoundsPlayed\"AND\"CorrectGuesses\"<=\"LiarRounds\""
+            && previous.Where(pair => pair.Key != "ProfileTest_LegacyRenamed").All(pair => current.TryGetValue(pair.Key, out string? expression) && expression == pair.Value),
+            "이름이 바뀐 기존 시민 한도만 교체하고 다른 점수·역할 CHECK는 반복 실행 후에도 그대로 보존해야 합니다.");
+        await using var version = new NpgsqlCommand("SELECT count(*) FROM \"SchemaVersion\" WHERE \"Version\"=7", owner);
+        Check(Convert.ToInt32(await version.ExecuteScalarAsync()) == 1, "정답 찬반 집계 마이그레이션7을 한 번 적용해야 합니다.");
+        Report("006 업그레이드·007 직접 두 번 재실행·CHECK 이름 독립성과 비관계 제약 보존 검증");
+    }
+
+    private static async Task VerifyFreshJudgmentSchemaAsync(string connectionString)
+    {
+        string schema = "drawliar_profile_fresh_" + Guid.NewGuid().ToString("N");
+        var scoped = new NpgsqlConnectionStringBuilder(connectionString) { SearchPath = schema, Pooling = false, IncludeErrorDetail = false };
+        await using var owner = new NpgsqlConnection(scoped.ConnectionString);
+        await owner.OpenAsync();
+        await using (var create = new NpgsqlCommand("CREATE SCHEMA \"" + schema + "\"", owner)) await create.ExecuteNonQueryAsync();
+        try
+        {
+            using var database = new ServerDatabase(new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
+            { ["ConnectionStrings:DrawLiarDatabase"] = scoped.ConnectionString }).Build());
+            await database.InitializeAsync();
+            await database.InitializeAsync();
+            var checks = await ProfileChecksAsync(owner);
+            Check(checks["AccountMatch_JudgmentBounds"] == "\"CorrectVotes\"<=\"RoundsPlayed\"AND\"CorrectGuesses\"<=\"LiarRounds\""
+                && checks.Values.All(expression => !expression.Contains("\"CorrectVotes\"<=\"CitizenRounds\"", StringComparison.Ordinal)),
+                "신규 DB도 시민 라운드에 제한하지 않는 찬반 한도를 적용해야 합니다.");
+            Report("신규 스키마 반복 초기화·모든 역할의 올바른 찬반 집계 한도 검증");
+        }
+        finally
+        {
+            await using var drop = new NpgsqlCommand("DROP SCHEMA \"" + schema + "\" CASCADE", owner);
+            await drop.ExecuteNonQueryAsync();
         }
     }
 
@@ -167,7 +249,7 @@ internal static partial class Integration
             new MatchPlayerResult { AccountId = accounts[1].ToString(), Score = 10 + index, Rank = 1, Won = true,
                 RoundsPlayed = 2, CitizenRounds = 2, LiarRounds = 0, CorrectVotes = 1, CorrectGuesses = 0 },
             new MatchPlayerResult { AccountId = accounts[2].ToString(), Score = 5 + index, Rank = 3, Won = false,
-                RoundsPlayed = 2, CitizenRounds = 0, LiarRounds = 2, CorrectVotes = 0, CorrectGuesses = 1 }
+                RoundsPlayed = 2, CitizenRounds = 0, LiarRounds = 2, CorrectVotes = 2, CorrectGuesses = 1 }
         }
     };
 

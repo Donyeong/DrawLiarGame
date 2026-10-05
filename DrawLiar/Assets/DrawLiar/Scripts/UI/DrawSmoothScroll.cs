@@ -27,11 +27,6 @@ namespace DrawLiar
             if (scroll != null) _bindings.GetValue(scroll, value => new Binding(value)).Refresh();
         }
 
-        public static void RefreshAll(VisualElement root)
-        {
-            root?.Query<ScrollView>().ForEach(Bind);
-        }
-
         private static Vector2 ScrollDelta(ScrollView scroll, Vector2 delta)
         {
             if (scroll.mode == ScrollViewMode.Vertical)
@@ -120,11 +115,9 @@ namespace DrawLiar
 
             public void Refresh()
             {
-                bool reduced = DrawUIMotion.IsReducedMotion(_scroll);
-                _scroll.touchScrollBehavior = reduced ? ScrollView.TouchScrollBehavior.Clamped : ScrollView.TouchScrollBehavior.Elastic;
-                _scroll.scrollDecelerationRate = reduced ? 0 : DECELERATION_RATE;
+                _scroll.touchScrollBehavior = ScrollView.TouchScrollBehavior.Elastic;
+                _scroll.scrollDecelerationRate = DECELERATION_RATE;
                 _scroll.elasticity = ELASTICITY;
-                if (reduced) _scroll.scrollOffset = ClampOffset(_scroll, _scroll.scrollOffset);
                 Stop();
             }
 
@@ -141,12 +134,6 @@ namespace DrawLiar
                 evt.StopImmediatePropagation();
                 if (!CanScroll(_scroll, delta)) { Stop(); return; }
                 delta = ScrollDelta(_scroll, delta);
-                if (DrawUIMotion.IsReducedMotion(_scroll))
-                {
-                    Stop();
-                    _scroll.scrollOffset = ClampOffset(_scroll, _scroll.scrollOffset + delta * _scroll.mouseWheelScrollSize);
-                    return;
-                }
                 if (_scroll.mode != _lastMode || (_scroll.scrollOffset - _lastOffset).sqrMagnitude > EDGE_TOLERANCE * EDGE_TOLERANCE) Stop();
                 if (delta.x * _velocity.x < 0) _velocity.x = 0;
                 if (delta.y * _velocity.y < 0) _velocity.y = 0;
@@ -160,7 +147,7 @@ namespace DrawLiar
             private void Animate()
             {
                 if (_scroll.panel == null || !_scroll.enabledInHierarchy || IsHidden(_scroll) || _scroll.mode != _lastMode
-                    || DrawUIMotion.IsReducedMotion(_scroll) || (_scroll.scrollOffset - _lastOffset).sqrMagnitude > EDGE_TOLERANCE * EDGE_TOLERANCE)
+                    || (_scroll.scrollOffset - _lastOffset).sqrMagnitude > EDGE_TOLERANCE * EDGE_TOLERANCE)
                 {
                     Stop();
                     return;

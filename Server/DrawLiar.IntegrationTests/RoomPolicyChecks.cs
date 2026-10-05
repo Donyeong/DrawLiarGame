@@ -173,8 +173,10 @@ internal static partial class Integration
         room.Join(second, Ticket("second"), 0);
         room.Join(third, Ticket("third"), 0);
         room.Join(observer, Ticket("observer", true), 0);
-        void Configure(GameConnection connection, RoomSettings? settings, double now) => room.Receive(connection,
-            new GameplayEnvelope { Type = "request", Kind = "configure", Settings = settings! }, now);
+        Task Configure(GameConnection connection, RoomSettings? settings, double now) => room.ConfigureAsync(connection,
+            new GameplayEnvelope { Type = "request", Kind = "configure", Settings = settings!, Password = "PolicyQA3891", RequestId = Guid.NewGuid().ToString("N") }, now,
+            (request, cancellation) => Task.FromResult(new RoomConfigurationData
+            { RoomId = request.RoomId, Settings = request.Settings, Version = request.ExpectedVersion + 1 }));
         string SettingsJson() => JsonSerializer.Serialize(room.Status().Settings, Json);
         var requested = new RoomSettings
         {
@@ -185,11 +187,11 @@ internal static partial class Integration
         };
         string initial = SettingsJson();
         int before = notifications;
-        Configure(second, requested, .1);
-        Configure(observer, requested, .2);
-        Configure(host, null, .3);
+        await Configure(second, requested, .1);
+        await Configure(observer, requested, .2);
+        await Configure(host, null, .3);
         Check(SettingsJson() == initial && notifications == before, "비방장·관전자·빈 설정은 대기방 설정을 바꿀 수 없습니다.");
-        Configure(host, requested, 1);
+        await Configure(host, requested, 1);
         var status = room.Status();
         Check(status.Settings.RoomName == requested.RoomName && status.Settings.IsPrivate && status.Settings.MaxPlayers == 8
             && status.Settings.Mode == (int)DrawingMode.Individual && status.Settings.Victory == (int)VictoryMode.TargetScore
@@ -216,7 +218,7 @@ internal static partial class Integration
             var invalid = requested.Copy();
             invalid.RoomName = "거절할 변경";
             invalid.Topics = topics;
-            Configure(host, invalid, 2);
+            await Configure(host, invalid, 2);
             Check(SettingsJson() == accepted && notifications == before, "빈 선택·미지 주제·단어 없는 주제는 설정 전체를 바꾸면 안 됩니다.");
         }
         var normalized = requested.Copy();
@@ -226,7 +228,7 @@ internal static partial class Integration
         normalized.RoleSeconds = -1; normalized.DrawSeconds = -1; normalized.DiscussionSeconds = -1;
         normalized.RebuttalSeconds = -1; normalized.VoteSeconds = -1; normalized.RevealSeconds = -1;
         normalized.GuessSeconds = -1; normalized.ResultSeconds = -1; normalized.Topics = null;
-        Configure(host, normalized, 3);
+        await Configure(host, normalized, 3);
         status = room.Status();
         Check(status.Settings.RoomName == "정규화" && status.Settings.Mode == 0 && status.Settings.Victory == 0
             && status.Settings.LiarCount == 7 && status.Settings.RoundCount == 1 && status.Settings.TargetScore == 1
@@ -240,22 +242,22 @@ internal static partial class Integration
         Check(room.Status().IsInProgress, "설정 변경 후 정상 시작이 가능해야 합니다.");
         string running = SettingsJson();
         before = notifications;
-        Configure(host, requested, 4.1);
+        await Configure(host, requested, 4.1);
         Check(SettingsJson() == running && notifications == before, "진행 중에는 방장도 설정을 바꿀 수 없습니다.");
         for (int index = 1; index <= 12 && room.Status().IsInProgress; index++) room.Tick(4 + index * 1000);
         Check(!room.Status().IsInProgress, "한 경기의 자연 종료 상태를 준비해야 합니다.");
-        Configure(host, requested, 13000);
+        await Configure(host, requested, 13000);
         Check(room.Status().Settings.RoomName == requested.RoomName, "경기 종료 후에는 방장이 설정을 다시 바꿀 수 있어야 합니다.");
         host.Abort(); room.Disconnect(host, 13001);
         Check(room.Status().OwnerAccountId == "second", "방장 이탈은 연결된 참가자에게 권한을 이전해야 합니다.");
         var transferred = requested.Copy(); transferred.RoomName = "새 방장의 설정";
-        Configure(host, transferred, 13002);
+        await Configure(host, transferred, 13002);
         Check(room.Status().Settings.RoomName == requested.RoomName, "이전 방장의 오래된 연결은 설정 권한을 가지면 안 됩니다.");
-        Configure(second, transferred, 13003);
+        await Configure(second, transferred, 13003);
         Check(room.Status().Settings.RoomName == transferred.RoomName, "이전된 방장 권한은 종료 후 설정에도 적용되어야 합니다.");
         await using var formerHost = new GameConnection(new PolicySocket(), "host", "test", CancellationToken.None);
         Check(room.Join(formerHost, Ticket("host"), 13004), "이전 방장이 재접속할 수 있어야 합니다.");
-        Configure(formerHost, requested, 13005);
+        await Configure(formerHost, requested, 13005);
         Check(room.Status().OwnerAccountId == "second" && room.Status().Settings.RoomName == transferred.RoomName,
             "재접속한 이전 방장은 현재 방장의 설정 권한을 되찾으면 안 됩니다.");
         Report("방장 대기실/종료후 설정·진행중/비방장 거부·주제 범위·전체 snapshot/heartbeat·호스트 이전 검증");

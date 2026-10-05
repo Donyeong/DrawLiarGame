@@ -9,7 +9,6 @@ namespace DrawLiar
     public static class DrawUIMotion
     {
         private const int FRAME_DELAY_MS = 20;
-        private const int REDUCED_DURATION_MS = 80;
         private const int MAX_STAGGER_MS = 140;
         private static readonly ConditionalWeakTable<VisualElement, Motion> _motions = new ConditionalWeakTable<VisualElement, Motion>();
         private static readonly List<StylePropertyName> _properties = new List<StylePropertyName> { "opacity", "translate", "scale" };
@@ -22,8 +21,6 @@ namespace DrawLiar
                 if (current.ClassListContains(className)) return true;
             return false;
         }
-
-        public static bool IsReducedMotion(VisualElement element) => HasAncestorClass(element, "reduce-motion");
 
         public static void Enter(VisualElement element, int duration = 220, float offset = 8, int delay = 0)
         {
@@ -109,21 +106,19 @@ namespace DrawLiar
             public void Enter(int duration, float offset, int delay, bool scale)
             {
                 Reset();
-                bool reduced = IsReducedMotion(_element);
                 bool button = _element is Button;
-                int actualDuration = reduced ? REDUCED_DURATION_MS : duration;
-                float actualOffset = reduced || button ? 0 : offset;
-                int actualDelay = reduced ? FRAME_DELAY_MS : FRAME_DELAY_MS + delay;
+                float actualOffset = button ? 0 : offset;
+                int actualDelay = FRAME_DELAY_MS + delay;
                 int version = _version;
                 SetTransition(0, button);
                 _element.style.opacity = 0;
                 if (!button) _element.style.translate = new Translate(0, actualOffset);
-                if (scale && !reduced && !button) _element.style.scale = new Scale(new Vector3(.98f, .98f, 1));
+                if (scale && !button) _element.style.scale = new Scale(new Vector3(.98f, .98f, 1));
                 _start = _element.schedule.Execute(() =>
                 {
                     if (version != _version) return;
                     _start = null;
-                    SetTransition(actualDuration, button);
+                    SetTransition(duration, button);
                     _element.style.opacity = _opacity.keyword == StyleKeyword.Undefined ? _opacity.value : 1;
                     if (!button) _element.style.translate = new Translate(0, 0);
                     if (scale && !button) _element.style.scale = new Scale(Vector3.one);
@@ -132,26 +127,24 @@ namespace DrawLiar
                         if (version != _version) return;
                         _finish = null;
                         Restore();
-                    }).StartingIn(actualDuration + FRAME_DELAY_MS);
+                    }).StartingIn(duration + FRAME_DELAY_MS);
                 }).StartingIn(actualDelay);
             }
 
             public void Exit(int duration, float offset, bool scale, Action completed)
             {
                 Cancel();
-                bool reduced = IsReducedMotion(_element);
-                int actualDuration = reduced ? REDUCED_DURATION_MS : duration;
                 int version = _version;
-                SetTransition(actualDuration, false);
+                SetTransition(duration, false);
                 _element.style.opacity = 0;
-                _element.style.translate = new Translate(0, reduced ? 0 : offset);
-                if (scale) _element.style.scale = new Scale(new Vector3(reduced ? 1 : .985f, reduced ? 1 : .985f, 1));
+                _element.style.translate = new Translate(0, offset);
+                if (scale) _element.style.scale = new Scale(new Vector3(.985f, .985f, 1));
                 _finish = _element.schedule.Execute(() =>
                 {
                     if (version != _version) return;
                     _finish = null;
                     completed?.Invoke();
-                }).StartingIn(actualDuration + FRAME_DELAY_MS);
+                }).StartingIn(duration + FRAME_DELAY_MS);
             }
 
             public void After(int delay, Action action)

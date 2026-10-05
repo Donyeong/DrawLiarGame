@@ -92,6 +92,21 @@ namespace DrawLiar
     [Serializable] public sealed class FriendListResponse { public FriendData[] Friends = Array.Empty<FriendData>(); public FriendData[] Incoming = Array.Empty<FriendData>(); public FriendData[] Outgoing = Array.Empty<FriendData>(); }
     [Serializable] public sealed class FriendRequest { public string AccountId = ""; }
     [Serializable] public sealed class FriendRespondRequest { public string AccountId = ""; public bool Accept; }
+    [Serializable] public sealed class SocialInboxResponse
+    {
+        public FriendListResponse Friends = new FriendListResponse();
+        public RoomInvitationData[] RoomInvitations = Array.Empty<RoomInvitationData>();
+    }
+    [Serializable] public sealed class RoomInvitationData
+    {
+        public string InvitationId = "";
+        public string RoomId = "";
+        public string RoomCode = "";
+        public string RoomName = "";
+        public FriendData Sender = new FriendData();
+        public string ExpiresAt = "";
+    }
+    [Serializable] public sealed class RoomInvitationRespondRequest { public bool Accept; public string Password = ""; }
     [Serializable] public sealed class ShopProduct { public string Id = ""; public string Name = ""; public int Price; public int Accessory; }
     [Serializable] public sealed class ShopResponse { public ShopProduct[] Products = Array.Empty<ShopProduct>(); }
     [Serializable] public sealed class PurchaseRequest { public string ProductId = ""; public string OperationId = ""; }
@@ -128,17 +143,30 @@ namespace DrawLiar
         public int SpectatorCount;
         public bool IsInProgress;
         public bool IsPrivate;
+        public long ConfigurationVersion;
+        public long AccessVersion;
     }
     [Serializable] public sealed class RoomListResponse { public ServerRoomData[] Rooms = Array.Empty<ServerRoomData>(); }
     [Serializable] public sealed class ServerTopicData { public string Name = ""; public string[] Words = Array.Empty<string>(); }
-    [Serializable] public sealed class CreateRoomRequest { public ServerRoomSettings Settings = new ServerRoomSettings(); public ServerTopicData[] CustomTopics = Array.Empty<ServerTopicData>(); }
-    [Serializable] public sealed class JoinRoomRequest { public bool AsSpectator; }
+    [Serializable] public sealed class CreateRoomRequest { public ServerRoomSettings Settings = new ServerRoomSettings(); public ServerTopicData[] CustomTopics = Array.Empty<ServerTopicData>(); public string Password = ""; }
+    [Serializable] public sealed class JoinRoomRequest { public bool AsSpectator; public string Password = ""; }
     [Serializable] public sealed class DedicatedAssignment { public string RoomId = ""; public string RoomCode = ""; public string DedicatedUrl = ""; public string JoinTicket = ""; public string ExpiresAt = ""; }
     [Serializable] public sealed class RegisterGameRequest { public string NodeId = ""; public string PublicUrl = ""; }
     [Serializable] public sealed class RegisterDedicatedRequest { public string NodeId = ""; public string PublicUrl = ""; public int Capacity = 32; }
-    [Serializable] public sealed class RoomStatusData { public string RoomId = ""; public int PlayerCount; public int SpectatorCount; public bool IsInProgress; public string OwnerAccountId = ""; public bool Closed; public string[] PlayerAccountIds = Array.Empty<string>(); public string[] SpectatorAccountIds = Array.Empty<string>(); public string[] AdmissionIds = Array.Empty<string>(); public ServerRoomSettings Settings = new ServerRoomSettings(); }
+    [Serializable] public sealed class RoomStatusData { public string RoomId = ""; public int PlayerCount; public int SpectatorCount; public bool IsInProgress; public string OwnerAccountId = ""; public bool Closed; public string[] PlayerAccountIds = Array.Empty<string>(); public string[] SpectatorAccountIds = Array.Empty<string>(); public string[] AdmissionIds = Array.Empty<string>(); public ServerRoomSettings Settings = new ServerRoomSettings(); public long ConfigurationVersion; }
     [Serializable] public sealed class DedicatedHeartbeatRequest { public string NodeId = ""; public RoomStatusData[] Rooms = Array.Empty<RoomStatusData>(); }
-    [Serializable] public sealed class DedicatedHeartbeatResponse { public string[] ClosedRoomIds = Array.Empty<string>(); }
+    [Serializable] public sealed class DedicatedHeartbeatResponse { public string[] ClosedRoomIds = Array.Empty<string>(); public RoomConfigurationData[] Configurations = Array.Empty<RoomConfigurationData>(); }
+    [Serializable] public sealed class ConfigureRoomRequest
+    {
+        public string NodeId = "";
+        public string RoomId = "";
+        public string OwnerAccountId = "";
+        public string OperationId = "";
+        public long ExpectedVersion;
+        public ServerRoomSettings Settings = new ServerRoomSettings();
+        public string Password = "";
+    }
+    [Serializable] public sealed class RoomConfigurationData { public string RoomId = ""; public ServerRoomSettings Settings = new ServerRoomSettings(); public long Version; public long AccessVersion; }
     [Serializable] public sealed class RedeemTicketRequest { public string JoinTicket = ""; public string NodeId = ""; public string RoomId = ""; }
     [Serializable] public sealed class RedeemTicketResponse { public string AccountId = ""; public string AdmissionId = ""; public ProfileData Profile = new ProfileData(); public ServerRoomData Room = new ServerRoomData(); public string SessionToken = ""; public bool IsSpectator; public bool SpectatorOnly; public ServerTopicData[] CustomTopics = Array.Empty<ServerTopicData>(); }
     [Serializable] public sealed class SessionCheckRequest { public string SessionToken = ""; public string AccountId = ""; }

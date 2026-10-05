@@ -10,7 +10,9 @@ namespace DrawLiar
     {
         public const int MIN_START_PLAYERS = 3;
         public const int MAX_PLAYERS = ServerRoomSettings.MAX_PLAYERS;
-        public const string TieRule = "최다 득표 동률은 모두 지목 · 투표가 없으면 아무도 지목되지 않아요";
+        public const int MAX_CANVAS_STROKES = 12000;
+        public const int MAX_ROUND_STROKES = MAX_CANVAS_STROKES * MAX_PLAYERS;
+        public const string TieRule = "최다 득표 동률은 무작위 1명 지목 · 찬반 동수는 가결";
 
         public static string CleanText(string value, int maxLength, string fallback = "")
         {
@@ -42,19 +44,21 @@ namespace DrawLiar
                 .Where(character => !char.IsWhiteSpace(character)).ToArray()).ToLowerInvariant();
         }
 
-        public static HashSet<int> CaughtPlayers(IEnumerable<int> votes)
+        public static int? SelectAccused(IEnumerable<int> votes, Random random)
         {
             var counts = votes.GroupBy(id => id).ToArray();
-            if (counts.Length == 0) return new HashSet<int>();
+            if (counts.Length == 0) return null;
             var maximum = counts.Max(group => group.Count());
-            return new HashSet<int>(counts.Where(group => group.Count() == maximum).Select(group => group.Key));
+            var tied = counts.Where(group => group.Count() == maximum).Select(group => group.Key).OrderBy(id => id).ToArray();
+            return tied[random.Next(tied.Length)];
         }
 
         public static int RoundScore(bool liar, bool caught, bool correctGuess, bool correctVote, ScoreRules rules)
         {
-            return liar
+            int judgmentBonus = correctVote ? Math.Max(0, rules.CitizenCorrectVote) : 0;
+            return judgmentBonus + (liar
                 ? (caught ? 0 : Math.Max(0, rules.LiarUncaught)) + (correctGuess ? Math.Max(0, rules.LiarCorrectGuess) : 0)
-                : (correctVote ? Math.Max(0, rules.CitizenCorrectVote) : 0);
+                : 0);
         }
 
         public static bool ValidStroke(DrawStroke stroke, int version)

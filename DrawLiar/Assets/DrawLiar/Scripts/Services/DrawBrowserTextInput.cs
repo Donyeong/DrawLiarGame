@@ -13,8 +13,33 @@ namespace DrawLiar
         {
             public int Id, Limit, Keyboard;
             public float X, Y, Width, Height, ClipX, ClipY, ClipWidth, ClipHeight, HitX, HitY, HitWidth, HitHeight, FontSize;
-            public bool Multiline, Password, Correction, Rtl;
+            public bool Multiline, Password, Correction, Rtl, SubmitOnCompositionEnd;
             public string Value, Placeholder, Name, Color, Background;
+        }
+
+        private sealed class BrowserKeyDownEvent : KeyDownEvent
+        {
+            public DrawBrowserTextInput Owner { get; private set; }
+            private TextField _field;
+
+            public BrowserKeyDownEvent(DrawBrowserTextInput owner, TextField field, KeyCode key, EventModifiers eventModifiers)
+            {
+                Owner = owner; _field = field; keyCode = key; modifiers = eventModifiers;
+            }
+
+            protected override void PreDispatch(IPanel panel)
+            {
+                base.PreDispatch(panel);
+                bool allowClosedEscape = keyCode == KeyCode.Escape && Owner?._active == null;
+                if (Owner == null || Owner._disposed || Owner._active != _field && !allowClosedEscape)
+                    StopImmediatePropagation();
+            }
+
+            protected override void PostDispatch(IPanel panel)
+            {
+                try { base.PostDispatch(panel); }
+                finally { Owner = null; _field = null; }
+            }
         }
 
         private readonly VisualElement _root;
@@ -24,7 +49,7 @@ namespace DrawLiar
         private TextField _active;
         private TextElement _text;
         private StyleFloat _opacity;
-        private bool _hideKeyboard, _captureKeyboard, _dispatching, _reading, _disposed;
+        private bool _hideKeyboard, _captureKeyboard, _reading, _disposed;
         private string _knownValue;
         private int _nextId, _activeId;
         private float _nextLayout;
@@ -114,7 +139,8 @@ namespace DrawLiar
                     Name = string.IsNullOrEmpty(field.name) ? field.label : field.name,
                     Multiline = field.multiline, Password = field.isPasswordField,
                     Keyboard = (int)field.textEdition.keyboardType, Correction = field.textEdition.autoCorrection,
-                    Rtl = IsRightToLeft(text ?? input)
+                    Rtl = IsRightToLeft(text ?? input),
+                    SubmitOnCompositionEnd = field.ClassListContains("chat-input") || field.ClassListContains("lobby-chat-input") || field.ClassListContains("guess-input")
                 });
             }
             if (_active != null && !found.Contains(_active)) Close(false);
@@ -122,6 +148,9 @@ namespace DrawLiar
             foreach (var field in _ids.Keys) if (!found.Contains(field)) removed.Add(field);
             foreach (var field in removed) { _fields.Remove(_ids[field]); _ids.Remove(field); }
             DrawBrowserInterop.DrawBrowserInputConfigure(JsonUtility.ToJson(new InputFields { Fields = configuration.ToArray() }));
+            var focused = ParentField(_root.panel?.focusController.focusedElement as VisualElement);
+            if (_active == null && focused != null && found.Contains(focused) && _ids.TryGetValue(focused, out int focusedId))
+                Open(focused, focusedId);
         }
 
         private void OnFocusIn(FocusInEvent evt)
@@ -159,7 +188,8 @@ namespace DrawLiar
 
         private void OnKeyDown(KeyDownEvent evt)
         {
-            if (_active != null && !_dispatching) evt.StopImmediatePropagation();
+            if (_active != null && !(evt is BrowserKeyDownEvent browser && ReferenceEquals(browser.Owner, this)))
+                evt.StopImmediatePropagation();
         }
 
         private void Poll()
@@ -216,13 +246,8 @@ namespace DrawLiar
         {
             if (_active == null) return;
             var target = key == KeyCode.Return ? _active : (VisualElement)_text ?? _active;
-            using (var evt = KeyDownEvent.GetPooled('\0', key, modifiers))
-            {
-                evt.target = target;
-                _dispatching = true;
-                try { target.SendEvent(evt); }
-                finally { _dispatching = false; }
-            }
+            var evt = new BrowserKeyDownEvent(this, _active, key, modifiers) { target = target };
+            target.SendEvent(evt);
         }
 
         private void MoveFocus(bool backwards)

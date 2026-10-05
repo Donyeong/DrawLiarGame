@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -13,10 +14,18 @@ namespace DrawLiar
         private int capturedPointer=-1;
         private Vector2 last;
         private float lastSend;
-        public static readonly Color32 PaperColor = new Color32(246,241,230,255);
+        private Texture2D _previewTexture;
+        private Color32[] _previewPixels;
+        private IReadOnlyList<DrawStroke> _previewStrokes;
+        private int? _previewAuthorId;
+        private DrawingMode _previewMode;
+        private bool _previewDirty;
+        private float _nextPreviewRefresh;
+        public static readonly Color32 PaperColor = new Color32(255,255,255,255);
         public Color32 BrushColor = new Color32(40,43,39,255);
         public float BrushSize = .009f;
         public bool Eraser;
+        public bool HasAuthorPreview => _previewAuthorId.HasValue;
 
         public DrawingSurface(DrawNetworkManager manager)
         {
@@ -31,19 +40,49 @@ namespace DrawLiar
             RegisterCallback<PointerUpEvent>(Up);
             RegisterCallback<PointerCaptureOutEvent>(e=>{if(e.pointerId==capturedPointer){drawing=false;capturedPointer=-1;}});
             schedule.Execute(Upload).Every(16);
-            RegisterCallback<DetachFromPanelEvent>(_=>Object.Destroy(texture));
+            RegisterCallback<DetachFromPanelEvent>(_=>
+            {
+                Object.Destroy(texture);
+                if(_previewTexture!=null)Object.Destroy(_previewTexture);
+                _previewTexture=null;_previewPixels=null;_previewStrokes=null;
+            });
         }
 
         public void ClearCanvas()
         {
+            ClearAuthorPreview();
             for(var i=0;i<pixels.Length;i++)pixels[i]=PaperColor;
             dirty=true;
+        }
+
+        public void ShowAuthorPreview(int authorId,DrawingMode mode,IReadOnlyList<DrawStroke> strokes)
+        {
+            if(mode==DrawingMode.Relay&&(strokes==null||strokes.Count==0)){ClearAuthorPreview();return;}
+            bool changed=_previewAuthorId!=authorId||_previewMode!=mode;
+            StopDrawing();
+            _previewAuthorId=authorId;_previewMode=mode;_previewStrokes=strokes??System.Array.Empty<DrawStroke>();
+            if(_previewTexture==null)
+            {
+                _previewPixels=new Color32[Width*Height];
+                _previewTexture=new Texture2D(Width,Height,TextureFormat.RGBA32,false){filterMode=FilterMode.Bilinear};
+            }
+            _previewDirty=true;
+            style.backgroundImage=new StyleBackground(_previewTexture);
+            if(changed){_nextPreviewRefresh=0;Upload();}
+        }
+
+        public void ClearAuthorPreview()
+        {
+            if(!_previewAuthorId.HasValue)return;
+            _previewAuthorId=null;_previewStrokes=null;_previewDirty=false;
+            style.backgroundImage=new StyleBackground(texture);
+            MarkDirtyRepaint();
         }
 
         private Vector2 Normalize(Vector2 p) => new Vector2(Mathf.Clamp01(p.x/contentRect.width),Mathf.Clamp01(p.y/contentRect.height));
         private void Down(PointerDownEvent e)
         {
-            if(drawing || e.button!=0 || !network.CanDraw)return;
+            if(drawing || HasAuthorPreview || e.button!=0 || !network.CanDraw)return;
             drawing=true;capturedPointer=e.pointerId;last=Normalize(e.localPosition);this.CapturePointer(e.pointerId);Emit(last);e.StopPropagation();
         }
         private void Move(PointerMoveEvent e)
@@ -63,19 +102,27 @@ namespace DrawLiar
             drawing=false;var pointer=capturedPointer;capturedPointer=-1;
             if(pointer>=0&&this.HasPointerCapture(pointer))this.ReleasePointer(pointer);
         }
+        public void CancelDrawing() => StopDrawing();
         private void Emit(Vector2 point)
         {
-            if(!network.CanDraw) { StopDrawing();return; }
+            if(!network.CanDraw||HasAuthorPreview) { StopDrawing();return; }
             var stroke=new DrawStroke { X1=last.x,Y1=last.y,X2=point.x,Y2=point.y,Size=BrushSize,R=BrushColor.r,G=BrushColor.g,B=BrushColor.b,Eraser=Eraser,CanvasVersion=network.CanvasVersion };
             network.SendStroke(stroke);last=point;lastSend=Time.unscaledTime;
         }
         public void Apply(DrawStroke stroke)
         {
+            Rasterize(stroke,pixels,0,false);
+            dirty=true;
+            if(HasAuthorPreview&&_previewMode==DrawingMode.Relay)_previewDirty=true;
+        }
+
+        private void Rasterize(DrawStroke stroke,Color32[] target,float expansion,bool restore)
+        {
             var a=new Vector2(stroke.X1*Width,(1-stroke.Y1)*Height);
             var b=new Vector2(stroke.X2*Width,(1-stroke.Y2)*Height);
-            var radius=Mathf.Clamp(stroke.Size*Width*.5f,1,48);
+            var radius=Mathf.Clamp(stroke.Size*Width*.5f,1,48)+expansion;
             var count=Mathf.Max(1,Mathf.CeilToInt(Vector2.Distance(a,b)/Mathf.Max(1,radius*.4f)));
-            var color=stroke.Eraser?PaperColor:new Color32(stroke.R,stroke.G,stroke.B,255);
+            var color=expansion>0?new Color32(120,103,158,255):stroke.Eraser?PaperColor:new Color32(stroke.R,stroke.G,stroke.B,255);
             for(var step=0;step<=count;step++)
             {
                 var point=Vector2.Lerp(a,b,step/(float)count);
@@ -85,11 +132,46 @@ namespace DrawLiar
                 {
                     var distance=Vector2.Distance(new Vector2(x,y),point);
                     var alpha=Mathf.Clamp01(radius+.5f-distance);
-                    if(alpha>0)pixels[y*Width+x]=Color32.Lerp(pixels[y*Width+x],color,alpha);
+                    if(alpha>0)
+                    {
+                        int index=y*Width+x;
+                        target[index]=Color32.Lerp(target[index],restore?pixels[index]:color,alpha);
+                    }
                 }
             }
-            dirty=true;
         }
-        private void Upload() { if(drawing&&!network.CanDraw)StopDrawing();if(!dirty)return;texture.SetPixels32(pixels);texture.Apply(false);if(panel!=null)RuntimePanelUtils.SetTextureDirty(panel,texture);MarkDirtyRepaint();dirty=false; }
+
+        private void RenderPreview()
+        {
+            if(_previewMode==DrawingMode.Relay)
+            {
+                System.Array.Copy(pixels,_previewPixels,pixels.Length);
+                foreach(var stroke in _previewStrokes)if(stroke.AuthorPlayerId==_previewAuthorId)Rasterize(stroke,_previewPixels,3,false);
+                foreach(var stroke in _previewStrokes)if(stroke.AuthorPlayerId==_previewAuthorId)Rasterize(stroke,_previewPixels,0,true);
+            }
+            else
+            {
+                for(int i=0;i<_previewPixels.Length;i++)_previewPixels[i]=PaperColor;
+                foreach(var stroke in _previewStrokes)if(stroke.AuthorPlayerId==_previewAuthorId)Rasterize(stroke,_previewPixels,0,false);
+            }
+            _previewTexture.SetPixels32(_previewPixels);_previewTexture.Apply(false);
+            if(panel!=null)RuntimePanelUtils.SetTextureDirty(panel,_previewTexture);
+            _previewDirty=false;
+            _nextPreviewRefresh=Time.unscaledTime+.1f;
+        }
+
+        private void Upload()
+        {
+            if(drawing&&(!network.CanDraw||HasAuthorPreview))StopDrawing();
+            bool changed=dirty;
+            if(dirty)
+            {
+                texture.SetPixels32(pixels);texture.Apply(false);
+                if(panel!=null)RuntimePanelUtils.SetTextureDirty(panel,texture);
+                dirty=false;
+            }
+            if(_previewDirty&&HasAuthorPreview&&Time.unscaledTime>=_nextPreviewRefresh){RenderPreview();changed=true;}
+            if(changed)MarkDirtyRepaint();
+        }
     }
 }

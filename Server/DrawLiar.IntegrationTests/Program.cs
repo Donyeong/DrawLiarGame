@@ -20,6 +20,22 @@ internal static partial class Integration
 
     public static async Task RunAsync(string[] args)
     {
+        if (args.Contains("--drawing-only"))
+        {
+            await VerifyDrawingHistoryAsync();
+            return;
+        }
+        if (args.Contains("--social-only"))
+        {
+            await VerifySocialAsync(args.FirstOrDefault(value => !value.StartsWith("--", StringComparison.Ordinal)) ?? "http://127.0.0.1:25550");
+            return;
+        }
+        if (args.Contains("--room-password-only") || args.Contains("--legacy-room-password-only"))
+        {
+            await VerifyRoomPasswordAsync(args.FirstOrDefault(value => !value.StartsWith("--", StringComparison.Ordinal)) ?? "http://127.0.0.1:25550",
+                args.Contains("--legacy-room-password-only"));
+            return;
+        }
         if (args.Contains("--profile-rules-only"))
         {
             await VerifyProfileRulesAsync();
@@ -33,6 +49,8 @@ internal static partial class Integration
         DrawLiar.Editor.GameSelfCheck.Run();
         VerifyAvatarPartRules();
         await VerifyRoomPolicyAsync();
+        await VerifyConsensusWireAsync();
+        await VerifyDrawingHistoryAsync();
         await VerifyProfileRulesAsync();
         VerifyGuestCredentialRules();
         if (args.Contains("--lobby-chat-only"))
@@ -332,8 +350,8 @@ internal static partial class Integration
         return await response.Content.ReadFromJsonAsync<T>(Json) ?? throw new InvalidDataException("응답이 비어 있습니다: " + path);
     }
 
-    private static Task<DedicatedAssignment> JoinAsync(HttpClient game, string roomId, TestUser user, bool spectator) =>
-        PostAsync<DedicatedAssignment>(game, "/api/rooms/" + Uri.EscapeDataString(roomId) + "/join", new JoinRoomRequest { AsSpectator = spectator }, user.Session.SessionToken);
+    private static Task<DedicatedAssignment> JoinAsync(HttpClient game, string roomId, TestUser user, bool spectator, string password = "") =>
+        PostAsync<DedicatedAssignment>(game, "/api/rooms/" + Uri.EscapeDataString(roomId) + "/join", new JoinRoomRequest { AsSpectator = spectator, Password = password }, user.Session.SessionToken);
 
     private static async Task WaitRoomOwnerAsync(HttpClient game, string token, string roomId, string owner)
     {

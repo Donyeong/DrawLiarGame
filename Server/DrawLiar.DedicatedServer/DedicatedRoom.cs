@@ -1,15 +1,17 @@
 namespace DrawLiar.DedicatedServer;
 
-internal sealed class DedicatedRoom
+internal sealed partial class DedicatedRoom
 {
-    private const int MAX_STROKES = 12000;
     private const int REPLAY_BATCH_SIZE = 256;
+    private const int HISTORY_BATCH_SIZE = REPLAY_BATCH_SIZE;
     private const int MAX_PENDING_ADMISSIONS = 128;
     private readonly object _gate = new();
     private readonly GameSession _session;
     private readonly Dictionary<string, int> _playerIds = new(StringComparer.Ordinal);
     private readonly Dictionary<string, GameConnection> _connections = new(StringComparer.Ordinal);
     private readonly List<DrawStroke> _canvas = new();
+    private readonly List<DrawStroke> _drawingHistory = new();
+    private int _drawingEpoch;
     private readonly HashSet<string> _admittedIds = new(StringComparer.Ordinal);
     private readonly Dictionary<string, double> _reconnectUntil = new(StringComparer.Ordinal);
     private readonly Action _statusChanged;
@@ -19,6 +21,9 @@ internal sealed class DedicatedRoom
     private long _sequence;
     private bool _dirty, _closeRequested;
     private double _lastSnapshot, _closeAfter;
+    private bool _configurationPending, _configurationSyncRequired;
+    private long _configurationVersion, _accessVersion;
+    private RoomConfigurationData? _deferredConfiguration;
 
     public string RoomId { get; }
 
@@ -29,6 +34,8 @@ internal sealed class DedicatedRoom
         _canRecordMatch = canRecordMatch ?? (() => true);
         RoomId = room.RoomId;
         _ownerAccountId = room.OwnerAccountId;
+        _configurationVersion = room.ConfigurationVersion;
+        _accessVersion = room.AccessVersion;
         string nodeId = room.NodeId;
         _closeAfter = now + 120;
         var settings = System.Text.Json.JsonSerializer.Deserialize<RoomSettings>(
@@ -60,21 +67,15 @@ internal sealed class DedicatedRoom
             });
         };
         _session.Changed += () => _dirty = true;
-        _session.CanvasCleared += () =>
-        {
-            _canvas.Clear();
-            BroadcastLocked(new GameplayEnvelope
-            {
-                Type = "canvas", Version = _session.CanvasVersion, Reset = true, Strokes = Array.Empty<DrawStroke>()
-            });
-        };
+        _session.CanvasCleared += ClearCanvasLocked;
     }
 
     public bool Join(GameConnection connection, RedeemTicketResponse ticket, double now)
     {
         lock (_gate)
         {
-            if (_admittedIds.Count >= MAX_PENDING_ADMISSIONS) return false;
+            if (_admittedIds.Count >= MAX_PENDING_ADMISSIONS || _configurationPending || _configurationSyncRequired
+                || ticket.Room.AccessVersion != _accessVersion) return false;
             if (!_playerIds.TryGetValue(ticket.AccountId, out int playerId))
             {
                 playerId = _nextPlayerId++;
@@ -90,7 +91,7 @@ internal sealed class DedicatedRoom
             _closeRequested = false;
             _session.UpdateProfile(playerId, ticket.Profile.DisplayName, ticket.Profile.AvatarColor, ticket.Profile.Accessory);
             EnsureHostLocked();
-            QueueReplayLocked(connection);
+            QueueReplayLocked(connection, now);
             BroadcastSnapshotsLocked(now);
             _statusChanged();
             return true;
@@ -129,36 +130,52 @@ internal sealed class DedicatedRoom
             if (!connection.AcceptRate(envelope.Type ?? "", now))
             {
                 if (connection.FrameRateExceeded) connection.Abort();
+                else if (envelope.Type == "request" && envelope.Kind == "authorDrawing") AuthorDrawingUnavailableLocked(connection, envelope, "RateLimited");
+                else if (envelope.Type == "request" && envelope.Kind == "clearOwn") NoticeLocked(connection, "지금은 이 요청을 처리할 수 없어요.");
                 return;
             }
             if (envelope.Type == "stroke")
             {
+                _session.Tick(now);
+                if (_dirty) BroadcastSnapshotsLocked(now);
                 if (_session.Phase != GamePhase.Drawing || _session.ArtistId != connection.PlayerId
                     || !GameRules.ValidStroke(envelope.Stroke, _session.CanvasVersion)) return;
-                if (_canvas.Count >= MAX_STROKES)
+                if (_canvas.Count >= GameRules.MAX_CANVAS_STROKES || _drawingHistory.Count >= GameRules.MAX_ROUND_STROKES)
                 {
                     NoticeLocked(connection, "이 캔버스에 더 이상 선을 추가할 수 없어요. 차례를 마쳐 주세요.");
                     return;
                 }
-                _canvas.Add(envelope.Stroke);
-                BroadcastLocked(new GameplayEnvelope { Type = "stroke", Stroke = envelope.Stroke });
+                var stroke = envelope.Stroke;
+                stroke.AuthorPlayerId = connection.PlayerId;
+                if (stroke.Eraser) { stroke.R = stroke.G = stroke.B = 255; stroke.Eraser = false; }
+                _canvas.Add(stroke);
+                _drawingHistory.Add(stroke);
+                BroadcastLocked(new GameplayEnvelope { Type = "stroke", Stroke = stroke, Round = _session.Round, DrawingEpoch = _drawingEpoch });
                 return;
             }
             if (envelope.Type != "request") return;
+            if (envelope.Kind == "authorDrawing")
+            {
+                _session.Tick(now);
+                if (_dirty) BroadcastSnapshotsLocked(now);
+                QueueAuthorDrawingLocked(connection, envelope, now);
+                return;
+            }
             bool host = _ownerAccountId == connection.AccountId;
             bool accepted = envelope.Kind switch
             {
                 "start" => StartLocked(host, now),
                 "lobby" => ReturnToLobbyLocked(host),
-                "configure" => host && envelope.Settings != null && _session.Configure(envelope.Settings),
                 "endTurn" => _session.EndTurn(connection.PlayerId, now),
-                "vote" => _session.Vote(connection.PlayerId, envelope.Target, now),
+                "clearOwn" => ClearOwnLocked(connection, envelope, now),
+                "vote" => envelope.BallotVersion == _session.BallotVersion && _session.Vote(connection.PlayerId, envelope.Target, now),
+                "judge" => envelope.BallotVersion == _session.BallotVersion
+                    && _session.Judge(connection.PlayerId, envelope.Target, envelope.Approve, now),
                 "guess" => _session.Guess(connection.PlayerId, envelope.Text, now),
                 "chat" => ChatLocked(connection, envelope.Text, now),
                 _ => false
             };
             if (!accepted) NoticeLocked(connection, "지금은 이 요청을 처리할 수 없어요.");
-            else if (envelope.Kind == "configure") _statusChanged();
             RemoveUnusedPlayerIdsLocked();
             if (_dirty) BroadcastSnapshotsLocked(now);
         }
@@ -196,7 +213,8 @@ internal sealed class DedicatedRoom
                 AdmissionIds = _admittedIds.ToArray(),
                 Settings = System.Text.Json.JsonSerializer.Deserialize<ServerRoomSettings>(
                     System.Text.Json.JsonSerializer.Serialize(_session.Settings, GameplayWire.Json), GameplayWire.Json)!,
-                Closed = _closeRequested
+                Closed = _closeRequested,
+                ConfigurationVersion = _configurationSyncRequired ? -1 : _configurationVersion
             };
         }
     }
@@ -219,6 +237,7 @@ internal sealed class DedicatedRoom
 
     private void EnsureHostLocked()
     {
+        if (_configurationPending) return;
         if (_connections.TryGetValue(_ownerAccountId, out var owner) && owner.IsAlive) return;
         var candidate = _connections.Values.Where(connection => connection.IsAlive)
             .OrderBy(connection => _session.Snapshot(connection.PlayerId, -1, 0).LocalIsSpectator)
@@ -232,7 +251,7 @@ internal sealed class DedicatedRoom
 
     private bool StartLocked(bool host, double now)
     {
-        if (!host || !_canRecordMatch()) return false;
+        if (!host || _configurationPending || _configurationSyncRequired || !_canRecordMatch()) return false;
         foreach (var connection in _connections.Values.Where(connection => !connection.IsAlive).ToArray())
             Disconnect(connection, now);
         return _connections.Values.Count(connection => connection.IsAlive && !_session.IsSpectator(connection.PlayerId))
@@ -241,7 +260,7 @@ internal sealed class DedicatedRoom
 
     private bool ReturnToLobbyLocked(bool host)
     {
-        if (!host || _session.Phase != GamePhase.MatchResults) return false;
+        if (!host || _configurationPending || _configurationSyncRequired || _session.Phase != GamePhase.MatchResults) return false;
         _session.ReturnToLobby();
         RemoveUnusedPlayerIdsLocked();
         return true;
@@ -266,26 +285,6 @@ internal sealed class DedicatedRoom
         return true;
     }
 
-    private void QueueReplayLocked(GameConnection connection)
-    {
-        if (_canvas.Count == 0)
-        {
-            connection.Queue(new GameplayEnvelope
-            {
-                Type = "canvas", Version = _session.CanvasVersion, Reset = true,
-                Strokes = Array.Empty<DrawStroke>(), Sequence = ++_sequence
-            });
-            return;
-        }
-        for (int index = 0; index < _canvas.Count; index += REPLAY_BATCH_SIZE)
-            connection.Queue(new GameplayEnvelope
-            {
-                Type = "canvas", Version = _session.CanvasVersion, Reset = index == 0,
-                Strokes = _canvas.GetRange(index, Math.Min(REPLAY_BATCH_SIZE, _canvas.Count - index)).ToArray(),
-                Sequence = ++_sequence
-            });
-    }
-
     private void BroadcastSnapshotsLocked(double now)
     {
         int hostId = _playerIds.TryGetValue(_ownerAccountId, out int id) ? id : -1;
@@ -294,6 +293,7 @@ internal sealed class DedicatedRoom
         foreach (var connection in _connections.Values)
         {
             var snapshot = _session.Snapshot(connection.PlayerId, hostId, now);
+            snapshot.CanStart &= !_configurationPending && !_configurationSyncRequired;
             foreach (var player in snapshot.Players)
                 player.AccountId = accounts.TryGetValue(player.Id, out string? accountId) ? accountId : "";
             connection.Queue(new GameplayEnvelope

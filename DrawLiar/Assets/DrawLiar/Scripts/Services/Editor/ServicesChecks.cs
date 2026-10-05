@@ -21,8 +21,48 @@ namespace DrawLiar.Editor
             }
             const string LEGACY_ROOM_ID = "30e2c8b3-22c2-4e10-a22c-486d52b4422a";
             Require(LobbyServiceBridge.NormalizeCode(LEGACY_ROOM_ID) == LEGACY_ROOM_ID, "기존 방 코드 호환 실패");
+            CheckRoomJoinAddresses(LEGACY_ROOM_ID);
             CheckGoogleCallback();
-            Debug.Log("DRAWLIAR_SERVICES_CHECKS_OK: room-code validation and Google PKCE callback validation.");
+            Debug.Log("DRAWLIAR_SERVICES_CHECKS_OK: room-code/address validation and Google PKCE callback validation.");
+        }
+
+        private static void CheckRoomJoinAddresses(string legacyId)
+        {
+            const string PAGE = RoomJoinAddress.DEFAULT_PAGE_URL;
+            foreach (string page in new[] { PAGE, PAGE + "/", PAGE + ".html", PAGE + ".html/",
+                "http://rascallab.com/games/liar-canvas", "https://www.rascallab.com/games/liar-canvas",
+                "http://localhost:8090/games/liar-canvas", "http://127.0.0.1:8090/games/liar-canvas",
+                "http://[::1]:8090/games/liar-canvas" })
+                Require(RoomJoinAddress.NormalizeCode(page + "?room=k7m-%209rX") == "K7M9RX", "방 주소 정규화 실패: " + page);
+            Require(RoomJoinAddress.NormalizeCode(PAGE + "?lang=ko&%72oom=K7M9RX#chat") == "K7M9RX", "방 파라미터 1회 디코딩 실패");
+            Require(RoomJoinAddress.NormalizeCode(PAGE + "?room=%7B" + legacyId + "%7D") == legacyId, "주소의 기존 방 UUID 호환 실패");
+            Require(RoomJoinAddress.Create(PAGE + ".html/?token=secret&room=OLD#fragment", "k7m-9rx")
+                == PAGE + "?room=K7M9RX", "공유 주소에 토큰·다른 쿼리·fragment가 남았습니다.");
+            Require(RoomJoinAddress.Create(PAGE, legacyId) == PAGE + "?room=" + legacyId, "기존 UUID 방의 공유 주소 생성 실패");
+            const string PREVIEW = "https://preview.example:8443/games/liar-canvas";
+            Require(RoomJoinAddress.NormalizeCode(PREVIEW + "?room=K7M9RX", PREVIEW) == "K7M9RX", "현재 웹 원점 허용 실패");
+            foreach (string invalid in new[] {
+                PAGE, PAGE + "?room=", PAGE + "?room", PAGE + "?room=K7M9RX&room=K7M9RX",
+                PAGE + "?room=K7M9RX&%72oom=K7M9RX", PAGE + "?ROOM=K7M9RX", PAGE + "?room=K7M9R%",
+                PAGE + "?room=K7M9R%XX", PAGE + "?room=%254B7M9RX", PAGE + "?room=K7M9RX&other=%",
+                PAGE + "?room=K7M0RX", "ftp://rascallab.com/games/liar-canvas?room=K7M9RX",
+                "https://user:secret@rascallab.com/games/liar-canvas?room=K7M9RX",
+                "https://@rascallab.com/games/liar-canvas?room=K7M9RX",
+                "https://rascallab.com.attacker.example/games/liar-canvas?room=K7M9RX",
+                "https://attacker.example/games/liar-canvas?room=K7M9RX",
+                "https://rascallab.com/games/other?room=K7M9RX",
+                "https://rascallab.com/games/other/../liar-canvas?room=K7M9RX",
+                "https://rascallab.com/games/liar-canvas%2F?room=K7M9RX",
+                "https://preview.example:8444/games/liar-canvas?room=K7M9RX",
+                "http://preview.example:8443/games/liar-canvas?room=K7M9RX",
+                PAGE + "?room=K7M9RX&other=" + new string('a', 2048)
+            })
+            {
+                bool rejected = false;
+                try { RoomJoinAddress.NormalizeCode(invalid, PREVIEW); }
+                catch (InvalidOperationException) { rejected = true; }
+                Require(rejected, "잘못된 방 주소 허용: " + invalid);
+            }
         }
 
         private static void CheckGoogleCallback()

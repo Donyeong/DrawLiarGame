@@ -10,9 +10,9 @@ using UnityEngine;
 
 namespace DrawLiar
 {
-    public sealed class DrawNetworkManager : MonoBehaviour
+    public sealed partial class DrawNetworkManager : MonoBehaviour
     {
-        private const int MAXIMUM_STROKES = 12000;
+        private const int MAXIMUM_STROKES = GameRules.MAX_CANVAS_STROKES;
         private const int MAXIMUM_FRAME_BYTES = 1024 * 1024;
         private const int MAXIMUM_PENDING_FRAMES = 512;
         private sealed class IncomingQueue
@@ -34,6 +34,9 @@ namespace DrawLiar
         private int _generation, _pendingSends, _canvasVersion;
         private long _sequence;
         private bool _configuringRoom;
+        private bool _refreshingProfile;
+        private event Action<GameplayEnvelope> RoomConfigurationReceived;
+        private event Action<GameplayEnvelope> ProfileRefreshReceived;
 
         public RoomSnapshot State { get; private set; }
         public bool IsConnected => _socket != null && _socket.State == WebSocketState.Open && State != null;
@@ -80,31 +83,37 @@ namespace DrawLiar
             }
         }
 
-        public async Task ConfigureRoomAsync(RoomSettings settings)
+        public async Task ConfigureRoomAsync(RoomSettings settings, string password = "")
         {
             if (!CanConfigureRoom(State)) throw new InvalidOperationException(DrawLocalization.Text("방 옵션 변경 권한이 없습니다."));
             if (settings == null || _configuringRoom) throw new InvalidOperationException(DrawLocalization.Text("방 옵션을 저장하지 못했습니다. 다시 시도하세요."));
             var valid = settings.Copy();
             valid.Validate();
             if (valid.Topics == null || valid.Topics.Length == 0) throw new InvalidOperationException(DrawLocalization.Text("주제를 하나 이상 선택하세요."));
-            string expected = JsonUtility.ToJson(valid);
-            if (JsonUtility.ToJson(State.Settings) == expected) return;
+            password ??= "";
+            if (!valid.IsPrivate) password = "";
+            string requestId = Guid.NewGuid().ToString("N");
             var completion = DrawAsync.Completion<bool>();
             void OnState(RoomSnapshot state)
             {
                 if (!CanConfigureRoom(state)) completion.TrySetException(new InvalidOperationException(DrawLocalization.Text("방 옵션 변경 권한이 없습니다.")));
-                else if (JsonUtility.ToJson(state.Settings) == expected) completion.TrySetResult(true);
             }
-            void OnNotice(string message) => completion.TrySetException(new InvalidOperationException(message));
+            void OnConfigured(GameplayEnvelope message)
+            {
+                if (message.RequestId != requestId) return;
+                if (message.Accepted) completion.TrySetResult(true);
+                else completion.TrySetException(new InvalidOperationException(DrawLocalization.Text(string.IsNullOrWhiteSpace(message.Text)
+                    ? "방 옵션을 저장하지 못했습니다. 다시 시도하세요." : message.Text)));
+            }
             _configuringRoom = true;
             StateChanged += OnState;
-            Notice += OnNotice;
+            RoomConfigurationReceived += OnConfigured;
             try
             {
                 using (var timeout = CancellationTokenSource.CreateLinkedTokenSource(_lifetime.Token))
                 {
                     DrawAsync.CancelAfter(timeout, TimeSpan.FromSeconds(10));
-                    await SendAsync(new GameplayEnvelope { Type = "request", Kind = "configure", Settings = valid }, _generation, timeout.Token);
+                    await SendAsync(new GameplayEnvelope { Type = "request", Kind = "configure", Settings = valid, Password = password, RequestId = requestId }, _generation, timeout.Token);
                     using (timeout.Token.Register(() => completion.TrySetCanceled())) await completion.Task;
                 }
             }
@@ -115,17 +124,58 @@ namespace DrawLiar
             finally
             {
                 StateChanged -= OnState;
-                Notice -= OnNotice;
+                RoomConfigurationReceived -= OnConfigured;
                 _configuringRoom = false;
+                password = "";
             }
         }
 
         private bool CanConfigureRoom(RoomSnapshot state) => IsConnected && state != null && state.IsHost
             && (state.Phase == GamePhase.Lobby || state.Phase == GamePhase.MatchResults);
 
+        public async Task RefreshProfileAsync()
+        {
+            if (!IsConnected) return;
+            if (_refreshingProfile) throw new InvalidOperationException(DrawLocalization.Text("프로필을 불러오지 못했습니다."));
+            string requestId = Guid.NewGuid().ToString("N");
+            int generation = _generation;
+            var completion = DrawAsync.Completion<bool>();
+            void OnRefreshed(GameplayEnvelope message)
+            {
+                if (message.RequestId != requestId || generation != _generation) return;
+                if (message.Accepted) completion.TrySetResult(true);
+                else completion.TrySetException(new InvalidOperationException(DrawLocalization.Text(string.IsNullOrWhiteSpace(message.Text)
+                    ? "프로필을 불러오지 못했습니다." : message.Text)));
+            }
+            _refreshingProfile = true;
+            ProfileRefreshReceived += OnRefreshed;
+            try
+            {
+                using var timeout = CancellationTokenSource.CreateLinkedTokenSource(_lifetime.Token);
+                DrawAsync.CancelAfter(timeout, TimeSpan.FromSeconds(10));
+                await SendAsync(new GameplayEnvelope { Type = "request", Kind = "refreshProfile", RequestId = requestId }, generation, timeout.Token);
+                using (timeout.Token.Register(() => completion.TrySetCanceled())) await completion.Task;
+            }
+            catch (OperationCanceledException)
+            {
+                throw new InvalidOperationException(DrawLocalization.Text("프로필을 불러오지 못했습니다."));
+            }
+            finally
+            {
+                ProfileRefreshReceived -= OnRefreshed;
+                _refreshingProfile = false;
+            }
+        }
+
         public void StartMatch() => Request("start");
         public void EndTurn() => Request("endTurn");
-        public void Vote(int id) => Request("vote", target: id);
+        public void Vote(int id) => Request("vote", target: id, ballotVersion: State?.BallotVersion ?? 0);
+        public void Judge(bool approve)
+        {
+            var state = State;
+            if (state == null || !state.HasAccused) return;
+            Request("judge", target: state.AccusedPlayerId, approve: approve, ballotVersion: state.BallotVersion);
+        }
         public void Guess(string answer) => Request("guess", GameRules.CleanText(answer, 40));
         public void Chat(string text) => Request("chat", GameRules.CleanText(text, 160));
         public void ReturnToLobby() => Request("lobby");
@@ -134,6 +184,8 @@ namespace DrawLiar
         {
             if (!CanDraw) return;
             stroke.CanvasVersion = _canvasVersion;
+            stroke.AuthorPlayerId = LocalPlayerId;
+            if (stroke.Eraser) { stroke.R = stroke.G = stroke.B = 255; stroke.Eraser = false; }
             if (GameRules.ValidStroke(stroke, _canvasVersion)) Send(new GameplayEnvelope { Type = "stroke", Stroke = stroke });
         }
 
@@ -158,6 +210,7 @@ namespace DrawLiar
             _sequence = 0;
             _canvas.Clear();
             _canvasVersion = 0;
+            ResetDrawingHistory(0, 0, false);
             State = null;
             CanvasCleared?.Invoke();
             StateChanged?.Invoke(null);
@@ -184,9 +237,10 @@ namespace DrawLiar
             if (generation == _generation) Leave();
         }
 
-        private void Request(string kind, string text = "", int target = -1)
+        private void Request(string kind, string text = "", int target = -1, bool approve = false, int ballotVersion = 0)
         {
-            if (IsConnected) Send(new GameplayEnvelope { Type = "request", Kind = kind, Text = text, Target = target });
+            if (IsConnected) Send(new GameplayEnvelope { Type = "request", Kind = kind, Text = text, Target = target,
+                Approve = approve, BallotVersion = ballotVersion });
         }
 
         private void Send(GameplayEnvelope envelope)
@@ -294,24 +348,21 @@ namespace DrawLiar
                 switch (message.Type)
                 {
                     case "state":
+                        var previousState = State;
                         State = message.State;
+                        SynchronizeDrawingState(previousState);
                         var ready = _initialState;
                         StateChanged?.Invoke(State);
                         if (State != null && incoming.Generation == DrawAsync.Read(ref _generation)) ready?.TrySetResult(true);
                         break;
-                    case "canvas":
-                        if (message.Reset)
-                        {
-                            _canvas.Clear();
-                            _canvasVersion = message.Version;
-                            CanvasCleared?.Invoke();
-                        }
-                        if (message.Version == _canvasVersion && message.Strokes != null)
-                            foreach (var stroke in message.Strokes) ReceiveStroke(stroke);
-                        break;
-                    case "stroke": ReceiveStroke(message.Stroke); break;
+                    case "canvas": ReceiveCanvas(message); break;
+                    case "stroke": if (CurrentDrawingFrame(message)) ReceiveStroke(message.Stroke); break;
+                    case "clearOwn": ReceiveClearOwn(message); break;
+                    case "authorDrawing": ReceiveAuthorDrawing(message); break;
                     case "chat": ChatReceived?.Invoke(message.Line); break;
                     case "notice": Notice?.Invoke(message.Text); break;
+                    case "configured": RoomConfigurationReceived?.Invoke(message); break;
+                    case "profile-refreshed": ProfileRefreshReceived?.Invoke(message); break;
                     case "disconnected":
                         _initialState?.TrySetException(new IOException(message.Text));
                         Leave();
@@ -319,13 +370,16 @@ namespace DrawLiar
                         break;
                 }
             }
+            AdvanceDrawingRequests();
         }
 
         private void ReceiveStroke(DrawStroke stroke)
         {
-            if (!GameRules.ValidStroke(stroke, _canvasVersion) || _canvas.Count >= MAXIMUM_STROKES) return;
+            if (!GameRules.ValidStroke(stroke, _canvasVersion) || stroke.AuthorPlayerId <= 0 || _canvas.Count >= MAXIMUM_STROKES
+                || !AddAuthorStroke(stroke)) return;
             _canvas.Add(stroke);
             StrokeReceived?.Invoke(stroke);
+            AuthorDrawingChanged?.Invoke(stroke.AuthorPlayerId);
         }
 
         private void OnDestroy() => Leave();

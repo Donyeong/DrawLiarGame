@@ -20,6 +20,20 @@ namespace DrawLiar
         public bool IsInProgress;
     }
 
+    public sealed class RoomPasswordPrompt
+    {
+        public string RoomCode { get; }
+        public string RoomName { get; }
+        public string Error { get; }
+
+        public RoomPasswordPrompt(string roomCode, string roomName, string error)
+        {
+            RoomCode = roomCode ?? "";
+            RoomName = roomName ?? "";
+            Error = error ?? "";
+        }
+    }
+
     [DisallowMultipleComponent]
     public sealed class LobbyServiceBridge : MonoBehaviour
     {
@@ -28,12 +42,20 @@ namespace DrawLiar
         private DrawNetworkManager _manager;
         private OnlineServicesConfig _config;
         private string _mainSession = "", _gameSession = "", _gameServerUrl = "", _roomCode = "";
+        private string _pendingRoomInvite = "";
         private CancellationToken _lifetime;
         private CancellationTokenSource _googleCancellation;
+        private CancellationTokenSource _socialCancellation = new CancellationTokenSource();
         private string _statusSource = "";
         private object[] _statusArguments = Array.Empty<object>();
         private bool _lobbyChatPaused;
         private bool _loggingOut;
+        private bool _socialPolling;
+        private double _nextSocialPoll;
+        private int _socialRevision;
+        private string _inboxFingerprint = "";
+        private readonly HashSet<string> _knownFriendRequests = new HashSet<string>();
+        private readonly HashSet<string> _knownRoomInvitations = new HashSet<string>();
 
         public string RoomCode => _roomCode;
         public bool IsGoogleSigningIn => _googleCancellation != null;
@@ -41,8 +63,11 @@ namespace DrawLiar
         public bool IsBusy { get; private set; }
         public bool IsOnlineRoom => _manager != null && _manager.IsConnected;
         public bool IsAuthenticated => !string.IsNullOrEmpty(_gameSession);
+        public bool HasPendingRoomInvite => !string.IsNullOrEmpty(_pendingRoomInvite);
         public ProfileData Profile { get; private set; }
         public FriendListResponse Friends { get; private set; } = new FriendListResponse();
+        public SocialInboxResponse Inbox { get; private set; } = new SocialInboxResponse();
+        public int NotificationCount => Inbox.Friends.Incoming.Length + Inbox.RoomInvitations.Length;
         public ShopResponse Shop { get; private set; } = new ShopResponse();
         public IReadOnlyList<PublicRoomInfo> PublicRooms => _publicRooms;
         public IReadOnlyList<LobbyChatMessage> LobbyMessages => _lobbyChat.Messages;
@@ -54,6 +79,14 @@ namespace DrawLiar
         public event Action ProfileChanged;
         public event Action LobbyChatChanged;
         public event Action<string> LobbyChatNotice;
+        public event Action SocialChanged;
+        public event Action<string> SocialNotice;
+        public event Func<RoomPasswordPrompt, CancellationToken, Task<string>> RoomPasswordRequested;
+
+        private sealed class RoomPasswordException : InvalidOperationException
+        {
+            public RoomPasswordException(string message) : base(message) { }
+        }
 
         public void Initialize(DrawNetworkManager manager)
         {
@@ -68,6 +101,15 @@ namespace DrawLiar
             _manager.StateChanged += OnRoomState;
             _lobbyChat.Changed += OnLobbyChatChanged;
             _lobbyChat.Notice += OnLobbyChatNotice;
+#if UNITY_WEBGL && !UNITY_EDITOR
+            _pendingRoomInvite = "";
+            string invite = DrawBrowserInterop.RoomInvite();
+            if (!string.IsNullOrEmpty(invite))
+            {
+                try { _pendingRoomInvite = NormalizeCode(invite); }
+                catch (InvalidOperationException) { SetStatus("방 코드 또는 주소를 확인하세요."); }
+            }
+#endif
         }
 
         private void OnRoomState(RoomSnapshot state)
@@ -86,10 +128,95 @@ namespace DrawLiar
         private void StopLobbyChat(bool clearHistory = false) => _lobbyChat.Stop(clearHistory);
         private void OnLobbyChatChanged() => LobbyChatChanged?.Invoke();
         private void OnLobbyChatNotice(string message) => LobbyChatNotice?.Invoke(message);
-        private void Update() => _lobbyChat.Drain();
+        private void Update()
+        {
+            _lobbyChat.Drain();
+            if (IsAuthenticated && !_loggingOut && !_lobbyChatPaused && !IsBusy && !_socialPolling
+                && Time.realtimeSinceStartupAsDouble >= _nextSocialPoll)
+                _ = PollSocialAsync();
+        }
+
+        private async Task PollSocialAsync()
+        {
+            _socialPolling = true;
+            string session = _gameSession;
+            int revision = 0;
+            double delay = 3;
+            try
+            {
+                var refresh = RefreshSocialAsync();
+                revision = _socialRevision;
+                await refresh;
+            }
+            catch (OperationCanceledException) { }
+            catch (Exception) { delay = 30; }
+            finally
+            {
+                _socialPolling = false;
+                if (session == _gameSession && revision == _socialRevision)
+                    _nextSocialPoll = Time.realtimeSinceStartupAsDouble + delay;
+            }
+        }
+
+        public async Task RefreshSocialAsync()
+        {
+            RequireLogin();
+            int revision = ++_socialRevision;
+            string session = _gameSession;
+            var inbox = await SendAsync<SocialInboxResponse>(_gameServerUrl, "/api/social/inbox", "GET",
+                bearer: session, cancellationToken: _socialCancellation.Token);
+            if (revision != _socialRevision || session != _gameSession || _loggingOut || _lobbyChatPaused) return;
+            inbox.Friends ??= new FriendListResponse();
+            inbox.Friends.Friends ??= Array.Empty<FriendData>();
+            inbox.Friends.Incoming ??= Array.Empty<FriendData>();
+            inbox.Friends.Outgoing ??= Array.Empty<FriendData>();
+            inbox.RoomInvitations ??= Array.Empty<RoomInvitationData>();
+            string fingerprint = JsonUtility.ToJson(inbox);
+            var newRequests = inbox.Friends.Incoming.Where(friend => !_knownFriendRequests.Contains(friend.AccountId)).ToArray();
+            var newInvitations = inbox.RoomInvitations.Where(invite => !_knownRoomInvitations.Contains(invite.InvitationId)).ToArray();
+            _knownFriendRequests.Clear();
+            _knownRoomInvitations.Clear();
+            foreach (var friend in inbox.Friends.Incoming) _knownFriendRequests.Add(friend.AccountId);
+            foreach (var invite in inbox.RoomInvitations) _knownRoomInvitations.Add(invite.InvitationId);
+            Friends = inbox.Friends;
+            Inbox = inbox;
+            if (_inboxFingerprint != fingerprint)
+            {
+                _inboxFingerprint = fingerprint;
+                SocialChanged?.Invoke();
+            }
+            if (newRequests.Length == 1) SocialNotice?.Invoke(DrawLocalization.Format("{0}님이 친구 요청을 보냈습니다.", newRequests[0].DisplayName));
+            else if (newRequests.Length > 1) SocialNotice?.Invoke(DrawLocalization.Format("친구 요청 {0}개가 도착했습니다.", newRequests.Length));
+            if (newInvitations.Length == 1) SocialNotice?.Invoke(DrawLocalization.Format("{0}님이 방에 초대했습니다.", newInvitations[0].Sender.DisplayName));
+            else if (newInvitations.Length > 1) SocialNotice?.Invoke(DrawLocalization.Format("방 초대 {0}개가 도착했습니다.", newInvitations.Length));
+        }
+
+        private void ResetSocial()
+        {
+            ++_socialRevision;
+            RenewSocialCancellation();
+            _nextSocialPoll = 0;
+            _inboxFingerprint = "";
+            _knownFriendRequests.Clear();
+            _knownRoomInvitations.Clear();
+            Inbox = new SocialInboxResponse();
+            Friends = Inbox.Friends;
+            SocialChanged?.Invoke();
+        }
+
+        private void RenewSocialCancellation()
+        {
+            _socialCancellation.Cancel();
+            _socialCancellation.Dispose();
+            _socialCancellation = new CancellationTokenSource();
+        }
+
         private void OnApplicationPause(bool paused)
         {
             _lobbyChatPaused = paused;
+            ++_socialRevision;
+            if (paused) RenewSocialCancellation();
+            if (!paused) _nextSocialPoll = 0;
             if (paused) StopLobbyChat(); else StartLobbyChat();
         }
 
@@ -129,6 +256,7 @@ namespace DrawLiar
             _mainSession = login.SessionToken;
             _gameServerUrl = gameServerUrl.TrimEnd('/');
             _gameSession = session.SessionToken;
+            ResetSocial();
             SetProfile(session.Profile);
             StartLobbyChat();
             SetStatus("로그인했습니다. 방을 만들거나 참가하세요.");
@@ -164,8 +292,18 @@ namespace DrawLiar
         public Task SaveProfileAsync(string displayName, int avatarColor, int accessory) => RunAsync(async () =>
         {
             RequireLogin();
-            SetProfile(await SendGameAsync<ProfileData>("/api/profile", "PATCH",
-                new UpdateProfileRequest { DisplayName = displayName.Trim(), AvatarColor = avatarColor, Accessory = accessory }));
+            string session = _gameSession, accountId = Profile?.AccountId;
+            void CheckSession()
+            {
+                _lifetime.ThrowIfCancellationRequested();
+                if (_loggingOut || session != _gameSession || accountId != Profile?.AccountId) throw new OperationCanceledException();
+            }
+            var profile = await SendGameAsync<ProfileData>("/api/profile", "PATCH",
+                new UpdateProfileRequest { DisplayName = displayName.Trim(), AvatarColor = avatarColor, Accessory = accessory });
+            CheckSession();
+            SetProfile(profile);
+            if (_manager != null && _manager.IsConnected) await _manager.RefreshProfileAsync();
+            CheckSession();
             SetStatus("캐릭터를 저장했습니다.");
         });
 
@@ -186,30 +324,82 @@ namespace DrawLiar
 
         public Task RefreshFriendsAsync() => RunAsync(async () =>
         {
-            RequireLogin(); Friends = await SendGameAsync<FriendListResponse>("/api/friends", "GET");
+            await RefreshSocialAsync();
             SetStatus("친구 목록을 갱신했습니다.");
         });
 
         public Task RequestFriendAsync(string accountId) => RunAsync(async () =>
         {
             RequireLogin();
+            ++_socialRevision;
             await SendGameAsync<ApiError>("/api/friends/request", "POST", new FriendRequest { AccountId = accountId.Trim() });
-            Friends = await SendGameAsync<FriendListResponse>("/api/friends", "GET");
+            await RefreshSocialAsync();
             SetStatus("친구 요청을 보냈습니다.");
         });
 
         public Task RespondFriendAsync(string accountId, bool accept) => RunAsync(async () =>
         {
             RequireLogin();
+            ++_socialRevision;
             await SendGameAsync<ApiError>("/api/friends/respond", "POST", new FriendRespondRequest { AccountId = accountId, Accept = accept });
-            Friends = await SendGameAsync<FriendListResponse>("/api/friends", "GET");
+            await RefreshSocialAsync();
             SetStatus(accept ? "친구 요청을 수락했습니다." : "친구 요청을 거절했습니다.");
         });
 
         public Task RemoveFriendAsync(string accountId) => RunAsync(async () =>
         {
-            RequireLogin(); await SendGameAsync<ApiError>("/api/friends/" + Uri.EscapeDataString(accountId), "DELETE");
-            Friends = await SendGameAsync<FriendListResponse>("/api/friends", "GET"); SetStatus("친구를 삭제했습니다.");
+            RequireLogin(); ++_socialRevision;
+            await SendGameAsync<ApiError>("/api/friends/" + Uri.EscapeDataString(accountId), "DELETE");
+            await RefreshSocialAsync(); SetStatus("친구를 삭제했습니다.");
+        });
+
+        public async Task<RoomInvitationData> InviteFriendAsync(string accountId)
+        {
+            RoomInvitationData invitation = null;
+            await RunAsync(async () =>
+            {
+                RequireLogin();
+                if (!IsOnlineRoom || string.IsNullOrEmpty(_roomCode)) throw new InvalidOperationException("방에 입장한 뒤 친구를 초대하세요.");
+                invitation = await SendGameAsync<RoomInvitationData>("/api/rooms/" + Uri.EscapeDataString(_roomCode) + "/invite", "POST",
+                    new FriendRequest { AccountId = accountId });
+                SetStatus("친구를 초대했습니다.");
+            });
+            return invitation;
+        }
+
+        public Task RespondRoomInvitationAsync(string invitationId, bool accept, bool leaveCurrentRoom = false) => RunAsync(async () =>
+        {
+            RequireLogin();
+            if (!Guid.TryParse(invitationId, out var id)) throw new InvalidOperationException("초대가 만료되었거나 취소되었습니다.");
+            if (accept && IsOnlineRoom && !leaveCurrentRoom) throw new InvalidOperationException("현재 방에서 나온 뒤 참가하세요.");
+            if (accept && _manager == null) throw new InvalidOperationException("네트워크가 초기화되지 않았습니다.");
+            ++_socialRevision;
+            try
+            {
+                string path = "/api/room-invitations/" + id + "/respond";
+                var invitation = Inbox.RoomInvitations.FirstOrDefault(entry => entry.InvitationId == id.ToString());
+                var assignment = accept
+                    ? await RequestRoomAssignmentAsync(password => SendGameAsync<DedicatedAssignment>(path, "POST",
+                        new RoomInvitationRespondRequest { Accept = true, Password = password }), invitation?.RoomCode, invitation?.RoomName)
+                    : await SendGameAsync<DedicatedAssignment>(path, "POST", new RoomInvitationRespondRequest { Accept = false });
+                if (accept)
+                {
+                    if (IsOnlineRoom)
+                    {
+                        await _manager.LeaveAsync();
+                        _roomCode = "";
+                    }
+                    await ConnectRoomAsync(assignment);
+                }
+                else SetStatus("방 초대를 거절했습니다.");
+            }
+            finally
+            {
+                _nextSocialPoll = 0;
+                try { await RefreshSocialAsync(); }
+                catch (OperationCanceledException) { }
+                catch (Exception) { }
+            }
         });
 
         public Task RefreshShopAsync() => RunAsync(async () =>
@@ -225,7 +415,7 @@ namespace DrawLiar
             SetStatus("아이템을 구매했습니다.");
         });
 
-        public Task HostAsync(RoomSettings settings) => RunAsync(async () =>
+        public Task HostAsync(RoomSettings settings, string password = "") => RunAsync(async () =>
         {
             RequireAvailable();
             settings = settings?.Copy() ?? new RoomSettings(); settings.Validate();
@@ -233,20 +423,60 @@ namespace DrawLiar
             var customTopics = GameDataStore.LoadCustomTopics().Where(topic => settings.Topics == null || settings.Topics.Contains(topic.Name))
                 .Select(topic => new ServerTopicData { Name = topic.Name, Words = topic.Words }).ToArray();
             var assignment = await SendGameAsync<DedicatedAssignment>("/api/rooms", "POST",
-                new CreateRoomRequest { Settings = serverSettings, CustomTopics = customTopics });
+                new CreateRoomRequest { Settings = serverSettings, CustomTopics = customTopics, Password = settings.IsPrivate ? password : "" });
             await ConnectRoomAsync(assignment);
         });
 
         public Task JoinCodeAsync(string code, bool asSpectator = false) => JoinLobbyAsync(NormalizeCode(code), asSpectator);
 
+        public async Task TryJoinInviteAsync()
+        {
+            if (!HasPendingRoomInvite || !IsAuthenticated || IsBusy || IsOnlineRoom || _manager == null) return;
+            string code = _pendingRoomInvite;
+            _pendingRoomInvite = "";
+#if UNITY_WEBGL && !UNITY_EDITOR
+            DrawBrowserInterop.ClearRoomInvite();
+#endif
+            await JoinCodeAsync(code);
+        }
+
         public Task JoinLobbyAsync(string roomId, bool asSpectator = false) => RunAsync(async () =>
         {
             RequireAvailable();
             if (string.IsNullOrWhiteSpace(roomId)) throw new InvalidOperationException("방 코드를 입력하세요.");
-            var assignment = await SendGameAsync<DedicatedAssignment>("/api/rooms/" + Uri.EscapeDataString(roomId) + "/join", "POST",
-                new JoinRoomRequest { AsSpectator = asSpectator });
+            var assignment = await RequestRoomAssignmentAsync(password => SendGameAsync<DedicatedAssignment>(
+                "/api/rooms/" + Uri.EscapeDataString(roomId) + "/join", "POST",
+                new JoinRoomRequest { AsSpectator = asSpectator, Password = password }), roomId, "");
             await ConnectRoomAsync(assignment);
         });
+
+        private async Task<DedicatedAssignment> RequestRoomAssignmentAsync(Func<string, Task<DedicatedAssignment>> request,
+            string roomCode, string roomName)
+        {
+            string session = _gameSession;
+            string password = "";
+            try
+            {
+                while (true)
+                {
+                    _lifetime.ThrowIfCancellationRequested();
+                    if (session != _gameSession || _loggingOut) throw new OperationCanceledException();
+                    try
+                    {
+                        var assignment = await request(password);
+                        if (session != _gameSession || _loggingOut) throw new OperationCanceledException();
+                        return assignment;
+                    }
+                    catch (RoomPasswordException exception)
+                    {
+                        var prompt = RoomPasswordRequested;
+                        if (prompt == null) throw;
+                        password = await prompt(new RoomPasswordPrompt(roomCode, roomName, exception.Message), _lifetime);
+                    }
+                }
+            }
+            finally { password = ""; }
+        }
 
         private async Task ConnectRoomAsync(DedicatedAssignment assignment)
         {
@@ -277,6 +507,7 @@ namespace DrawLiar
         public Task LogoutAsync() => RunAsync(async () =>
         {
             _loggingOut = true;
+            ++_socialRevision;
             StopLobbyChat(true);
             try
             {
@@ -290,6 +521,7 @@ namespace DrawLiar
                 StopLobbyChat(true);
                 _loggingOut = false;
                 Profile = null; Friends = new FriendListResponse(); Shop = new ShopResponse(); _publicRooms.Clear();
+                ResetSocial();
                 ProfileChanged?.Invoke(); SetStatus("로그아웃했습니다.");
             }
         });
@@ -359,7 +591,10 @@ namespace DrawLiar
             {
                 string code = "ConnectionFailed";
                 try { code = JsonUtility.FromJson<ApiError>(request.downloadHandler.text)?.Code ?? code; } catch (ArgumentException) { }
-                throw new InvalidOperationException(DescribeError(code, request.responseCode));
+                string message = DescribeError(code, request.responseCode);
+                if (code == "RoomPasswordRequired" || code == "InvalidRoomPassword" || code == "InvalidRoomPasswordFormat")
+                    throw new RoomPasswordException(message);
+                throw new InvalidOperationException(message);
             }
             if (string.IsNullOrEmpty(request.downloadHandler.text))
             {
@@ -371,14 +606,11 @@ namespace DrawLiar
 
         public static string NormalizeCode(string value)
         {
-            if (string.IsNullOrWhiteSpace(value)) return "";
-            if (value.Length > 64) throw new InvalidOperationException("6자리 방 코드를 입력하세요.");
-            if (Guid.TryParse(value.Trim(), out Guid legacyId)) return legacyId.ToString();
-            string code = new string(value.Where(character => !char.IsWhiteSpace(character) && character != '-').ToArray()).ToUpperInvariant();
-            const string ALPHABET = "23456789ABCDEFGHJKMNPQRSTVWXYZ";
-            if (code.Length != 6 || code.Any(character => ALPHABET.IndexOf(character) < 0))
-                throw new InvalidOperationException("영문·숫자 6자리 방 코드를 확인하세요.");
-            return code;
+#if UNITY_WEBGL && !UNITY_EDITOR
+            return RoomJoinAddress.NormalizeCode(value, DrawBrowserInterop.RoomPageUrl());
+#else
+            return RoomJoinAddress.NormalizeCode(value);
+#endif
         }
 
         private static string DescribeError(string code, long status)
@@ -392,6 +624,11 @@ namespace DrawLiar
                 case "RoomUnavailable": return "방을 찾지 못했습니다. 방 코드를 확인하세요.";
                 case "InvalidRoomCode": return "영문·숫자 6자리 방 코드를 확인하세요.";
                 case "RoomFull": return "참가 인원이 가득 찼습니다. 관전으로 참가할 수 있습니다.";
+                case "RoomPasswordRequired": return "비밀번호가 필요한 방입니다.";
+                case "RoomPasswordNotConfigured": return "방장이 비밀번호를 설정한 뒤 입장할 수 있습니다.";
+                case "InvalidRoomPassword": return "비밀번호가 올바르지 않습니다.";
+                case "InvalidRoomPasswordFormat": return "비밀번호는 4~32자로 입력하세요.";
+                case "RoomConfigurationChanged": return "방 설정이 변경되었습니다. 다시 시도하세요.";
                 case "InsufficientCoins": return "코인이 부족합니다.";
                 case "GoogleUnavailable": return "서버의 Google 로그인 설정을 확인해야 합니다.";
                 case "InvalidGoogleCredential": return "Google 인증에 실패했습니다. 다시 로그인해 주세요.";
@@ -407,6 +644,13 @@ namespace DrawLiar
                 case "FriendLimit": return "친구 목록의 최대 인원에 도달했습니다.";
                 case "AccountNotFound": return "계정 ID를 찾지 못했습니다.";
                 case "FriendRequestNotFound": return "친구 요청을 찾지 못했습니다. 목록을 갱신하세요.";
+                case "NotFriends": return "친구로 추가된 상대만 초대할 수 있습니다.";
+                case "NotRoomMember": return "방에 입장한 뒤 친구를 초대하세요.";
+                case "AlreadyInRoom": return "이미 같은 방에 있습니다.";
+                case "RoomInvitationCooldown": return "잠시 후 다시 초대하세요.";
+                case "RoomInvitationLimit": return "보낸 초대가 많습니다. 잠시 후 다시 시도하세요.";
+                case "RoomInvitationUnavailable":
+                case "InvalidInvitation": return "초대가 만료되었거나 취소되었습니다.";
             }
             if (status == 401) return "로그인이 만료되었습니다. 다시 로그인해 주세요.";
             if (status == 429) return "요청이 많습니다. 잠시 후 다시 시도하세요.";
@@ -416,6 +660,8 @@ namespace DrawLiar
         private void OnDestroy()
         {
             _googleCancellation?.Cancel();
+            _socialCancellation.Cancel();
+            _socialCancellation.Dispose();
             if (_manager != null) _manager.StateChanged -= OnRoomState;
             _lobbyChat.Changed -= OnLobbyChatChanged;
             _lobbyChat.Notice -= OnLobbyChatNotice;

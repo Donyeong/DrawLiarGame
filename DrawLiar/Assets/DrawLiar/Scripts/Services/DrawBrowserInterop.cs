@@ -14,6 +14,9 @@ namespace DrawLiar
         [DllImport("__Internal")] private static extern string DrawBrowserTopicsLoad();
         [DllImport("__Internal")] private static extern int DrawBrowserTopicsSave(string payload);
         [DllImport("__Internal")] private static extern int DrawBrowserIsMobile();
+        [DllImport("__Internal")] private static extern string DrawBrowserRoomPageUrl();
+        [DllImport("__Internal")] private static extern string DrawBrowserRoomInvite();
+        [DllImport("__Internal")] private static extern void DrawBrowserRoomInviteClear();
         [DllImport("__Internal")] internal static extern int DrawBrowserClipboardStart(string value, int read);
         [DllImport("__Internal")] internal static extern int DrawBrowserClipboardState(int id);
         [DllImport("__Internal")] internal static extern string DrawBrowserClipboardValue(int id);
@@ -68,6 +71,10 @@ namespace DrawLiar
         }
 
         public static bool IsMobile => DrawBrowserIsMobile() == 1;
+
+        public static string RoomPageUrl() => DrawBrowserRoomPageUrl() ?? "";
+        public static string RoomInvite() => DrawBrowserRoomInvite() ?? "";
+        public static void ClearRoomInvite() => DrawBrowserRoomInviteClear();
 
         public static string LoadCustomTopics()
         {

@@ -75,11 +75,21 @@ var DrawLiarBrowserLibrary = {
     closeInput: function(id, focusCanvas) {
       var entry = DrawBrowser.input;
       if (!entry || entry.id !== id) return;
+      if (entry.compositionTimer) clearTimeout(entry.compositionTimer);
       DrawBrowser.input = null;
       DrawBrowser.closedInputs[id] = {value:DrawBrowser.inputValue(entry.element.value, entry.limit), limit:entry.limit};
       if (DrawBrowser.inputFields[id]) DrawBrowser.inputFields[id].Value = DrawBrowser.closedInputs[id].value;
       entry.element.remove();
       if (focusCanvas && Module.canvas) Module.canvas.focus({preventScroll:true});
+    },
+    settleInput: function(entry) {
+      if (entry.compositionTimer) clearTimeout(entry.compositionTimer);
+      entry.compositionTimer = setTimeout(function() {
+        entry.compositionTimer = 0; entry.ending = false;
+        if (entry.composing || !entry.submitAfterComposition) return;
+        entry.submitAfterComposition = false;
+        if (DrawBrowser.input === entry && document.activeElement === entry.element) entry.flags |= 1;
+      }, 0);
     },
     openInput: function(id) {
       var field = DrawBrowser.inputFields[id];
@@ -91,7 +101,8 @@ var DrawLiarBrowserLibrary = {
       }
       if (DrawBrowser.input) DrawBrowser.closeInput(DrawBrowser.input.id, false);
       var element = document.createElement(field.Multiline ? 'textarea' : 'input');
-      var entry = {id:id, element:element, limit:field.Limit, flags:0, composing:false, ending:false};
+      var entry = {id:id, element:element, limit:field.Limit, flags:0, composing:false, ending:false,
+        submitAfterComposition:false, enterDown:false, imeKeyDown:false, compositionTimer:0};
       delete DrawBrowser.closedInputs[id];
       DrawBrowser.input = entry;
       element.id = 'drawliar-text-input';
@@ -111,23 +122,58 @@ var DrawLiarBrowserLibrary = {
       element.addEventListener('input', function() {
         if (!entry.composing) element.value = DrawBrowser.inputValue(element.value, field.Limit);
         entry.flags |= 64;
+        if (entry.submitAfterComposition && !entry.composing) DrawBrowser.settleInput(entry);
       });
-      element.addEventListener('compositionstart', function() { entry.composing = true; });
+      element.addEventListener('compositionstart', function() {
+        if (entry.compositionTimer) clearTimeout(entry.compositionTimer);
+        entry.compositionTimer = 0; entry.composing = true; entry.ending = false; entry.submitAfterComposition = false;
+      });
       element.addEventListener('compositionend', function() {
         entry.composing = false; entry.ending = true; entry.flags |= 64;
         element.value = DrawBrowser.inputValue(element.value, field.Limit);
-        setTimeout(function() { entry.ending = false; }, 0);
+        DrawBrowser.settleInput(entry);
       });
       element.addEventListener('keydown', function(event) {
         event.stopPropagation();
-        if (event.isComposing || entry.composing || entry.ending || event.keyCode === 229) return;
-        if (event.key === 'Enter' && !field.Multiline) { event.preventDefault(); if (!event.repeat) entry.flags |= 1; }
-        else if (event.key === 'Escape') { event.preventDefault(); entry.flags |= 2; }
+        var composing = event.isComposing || entry.composing || entry.ending || event.keyCode === 229;
+        var enter = event.key === 'Enter' || event.code === 'Enter' || event.code === 'NumpadEnter' || event.keyCode === 13;
+        entry.imeKeyDown = !enter && composing && event.key === 'Process';
+        if (event.key === 'Escape') { entry.submitAfterComposition = false; entry.imeKeyDown = false; }
+        if (enter && !field.Multiline) {
+          if (!composing) event.preventDefault();
+          if (event.repeat || entry.enterDown) return;
+          entry.enterDown = true;
+          if (composing) {
+            // IME가 마지막 글자를 확정하도록 기본 동작을 허용하고 채팅 전송을 예약한다.
+            if (field.SubmitOnCompositionEnd) {
+              entry.submitAfterComposition = true;
+              if (!entry.composing) DrawBrowser.settleInput(entry);
+            }
+          } else entry.flags |= 1;
+          return;
+        }
+        if (composing) return;
+        if (event.key === 'Escape') { event.preventDefault(); entry.flags |= 2; }
         else if (event.key === 'Tab') { event.preventDefault(); entry.flags |= 8 | (event.shiftKey ? 16 : 0); }
       });
-      element.addEventListener('keyup', function(event) { event.stopPropagation(); });
+      element.addEventListener('keyup', function(event) {
+        event.stopPropagation();
+        var enter = event.key === 'Enter' || event.code === 'Enter' || event.code === 'NumpadEnter' || event.keyCode === 13;
+        if (enter) {
+          // 일부 IME는 keydown에서 물리 키를 숨기므로 Enter keyup으로만 전송 의도를 복원한다.
+          if (entry.imeKeyDown && !entry.enterDown && field.SubmitOnCompositionEnd && !field.Multiline) {
+            entry.submitAfterComposition = true;
+          }
+          entry.enterDown = false;
+          if (entry.submitAfterComposition && !entry.composing) DrawBrowser.settleInput(entry);
+        }
+        entry.imeKeyDown = false;
+      });
       element.addEventListener('keypress', function(event) { event.stopPropagation(); });
-      element.addEventListener('blur', function() { if (DrawBrowser.input === entry && !entry.reparenting) entry.flags |= 4; });
+      element.addEventListener('blur', function() {
+        if (DrawBrowser.input !== entry || entry.reparenting) return;
+        entry.submitAfterComposition = false; entry.enterDown = false; entry.imeKeyDown = false; entry.flags |= 4;
+      });
       DrawBrowser.overlayParent(element);
       DrawBrowser.layoutInput(entry);
       element.focus({preventScroll:true});
@@ -217,6 +263,27 @@ var DrawLiarBrowserLibrary = {
 
   DrawBrowserIsMobile: function() {
     return window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 720 ? 1 : 0;
+  },
+
+  DrawBrowserRoomPageUrl: function() {
+    try { return DrawBrowser.string(new URL('/games/liar-canvas', location.origin).href); }
+    catch (_) { return 0; }
+  },
+
+  DrawBrowserRoomInvite: function() {
+    try {
+      var address = new URL(location.href);
+      return DrawBrowser.string(address.searchParams.has('room') && address.href.length <= 2048 ? address.href : '');
+    } catch (_) { return 0; }
+  },
+
+  DrawBrowserRoomInviteClear: function() {
+    try {
+      var address = new URL(location.href);
+      if (!address.searchParams.has('room')) return;
+      address.searchParams.delete('room');
+      history.replaceState(history.state, '', address.pathname + address.search + address.hash);
+    } catch (_) { }
   },
 
   DrawBrowserInputConfigure: function(pointer) {

@@ -783,8 +783,8 @@ MonoBehaviour:
       Description: "\uAD00\uC804 {0}\uBA85"
       Languages:
       - "\uAD00\uC804 {0}\uBA85"
-      - '{0} spectators'
-      - "\u89C2\u6218 {0}\u4EBA"
+      - 'Spectators: {0}'
+      - "\u89C2\u6218 {0} \u4EBA"
       - "\u89C0\u6230 {0} \u4EBA"
       - "\u89B3\u6226 {0}\u4EBA"
       - 'Espectadores: {0}'
@@ -1269,27 +1269,6 @@ MonoBehaviour:
       - Lanjut
       - "\u0906\u0917\u0947"
       - "\u0627\u0644\u062A\u0627\u0644\u064A"
-      Flags: 000000000000000000000000
-      Languages_Touch: []
-    - Term: UI/64uo7JyEOiDstIggwrcg67CY66GgIDDstIjripQg6rG064SI65uw6riw
-      TermType: 0
-      Description: "\uB2E8\uC704: \uCD08 \xB7 \uBC18\uB860 0\uCD08\uB294 \uAC74\uB108\uB6F0\uAE30"
-      Languages:
-      - "\uB2E8\uC704: \uCD08 \xB7 \uBC18\uB860 0\uCD08\uB294 \uAC74\uB108\uB6F0\uAE30"
-      - "Seconds \xB7 Skip objections when set to 0"
-      - "\u5355\u4F4D\uFF1A\u79D2 \xB7 \u5F02\u8BAE\u8BBE\u4E3A0\u5219\u8DF3\u8FC7"
-      - "\u55AE\u4F4D\uFF1A\u79D2 \xB7 \u7570\u8B70\u8A2D\u70BA 0 \u5247\u7565\u904E"
-      - "\u5358\u4F4D\uFF1A\u79D2 \xB7 \u53CD\u8AD6\u304C0\u79D2\u306A\u3089\u30B9\u30AD\u30C3\u30D7"
-      - "En segundos \xB7 0 s de defensa para omitir"
-      - "Em segundos \xB7 0 s de defesa para pular"
-      - "En secondes \xB7 0 s de d\xE9fense pour passer"
-      - "In Sekunden \xB7 Verteidigung mit 0 s \xFCberspringen"
-      - "Dalam detik \xB7 Pembelaan 0 dtk untuk dilewati"
-      - "\u0938\u0947\u0915\u0902\u0921 \u092E\u0947\u0902 \xB7 \u0938\u092B\u093C\u093E\u0908
-        \u0915\u0947 \u0932\u093F\u090F 0 \u0938\u0947\u0915\u0902\u0921 \u091A\u0941\u0928\u0928\u0947
-        \u092A\u0930 \u092F\u0939 \u091A\u0930\u0923 \u091B\u0942\u091F\u0947\u0917\u093E"
-      - "\u0628\u0627\u0644\u062B\u0648\u0627\u0646\u064A \xB7 0 \u062B\u0627\u0646\u064A\u0629
-        \u0644\u0644\u062F\u0641\u0627\u0639 \u0644\u062A\u062E\u0637\u064A\u0647"
       Flags: 000000000000000000000000
       Languages_Touch: []
     - Term: UI/64ur6riw
@@ -5030,24 +5009,6 @@ MonoBehaviour:
       - "\u0642\u0628\u0639\u0629 \u0627\u0644\u0631\u0633\u0651\u0627\u0645"
       Flags: 000000000000000000000000
       Languages_Touch: []
-    - Term: UI/7ZmU66m0IOybgOyngeyehCDspITsnbTquLA
-      TermType: 0
-      Description: "\uD654\uBA74 \uC6C0\uC9C1\uC784 \uC904\uC774\uAE30"
-      Languages:
-      - "\uD654\uBA74 \uC6C0\uC9C1\uC784 \uC904\uC774\uAE30"
-      - Reduce motion
-      - "\u51CF\u5C11\u5C4F\u5E55\u52A8\u6001\u6548\u679C"
-      - "\u6E1B\u5C11\u756B\u9762\u52D5\u614B\u6548\u679C"
-      - "\u753B\u9762\u306E\u52D5\u304D\u3092\u6E1B\u3089\u3059"
-      - Reducir movimiento
-      - Reduzir movimento
-      - "R\xE9duire les animations"
-      - Bewegung reduzieren
-      - Kurangi gerakan
-      - "\u0910\u0928\u093F\u092E\u0947\u0936\u0928 \u0915\u092E \u0915\u0930\u0947\u0902"
-      - "\u062A\u0642\u0644\u064A\u0644 \u0627\u0644\u062D\u0631\u0643\u0629"
-      Flags: 000000000000000000000000
-      Languages_Touch: []
     - Term: UI/7ZmV7J24
       TermType: 0
       Description: "\uD655\uC778"
@@ -6519,6 +6480,1172 @@ MonoBehaviour:
       - Menunggu persetujuan
       - "\u0938\u094D\u0935\u0940\u0915\u0943\u0924\u093F \u0915\u0940 \u092A\u094D\u0930\u0924\u0940\u0915\u094D\u0937\u093E"
       - "\u0628\u0627\u0646\u062A\u0638\u0627\u0631 \u0627\u0644\u0642\u0628\u0648\u0644"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/67Cp7J6l
+      TermType: 0
+      Description: "\uBC29\uC7A5"
+      Languages:
+      - "\uBC29\uC7A5"
+      - Host
+      - "\u623F\u4E3B"
+      - "\u623F\u4E3B"
+      - "\u30DB\u30B9\u30C8"
+      - "Anfitri\xF3n"
+      - "Anfitri\xE3o"
+      - "H\xF4te"
+      - Gastgeber
+      - Pemilik ruang
+      - "\u092E\u0947\u091C\u093C\u092C\u093E\u0928"
+      - "\u0627\u0644\u0645\u0636\u064A\u0641"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7KeA66qp7ZWY6riw
+      TermType: 0
+      Description: "\uC9C0\uBAA9\uD558\uAE30"
+      Languages:
+      - "\uC9C0\uBAA9\uD558\uAE30"
+      - Nominate
+      - "\u63D0\u540D"
+      - "\u63D0\u540D"
+      - "\u6307\u540D\u3059\u308B"
+      - Nominar
+      - Indicar
+      - "D\xE9signer"
+      - Nominieren
+      - Tunjuk
+      - "\u0928\u093E\u092E\u093F\u0924 \u0915\u0930\u0947\u0902"
+      - "\u062A\u0631\u0634\u064A\u062D"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7KeA66qpIOyZhOujjA
+      TermType: 0
+      Description: "\uC9C0\uBAA9 \uC644\uB8CC"
+      Languages:
+      - "\uC9C0\uBAA9 \uC644\uB8CC"
+      - Nomination submitted
+      - "\u5DF2\u63D0\u540D"
+      - "\u5DF2\u63D0\u540D"
+      - "\u6307\u540D\u6E08\u307F"
+      - "Nominaci\xF3n enviada"
+      - "Indica\xE7\xE3o enviada"
+      - "D\xE9signation envoy\xE9e"
+      - Nominierung abgegeben
+      - Sudah menunjuk
+      - "\u0928\u093E\u092E\u093E\u0902\u0915\u0928 \u092D\u0947\u091C\u093E \u0917\u092F\u093E"
+      - "\u062A\u0645 \u0627\u0644\u062A\u0631\u0634\u064A\u062D"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7KeA66qp7ZWgIO2UjOugiOydtOyWtOulvCDshKDtg53tlZjshLjsmpQ
+      TermType: 0
+      Description: "\uC9C0\uBAA9\uD560 \uD50C\uB808\uC774\uC5B4\uB97C \uC120\uD0DD\uD558\uC138\uC694"
+      Languages:
+      - "\uC9C0\uBAA9\uD560 \uD50C\uB808\uC774\uC5B4\uB97C \uC120\uD0DD\uD558\uC138\uC694"
+      - Choose a player to nominate
+      - "\u9009\u62E9\u8981\u63D0\u540D\u7684\u73A9\u5BB6"
+      - "\u9078\u64C7\u8981\u63D0\u540D\u7684\u73A9\u5BB6"
+      - "\u6307\u540D\u3059\u308B\u30D7\u30EC\u30A4\u30E4\u30FC\u3092\u9078\u3093\u3067\u304F\u3060\u3055\u3044"
+      - Elige a un jugador para nominar
+      - Escolha um jogador para indicar
+      - "Choisissez un joueur \xE0 d\xE9signer"
+      - "W\xE4hle einen Spieler zur Nominierung"
+      - Pilih pemain untuk ditunjuk
+      - "\u0928\u093E\u092E\u093F\u0924 \u0915\u0930\u0928\u0947 \u0915\u0947 \u0932\u093F\u090F
+        \u0916\u093F\u0932\u093E\u0921\u093C\u0940 \u091A\u0941\u0928\u0947\u0902"
+      - "\u0627\u062E\u062A\u0631 \u0644\u0627\u0639\u0628\u064B\u0627 \u0644\u062A\u0631\u0634\u064A\u062D\u0647"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7KeA66qpIHswfS97MX0
+      TermType: 0
+      Description: "\uC9C0\uBAA9 {0}/{1}"
+      Languages:
+      - "\uC9C0\uBAA9 {0}/{1}"
+      - Nominations {0}/{1}
+      - "\u63D0\u540D {0}/{1}"
+      - "\u63D0\u540D {0}/{1}"
+      - "\u6307\u540D {0}/{1}"
+      - Nominaciones {0}/{1}
+      - "Indica\xE7\xF5es {0}/{1}"
+      - "D\xE9signations {0}/{1}"
+      - Nominierungen {0}/{1}
+      - Penunjukan {0}/{1}
+      - "\u0928\u093E\u092E\u093E\u0902\u0915\u0928 {0}/{1}"
+      - "\u0627\u0644\u062A\u0631\u0634\u064A\u062D\u0627\u062A {0}/{1}"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7KeA66qp65CcIO2UjOugiOydtOyWtA
+      TermType: 0
+      Description: "\uC9C0\uBAA9\uB41C \uD50C\uB808\uC774\uC5B4"
+      Languages:
+      - "\uC9C0\uBAA9\uB41C \uD50C\uB808\uC774\uC5B4"
+      - Nominated player
+      - "\u88AB\u63D0\u540D\u7684\u73A9\u5BB6"
+      - "\u88AB\u63D0\u540D\u7684\u73A9\u5BB6"
+      - "\u6307\u540D\u3055\u308C\u305F\u30D7\u30EC\u30A4\u30E4\u30FC"
+      - Jugador nominado
+      - Jogador indicado
+      - "Joueur d\xE9sign\xE9"
+      - Nominierter Spieler
+      - Pemain yang ditunjuk
+      - "\u0928\u093E\u092E\u093F\u0924 \u0916\u093F\u0932\u093E\u0921\u093C\u0940"
+      - "\u0627\u0644\u0644\u0627\u0639\u0628 \u0627\u0644\u0645\u0631\u0634\u062D"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7LCs7ISx
+      TermType: 0
+      Description: "\uCC2C\uC131"
+      Languages:
+      - "\uCC2C\uC131"
+      - Agree
+      - "\u8D5E\u6210"
+      - "\u8D0A\u6210"
+      - "\u8CDB\u6210"
+      - A favor
+      - A favor
+      - Pour
+      - "Daf\xFCr"
+      - Setuju
+      - "\u0938\u0939\u092E\u0924\u093F"
+      - "\u0645\u0648\u0627\u0641\u0642"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/67CY64yA
+      TermType: 0
+      Description: "\uBC18\uB300"
+      Languages:
+      - "\uBC18\uB300"
+      - Disagree
+      - "\u53CD\u5BF9"
+      - "\u53CD\u5C0D"
+      - "\u53CD\u5BFE"
+      - En contra
+      - Contra
+      - Contre
+      - Dagegen
+      - Tidak setuju
+      - "\u0905\u0938\u0939\u092E\u0924\u093F"
+      - "\u0645\u0639\u0627\u0631\u0636"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7LCs7ISxIHswfSDCtyDrsJjrjIAgezF9
+      TermType: 0
+      Description: "\uCC2C\uC131 {0} \xB7 \uBC18\uB300 {1}"
+      Languages:
+      - "\uCC2C\uC131 {0} \xB7 \uBC18\uB300 {1}"
+      - "Agree {0} \xB7 Disagree {1}"
+      - "\u8D5E\u6210 {0} \xB7 \u53CD\u5BF9 {1}"
+      - "\u8D0A\u6210 {0} \xB7 \u53CD\u5C0D {1}"
+      - "\u8CDB\u6210 {0} \xB7 \u53CD\u5BFE {1}"
+      - "A favor {0} \xB7 En contra {1}"
+      - "A favor {0} \xB7 Contra {1}"
+      - "Pour {0} \xB7 Contre {1}"
+      - "Daf\xFCr {0} \xB7 Dagegen {1}"
+      - "Setuju {0} \xB7 Tidak setuju {1}"
+      - "\u0938\u0939\u092E\u0924 {0} \xB7 \u0905\u0938\u0939\u092E\u0924 {1}"
+      - "\u0645\u0648\u0627\u0641\u0642 {0} \xB7 \u0645\u0639\u0627\u0631\u0636 {1}"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7LCs67CYIO2IrO2RnCB7MH0vezF9
+      TermType: 0
+      Description: "\uCC2C\uBC18 \uD22C\uD45C {0}/{1}"
+      Languages:
+      - "\uCC2C\uBC18 \uD22C\uD45C {0}/{1}"
+      - Verdict votes {0}/{1}
+      - "\u8D5E\u6210\u6216\u53CD\u5BF9 {0}/{1}"
+      - "\u8D0A\u6210\u6216\u53CD\u5C0D {0}/{1}"
+      - "\u8CDB\u5426\u6295\u7968 {0}/{1}"
+      - Votos de veredicto {0}/{1}
+      - Votos de veredito {0}/{1}
+      - "Votes de d\xE9cision {0}/{1}"
+      - Entscheidungsstimmen {0}/{1}
+      - Suara keputusan {0}/{1}
+      - "\u0928\u093F\u0930\u094D\u0923\u092F \u092E\u0924 {0}/{1}"
+      - "\u0623\u0635\u0648\u0627\u062A \u0627\u0644\u0642\u0631\u0627\u0631 {0}/{1}"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7LCs7ISxIOygnOy2nCDsmYTro4w
+      TermType: 0
+      Description: "\uCC2C\uC131 \uC81C\uCD9C \uC644\uB8CC"
+      Languages:
+      - "\uCC2C\uC131 \uC81C\uCD9C \uC644\uB8CC"
+      - Agreement submitted
+      - "\u5DF2\u6295\u8D5E\u6210\u7968"
+      - "\u5DF2\u6295\u8D0A\u6210\u7968"
+      - "\u8CDB\u6210\u7968\u3092\u9001\u4FE1\u6E08\u307F"
+      - Voto a favor enviado
+      - Voto a favor enviado
+      - "Vote pour envoy\xE9"
+      - "Stimme daf\xFCr abgegeben"
+      - Suara setuju terkirim
+      - "\u0938\u0939\u092E\u0924\u093F \u092E\u0924 \u092D\u0947\u091C\u093E \u0917\u092F\u093E"
+      - "\u062A\u0645 \u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0645\u0648\u0627\u0641\u0642\u0629"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/67CY64yAIOygnOy2nCDsmYTro4w
+      TermType: 0
+      Description: "\uBC18\uB300 \uC81C\uCD9C \uC644\uB8CC"
+      Languages:
+      - "\uBC18\uB300 \uC81C\uCD9C \uC644\uB8CC"
+      - Disagreement submitted
+      - "\u5DF2\u6295\u53CD\u5BF9\u7968"
+      - "\u5DF2\u6295\u53CD\u5C0D\u7968"
+      - "\u53CD\u5BFE\u7968\u3092\u9001\u4FE1\u6E08\u307F"
+      - Voto en contra enviado
+      - Voto contra enviado
+      - "Vote contre envoy\xE9"
+      - Stimme dagegen abgegeben
+      - Suara tidak setuju terkirim
+      - "\u0905\u0938\u0939\u092E\u0924\u093F \u092E\u0924 \u092D\u0947\u091C\u093E
+        \u0917\u092F\u093E"
+      - "\u062A\u0645 \u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0645\u0639\u0627\u0631\u0636\u0629"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/67CY66GgIOykkQ
+      TermType: 0
+      Description: "\uBC18\uB860 \uC911"
+      Languages:
+      - "\uBC18\uB860 \uC911"
+      - Defending
+      - "\u6B63\u5728\u8FA9\u89E3"
+      - "\u6B63\u5728\u8FAF\u89E3"
+      - "\u53CD\u8AD6\u4E2D"
+      - "Defendi\xE9ndose"
+      - Defendendo-se
+      - "Se d\xE9fend"
+      - Verteidigt sich
+      - Sedang membela diri
+      - "\u0938\u092B\u093C\u093E\u0908 \u0926\u0947 \u0930\u0939\u0947 \u0939\u0948\u0902"
+      - "\u064A\u062F\u0627\u0641\u0639 \u0639\u0646 \u0646\u0641\u0633\u0647"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/67CY66GgIMK3IOywrOuwmA
+      TermType: 0
+      Description: "\uBC18\uB860 \xB7 \uCC2C\uBC18"
+      Languages:
+      - "\uBC18\uB860 \xB7 \uCC2C\uBC18"
+      - "Defense \xB7 Verdict"
+      - "\u8FA9\u89E3 \xB7 \u8868\u51B3"
+      - "\u8FAF\u89E3 \xB7 \u8868\u6C7A"
+      - "\u53CD\u8AD6\u30FB\u8CDB\u5426"
+      - "Defensa \xB7 Veredicto"
+      - "Defesa \xB7 Veredito"
+      - "D\xE9fense \xB7 D\xE9cision"
+      - "Verteidigung \xB7 Entscheidung"
+      - "Pembelaan \xB7 Keputusan"
+      - "\u0938\u092B\u093C\u093E\u0908 \xB7 \u0928\u093F\u0930\u094D\u0923\u092F"
+      - "\u0627\u0644\u062F\u0641\u0627\u0639 \xB7 \u0627\u0644\u0642\u0631\u0627\u0631"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/64uo7JyEOiDstIg
+      TermType: 0
+      Description: "\uB2E8\uC704: \uCD08"
+      Languages:
+      - "\uB2E8\uC704: \uCD08"
+      - 'Unit: seconds'
+      - "\u5355\u4F4D\uFF1A\u79D2"
+      - "\u55AE\u4F4D\uFF1A\u79D2"
+      - "\u5358\u4F4D\uFF1A\u79D2"
+      - 'Unidad: segundos'
+      - 'Unidade: segundos'
+      - "Unit\xE9 : secondes"
+      - 'Einheit: Sekunden'
+      - 'Satuan: detik'
+      - "\u0907\u0915\u093E\u0908: \u0938\u0947\u0915\u0902\u0921"
+      - "\u0627\u0644\u0648\u062D\u062F\u0629: \u062B\u0648\u0627\u0646\u064D"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7KeA66qp7J20IOu2gOqysOuQmOyXiOyWtOyalC4g7Yag66Gg6rO8IOyngOuqqSDtiKztkZzrpbwg64uk7IucIOynhO2Wie2VtCDso7zshLjsmpQu
+      TermType: 0
+      Description: "\uC9C0\uBAA9\uC774 \uBD80\uACB0\uB418\uC5C8\uC5B4\uC694. \uD1A0\uB860\uACFC
+        \uC9C0\uBAA9 \uD22C\uD45C\uB97C \uB2E4\uC2DC \uC9C4\uD589\uD574 \uC8FC\uC138\uC694."
+      Languages:
+      - "\uC9C0\uBAA9\uC774 \uBD80\uACB0\uB418\uC5C8\uC5B4\uC694. \uD1A0\uB860\uACFC
+        \uC9C0\uBAA9 \uD22C\uD45C\uB97C \uB2E4\uC2DC \uC9C4\uD589\uD574 \uC8FC\uC138\uC694."
+      - The accusation was rejected. Resume the discussion and nominations.
+      - "\u6307\u63A7\u88AB\u5426\u51B3\u3002\u8BF7\u91CD\u65B0\u8BA8\u8BBA\u5E76\u63D0\u540D\u3002"
+      - "\u6307\u63A7\u88AB\u5426\u6C7A\u3002\u8ACB\u91CD\u65B0\u8A0E\u8AD6\u4E26\u63D0\u540D\u3002"
+      - "\u6307\u540D\u304C\u5426\u6C7A\u3055\u308C\u307E\u3057\u305F\u3002\u3082\u3046\u4E00\u5EA6\u8A71\u3057\u5408\u3063\u3066\u6307\u540D\u6295\u7968\u3092\u3057\u3066\u304F\u3060\u3055\u3044\u3002"
+      - "La acusaci\xF3n fue rechazada. Contin\xFAen el debate y las nominaciones."
+      - "A acusa\xE7\xE3o foi rejeitada. Retomem a discuss\xE3o e as indica\xE7\xF5es."
+      - "La d\xE9signation a \xE9t\xE9 rejet\xE9e. Reprenez la discussion et les
+        d\xE9signations."
+      - Die Nominierung wurde abgelehnt. Diskutiert und nominiert erneut.
+      - Penunjukan ditolak. Lanjutkan diskusi dan penunjukan.
+      - "\u0928\u093E\u092E\u093E\u0902\u0915\u0928 \u0905\u0938\u094D\u0935\u0940\u0915\u093E\u0930
+        \u0939\u094B \u0917\u092F\u093E\u0964 \u091A\u0930\u094D\u091A\u093E \u0914\u0930
+        \u0928\u093E\u092E\u093E\u0902\u0915\u0928 \u092B\u093F\u0930 \u0938\u0947
+        \u0936\u0941\u0930\u0942 \u0915\u0930\u0947\u0902\u0964"
+      - "\u0631\u064F\u0641\u0636 \u0627\u0644\u062A\u0631\u0634\u064A\u062D. \u0627\u0633\u062A\u0623\u0646\u0641\u0648\u0627
+        \u0627\u0644\u0646\u0642\u0627\u0634 \u0648\u0627\u0644\u062A\u0631\u0634\u064A\u062D\u0627\u062A."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7KeA66qp65CcIOy5nOq1rOydmCDsl7DqsrDsnbQg64GK6rKoIO2GoOuhoOqzvCDsp4Drqqkg7Yis7ZGc66W8IOuLpOyLnCDsi5zsnpHtlbTsmpQu
+      TermType: 0
+      Description: "\uC9C0\uBAA9\uB41C \uCE5C\uAD6C\uC758 \uC5F0\uACB0\uC774 \uB04A\uACA8
+        \uD1A0\uB860\uACFC \uC9C0\uBAA9 \uD22C\uD45C\uB97C \uB2E4\uC2DC \uC2DC\uC791\uD574\uC694."
+      Languages:
+      - "\uC9C0\uBAA9\uB41C \uCE5C\uAD6C\uC758 \uC5F0\uACB0\uC774 \uB04A\uACA8 \uD1A0\uB860\uACFC
+        \uC9C0\uBAA9 \uD22C\uD45C\uB97C \uB2E4\uC2DC \uC2DC\uC791\uD574\uC694."
+      - The nominee disconnected. Restarting discussion and nominations.
+      - "\u88AB\u63D0\u540D\u7684\u73A9\u5BB6\u5DF2\u65AD\u7EBF\u3002\u91CD\u65B0\u5F00\u59CB\u8BA8\u8BBA\u548C\u63D0\u540D\u3002"
+      - "\u88AB\u63D0\u540D\u7684\u73A9\u5BB6\u5DF2\u65B7\u7DDA\u3002\u91CD\u65B0\u958B\u59CB\u8A0E\u8AD6\u548C\u63D0\u540D\u3002"
+      - "\u6307\u540D\u3055\u308C\u305F\u30D7\u30EC\u30A4\u30E4\u30FC\u304C\u5207\u65AD\u3057\u305F\u305F\u3081\u3001\u8A71\u3057\u5408\u3044\u3068\u6307\u540D\u6295\u7968\u3092\u518D\u958B\u3057\u307E\u3059\u3002"
+      - "El jugador nominado se desconect\xF3. Se reinician el debate y las nominaciones."
+      - "O jogador indicado se desconectou. Reiniciando a discuss\xE3o e as indica\xE7\xF5es."
+      - "Le joueur d\xE9sign\xE9 est d\xE9connect\xE9. La discussion et les d\xE9signations
+        reprennent."
+      - Der nominierte Spieler ist getrennt. Diskussion und Nominierungen starten
+        neu.
+      - Pemain yang ditunjuk terputus. Diskusi dan penunjukan dimulai kembali.
+      - "\u0928\u093E\u092E\u093F\u0924 \u0916\u093F\u0932\u093E\u0921\u093C\u0940
+        \u0915\u093E \u0938\u0902\u092A\u0930\u094D\u0915 \u091F\u0942\u091F \u0917\u092F\u093E\u0964
+        \u091A\u0930\u094D\u091A\u093E \u0914\u0930 \u0928\u093E\u092E\u093E\u0902\u0915\u0928
+        \u092B\u093F\u0930 \u0936\u0941\u0930\u0942 \u0939\u094B \u0930\u0939\u0947
+        \u0939\u0948\u0902\u0964"
+      - "\u0627\u0646\u0642\u0637\u0639 \u0627\u062A\u0635\u0627\u0644 \u0627\u0644\u0644\u0627\u0639\u0628
+        \u0627\u0644\u0645\u0631\u0634\u062D. \u064A\u064F\u0633\u062A\u0623\u0646\u0641
+        \u0627\u0644\u0646\u0642\u0627\u0634 \u0648\u0627\u0644\u062A\u0631\u0634\u064A\u062D."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/67CpIOyjvOyGjCDrs7Xsgqw
+      TermType: 0
+      Description: "\uBC29 \uC8FC\uC18C \uBCF5\uC0AC"
+      Languages:
+      - "\uBC29 \uC8FC\uC18C \uBCF5\uC0AC"
+      - Copy room link
+      - "\u590D\u5236\u623F\u95F4\u94FE\u63A5"
+      - "\u8907\u88FD\u623F\u9593\u9023\u7D50"
+      - "\u90E8\u5C4B\u30EA\u30F3\u30AF\u3092\u30B3\u30D4\u30FC"
+      - Copiar enlace de sala
+      - Copiar link da sala
+      - Copier le lien de la salle
+      - Raumlink kopieren
+      - Salin tautan ruang
+      - "\u0915\u092E\u0930\u0947 \u0915\u093E \u0932\u093F\u0902\u0915 \u0915\u0949\u092A\u0940
+        \u0915\u0930\u0947\u0902"
+      - "\u0646\u0633\u062E \u0631\u0627\u0628\u0637 \u0627\u0644\u063A\u0631\u0641\u0629"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/67CpIOyjvOyGjOulvCDrs7XsgqztlojsirXri4jri6Qu
+      TermType: 0
+      Description: "\uBC29 \uC8FC\uC18C\uB97C \uBCF5\uC0AC\uD588\uC2B5\uB2C8\uB2E4."
+      Languages:
+      - "\uBC29 \uC8FC\uC18C\uB97C \uBCF5\uC0AC\uD588\uC2B5\uB2C8\uB2E4."
+      - Room link copied.
+      - "\u5DF2\u590D\u5236\u623F\u95F4\u94FE\u63A5\u3002"
+      - "\u5DF2\u8907\u88FD\u623F\u9593\u9023\u7D50\u3002"
+      - "\u90E8\u5C4B\u30EA\u30F3\u30AF\u3092\u30B3\u30D4\u30FC\u3057\u307E\u3057\u305F\u3002"
+      - Enlace de sala copiado.
+      - Link da sala copiado.
+      - "Lien de la salle copi\xE9."
+      - Raumlink kopiert.
+      - Tautan ruang disalin.
+      - "\u0915\u092E\u0930\u0947 \u0915\u093E \u0932\u093F\u0902\u0915 \u0915\u0949\u092A\u0940
+        \u0939\u094B \u0917\u092F\u093E\u0964"
+      - "\u062A\u0645 \u0646\u0633\u062E \u0631\u0627\u0628\u0637 \u0627\u0644\u063A\u0631\u0641\u0629."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/67CpIOy9lOuTnCDrmJDripQg7KO87IaM
+      TermType: 0
+      Description: "\uBC29 \uCF54\uB4DC \uB610\uB294 \uC8FC\uC18C"
+      Languages:
+      - "\uBC29 \uCF54\uB4DC \uB610\uB294 \uC8FC\uC18C"
+      - Room code or link
+      - "\u623F\u95F4\u4EE3\u7801\u6216\u94FE\u63A5"
+      - "\u623F\u9593\u4EE3\u78BC\u6216\u9023\u7D50"
+      - "\u90E8\u5C4B\u30B3\u30FC\u30C9\u307E\u305F\u306F\u30EA\u30F3\u30AF"
+      - "C\xF3digo o enlace de sala"
+      - "C\xF3digo ou link da sala"
+      - Code ou lien de la salle
+      - Raumcode oder Link
+      - Kode atau tautan ruang
+      - "\u0915\u092E\u0930\u0947 \u0915\u093E \u0915\u094B\u0921 \u092F\u093E \u0932\u093F\u0902\u0915"
+      - "\u0631\u0645\u0632 \u0627\u0644\u063A\u0631\u0641\u0629 \u0623\u0648 \u0631\u0627\u0628\u0637\u0647\u0627"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/67CpIOy9lOuTnCDrmJDripQg7KO87IaM66W8IO2ZleyduO2VmOyEuOyalC4
+      TermType: 0
+      Description: "\uBC29 \uCF54\uB4DC \uB610\uB294 \uC8FC\uC18C\uB97C \uD655\uC778\uD558\uC138\uC694."
+      Languages:
+      - "\uBC29 \uCF54\uB4DC \uB610\uB294 \uC8FC\uC18C\uB97C \uD655\uC778\uD558\uC138\uC694."
+      - Check the room code or link.
+      - "\u8BF7\u68C0\u67E5\u623F\u95F4\u4EE3\u7801\u6216\u94FE\u63A5\u3002"
+      - "\u8ACB\u6AA2\u67E5\u623F\u9593\u4EE3\u78BC\u6216\u9023\u7D50\u3002"
+      - "\u90E8\u5C4B\u30B3\u30FC\u30C9\u307E\u305F\u306F\u30EA\u30F3\u30AF\u3092\u78BA\u8A8D\u3057\u3066\u304F\u3060\u3055\u3044\u3002"
+      - "Revisa el c\xF3digo o enlace de sala."
+      - "Confira o c\xF3digo ou link da sala."
+      - "V\xE9rifiez le code ou le lien de la salle."
+      - "Pr\xFCfe den Raumcode oder Link."
+      - Periksa kode atau tautan ruang.
+      - "\u0915\u092E\u0930\u0947 \u0915\u093E \u0915\u094B\u0921 \u092F\u093E \u0932\u093F\u0902\u0915
+        \u091C\u093E\u0901\u091A\u0947\u0902\u0964"
+      - "\u062A\u062D\u0642\u0642 \u0645\u0646 \u0631\u0645\u0632 \u0627\u0644\u063A\u0631\u0641\u0629
+        \u0623\u0648 \u0631\u0627\u0628\u0637\u0647\u0627."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7JWM66a8
+      TermType: 0
+      Description: "\uC54C\uB9BC"
+      Languages:
+      - "\uC54C\uB9BC"
+      - Notifications
+      - "\u901A\u77E5"
+      - "\u901A\u77E5"
+      - "\u901A\u77E5"
+      - Notificaciones
+      - "Notifica\xE7\xF5es"
+      - Notifications
+      - Benachrichtigungen
+      - Notifikasi
+      - "\u0938\u0942\u091A\u0928\u093E\u090F\u0901"
+      - "\u0627\u0644\u0625\u0634\u0639\u0627\u0631\u0627\u062A"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7JWM66a87J20IOyXhuyKteuLiOuLpC4
+      TermType: 0
+      Description: "\uC54C\uB9BC\uC774 \uC5C6\uC2B5\uB2C8\uB2E4."
+      Languages:
+      - "\uC54C\uB9BC\uC774 \uC5C6\uC2B5\uB2C8\uB2E4."
+      - No notifications.
+      - "\u6682\u65E0\u901A\u77E5\u3002"
+      - "\u66AB\u7121\u901A\u77E5\u3002"
+      - "\u901A\u77E5\u306F\u3042\u308A\u307E\u305B\u3093\u3002"
+      - No hay notificaciones.
+      - "Nenhuma notifica\xE7\xE3o."
+      - Aucune notification.
+      - Keine Benachrichtigungen.
+      - Tidak ada notifikasi.
+      - "\u0915\u094B\u0908 \u0938\u0942\u091A\u0928\u093E \u0928\u0939\u0940\u0902
+        \u0939\u0948\u0964"
+      - "\u0644\u0627 \u062A\u0648\u062C\u062F \u0625\u0634\u0639\u0627\u0631\u0627\u062A."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/67CpIOy0iOuMgA
+      TermType: 0
+      Description: "\uBC29 \uCD08\uB300"
+      Languages:
+      - "\uBC29 \uCD08\uB300"
+      - Room invitations
+      - "\u623F\u95F4\u9080\u8BF7"
+      - "\u623F\u9593\u9080\u8ACB"
+      - "\u90E8\u5C4B\u306E\u62DB\u5F85"
+      - Invitaciones a salas
+      - Convites para salas
+      - "Invitations \xE0 une salle"
+      - Raumeinladungen
+      - Undangan ruang
+      - "\u0915\u092E\u0930\u0947 \u0915\u0947 \u0928\u093F\u092E\u0902\u0924\u094D\u0930\u0923"
+      - "\u062F\u0639\u0648\u0627\u062A \u0627\u0644\u063A\u0631\u0641"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7Lmc6rWsIOy0iOuMgA
+      TermType: 0
+      Description: "\uCE5C\uAD6C \uCD08\uB300"
+      Languages:
+      - "\uCE5C\uAD6C \uCD08\uB300"
+      - Invite friends
+      - "\u9080\u8BF7\u597D\u53CB"
+      - "\u9080\u8ACB\u597D\u53CB"
+      - "\u30D5\u30EC\u30F3\u30C9\u3092\u62DB\u5F85"
+      - Invitar amigos
+      - Convidar amigos
+      - Inviter des amis
+      - Freunde einladen
+      - Undang teman
+      - "\u0926\u094B\u0938\u094D\u0924\u094B\u0902 \u0915\u094B \u092C\u0941\u0932\u093E\u090F\u0901"
+      - "\u062F\u0639\u0648\u0629 \u0627\u0644\u0623\u0635\u062F\u0642\u0627\u0621"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7LSI64yA
+      TermType: 0
+      Description: "\uCD08\uB300"
+      Languages:
+      - "\uCD08\uB300"
+      - Invite
+      - "\u9080\u8BF7"
+      - "\u9080\u8ACB"
+      - "\u62DB\u5F85"
+      - Invitar
+      - Convidar
+      - Inviter
+      - Einladen
+      - Undang
+      - "\u092C\u0941\u0932\u093E\u090F\u0901"
+      - "\u062F\u0639\u0648\u0629"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7LSI64yA65Co
+      TermType: 0
+      Description: "\uCD08\uB300\uB428"
+      Languages:
+      - "\uCD08\uB300\uB428"
+      - Invited
+      - "\u5DF2\u9080\u8BF7"
+      - "\u5DF2\u9080\u8ACB"
+      - "\u62DB\u5F85\u6E08\u307F"
+      - Invitado
+      - Convidado
+      - "Invit\xE9"
+      - Eingeladen
+      - Diundang
+      - "\u0928\u093F\u092E\u0902\u0924\u094D\u0930\u093F\u0924"
+      - "\u062A\u0645\u062A \u0627\u0644\u062F\u0639\u0648\u0629"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7ZiE7J6sIOuwqeyXkOyEnCDrgpjqsIAg7LSI64yA67Cb7J2AIOuwqeycvOuhnCDsnbTrj5ntlaDquYzsmpQ_
+      TermType: 0
+      Description: "\uD604\uC7AC \uBC29\uC5D0\uC11C \uB098\uAC00 \uCD08\uB300\uBC1B\uC740
+        \uBC29\uC73C\uB85C \uC774\uB3D9\uD560\uAE4C\uC694?"
+      Languages:
+      - "\uD604\uC7AC \uBC29\uC5D0\uC11C \uB098\uAC00 \uCD08\uB300\uBC1B\uC740 \uBC29\uC73C\uB85C
+        \uC774\uB3D9\uD560\uAE4C\uC694?"
+      - Leave this room and join the invited room?
+      - "\u8981\u79BB\u5F00\u5F53\u524D\u623F\u95F4\u5E76\u52A0\u5165\u53D7\u9080\u623F\u95F4\u5417\uFF1F"
+      - "\u8981\u96E2\u958B\u76EE\u524D\u623F\u9593\u4E26\u52A0\u5165\u53D7\u9080\u623F\u9593\u55CE\uFF1F"
+      - "\u4ECA\u306E\u90E8\u5C4B\u3092\u9000\u51FA\u3057\u3066\u62DB\u5F85\u3055\u308C\u305F\u90E8\u5C4B\u306B\u79FB\u52D5\u3057\u307E\u3059\u304B\uFF1F"
+      - "\xBFSalir de esta sala y entrar en la sala invitada?"
+      - Sair desta sala e entrar na sala do convite?
+      - "Quitter cette salle et rejoindre la salle invit\xE9e ?"
+      - Diesen Raum verlassen und dem eingeladenen Raum beitreten?
+      - Keluar dari ruang ini dan masuk ke ruang undangan?
+      - "\u0907\u0938 \u0915\u092E\u0930\u0947 \u0938\u0947 \u0928\u093F\u0915\u0932\u0915\u0930
+        \u0906\u092E\u0902\u0924\u094D\u0930\u093F\u0924 \u0915\u092E\u0930\u0947
+        \u092E\u0947\u0902 \u091C\u093E\u0928\u093E \u0939\u0948?"
+      - "\u0647\u0644 \u062A\u0631\u064A\u062F \u0645\u063A\u0627\u062F\u0631\u0629
+        \u0647\u0630\u0647 \u0627\u0644\u063A\u0631\u0641\u0629 \u0648\u0627\u0644\u0627\u0646\u0636\u0645\u0627\u0645
+        \u0625\u0644\u0649 \u0627\u0644\u063A\u0631\u0641\u0629 \u0627\u0644\u0645\u062F\u0639\u0648
+        \u0625\u0644\u064A\u0647\u0627\u061F"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7J2064-Z
+      TermType: 0
+      Description: "\uC774\uB3D9"
+      Languages:
+      - "\uC774\uB3D9"
+      - Join
+      - "\u8FDB\u5165"
+      - "\u9032\u5165"
+      - "\u79FB\u52D5"
+      - Entrar
+      - Entrar
+      - Rejoindre
+      - Beitreten
+      - Masuk
+      - "\u091C\u093E\u090F\u0901"
+      - "\u0627\u0646\u0636\u0645\u0627\u0645"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/ezB964uY7J20IOy5nOq1rCDsmpTssq3snYQg67O064OI7Iq164uI64ukLg
+      TermType: 0
+      Description: "{0}\uB2D8\uC774 \uCE5C\uAD6C \uC694\uCCAD\uC744 \uBCF4\uB0C8\uC2B5\uB2C8\uB2E4."
+      Languages:
+      - "{0}\uB2D8\uC774 \uCE5C\uAD6C \uC694\uCCAD\uC744 \uBCF4\uB0C8\uC2B5\uB2C8\uB2E4."
+      - '{0} sent you a friend request.'
+      - "{0} \u5411\u4F60\u53D1\u9001\u4E86\u597D\u53CB\u8BF7\u6C42\u3002"
+      - "{0} \u5411\u4F60\u50B3\u9001\u4E86\u597D\u53CB\u8ACB\u6C42\u3002"
+      - "{0}\u304B\u3089\u30D5\u30EC\u30F3\u30C9\u7533\u8ACB\u304C\u5C4A\u304D\u307E\u3057\u305F\u3002"
+      - "{0} te envi\xF3 una solicitud de amistad."
+      - "{0} enviou uma solicita\xE7\xE3o de amizade."
+      - "{0} vous a envoy\xE9 une demande d\u2019ami."
+      - '{0} hat dir eine Freundschaftsanfrage gesendet.'
+      - '{0} mengirim permintaan pertemanan.'
+      - "{0} \u0928\u0947 \u0926\u094B\u0938\u094D\u0924\u0940 \u0915\u093E \u0905\u0928\u0941\u0930\u094B\u0927
+        \u092D\u0947\u091C\u093E \u0939\u0948\u0964"
+      - "\u0623\u0631\u0633\u0644 \u0625\u0644\u064A\u0643 {0} \u0637\u0644\u0628
+        \u0635\u062F\u0627\u0642\u0629."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7Lmc6rWsIOyalOyyrSB7MH3qsJzqsIAg64-E7LCp7ZaI7Iq164uI64ukLg
+      TermType: 0
+      Description: "\uCE5C\uAD6C \uC694\uCCAD {0}\uAC1C\uAC00 \uB3C4\uCC29\uD588\uC2B5\uB2C8\uB2E4."
+      Languages:
+      - "\uCE5C\uAD6C \uC694\uCCAD {0}\uAC1C\uAC00 \uB3C4\uCC29\uD588\uC2B5\uB2C8\uB2E4."
+      - You have {0} new friend requests.
+      - "\u4F60\u6536\u5230 {0} \u6761\u597D\u53CB\u8BF7\u6C42\u3002"
+      - "\u4F60\u6536\u5230 {0} \u5247\u597D\u53CB\u8ACB\u6C42\u3002"
+      - "\u30D5\u30EC\u30F3\u30C9\u7533\u8ACB\u304C{0}\u4EF6\u5C4A\u304D\u307E\u3057\u305F\u3002"
+      - Tienes {0} nuevas solicitudes de amistad.
+      - "Voc\xEA recebeu {0} solicita\xE7\xF5es de amizade."
+      - "Vous avez re\xE7u {0} demandes d\u2019ami."
+      - Du hast {0} neue Freundschaftsanfragen.
+      - Ada {0} permintaan pertemanan baru.
+      - "\u0926\u094B\u0938\u094D\u0924\u0940 \u0915\u0947 {0} \u0928\u090F \u0905\u0928\u0941\u0930\u094B\u0927
+        \u0906\u090F \u0939\u0948\u0902\u0964"
+      - "\u0644\u062F\u064A\u0643 {0} \u0637\u0644\u0628\u0627\u062A \u0635\u062F\u0627\u0642\u0629
+        \u062C\u062F\u064A\u062F\u0629."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/ezB964uY7J20IOuwqeyXkCDstIjrjIDtlojsirXri4jri6Qu
+      TermType: 0
+      Description: "{0}\uB2D8\uC774 \uBC29\uC5D0 \uCD08\uB300\uD588\uC2B5\uB2C8\uB2E4."
+      Languages:
+      - "{0}\uB2D8\uC774 \uBC29\uC5D0 \uCD08\uB300\uD588\uC2B5\uB2C8\uB2E4."
+      - '{0} invited you to a room.'
+      - "{0} \u9080\u8BF7\u4F60\u52A0\u5165\u623F\u95F4\u3002"
+      - "{0} \u9080\u8ACB\u4F60\u52A0\u5165\u623F\u9593\u3002"
+      - "{0}\u304B\u3089\u90E8\u5C4B\u306B\u62DB\u5F85\u3055\u308C\u307E\u3057\u305F\u3002"
+      - "{0} te invit\xF3 a una sala."
+      - "{0} convidou voc\xEA para uma sala."
+      - "{0} vous a invit\xE9 dans une salle."
+      - '{0} hat dich in einen Raum eingeladen.'
+      - '{0} mengundangmu ke ruang.'
+      - "{0} \u0928\u0947 \u0906\u092A\u0915\u094B \u0915\u092E\u0930\u0947 \u092E\u0947\u0902
+        \u092C\u0941\u0932\u093E\u092F\u093E \u0939\u0948\u0964"
+      - "\u062F\u0639\u0627\u0643 {0} \u0625\u0644\u0649 \u063A\u0631\u0641\u0629."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/67CpIOy0iOuMgCB7MH3qsJzqsIAg64-E7LCp7ZaI7Iq164uI64ukLg
+      TermType: 0
+      Description: "\uBC29 \uCD08\uB300 {0}\uAC1C\uAC00 \uB3C4\uCC29\uD588\uC2B5\uB2C8\uB2E4."
+      Languages:
+      - "\uBC29 \uCD08\uB300 {0}\uAC1C\uAC00 \uB3C4\uCC29\uD588\uC2B5\uB2C8\uB2E4."
+      - You have {0} new room invitations.
+      - "\u4F60\u6536\u5230 {0} \u6761\u623F\u95F4\u9080\u8BF7\u3002"
+      - "\u4F60\u6536\u5230 {0} \u5247\u623F\u9593\u9080\u8ACB\u3002"
+      - "\u90E8\u5C4B\u306E\u62DB\u5F85\u304C{0}\u4EF6\u5C4A\u304D\u307E\u3057\u305F\u3002"
+      - Tienes {0} nuevas invitaciones a salas.
+      - "Voc\xEA recebeu {0} convites para salas."
+      - "Vous avez re\xE7u {0} invitations \xE0 une salle."
+      - Du hast {0} neue Raumeinladungen.
+      - Ada {0} undangan ruang baru.
+      - "\u0915\u092E\u0930\u0947 \u0915\u0947 {0} \u0928\u090F \u0928\u093F\u092E\u0902\u0924\u094D\u0930\u0923
+        \u0906\u090F \u0939\u0948\u0902\u0964"
+      - "\u0644\u062F\u064A\u0643 {0} \u062F\u0639\u0648\u0627\u062A \u062C\u062F\u064A\u062F\u0629
+        \u0625\u0644\u0649 \u063A\u0631\u0641."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/67Cp7JeQIOyeheyepe2VnCDrkqQg7Lmc6rWs66W8IOy0iOuMgO2VmOyEuOyalC4
+      TermType: 0
+      Description: "\uBC29\uC5D0 \uC785\uC7A5\uD55C \uB4A4 \uCE5C\uAD6C\uB97C \uCD08\uB300\uD558\uC138\uC694."
+      Languages:
+      - "\uBC29\uC5D0 \uC785\uC7A5\uD55C \uB4A4 \uCE5C\uAD6C\uB97C \uCD08\uB300\uD558\uC138\uC694."
+      - Join a room before inviting friends.
+      - "\u8BF7\u5148\u52A0\u5165\u623F\u95F4\u518D\u9080\u8BF7\u597D\u53CB\u3002"
+      - "\u8ACB\u5148\u52A0\u5165\u623F\u9593\u518D\u9080\u8ACB\u597D\u53CB\u3002"
+      - "\u90E8\u5C4B\u306B\u5165\u3063\u3066\u304B\u3089\u30D5\u30EC\u30F3\u30C9\u3092\u62DB\u5F85\u3057\u3066\u304F\u3060\u3055\u3044\u3002"
+      - Entra en una sala antes de invitar amigos.
+      - Entre em uma sala antes de convidar amigos.
+      - "Rejoignez une salle avant d\u2019inviter des amis."
+      - "Tritt einem Raum bei, bevor du Freunde einl\xE4dst."
+      - Masuk ke ruang sebelum mengundang teman.
+      - "\u0926\u094B\u0938\u094D\u0924\u094B\u0902 \u0915\u094B \u092C\u0941\u0932\u093E\u0928\u0947
+        \u0938\u0947 \u092A\u0939\u0932\u0947 \u0915\u092E\u0930\u0947 \u092E\u0947\u0902
+        \u091C\u093E\u090F\u0901\u0964"
+      - "\u0627\u0646\u0636\u0645 \u0625\u0644\u0649 \u063A\u0631\u0641\u0629 \u0642\u0628\u0644
+        \u062F\u0639\u0648\u0629 \u0627\u0644\u0623\u0635\u062F\u0642\u0627\u0621."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7Lmc6rWs66W8IOy0iOuMgO2WiOyKteuLiOuLpC4
+      TermType: 0
+      Description: "\uCE5C\uAD6C\uB97C \uCD08\uB300\uD588\uC2B5\uB2C8\uB2E4."
+      Languages:
+      - "\uCE5C\uAD6C\uB97C \uCD08\uB300\uD588\uC2B5\uB2C8\uB2E4."
+      - Friend invited.
+      - "\u5DF2\u9080\u8BF7\u597D\u53CB\u3002"
+      - "\u5DF2\u9080\u8ACB\u597D\u53CB\u3002"
+      - "\u30D5\u30EC\u30F3\u30C9\u3092\u62DB\u5F85\u3057\u307E\u3057\u305F\u3002"
+      - Amigo invitado.
+      - Amigo convidado.
+      - "Ami invit\xE9."
+      - Freund eingeladen.
+      - Teman diundang.
+      - "\u0926\u094B\u0938\u094D\u0924 \u0915\u094B \u0928\u093F\u092E\u0902\u0924\u094D\u0930\u0923
+        \u092D\u0947\u091C \u0926\u093F\u092F\u093E\u0964"
+      - "\u062A\u0645\u062A \u062F\u0639\u0648\u0629 \u0627\u0644\u0635\u062F\u064A\u0642."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7LSI64yA6rCAIOunjOujjOuQmOyXiOqxsOuCmCDst6jshozrkJjsl4jsirXri4jri6Qu
+      TermType: 0
+      Description: "\uCD08\uB300\uAC00 \uB9CC\uB8CC\uB418\uC5C8\uAC70\uB098 \uCDE8\uC18C\uB418\uC5C8\uC2B5\uB2C8\uB2E4."
+      Languages:
+      - "\uCD08\uB300\uAC00 \uB9CC\uB8CC\uB418\uC5C8\uAC70\uB098 \uCDE8\uC18C\uB418\uC5C8\uC2B5\uB2C8\uB2E4."
+      - This invitation has expired or was canceled.
+      - "\u6B64\u9080\u8BF7\u5DF2\u8FC7\u671F\u6216\u53D6\u6D88\u3002"
+      - "\u6B64\u9080\u8ACB\u5DF2\u904E\u671F\u6216\u53D6\u6D88\u3002"
+      - "\u62DB\u5F85\u306F\u671F\u9650\u5207\u308C\u304B\u53D6\u308A\u6D88\u3055\u308C\u3066\u3044\u307E\u3059\u3002"
+      - "Esta invitaci\xF3n ha caducado o se ha cancelado."
+      - Este convite expirou ou foi cancelado.
+      - "Cette invitation a expir\xE9 ou a \xE9t\xE9 annul\xE9e."
+      - "Diese Einladung ist abgelaufen oder wurde zur\xFCckgezogen."
+      - Undangan ini kedaluwarsa atau dibatalkan.
+      - "\u092F\u0939 \u0928\u093F\u092E\u0902\u0924\u094D\u0930\u0923 \u0938\u092E\u093E\u092A\u094D\u0924
+        \u0939\u094B \u0917\u092F\u093E \u0939\u0948 \u092F\u093E \u0930\u0926\u094D\u0926
+        \u0915\u093F\u092F\u093E \u0917\u092F\u093E \u0939\u0948\u0964"
+      - "\u0627\u0646\u062A\u0647\u062A \u0635\u0644\u0627\u062D\u064A\u0629 \u0647\u0630\u0647
+        \u0627\u0644\u062F\u0639\u0648\u0629 \u0623\u0648 \u062A\u0645 \u0625\u0644\u063A\u0627\u0624\u0647\u0627."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/67CpIOy0iOuMgOulvCDqsbDsoIjtlojsirXri4jri6Qu
+      TermType: 0
+      Description: "\uBC29 \uCD08\uB300\uB97C \uAC70\uC808\uD588\uC2B5\uB2C8\uB2E4."
+      Languages:
+      - "\uBC29 \uCD08\uB300\uB97C \uAC70\uC808\uD588\uC2B5\uB2C8\uB2E4."
+      - Room invitation declined.
+      - "\u5DF2\u62D2\u7EDD\u623F\u95F4\u9080\u8BF7\u3002"
+      - "\u5DF2\u62D2\u7D55\u623F\u9593\u9080\u8ACB\u3002"
+      - "\u90E8\u5C4B\u306E\u62DB\u5F85\u3092\u65AD\u308A\u307E\u3057\u305F\u3002"
+      - "Invitaci\xF3n a sala rechazada."
+      - Convite para sala recusado.
+      - "Invitation \xE0 une salle refus\xE9e."
+      - Raumeinladung abgelehnt.
+      - Undangan ruang ditolak.
+      - "\u0915\u092E\u0930\u0947 \u0915\u093E \u0928\u093F\u092E\u0902\u0924\u094D\u0930\u0923
+        \u0905\u0938\u094D\u0935\u0940\u0915\u093E\u0930 \u0915\u093F\u092F\u093E\u0964"
+      - "\u062A\u0645 \u0631\u0641\u0636 \u062F\u0639\u0648\u0629 \u0627\u0644\u063A\u0631\u0641\u0629."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7Lmc6rWs66GcIOy2lOqwgOuQnCDsg4HrjIDrp4wg7LSI64yA7ZWgIOyImCDsnojsirXri4jri6Qu
+      TermType: 0
+      Description: "\uCE5C\uAD6C\uB85C \uCD94\uAC00\uB41C \uC0C1\uB300\uB9CC \uCD08\uB300\uD560
+        \uC218 \uC788\uC2B5\uB2C8\uB2E4."
+      Languages:
+      - "\uCE5C\uAD6C\uB85C \uCD94\uAC00\uB41C \uC0C1\uB300\uB9CC \uCD08\uB300\uD560
+        \uC218 \uC788\uC2B5\uB2C8\uB2E4."
+      - You can only invite friends.
+      - "\u53EA\u80FD\u9080\u8BF7\u5DF2\u6DFB\u52A0\u7684\u597D\u53CB\u3002"
+      - "\u53EA\u80FD\u9080\u8ACB\u5DF2\u52A0\u5165\u7684\u597D\u53CB\u3002"
+      - "\u30D5\u30EC\u30F3\u30C9\u306E\u307F\u62DB\u5F85\u3067\u304D\u307E\u3059\u3002"
+      - Solo puedes invitar a tus amigos.
+      - "Voc\xEA s\xF3 pode convidar amigos."
+      - Vous pouvez uniquement inviter des amis.
+      - Du kannst nur Freunde einladen.
+      - Kamu hanya bisa mengundang teman.
+      - "\u0906\u092A \u0915\u0947\u0935\u0932 \u0926\u094B\u0938\u094D\u0924\u094B\u0902
+        \u0915\u094B \u092C\u0941\u0932\u093E \u0938\u0915\u0924\u0947 \u0939\u0948\u0902\u0964"
+      - "\u064A\u0645\u0643\u0646\u0643 \u062F\u0639\u0648\u0629 \u0627\u0644\u0623\u0635\u062F\u0642\u0627\u0621
+        \u0641\u0642\u0637."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7J2066-4IOqwmeydgCDrsKnsl5Ag7J6I7Iq164uI64ukLg
+      TermType: 0
+      Description: "\uC774\uBBF8 \uAC19\uC740 \uBC29\uC5D0 \uC788\uC2B5\uB2C8\uB2E4."
+      Languages:
+      - "\uC774\uBBF8 \uAC19\uC740 \uBC29\uC5D0 \uC788\uC2B5\uB2C8\uB2E4."
+      - Already in this room.
+      - "\u5DF2\u5728\u6B64\u623F\u95F4\u4E2D\u3002"
+      - "\u5DF2\u5728\u6B64\u623F\u9593\u4E2D\u3002"
+      - "\u3059\u3067\u306B\u540C\u3058\u90E8\u5C4B\u306B\u3044\u307E\u3059\u3002"
+      - "Ya est\xE1 en esta sala."
+      - "J\xE1 est\xE1 nesta sala."
+      - "D\xE9j\xE0 dans cette salle."
+      - Bereits in diesem Raum.
+      - Sudah berada di ruang ini.
+      - "\u092A\u0939\u0932\u0947 \u0938\u0947 \u0907\u0938\u0940 \u0915\u092E\u0930\u0947
+        \u092E\u0947\u0902 \u0939\u0948\u0902\u0964"
+      - "\u0645\u0648\u062C\u0648\u062F \u0641\u064A \u0647\u0630\u0647 \u0627\u0644\u063A\u0631\u0641\u0629
+        \u0628\u0627\u0644\u0641\u0639\u0644."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7J6g7IucIO2bhCDri6Tsi5wg7LSI64yA7ZWY7IS47JqULg
+      TermType: 0
+      Description: "\uC7A0\uC2DC \uD6C4 \uB2E4\uC2DC \uCD08\uB300\uD558\uC138\uC694."
+      Languages:
+      - "\uC7A0\uC2DC \uD6C4 \uB2E4\uC2DC \uCD08\uB300\uD558\uC138\uC694."
+      - Wait a moment before inviting again.
+      - "\u8BF7\u7A0D\u540E\u518D\u6B21\u9080\u8BF7\u3002"
+      - "\u8ACB\u7A0D\u5F8C\u518D\u6B21\u9080\u8ACB\u3002"
+      - "\u5C11\u3057\u5F85\u3063\u3066\u304B\u3089\u3082\u3046\u4E00\u5EA6\u62DB\u5F85\u3057\u3066\u304F\u3060\u3055\u3044\u3002"
+      - Espera un momento antes de volver a invitar.
+      - Aguarde um momento antes de convidar novamente.
+      - "Patientez avant d\u2019envoyer une nouvelle invitation."
+      - "Warte kurz, bevor du erneut einl\xE4dst."
+      - Tunggu sebentar sebelum mengundang lagi.
+      - "\u0926\u094B\u092C\u093E\u0930\u093E \u092C\u0941\u0932\u093E\u0928\u0947
+        \u0938\u0947 \u092A\u0939\u0932\u0947 \u0925\u094B\u0921\u093C\u093E \u0930\u0941\u0915\u0947\u0902\u0964"
+      - "\u0627\u0646\u062A\u0638\u0631 \u0642\u0644\u064A\u0644\u064B\u0627 \u0642\u0628\u0644
+        \u0625\u0631\u0633\u0627\u0644 \u062F\u0639\u0648\u0629 \u0623\u062E\u0631\u0649."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/67O064K4IOy0iOuMgOqwgCDrp47sirXri4jri6QuIOyeoOyLnCDtm4Qg64uk7IucIOyLnOuPhO2VmOyEuOyalC4
+      TermType: 0
+      Description: "\uBCF4\uB0B8 \uCD08\uB300\uAC00 \uB9CE\uC2B5\uB2C8\uB2E4. \uC7A0\uC2DC
+        \uD6C4 \uB2E4\uC2DC \uC2DC\uB3C4\uD558\uC138\uC694."
+      Languages:
+      - "\uBCF4\uB0B8 \uCD08\uB300\uAC00 \uB9CE\uC2B5\uB2C8\uB2E4. \uC7A0\uC2DC \uD6C4
+        \uB2E4\uC2DC \uC2DC\uB3C4\uD558\uC138\uC694."
+      - Too many invitations. Try again shortly.
+      - "\u9080\u8BF7\u8FC7\u591A\uFF0C\u8BF7\u7A0D\u540E\u518D\u8BD5\u3002"
+      - "\u9080\u8ACB\u904E\u591A\uFF0C\u8ACB\u7A0D\u5F8C\u518D\u8A66\u3002"
+      - "\u62DB\u5F85\u304C\u591A\u3059\u304E\u307E\u3059\u3002\u5C11\u3057\u5F85\u3063\u3066\u518D\u8A66\u884C\u3057\u3066\u304F\u3060\u3055\u3044\u3002"
+      - "Demasiadas invitaciones. Int\xE9ntalo de nuevo en un momento."
+      - Convites demais. Tente novamente em breve.
+      - "Trop d\u2019invitations. R\xE9essayez dans un instant."
+      - Zu viele Einladungen. Versuche es gleich erneut.
+      - Terlalu banyak undangan. Coba lagi sebentar lagi.
+      - "\u092C\u0939\u0941\u0924 \u0905\u0927\u093F\u0915 \u0928\u093F\u092E\u0902\u0924\u094D\u0930\u0923
+        \u0939\u0948\u0902\u0964 \u0925\u094B\u0921\u093C\u0940 \u0926\u0947\u0930
+        \u092C\u093E\u0926 \u092B\u093F\u0930 \u0915\u094B\u0936\u093F\u0936 \u0915\u0930\u0947\u0902\u0964"
+      - "\u0639\u062F\u062F \u0627\u0644\u062F\u0639\u0648\u0627\u062A \u0643\u0628\u064A\u0631.
+        \u062D\u0627\u0648\u0644 \u0645\u062C\u062F\u062F\u064B\u0627 \u0628\u0639\u062F
+        \u0642\u0644\u064A\u0644."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7JWM66a8IHswfeqwnA
+      TermType: 0
+      Description: "\uC54C\uB9BC {0}\uAC1C"
+      Languages:
+      - "\uC54C\uB9BC {0}\uAC1C"
+      - '{0} notifications'
+      - "{0} \u6761\u901A\u77E5"
+      - "{0} \u5247\u901A\u77E5"
+      - "\u901A\u77E5{0}\u4EF6"
+      - '{0} notificaciones'
+      - "{0} notifica\xE7\xF5es"
+      - '{0} notifications'
+      - '{0} Benachrichtigungen'
+      - '{0} notifikasi'
+      - "{0} \u0938\u0942\u091A\u0928\u093E\u090F\u0901"
+      - "{0} \u0625\u0634\u0639\u0627\u0631\u0627\u062A"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/67CpIOu5hOuwgOuyiO2YuA
+      TermType: 0
+      Description: "\uBC29 \uBE44\uBC00\uBC88\uD638"
+      Languages:
+      - "\uBC29 \uBE44\uBC00\uBC88\uD638"
+      - Room password
+      - "\u623F\u95F4\u5BC6\u7801"
+      - "\u623F\u9593\u5BC6\u78BC"
+      - "\u90E8\u5C4B\u306E\u30D1\u30B9\u30EF\u30FC\u30C9"
+      - "Contrase\xF1a de la sala"
+      - Senha da sala
+      - Mot de passe de la salle
+      - Raumpasswort
+      - Kata sandi ruang
+      - "\u0915\u092E\u0930\u0947 \u0915\u093E \u092A\u093E\u0938\u0935\u0930\u094D\u0921"
+      - "\u0643\u0644\u0645\u0629 \u0645\u0631\u0648\u0631 \u0627\u0644\u063A\u0631\u0641\u0629"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/67mE67CA67KI7Zi4IOyeheugpQ
+      TermType: 0
+      Description: "\uBE44\uBC00\uBC88\uD638 \uC785\uB825"
+      Languages:
+      - "\uBE44\uBC00\uBC88\uD638 \uC785\uB825"
+      - Enter password
+      - "\u8F93\u5165\u5BC6\u7801"
+      - "\u8F38\u5165\u5BC6\u78BC"
+      - "\u30D1\u30B9\u30EF\u30FC\u30C9\u3092\u5165\u529B"
+      - "Introduce la contrase\xF1a"
+      - Digite a senha
+      - Saisir le mot de passe
+      - Passwort eingeben
+      - Masukkan kata sandi
+      - "\u092A\u093E\u0938\u0935\u0930\u094D\u0921 \u0926\u0930\u094D\u091C \u0915\u0930\u0947\u0902"
+      - "\u0623\u062F\u062E\u0644 \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/67mE67CA67KI7Zi464qUIDR-MzLsnpDroZwg7J6F66Cl7ZWY7IS47JqULg
+      TermType: 0
+      Description: "\uBE44\uBC00\uBC88\uD638\uB294 4~32\uC790\uB85C \uC785\uB825\uD558\uC138\uC694."
+      Languages:
+      - "\uBE44\uBC00\uBC88\uD638\uB294 4~32\uC790\uB85C \uC785\uB825\uD558\uC138\uC694."
+      - "Use a password of 4\u201332 characters."
+      - "\u8BF7\u8F93\u5165 4\uFF5E32 \u4E2A\u5B57\u7B26\u7684\u5BC6\u7801\u3002"
+      - "\u8ACB\u8F38\u5165 4\uFF5E32 \u500B\u5B57\u5143\u7684\u5BC6\u78BC\u3002"
+      - "\u30D1\u30B9\u30EF\u30FC\u30C9\u306F4\uFF5E32\u6587\u5B57\u3067\u5165\u529B\u3057\u3066\u304F\u3060\u3055\u3044\u3002"
+      - "Usa una contrase\xF1a de 4 a 32 caracteres."
+      - Use uma senha de 4 a 32 caracteres.
+      - "Utilisez un mot de passe de 4 \xE0 32 caract\xE8res."
+      - Verwende ein Passwort mit 4 bis 32 Zeichen.
+      - "Gunakan kata sandi 4\u201332 karakter."
+      - "\u092A\u093E\u0938\u0935\u0930\u094D\u0921 \u092E\u0947\u0902 4\u201332
+        \u0905\u0915\u094D\u0937\u0930 \u0939\u094B\u0928\u0947 \u091A\u093E\u0939\u093F\u090F\u0964"
+      - "\u0627\u0633\u062A\u062E\u062F\u0645 \u0643\u0644\u0645\u0629 \u0645\u0631\u0648\u0631
+        \u0645\u0646 4 \u0625\u0644\u0649 32 \u062D\u0631\u0641\u064B\u0627."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7IOIIOu5hOuwgOuyiO2YuA
+      TermType: 0
+      Description: "\uC0C8 \uBE44\uBC00\uBC88\uD638"
+      Languages:
+      - "\uC0C8 \uBE44\uBC00\uBC88\uD638"
+      - New password
+      - "\u65B0\u5BC6\u7801"
+      - "\u65B0\u5BC6\u78BC"
+      - "\u65B0\u3057\u3044\u30D1\u30B9\u30EF\u30FC\u30C9"
+      - "Nueva contrase\xF1a"
+      - Nova senha
+      - Nouveau mot de passe
+      - Neues Passwort
+      - Kata sandi baru
+      - "\u0928\u092F\u093E \u092A\u093E\u0938\u0935\u0930\u094D\u0921"
+      - "\u0643\u0644\u0645\u0629 \u0645\u0631\u0648\u0631 \u062C\u062F\u064A\u062F\u0629"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/67mE7JuMIOuRkOuptCDquLDsobQg67mE67CA67KI7Zi466W8IOycoOyngO2VqeuLiOuLpC4
+      TermType: 0
+      Description: "\uBE44\uC6CC \uB450\uBA74 \uAE30\uC874 \uBE44\uBC00\uBC88\uD638\uB97C
+        \uC720\uC9C0\uD569\uB2C8\uB2E4."
+      Languages:
+      - "\uBE44\uC6CC \uB450\uBA74 \uAE30\uC874 \uBE44\uBC00\uBC88\uD638\uB97C \uC720\uC9C0\uD569\uB2C8\uB2E4."
+      - Leave blank to keep the current password.
+      - "\u7559\u7A7A\u4EE5\u4FDD\u7559\u5F53\u524D\u5BC6\u7801\u3002"
+      - "\u7559\u7A7A\u4EE5\u4FDD\u7559\u76EE\u524D\u5BC6\u78BC\u3002"
+      - "\u7A7A\u6B04\u306A\u3089\u73FE\u5728\u306E\u30D1\u30B9\u30EF\u30FC\u30C9\u3092\u7DAD\u6301\u3057\u307E\u3059\u3002"
+      - "Deja el campo vac\xEDo para conservar la contrase\xF1a actual."
+      - Deixe em branco para manter a senha atual.
+      - Laissez vide pour conserver le mot de passe actuel.
+      - Leer lassen, um das aktuelle Passwort zu behalten.
+      - Biarkan kosong untuk mempertahankan kata sandi saat ini.
+      - "\u092E\u094C\u091C\u0942\u0926\u093E \u092A\u093E\u0938\u0935\u0930\u094D\u0921
+        \u0930\u0916\u0928\u0947 \u0915\u0947 \u0932\u093F\u090F \u0916\u093E\u0932\u0940
+        \u091B\u094B\u0921\u093C\u0947\u0902\u0964"
+      - "\u0627\u062A\u0631\u0643\u0647 \u0641\u0627\u0631\u063A\u064B\u0627 \u0644\u0644\u0627\u062D\u062A\u0641\u0627\u0638
+        \u0628\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631 \u0627\u0644\u062D\u0627\u0644\u064A\u0629."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/67mE67CA67KI7Zi46rCAIOyYrOuwlOultOyngCDslYrsirXri4jri6Qu
+      TermType: 0
+      Description: "\uBE44\uBC00\uBC88\uD638\uAC00 \uC62C\uBC14\uB974\uC9C0 \uC54A\uC2B5\uB2C8\uB2E4."
+      Languages:
+      - "\uBE44\uBC00\uBC88\uD638\uAC00 \uC62C\uBC14\uB974\uC9C0 \uC54A\uC2B5\uB2C8\uB2E4."
+      - Incorrect password.
+      - "\u5BC6\u7801\u4E0D\u6B63\u786E\u3002"
+      - "\u5BC6\u78BC\u4E0D\u6B63\u78BA\u3002"
+      - "\u30D1\u30B9\u30EF\u30FC\u30C9\u304C\u6B63\u3057\u304F\u3042\u308A\u307E\u305B\u3093\u3002"
+      - "Contrase\xF1a incorrecta."
+      - Senha incorreta.
+      - Mot de passe incorrect.
+      - Falsches Passwort.
+      - Kata sandi salah.
+      - "\u092A\u093E\u0938\u0935\u0930\u094D\u0921 \u0917\u0932\u0924 \u0939\u0948\u0964"
+      - "\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631 \u063A\u064A\u0631
+        \u0635\u062D\u064A\u062D\u0629."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/67mE67CA67KI7Zi46rCAIO2VhOyalO2VnCDrsKnsnoXri4jri6Qu
+      TermType: 0
+      Description: "\uBE44\uBC00\uBC88\uD638\uAC00 \uD544\uC694\uD55C \uBC29\uC785\uB2C8\uB2E4."
+      Languages:
+      - "\uBE44\uBC00\uBC88\uD638\uAC00 \uD544\uC694\uD55C \uBC29\uC785\uB2C8\uB2E4."
+      - This room requires a password.
+      - "\u6B64\u623F\u95F4\u9700\u8981\u5BC6\u7801\u3002"
+      - "\u6B64\u623F\u9593\u9700\u8981\u5BC6\u78BC\u3002"
+      - "\u3053\u306E\u90E8\u5C4B\u306B\u306F\u30D1\u30B9\u30EF\u30FC\u30C9\u304C\u5FC5\u8981\u3067\u3059\u3002"
+      - "Esta sala requiere una contrase\xF1a."
+      - Esta sala exige uma senha.
+      - "Cette salle n\xE9cessite un mot de passe."
+      - "Dieser Raum ben\xF6tigt ein Passwort."
+      - Ruang ini memerlukan kata sandi.
+      - "\u0907\u0938 \u0915\u092E\u0930\u0947 \u0915\u0947 \u0932\u093F\u090F \u092A\u093E\u0938\u0935\u0930\u094D\u0921
+        \u091A\u093E\u0939\u093F\u090F\u0964"
+      - "\u062A\u062A\u0637\u0644\u0628 \u0647\u0630\u0647 \u0627\u0644\u063A\u0631\u0641\u0629
+        \u0643\u0644\u0645\u0629 \u0645\u0631\u0648\u0631."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/67CpIOyEpOygleydtCDrs4Dqsr3rkJjsl4jsirXri4jri6QuIOuLpOyLnCDsi5zrj4TtlZjshLjsmpQu
+      TermType: 0
+      Description: "\uBC29 \uC124\uC815\uC774 \uBCC0\uACBD\uB418\uC5C8\uC2B5\uB2C8\uB2E4.
+        \uB2E4\uC2DC \uC2DC\uB3C4\uD558\uC138\uC694."
+      Languages:
+      - "\uBC29 \uC124\uC815\uC774 \uBCC0\uACBD\uB418\uC5C8\uC2B5\uB2C8\uB2E4. \uB2E4\uC2DC
+        \uC2DC\uB3C4\uD558\uC138\uC694."
+      - Room settings changed. Please try again.
+      - "\u623F\u95F4\u8BBE\u7F6E\u5DF2\u66F4\u6539\uFF0C\u8BF7\u91CD\u8BD5\u3002"
+      - "\u623F\u9593\u8A2D\u5B9A\u5DF2\u8B8A\u66F4\uFF0C\u8ACB\u91CD\u8A66\u3002"
+      - "\u90E8\u5C4B\u306E\u8A2D\u5B9A\u304C\u5909\u66F4\u3055\u308C\u307E\u3057\u305F\u3002\u3082\u3046\u4E00\u5EA6\u304A\u8A66\u3057\u304F\u3060\u3055\u3044\u3002"
+      - "La configuraci\xF3n de la sala cambi\xF3. Vuelve a intentarlo."
+      - "As configura\xE7\xF5es da sala mudaram. Tente novamente."
+      - "Les param\xE8tres de la salle ont chang\xE9. R\xE9essayez."
+      - "Die Raumeinstellungen wurden ge\xE4ndert. Versuche es erneut."
+      - Pengaturan ruang berubah. Silakan coba lagi.
+      - "\u0915\u092E\u0930\u0947 \u0915\u0940 \u0938\u0947\u091F\u093F\u0902\u0917
+        \u092C\u0926\u0932 \u0917\u0908 \u0939\u0948\u0964 \u092B\u093F\u0930 \u0915\u094B\u0936\u093F\u0936
+        \u0915\u0930\u0947\u0902\u0964"
+      - "\u062A\u063A\u064A\u0631\u062A \u0625\u0639\u062F\u0627\u062F\u0627\u062A
+        \u0627\u0644\u063A\u0631\u0641\u0629. \u062D\u0627\u0648\u0644 \u0645\u062C\u062F\u062F\u064B\u0627."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/67Cp7J6l7J20IOu5hOuwgOuyiO2YuOulvCDshKTsoJXtlZwg65KkIOyeheyepe2VoCDsiJgg7J6I7Iq164uI64ukLg
+      TermType: 0
+      Description: "\uBC29\uC7A5\uC774 \uBE44\uBC00\uBC88\uD638\uB97C \uC124\uC815\uD55C
+        \uB4A4 \uC785\uC7A5\uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4."
+      Languages:
+      - "\uBC29\uC7A5\uC774 \uBE44\uBC00\uBC88\uD638\uB97C \uC124\uC815\uD55C \uB4A4
+        \uC785\uC7A5\uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4."
+      - You can join after the host sets a password.
+      - "\u623F\u4E3B\u8BBE\u7F6E\u5BC6\u7801\u540E\u624D\u80FD\u52A0\u5165\u3002"
+      - "\u623F\u4E3B\u8A2D\u5B9A\u5BC6\u78BC\u5F8C\u624D\u80FD\u52A0\u5165\u3002"
+      - "\u30DB\u30B9\u30C8\u304C\u30D1\u30B9\u30EF\u30FC\u30C9\u3092\u8A2D\u5B9A\u3057\u3066\u304B\u3089\u5165\u5BA4\u3067\u304D\u307E\u3059\u3002"
+      - "Podr\xE1s entrar cuando el anfitri\xF3n establezca una contrase\xF1a."
+      - "Voc\xEA poder\xE1 entrar ap\xF3s o anfitri\xE3o definir uma senha."
+      - "Vous pourrez rejoindre la salle une fois que l\u2019h\xF4te aura d\xE9fini
+        un mot de passe."
+      - Du kannst beitreten, sobald der Gastgeber ein Passwort festgelegt hat.
+      - Kamu bisa masuk setelah pemilik ruang menetapkan kata sandi.
+      - "\u092E\u0947\u091C\u093C\u092C\u093E\u0928 \u0915\u0947 \u092A\u093E\u0938\u0935\u0930\u094D\u0921
+        \u0924\u092F \u0915\u0930\u0928\u0947 \u0915\u0947 \u092C\u093E\u0926 \u0906\u092A
+        \u092A\u094D\u0930\u0935\u0947\u0936 \u0915\u0930 \u0938\u0915\u0924\u0947
+        \u0939\u0948\u0902\u0964"
+      - "\u064A\u0645\u0643\u0646\u0643 \u0627\u0644\u0627\u0646\u0636\u0645\u0627\u0645
+        \u0628\u0639\u062F \u0623\u0646 \u064A\u062D\u062F\u062F \u0627\u0644\u0645\u0636\u064A\u0641
+        \u0643\u0644\u0645\u0629 \u0645\u0631\u0648\u0631."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7KCV64u1IOyeheugpQ
+      TermType: 0
+      Description: "\uC815\uB2F5 \uC785\uB825"
+      Languages:
+      - "\uC815\uB2F5 \uC785\uB825"
+      - Enter answer
+      - "\u8F93\u5165\u7B54\u6848"
+      - "\u8F38\u5165\u7B54\u6848"
+      - "\u7B54\u3048\u3092\u5165\u529B"
+      - Introducir respuesta
+      - Digite a resposta
+      - "Saisir la r\xE9ponse"
+      - Antwort eingeben
+      - Masukkan jawaban
+      - "\u0909\u0924\u094D\u0924\u0930 \u0926\u0930\u094D\u091C \u0915\u0930\u0947\u0902"
+      - "\u0623\u062F\u062E\u0644 \u0627\u0644\u0625\u062C\u0627\u0628\u0629"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/65287J207Ja0IOuLteuzgA
+      TermType: 0
+      Description: "\uB77C\uC774\uC5B4 \uB2F5\uBCC0"
+      Languages:
+      - "\uB77C\uC774\uC5B4 \uB2F5\uBCC0"
+      - Liar answers
+      - "\u8BF4\u8C0E\u8005\u7684\u7B54\u6848"
+      - "\u8AAA\u8B0A\u8005\u7684\u7B54\u6848"
+      - "\u30E9\u30A4\u30A2\u30FC\u306E\u56DE\u7B54"
+      - Respuestas de los mentirosos
+      - Respostas dos mentirosos
+      - "R\xE9ponses des menteurs"
+      - "Antworten der L\xFCgner"
+      - Jawaban pembohong
+      - "\u091D\u0942\u0920 \u092C\u094B\u0932\u0928\u0947 \u0935\u093E\u0932\u094B\u0902
+        \u0915\u0947 \u0909\u0924\u094D\u0924\u0930"
+      - "\u0625\u062C\u0627\u0628\u0627\u062A \u0627\u0644\u0643\u0627\u0630\u0628\u064A\u0646"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7KCV64u1
+      TermType: 0
+      Description: "\uC815\uB2F5"
+      Languages:
+      - "\uC815\uB2F5"
+      - Correct
+      - "\u6B63\u786E"
+      - "\u6B63\u78BA"
+      - "\u6B63\u89E3"
+      - Correcto
+      - Correto
+      - Correct
+      - Richtig
+      - Benar
+      - "\u0938\u0939\u0940"
+      - "\u0635\u062D\u064A\u062D\u0629"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7Jik64u1
+      TermType: 0
+      Description: "\uC624\uB2F5"
+      Languages:
+      - "\uC624\uB2F5"
+      - Incorrect
+      - "\u9519\u8BEF"
+      - "\u932F\u8AA4"
+      - "\u4E0D\u6B63\u89E3"
+      - Incorrecto
+      - Incorreto
+      - Incorrect
+      - Falsch
+      - Salah
+      - "\u0917\u0932\u0924"
+      - "\u062E\u0627\u0637\u0626\u0629"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/66-47KCc7Lac
+      TermType: 0
+      Description: "\uBBF8\uC81C\uCD9C"
+      Languages:
+      - "\uBBF8\uC81C\uCD9C"
+      - No answer
+      - "\u672A\u63D0\u4EA4"
+      - "\u672A\u63D0\u4EA4"
+      - "\u672A\u56DE\u7B54"
+      - Sin respuesta
+      - Sem resposta
+      - "Sans r\xE9ponse"
+      - Keine Antwort
+      - Tidak menjawab
+      - "\u0909\u0924\u094D\u0924\u0930 \u0928\u0939\u0940\u0902 \u0926\u093F\u092F\u093E"
+      - "\u0644\u0645 \u064A\u064F\u0642\u062F\u0651\u0645 \u0625\u062C\u0627\u0628\u0629"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7J2Y7Ius7Iqk65-s7Jq0IOyCrOuejOydhCDsp4DrqqntlZjshLjsmpQ
+      TermType: 0
+      Description: "\uC758\uC2EC\uC2A4\uB7EC\uC6B4 \uC0AC\uB78C\uC744 \uC9C0\uBAA9\uD558\uC138\uC694"
+      Languages:
+      - "\uC758\uC2EC\uC2A4\uB7EC\uC6B4 \uC0AC\uB78C\uC744 \uC9C0\uBAA9\uD558\uC138\uC694"
+      - Select the player you suspect
+      - "\u8BF7\u6307\u8BA4\u4F60\u6000\u7591\u7684\u73A9\u5BB6"
+      - "\u8ACB\u6307\u8A8D\u4F60\u61F7\u7591\u7684\u73A9\u5BB6"
+      - "\u602A\u3057\u3044\u30D7\u30EC\u30A4\u30E4\u30FC\u3092\u6307\u540D\u3057\u3066\u304F\u3060\u3055\u3044"
+      - "Se\xF1ala al jugador del que sospechas"
+      - "Indique o jogador de quem voc\xEA suspeita"
+      - "D\xE9signez le joueur que vous suspectez"
+      - "W\xE4hle den Spieler, den du verd\xE4chtigst"
+      - Pilih pemain yang kamu curigai
+      - "\u091C\u093F\u0938 \u0916\u093F\u0932\u093E\u0921\u093C\u0940 \u092A\u0930
+        \u0936\u0915 \u0939\u0948, \u0909\u0938\u0947 \u091A\u0941\u0928\u0947\u0902"
+      - "\u0627\u062E\u062A\u0631 \u0627\u0644\u0644\u0627\u0639\u0628 \u0627\u0644\u0630\u064A
+        \u062A\u0634\u062A\u0628\u0647 \u0628\u0647"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/64K0IOyEoCDsp4DsmrDquLA
+      TermType: 0
+      Description: "\uB0B4 \uC120 \uC9C0\uC6B0\uAE30"
+      Languages:
+      - "\uB0B4 \uC120 \uC9C0\uC6B0\uAE30"
+      - Clear my strokes
+      - "\u6E05\u9664\u6211\u7684\u7B14\u753B"
+      - "\u6E05\u9664\u6211\u7684\u7B46\u756B"
+      - "\u81EA\u5206\u306E\u7DDA\u3092\u6D88\u3059"
+      - Borrar mis trazos
+      - "Apagar meus tra\xE7os"
+      - Effacer mes traits
+      - "Meine Striche l\xF6schen"
+      - Hapus goresan saya
+      - "\u092E\u0947\u0930\u0940 \u0930\u0947\u0916\u093E\u090F\u0901 \u092E\u093F\u091F\u093E\u090F\u0901"
+      - "\u0627\u0645\u0633\u062D \u062E\u0637\u0648\u0637\u064A"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7Z2w7IOJ
+      TermType: 0
+      Description: "\uD770\uC0C9"
+      Languages:
+      - "\uD770\uC0C9"
+      - White
+      - "\u767D\u8272"
+      - "\u767D\u8272"
+      - "\u767D"
+      - Blanco
+      - Branco
+      - Blanc
+      - "Wei\xDF"
+      - Putih
+      - "\u0938\u092B\u093C\u0947\u0926"
+      - "\u0623\u0628\u064A\u0636"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/6re466as6riwIOyInOyEnCB7MH0
+      TermType: 0
+      Description: "\uADF8\uB9AC\uAE30 \uC21C\uC11C {0}"
+      Languages:
+      - "\uADF8\uB9AC\uAE30 \uC21C\uC11C {0}"
+      - Drawing order {0}
+      - "\u7ED8\u753B\u987A\u5E8F {0}"
+      - "\u7E6A\u756B\u9806\u5E8F {0}"
+      - "\u63CF\u304F\u9806\u756A {0}"
+      - Turno de dibujo {0}
+      - Ordem de desenho {0}
+      - Ordre de dessin {0}
+      - Zeichenreihenfolge {0}
+      - Urutan menggambar {0}
+      - "\u091A\u093F\u0924\u094D\u0930 \u092C\u0928\u093E\u0928\u0947 \u0915\u093E
+        \u0915\u094D\u0930\u092E {0}"
+      - "\u062A\u0631\u062A\u064A\u0628 \u0627\u0644\u0631\u0633\u0645 {0}"
       Flags: 000000000000000000000000
       Languages_Touch: []
     CaseInsensitiveTerms: 0

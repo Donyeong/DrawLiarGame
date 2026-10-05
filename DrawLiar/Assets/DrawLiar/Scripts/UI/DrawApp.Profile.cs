@@ -15,8 +15,12 @@ namespace DrawLiar
         private string _profileAccountId, _profileViewerAccountId;
         private int _profileVersion;
         private bool _profileActionBusy;
+        private PublicProfileData _loadedPublicProfile;
+        private VisualElement _roomCustomizeOverlay;
+        private string _roomCustomizeAccountId;
+        private VisualElement _roomCustomizeReturnFocus;
 
-        private void BindProfileTarget(VisualElement target, string accountId)
+        private void BindProfileTarget(VisualElement target, string accountId, Func<bool> canOpen = null)
         {
             if (target == null || !Guid.TryParse(accountId, out _)) return;
             target.name = "profile-open-" + accountId;
@@ -27,18 +31,20 @@ namespace DrawLiar
             SetTooltip(target, "프로필 보기");
             target.RegisterCallback<ClickEvent>(evt =>
             {
-                if (evt.button != 0) return;
+                if (evt.button != 0 || canOpen?.Invoke() == false) return;
                 OpenPublicProfile(accountId, target);
                 evt.StopImmediatePropagation();
             });
             target.RegisterCallback<KeyDownEvent>(evt =>
             {
                 if (evt.keyCode != KeyCode.Return && evt.keyCode != KeyCode.KeypadEnter && evt.keyCode != KeyCode.Space) return;
+                if (canOpen?.Invoke() == false) return;
                 OpenPublicProfile(accountId, target);
                 evt.StopImmediatePropagation();
             });
             target.RegisterCallback<NavigationSubmitEvent>(evt =>
             {
+                if (canOpen?.Invoke() == false) return;
                 OpenPublicProfile(accountId, target);
                 evt.StopImmediatePropagation();
             });
@@ -120,6 +126,7 @@ namespace DrawLiar
             if (_profileOverlay == null) return;
             CancelPublicProfileRequest();
             _profileActionBusy = false;
+            _loadedPublicProfile = null;
             _profileCancellation = CancellationTokenSource.CreateLinkedTokenSource(destroyCancellationToken);
             int version = ++_profileVersion;
             var popup = _profileOverlay;
@@ -154,6 +161,7 @@ namespace DrawLiar
 
         private void RenderPublicProfile(PublicProfileData profile)
         {
+            _loadedPublicProfile = profile;
             _profileBody.Clear();
             var hero = Box(_profileBody, "row public-profile-hero");
             var avatar = new AvatarElement(profile.AvatarColor, profile.Accessory);
@@ -214,7 +222,11 @@ namespace DrawLiar
         {
             switch (profile.Friendship)
             {
-                case "Self": Text(actions, "내 프로필", "public-profile-state"); break;
+                case "Self":
+                    Text(actions, "내 프로필", "public-profile-state");
+                    if (profile.AccountId == lobby.Profile?.AccountId)
+                        Button(actions, "꾸미기", OpenSelfCustomization, "primary").name = "public-profile-customize";
+                    break;
                 case "Friends": Text(actions, "친구", "public-profile-state"); break;
                 case "Outgoing": Text(actions, "수락 대기", "public-profile-state"); break;
                 case "Incoming":
@@ -232,6 +244,109 @@ namespace DrawLiar
         {
             _profileBody?.Q<VisualElement>(className: "public-profile-friend-actions")?.Query<Button>()
                 .ForEach(button => button.SetEnabled(!_profileActionBusy && !lobby.IsBusy));
+        }
+
+        private void OpenSelfCustomization()
+        {
+            if (!lobby.IsAuthenticated || lobby.IsBusy || _profileAccountId != lobby.Profile?.AccountId) return;
+            var returnFocus = _profileReturnFocus;
+            ClosePublicProfile(false);
+            if (!inRoom)
+            {
+                Navigate(LobbyScreen.Customize);
+                return;
+            }
+            if (!lobby.IsOnlineRoom) return;
+            SyncProfile();
+            CloseModal();
+            var popup = _roomCustomizeOverlay = Box(root, "overlay enter utility-overlay room-customize-overlay");
+            popup.name = "room-customize-overlay";
+            var modal = Box(popup, "modal utility-popup room-customize-popup");
+            modal.name = "room-customize-popup";
+            _roomCustomizeAccountId = lobby.Profile.AccountId;
+            _roomCustomizeReturnFocus = returnFocus;
+            var header = Box(modal, "row utility-popup-header");
+            Text(header, "캐릭터 꾸미기", "utility-popup-title grow");
+            IconButton(header, "닫기", DrawUIIcon.Kind.Close, () => CloseRoomCustomization(), "utility-popup-x");
+            var preview = Box(modal, "room-customize-preview");
+            preview.name = "room-customize-preview";
+            ProfileForm(modal, preview, () =>
+            {
+                if (this != null && _roomCustomizeOverlay == popup) CloseRoomCustomization();
+            }, true, () => CloseRoomCustomization());
+            popup.RegisterCallback<PointerDownEvent>(evt =>
+            {
+                if (_roomCustomizeOverlay == popup && ReferenceEquals(evt.target, popup)) CloseRoomCustomization();
+            });
+            popup.RegisterCallback<KeyDownEvent>(evt =>
+            {
+                if (overlay != null || _profileOverlay != null || _roomPasswordOverlay != null) return;
+                if (evt.keyCode == KeyCode.Escape)
+                {
+                    CloseRoomCustomization();
+                    evt.StopImmediatePropagation();
+                    return;
+                }
+                if (evt.keyCode != KeyCode.Tab) return;
+                var controls = modal.Query<VisualElement>().ToList().Where(control => control.canGrabFocus && control.enabledInHierarchy
+                    && control.tabIndex >= 0 && control.resolvedStyle.visibility == Visibility.Visible && IsVisible(control)).ToList();
+                if (controls.Count == 0) return;
+                int index = controls.IndexOf(root.focusController?.focusedElement as VisualElement);
+                int next = index < 0 ? (evt.shiftKey ? controls.Count - 1 : 0) : (index + (evt.shiftKey ? -1 : 1) + controls.Count) % controls.Count;
+                root.focusController?.IgnoreEvent(evt);
+                controls[next].Focus();
+                evt.StopImmediatePropagation();
+            }, TrickleDown.TrickleDown);
+            DrawUIMotion.ShowModal(popup, modal);
+            modal.Q<TextField>("customize-nickname")?.Focus();
+            HideMobileScrollers();
+        }
+
+        private void CloseRoomCustomization(bool restoreFocus = true, bool immediate = false)
+        {
+            var popup = _roomCustomizeOverlay;
+            var returnFocus = _roomCustomizeReturnFocus;
+            string accountId = _roomCustomizeAccountId;
+            _roomCustomizeOverlay = _roomCustomizeReturnFocus = null;
+            _roomCustomizeAccountId = null;
+            if (popup == null) return;
+            popup.Q<TextField>("customize-nickname")?.Blur();
+            if (immediate) popup.RemoveFromHierarchy();
+            else DrawUIMotion.HideModal(popup, popup.Q<VisualElement>(className: "modal"));
+            if (!restoreFocus || root == null) return;
+            root.schedule.Execute(() =>
+            {
+                if (this == null || !isActiveAndEnabled || _roomCustomizeOverlay != null || overlay != null || _profileOverlay != null) return;
+                var target = returnFocus?.panel != null ? returnFocus : root.Q<VisualElement>("profile-open-" + accountId);
+                target?.Focus();
+            }).StartingIn(180);
+        }
+
+        private void RestoreRoomCustomizationFocus()
+        {
+            var popup = _roomCustomizeOverlay;
+            if (popup == null || root == null) return;
+            root.schedule.Execute(() =>
+            {
+                if (this == null || !isActiveAndEnabled || _roomCustomizeOverlay != popup || popup.panel == null
+                    || overlay != null || _profileOverlay != null || _roomPasswordOverlay != null) return;
+                popup.Q<TextField>("customize-nickname")?.Focus();
+            }).StartingIn(180);
+        }
+
+        private void RefreshPublicProfileFriendship()
+        {
+            var profile = _loadedPublicProfile;
+            var actions = _profileBody?.Q<VisualElement>(className: "public-profile-friend-actions");
+            if (profile == null || actions?.panel == null || _profileActionBusy) return;
+            string state = profile.AccountId == lobby.Profile?.AccountId ? "Self"
+                : lobby.Friends.Friends.Any(friend => friend.AccountId == profile.AccountId) ? "Friends"
+                : lobby.Friends.Incoming.Any(friend => friend.AccountId == profile.AccountId) ? "Incoming"
+                : lobby.Friends.Outgoing.Any(friend => friend.AccountId == profile.AccountId) ? "Outgoing" : "None";
+            if (profile.Friendship == state) return;
+            profile.Friendship = state;
+            actions.Clear();
+            RenderPublicProfileFriendship(actions, profile);
         }
 
         private void StartPublicProfileFriendAction(Func<Task> action)
@@ -292,6 +407,7 @@ namespace DrawLiar
             _profileOverlay = _profileModal = _profileBody = _profileReturnFocus = null;
             _profileAccountId = _profileViewerAccountId = null;
             _profileActionBusy = false;
+            _loadedPublicProfile = null;
             if (popup == null) return;
             DrawUIMotion.HideModal(popup, modal);
             if (!restoreFocus || root == null) return;

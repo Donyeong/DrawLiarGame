@@ -79,6 +79,7 @@ public sealed partial class ServerDatabase
     {
         if (request.Rooms == null || request.Rooms.Length > 1024) throw new ApiException("InvalidHeartbeat");
         var closed = new List<string>();
+        var configurations = new List<RoomConfigurationData>();
         await using var connection = await _source.OpenConnectionAsync();
         await using var transaction = await connection.BeginTransactionAsync();
         if (await Execute(connection, transaction, "UPDATE \"DedicatedNode\" SET \"HeartbeatAt\"=now() WHERE \"NodeId\"=$1", request.NodeId) != 1)
@@ -98,10 +99,16 @@ public sealed partial class ServerDatabase
             await Execute(connection, transaction, "DELETE FROM \"RoomAdmission\" WHERE \"RoomId\"=$1 AND \"Id\"=ANY($2)", roomId, room.AdmissionIds);
             await Execute(connection, transaction, """
                 UPDATE "Room" SET "PlayerCount"=$3,"SpectatorCount"=$4,"IsInProgress"=$5,"OwnerAccountId"=$6,"UpdatedAt"=now(),
-                "PlayerAccountIds"=$7::jsonb,"SpectatorAccountIds"=$8::jsonb,"Settings"=$9::jsonb,
+                "PlayerAccountIds"=$7::jsonb,"SpectatorAccountIds"=$8::jsonb,
+                "ConfirmedPlayerAccountIds"=$7::jsonb,"ConfirmedSpectatorAccountIds"=$8::jsonb,
+                "Settings"=CASE WHEN "ConfigurationVersion"=$11 THEN $9::jsonb || jsonb_build_object('IsPrivate',"Settings"->'IsPrivate') ELSE "Settings" END,
                 "Established"="Established" OR $10 WHERE "RoomId"=$1 AND "NodeId"=$2
                 """, roomId, request.NodeId, room.PlayerCount, room.SpectatorCount, room.IsInProgress, owner,
-                JsonSerializer.Serialize(room.PlayerAccountIds), JsonSerializer.Serialize(room.SpectatorAccountIds), JsonSerializer.Serialize(room.Settings, ServerRuntime.Json), room.AdmissionIds.Length > 0 || room.PlayerCount + room.SpectatorCount > 0);
+                JsonSerializer.Serialize(room.PlayerAccountIds), JsonSerializer.Serialize(room.SpectatorAccountIds), JsonSerializer.Serialize(room.Settings, ServerRuntime.Json), room.AdmissionIds.Length > 0 || room.PlayerCount + room.SpectatorCount > 0, room.ConfigurationVersion);
+            await using (var configuration = Command(connection, transaction, "SELECT \"Settings\"::text,\"ConfigurationVersion\",\"AccessVersion\" FROM \"Room\" WHERE \"RoomId\"=$1 AND \"NodeId\"=$2 AND \"ConfigurationVersion\"<>$3", roomId, request.NodeId, room.ConfigurationVersion))
+            await using (var reader = await configuration.ExecuteReaderAsync())
+                if (await reader.ReadAsync()) configurations.Add(new RoomConfigurationData { RoomId = room.RoomId,
+                    Settings = JsonSerializer.Deserialize<ServerRoomSettings>(reader.GetString(0), ServerRuntime.Json)!, Version = reader.GetInt64(1), AccessVersion = reader.GetInt64(2) });
             if (room.Closed)
             {
                 // 발급·교환 중인 입장권이 끝난 뒤 GS가 방 종료를 승인한다.
@@ -118,12 +125,12 @@ public sealed partial class ServerDatabase
         await Execute(connection, transaction, "DELETE FROM \"RoomAdmission\" WHERE \"ExpiresAt\"<=now()");
         await RemoveUnoccupiedRooms(connection, transaction);
         await transaction.CommitAsync();
-        return new DedicatedHeartbeatResponse { ClosedRoomIds = closed.ToArray() };
+        return new DedicatedHeartbeatResponse { ClosedRoomIds = closed.ToArray(), Configurations = configurations.ToArray() };
     }
 
     private const string ROOM_SELECT = """
         SELECT r."RoomId",r."OwnerAccountId",r."NodeId",r."Settings"::text,r."PlayerCount",r."SpectatorCount",r."IsInProgress",d."PublicUrl",
-        r."PlayerAccountIds"::text,r."SpectatorAccountIds"::text,r."RoomCode"
+        r."PlayerAccountIds"::text,r."SpectatorAccountIds"::text,r."RoomCode",r."ConfigurationVersion",r."AccessVersion"
         FROM "Room" r JOIN "DedicatedNode" d ON d."NodeId"=r."NodeId"
         """;
 
@@ -131,7 +138,8 @@ public sealed partial class ServerDatabase
     {
         var settings = JsonSerializer.Deserialize<ServerRoomSettings>(reader.GetString(3), ServerRuntime.Json)!;
         return new ServerRoomData { RoomId = reader.GetGuid(0).ToString(), RoomCode = reader.GetString(10), OwnerAccountId = reader.GetGuid(1).ToString(), NodeId = reader.GetString(2), Settings = settings, Name = settings.RoomName,
-            IsPrivate = settings.IsPrivate, PlayerCount = reader.GetInt32(4), SpectatorCount = reader.GetInt32(5), IsInProgress = reader.GetBoolean(6) };
+            IsPrivate = settings.IsPrivate, PlayerCount = reader.GetInt32(4), SpectatorCount = reader.GetInt32(5), IsInProgress = reader.GetBoolean(6),
+            ConfigurationVersion = reader.GetInt64(11), AccessVersion = reader.GetInt64(12) };
     }
 
     public async Task<RoomListResponse> RoomsAsync(string? search, bool includePrivate = false)
@@ -151,6 +159,7 @@ public sealed partial class ServerDatabase
         var settings = request.Settings ?? throw new ApiException("InvalidSettings");
         ValidateSettings(settings);
         ValidateCustomTopics(request.CustomTopics);
+        string? passwordHash = settings.IsPrivate ? RoomPassword.Hash(request.Password) : null;
         await using var connection = await _source.OpenConnectionAsync();
         await using var transaction = await connection.BeginTransactionAsync();
         await RemoveUnoccupiedRooms(connection, transaction);
@@ -174,8 +183,8 @@ public sealed partial class ServerDatabase
         do
         {
             roomCode = RoomCodes.Create();
-        } while (await Execute(connection, transaction, "INSERT INTO \"Room\" (\"RoomId\",\"RoomCode\",\"OwnerAccountId\",\"NodeId\",\"Settings\",\"CustomTopics\") VALUES ($1,$2,$3,$4,$5::jsonb,$6::jsonb) ON CONFLICT (\"RoomCode\") DO NOTHING",
-            roomId, roomCode, session.AccountId, nodeId, JsonSerializer.Serialize(settings, ServerRuntime.Json), JsonSerializer.Serialize(request.CustomTopics, ServerRuntime.Json)) == 0);
+        } while (await Execute(connection, transaction, "INSERT INTO \"Room\" (\"RoomId\",\"RoomCode\",\"OwnerAccountId\",\"NodeId\",\"Settings\",\"CustomTopics\",\"PasswordHash\") VALUES ($1,$2,$3,$4,$5::jsonb,$6::jsonb,$7) ON CONFLICT (\"RoomCode\") DO NOTHING",
+            roomId, roomCode, session.AccountId, nodeId, JsonSerializer.Serialize(settings, ServerRuntime.Json), JsonSerializer.Serialize(request.CustomTopics, ServerRuntime.Json), passwordHash) == 0);
         await Execute(connection, transaction, "INSERT INTO \"RoomGameAuthority\" (\"RoomId\",\"NodeId\") VALUES ($1,$2)", roomId, nodeId);
         var assignment = await CreateTicket(connection, transaction, session, roomId, roomCode, publicUrl, false);
         await transaction.CommitAsync();
@@ -192,12 +201,20 @@ public sealed partial class ServerDatabase
         ) DELETE FROM "Room" WHERE "RoomId" IN (SELECT "RoomId" FROM expired)
         """);
 
-    public async Task<DedicatedAssignment> JoinRoomAsync(ServerSession session, string identifier, bool asSpectator)
+    public async Task<DedicatedAssignment> JoinRoomAsync(ServerSession session, string identifier, bool asSpectator, string password = "")
+    {
+        await using var connection = await _source.OpenConnectionAsync();
+        await using var transaction = await connection.BeginTransactionAsync();
+        var ticket = await JoinRoom(connection, transaction, session, identifier, asSpectator, password);
+        await transaction.CommitAsync();
+        return ticket;
+    }
+
+    private static async Task<DedicatedAssignment> JoinRoom(NpgsqlConnection connection, NpgsqlTransaction transaction,
+        ServerSession session, string identifier, bool asSpectator, string password)
     {
         bool legacyId = Guid.TryParse(identifier, out Guid parsedId);
         string lookup = legacyId ? parsedId.ToString() : RoomCodes.Normalize(identifier);
-        await using var connection = await _source.OpenConnectionAsync();
-        await using var transaction = await connection.BeginTransactionAsync();
         ServerRoomData room;
         string url;
         string[] players;
@@ -212,16 +229,26 @@ public sealed partial class ServerDatabase
             spectators = JsonSerializer.Deserialize<string[]>(reader.GetString(9))!;
         }
         Guid roomId = Guid.Parse(room.RoomId);
-        bool reconnectPlayer = players.Contains(session.AccountId.ToString());
-        bool reconnectSpectator = spectators.Contains(session.AccountId.ToString());
+        bool reconnectPlayer, reconnectSpectator;
+        await using (var membership = Command(connection, transaction, "SELECT \"ConfirmedPlayerAccountIds\" ? $2::text,\"ConfirmedSpectatorAccountIds\" ? $2::text,\"PasswordHash\" FROM \"Room\" WHERE \"RoomId\"=$1", roomId, session.AccountId))
+        await using (var reader = await membership.ExecuteReaderAsync())
+        {
+            await reader.ReadAsync();
+            reconnectPlayer = reader.GetBoolean(0);
+            reconnectSpectator = reader.GetBoolean(1);
+            if (room.IsPrivate && !reconnectPlayer && !reconnectSpectator)
+            {
+                if (reader.IsDBNull(2)) throw new ApiException("RoomPasswordNotConfigured", 409);
+                if (string.IsNullOrEmpty(password)) throw new ApiException("RoomPasswordRequired", 403);
+                if (!RoomPassword.Verify(password, reader.GetString(2))) throw new ApiException("InvalidRoomPassword", 403);
+            }
+        }
         bool spectator = reconnectSpectator || !reconnectPlayer && (asSpectator || room.IsInProgress);
         await Execute(connection, transaction, "DELETE FROM \"JoinTicket\" WHERE \"RoomId\"=$1 AND (\"ExpiresAt\"<=now() OR \"AccountId\"=$2)", roomId, session.AccountId);
         long reservations = await PendingReservations(connection, transaction, roomId, spectator, session.AccountId, players.Concat(spectators).ToArray());
         if (!reconnectPlayer && !reconnectSpectator && (spectator ? Math.Max(room.SpectatorCount, spectators.Length) + reservations >= 32 : Math.Max(room.PlayerCount, players.Length) + reservations >= room.Settings.MaxPlayers))
             throw new ApiException("RoomFull", 409);
-        var ticket = await CreateTicket(connection, transaction, session, roomId, room.RoomCode, url, spectator, asSpectator);
-        await transaction.CommitAsync();
-        return ticket;
+        return await CreateTicket(connection, transaction, session, roomId, room.RoomCode, url, spectator, asSpectator);
     }
 
     private static async Task<long> PendingReservations(NpgsqlConnection connection, NpgsqlTransaction transaction,
@@ -236,7 +263,8 @@ public sealed partial class ServerDatabase
     {
         string token = ServerRuntime.NewToken();
         DateTimeOffset expiresAt = DateTimeOffset.UtcNow.AddSeconds(60);
-        await Execute(connection, transaction, "INSERT INTO \"JoinTicket\" (\"Hash\",\"AccountId\",\"RoomId\",\"SessionHash\",\"IsSpectator\",\"ExpiresAt\",\"SpectatorOnly\") VALUES ($1,$2,$3,$4,$5,$6,$7)", ServerRuntime.Hash(token), session.AccountId, roomId, session.Hash, spectator, expiresAt, spectatorOnly);
+        long accessVersion = Convert.ToInt64(await Scalar(connection, transaction, "SELECT \"AccessVersion\" FROM \"Room\" WHERE \"RoomId\"=$1", roomId));
+        await Execute(connection, transaction, "INSERT INTO \"JoinTicket\" (\"Hash\",\"AccountId\",\"RoomId\",\"SessionHash\",\"IsSpectator\",\"ExpiresAt\",\"SpectatorOnly\",\"AccessVersion\") VALUES ($1,$2,$3,$4,$5,$6,$7,$8)", ServerRuntime.Hash(token), session.AccountId, roomId, session.Hash, spectator, expiresAt, spectatorOnly, accessVersion);
         return new DedicatedAssignment { RoomId = roomId.ToString(), RoomCode = roomCode, DedicatedUrl = url, JoinTicket = token, ExpiresAt = ServerRuntime.Timestamp(expiresAt) };
     }
 
@@ -251,10 +279,12 @@ public sealed partial class ServerDatabase
         string sessionHash;
         bool spectator;
         bool spectatorOnly;
+        long accessVersion;
         DateTimeOffset admissionUntil;
         await using (var command = Command(connection, transaction, """
             DELETE FROM "JoinTicket" t USING "Room" r WHERE t."Hash"=$1 AND t."ExpiresAt">now() AND t."RoomId"=$2
-            AND r."RoomId"=t."RoomId" AND r."NodeId"=$3 RETURNING t."AccountId",t."SessionHash",t."IsSpectator",t."SpectatorOnly",t."ExpiresAt"
+            AND r."RoomId"=t."RoomId" AND r."NodeId"=$3 AND t."AccessVersion"=r."AccessVersion"
+            RETURNING t."AccountId",t."SessionHash",t."IsSpectator",t."SpectatorOnly",t."ExpiresAt",t."AccessVersion"
             """, ServerRuntime.Hash(request.JoinTicket), roomId, request.NodeId))
         await using (var reader = await command.ExecuteReaderAsync())
         {
@@ -264,9 +294,10 @@ public sealed partial class ServerDatabase
             spectator = reader.GetBoolean(2);
             spectatorOnly = reader.GetBoolean(3);
             admissionUntil = reader.GetFieldValue<DateTimeOffset>(4);
+            accessVersion = reader.GetInt64(5);
         }
         string admissionId = ServerRuntime.Hash(request.JoinTicket);
-        await Execute(connection, transaction, "INSERT INTO \"RoomAdmission\" (\"Id\",\"RoomId\",\"AccountId\",\"IsSpectator\",\"ExpiresAt\") VALUES ($1,$2,$3,$4,$5)", admissionId, roomId, accountId, spectator, admissionUntil);
+        await Execute(connection, transaction, "INSERT INTO \"RoomAdmission\" (\"Id\",\"RoomId\",\"AccountId\",\"IsSpectator\",\"ExpiresAt\",\"AccessVersion\") VALUES ($1,$2,$3,$4,$5,$6)", admissionId, roomId, accountId, spectator, admissionUntil, accessVersion);
         string scope = (string)(await Scalar(connection, transaction, "SELECT \"Scope\" FROM \"Session\" WHERE \"Hash\"=$1", sessionHash) ?? "");
         if (!scope.StartsWith("game:", StringComparison.Ordinal)) throw new ApiException("InvalidTicket", 401);
         var session = await AuthenticateHash(connection, transaction, sessionHash, scope);

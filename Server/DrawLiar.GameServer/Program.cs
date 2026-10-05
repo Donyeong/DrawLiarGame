@@ -29,6 +29,8 @@ app.MapGet("/api/profiles/{accountId}", async (HttpContext context, string accou
     await database.PublicProfileAsync((await Authenticate(context)).AccountId, ServerRuntime.AccountId(accountId), context.RequestAborted));
 app.MapPatch("/api/profile", async (HttpContext context, UpdateProfileRequest request) => await database.UpdateProfileAsync((await Authenticate(context)).AccountId, request));
 app.MapGet("/api/friends", (Func<HttpContext, Task<FriendListResponse>>)(async context => await database.FriendsAsync((await Authenticate(context)).AccountId)));
+app.MapGet("/api/social/inbox", (Func<HttpContext, Task<SocialInboxResponse>>)(async context =>
+    await database.SocialInboxAsync((await Authenticate(context)).AccountId, context.RequestAborted)));
 app.MapPost("/api/friends/request", async (HttpContext context, FriendRequest request) => { await database.RequestFriendAsync((await Authenticate(context)).AccountId, ServerRuntime.AccountId(request.AccountId)); return Results.NoContent(); });
 app.MapPost("/api/friends/respond", async (HttpContext context, FriendRespondRequest request) => { await database.RespondFriendAsync((await Authenticate(context)).AccountId, ServerRuntime.AccountId(request.AccountId), request.Accept); return Results.NoContent(); });
 app.MapDelete("/api/friends/{accountId}", async (HttpContext context, string accountId) => { await database.RemoveFriendAsync((await Authenticate(context)).AccountId, ServerRuntime.AccountId(accountId)); return Results.NoContent(); });
@@ -36,7 +38,16 @@ app.MapGet("/api/shop", (Func<HttpContext, Task<ShopResponse>>)(async context =>
 app.MapPost("/api/shop/purchase", async (HttpContext context, PurchaseRequest request) => await database.PurchaseAsync((await Authenticate(context)).AccountId, request));
 app.MapGet("/api/rooms", async (HttpContext context, string? search) => { await Authenticate(context); return await database.RoomsAsync(search); });
 app.MapPost("/api/rooms", async (HttpContext context, CreateRoomRequest request) => await database.CreateRoomAsync(await Authenticate(context), request));
-app.MapPost("/api/rooms/{roomId}/join", async (HttpContext context, string roomId, JoinRoomRequest request) => await database.JoinRoomAsync(await Authenticate(context), roomId, request.AsSpectator)).RequireRateLimiting("room-join");
+app.MapPost("/api/rooms/{roomId}/join", async (HttpContext context, string roomId, JoinRoomRequest request) => await database.JoinRoomAsync(await Authenticate(context), roomId, request.AsSpectator, request.Password)).RequireRateLimiting("room-join");
+app.MapPost("/api/rooms/{roomId}/invite", async (HttpContext context, string roomId, FriendRequest request) =>
+    await database.InviteToRoomAsync(await Authenticate(context), roomId, ServerRuntime.AccountId(request.AccountId), context.RequestAborted)).RequireRateLimiting("room-join");
+app.MapPost("/api/room-invitations/{invitationId}/respond", async (HttpContext context, string invitationId, RoomInvitationRespondRequest request) =>
+    await database.RespondRoomInvitationAsync(await Authenticate(context), invitationId, request.Accept, request.Password, context.RequestAborted)).RequireRateLimiting("room-join");
+app.MapPost("/internal/rooms/configure", async (HttpContext context, ConfigureRoomRequest request) =>
+{
+    ServerRuntime.RequireCluster(context, app.Configuration);
+    return await database.ConfigureRoomAsync(request, context.RequestAborted);
+});
 app.MapPost("/internal/dedicated/register", async (HttpContext context, RegisterDedicatedRequest request) => { ServerRuntime.RequireCluster(context, app.Configuration); await database.RegisterDedicatedAsync(request, app.Environment.IsDevelopment()); return Results.NoContent(); });
 app.MapPost("/internal/dedicated/heartbeat", async (HttpContext context, DedicatedHeartbeatRequest request) => { ServerRuntime.RequireCluster(context, app.Configuration); return await database.DedicatedHeartbeatAsync(request); });
 app.MapPost("/internal/dedicated/matches", async (HttpContext context, MatchResultRequest request) =>
@@ -47,4 +58,10 @@ app.MapPost("/internal/dedicated/matches", async (HttpContext context, MatchResu
 });
 app.MapPost("/internal/tickets/redeem", async (HttpContext context, RedeemTicketRequest request) => { ServerRuntime.RequireCluster(context, app.Configuration); return await database.RedeemTicketAsync(request); });
 app.MapPost("/internal/sessions/check", async (HttpContext context, SessionCheckRequest request) => { ServerRuntime.RequireCluster(context, app.Configuration); return new SessionCheckResponse { Valid = await database.CheckDedicatedSessionAsync(request) }; });
+app.MapPost("/internal/profiles/refresh", async (HttpContext context, SessionCheckRequest request) =>
+{
+    ServerRuntime.RequireCluster(context, app.Configuration);
+    if (!await database.CheckDedicatedSessionAsync(request)) throw new ApiException("Unauthorized", 401);
+    return await database.ProfileAsync(ServerRuntime.AccountId(request.AccountId));
+});
 await app.RunAsync();

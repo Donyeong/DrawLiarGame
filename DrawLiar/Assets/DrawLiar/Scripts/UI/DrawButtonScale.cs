@@ -37,11 +37,6 @@ namespace DrawLiar
             if (button != null && _bindings.TryGetValue(button, out var binding)) binding.Reset();
         }
 
-        public static void ResetAll(VisualElement root)
-        {
-            root?.Query<Button>().ForEach(Reset);
-        }
-
         private sealed class Binding : IDisposable
         {
             private const CallbackOptions POINTER_OPTIONS = CallbackOptions.TrickleDown | CallbackOptions.IncludeDisabled;
@@ -53,7 +48,7 @@ namespace DrawLiar
 
             public bool MobileOnly { get; set; }
             private bool Enabled => (!MobileOnly || DrawUIMotion.HasAncestorClass(_button, "mobile"))
-                && _button.enabledInHierarchy && !DrawUIMotion.IsReducedMotion(_button);
+                && _button.enabledInHierarchy;
 
             public Binding(Button button, bool mobileOnly)
             {

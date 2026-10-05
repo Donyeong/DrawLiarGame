@@ -13,6 +13,9 @@
     <Compile Include="..\..\DrawLiar\Assets\DrawLiar\Scripts\Game\GameplayEnvelope.cs" Link="GameplayEnvelope.cs" />
     <Compile Include="..\..\DrawLiar\Assets\DrawLiar\Scripts\Game\Editor\GameSelfCheck.cs" Link="GameSelfCheck.cs" />
     <Compile Include="..\DrawLiar.DedicatedServer\DedicatedRoom.cs" Link="Dedicated\DedicatedRoom.cs" />
+    <Compile Include="..\DrawLiar.DedicatedServer\DedicatedRoom.Configuration.cs" Link="Dedicated\DedicatedRoom.Configuration.cs" />
+    <Compile Include="..\DrawLiar.DedicatedServer\DedicatedRoom.Profile.cs" Link="Dedicated\DedicatedRoom.Profile.cs" />
+    <Compile Include="..\DrawLiar.DedicatedServer\DedicatedRoom.Drawing.cs" Link="Dedicated\DedicatedRoom.Drawing.cs" />
     <Compile Include="..\DrawLiar.DedicatedServer\GameConnection.cs" Link="Dedicated\GameConnection.cs" />
     <Compile Include="..\DrawLiar.DedicatedServer\GameplayWire.cs" Link="Dedicated\GameplayWire.cs" />
     <Compile Include="..\DrawLiar.DedicatedServer\RoomRegistry.cs" Link="Dedicated\RoomRegistry.cs" />

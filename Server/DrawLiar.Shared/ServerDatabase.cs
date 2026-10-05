@@ -64,7 +64,7 @@ public sealed partial class ServerDatabase : IDisposable
     {
         Guid id = Guid.NewGuid();
         await using var connection = await _source.OpenConnectionAsync();
-        await Execute(connection, null, "INSERT INTO \"Account\" (\"Id\",\"DisplayName\") VALUES ($1,$2)", id, ServerRuntime.DisplayName(name));
+        await Execute(connection, null, "INSERT INTO \"Account\" (\"Id\",\"DisplayName\",\"AvatarColor\") VALUES ($1,$2,$3)", id, ServerRuntime.DisplayName(name), Random.Shared.Next(6));
         return id;
     }
 
@@ -233,7 +233,7 @@ public sealed partial class ServerDatabase : IDisposable
         {
             id = linkAccountId ?? Guid.NewGuid();
             if (!linkAccountId.HasValue)
-                await Execute(connection, transaction, "INSERT INTO \"Account\" (\"Id\",\"DisplayName\") VALUES ($1,$2)", id, displayName);
+                await Execute(connection, transaction, "INSERT INTO \"Account\" (\"Id\",\"DisplayName\",\"AvatarColor\") VALUES ($1,$2,$3)", id, displayName, Random.Shared.Next(6));
             else
             {
                 if (await Scalar(connection, transaction, "SELECT \"Id\" FROM \"Account\" WHERE \"Id\"=$1 AND NOT \"IsBanned\" FOR UPDATE", id) == null)

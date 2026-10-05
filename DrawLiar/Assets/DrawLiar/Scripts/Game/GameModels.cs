@@ -7,6 +7,7 @@ namespace DrawLiar
     public enum GamePhase { Lobby, RoleReveal, Drawing, Discussion, Rebuttal, Voting, LiarReveal, Guessing, RoundResults, MatchResults }
     public enum DrawingMode { Relay, Individual }
     public enum VictoryMode { RoundCount, TargetScore }
+    public enum GuessOutcome { Hidden, Correct, Incorrect, Unanswered }
 
     [Serializable]
     public sealed class RoomSettings
@@ -75,9 +76,11 @@ namespace DrawLiar
         public int AvatarColor;
         public int Accessory;
         public bool HasVoted;
+        public bool HasJudged;
         public bool HasGuessed;
         public int VoteCount;
         public string Guess;
+        public GuessOutcome GuessOutcome;
     }
 
     public sealed class CompletedMatchData
@@ -112,9 +115,20 @@ namespace DrawLiar
         public bool LocalIsLiar;
         public bool LocalIsSpectator;
         public int LocalPlayerId = -1;
+        public int HostPlayerId;
         public bool IsHost;
         public bool CanStart;
         public int CanvasVersion;
+        public int DrawingEpoch;
+        public int[] DrawingOrder = Array.Empty<int>();
+        public bool HasAccused;
+        public int AccusedPlayerId = -1;
+        public int BallotVersion;
+        public int ApprovalCount;
+        public int RejectionCount;
+        public int JudgmentVoterCount;
+        public int JudgmentVotesCast;
+        public bool LocalJudgmentApprove;
         public float RemainingSeconds;
         public RoomSettings Settings = new RoomSettings();
         public string[] AvailableTopics = Array.Empty<string>();
@@ -130,6 +144,7 @@ namespace DrawLiar
         public byte R, G, B;
         public bool Eraser;
         public int CanvasVersion;
+        public int AuthorPlayerId;
     }
 
     [Serializable]

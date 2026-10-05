@@ -684,8 +684,8 @@
       "Key": "관전 {0}명",
       "Values": [
         "관전 {0}명",
-        "{0} spectators",
-        "观战 {0}人",
+        "Spectators: {0}",
+        "观战 {0} 人",
         "觀戰 {0} 人",
         "観戦 {0}人",
         "Espectadores: {0}",
@@ -1120,23 +1120,6 @@
         "Lanjut",
         "आगे",
         "التالي"
-      ]
-    },
-    {
-      "Key": "단위: 초 · 반론 0초는 건너뛰기",
-      "Values": [
-        "단위: 초 · 반론 0초는 건너뛰기",
-        "Seconds · Skip objections when set to 0",
-        "单位：秒 · 异议设为0则跳过",
-        "單位：秒 · 異議設為 0 則略過",
-        "単位：秒 · 反論が0秒ならスキップ",
-        "En segundos · 0 s de defensa para omitir",
-        "Em segundos · 0 s de defesa para pular",
-        "En secondes · 0 s de défense pour passer",
-        "In Sekunden · Verteidigung mit 0 s überspringen",
-        "Dalam detik · Pembelaan 0 dtk untuk dilewati",
-        "सेकंड में · सफ़ाई के लिए 0 सेकंड चुनने पर यह चरण छूटेगा",
-        "بالثواني · 0 ثانية للدفاع لتخطيه"
       ]
     },
     {
@@ -4455,23 +4438,6 @@
       ]
     },
     {
-      "Key": "화면 움직임 줄이기",
-      "Values": [
-        "화면 움직임 줄이기",
-        "Reduce motion",
-        "减少屏幕动态效果",
-        "減少畫面動態效果",
-        "画面の動きを減らす",
-        "Reducir movimiento",
-        "Reduzir movimento",
-        "Réduire les animations",
-        "Bewegung reduzieren",
-        "Kurangi gerakan",
-        "ऐनिमेशन कम करें",
-        "تقليل الحركة"
-      ]
-    },
-    {
       "Key": "확인",
       "Values": [
         "확인",
@@ -5761,6 +5727,1026 @@
         "Menunggu persetujuan",
         "स्वीकृति की प्रतीक्षा",
         "بانتظار القبول"
+      ]
+    },
+    {
+      "Key": "방장",
+      "Values": [
+        "방장",
+        "Host",
+        "房主",
+        "房主",
+        "ホスト",
+        "Anfitrión",
+        "Anfitrião",
+        "Hôte",
+        "Gastgeber",
+        "Pemilik ruang",
+        "मेज़बान",
+        "المضيف"
+      ]
+    },
+    {
+      "Key": "지목하기",
+      "Values": [
+        "지목하기",
+        "Nominate",
+        "提名",
+        "提名",
+        "指名する",
+        "Nominar",
+        "Indicar",
+        "Désigner",
+        "Nominieren",
+        "Tunjuk",
+        "नामित करें",
+        "ترشيح"
+      ]
+    },
+    {
+      "Key": "지목 완료",
+      "Values": [
+        "지목 완료",
+        "Nomination submitted",
+        "已提名",
+        "已提名",
+        "指名済み",
+        "Nominación enviada",
+        "Indicação enviada",
+        "Désignation envoyée",
+        "Nominierung abgegeben",
+        "Sudah menunjuk",
+        "नामांकन भेजा गया",
+        "تم الترشيح"
+      ]
+    },
+    {
+      "Key": "지목할 플레이어를 선택하세요",
+      "Values": [
+        "지목할 플레이어를 선택하세요",
+        "Choose a player to nominate",
+        "选择要提名的玩家",
+        "選擇要提名的玩家",
+        "指名するプレイヤーを選んでください",
+        "Elige a un jugador para nominar",
+        "Escolha um jogador para indicar",
+        "Choisissez un joueur à désigner",
+        "Wähle einen Spieler zur Nominierung",
+        "Pilih pemain untuk ditunjuk",
+        "नामित करने के लिए खिलाड़ी चुनें",
+        "اختر لاعبًا لترشيحه"
+      ]
+    },
+    {
+      "Key": "지목 {0}/{1}",
+      "Values": [
+        "지목 {0}/{1}",
+        "Nominations {0}/{1}",
+        "提名 {0}/{1}",
+        "提名 {0}/{1}",
+        "指名 {0}/{1}",
+        "Nominaciones {0}/{1}",
+        "Indicações {0}/{1}",
+        "Désignations {0}/{1}",
+        "Nominierungen {0}/{1}",
+        "Penunjukan {0}/{1}",
+        "नामांकन {0}/{1}",
+        "الترشيحات {0}/{1}"
+      ]
+    },
+    {
+      "Key": "지목된 플레이어",
+      "Values": [
+        "지목된 플레이어",
+        "Nominated player",
+        "被提名的玩家",
+        "被提名的玩家",
+        "指名されたプレイヤー",
+        "Jugador nominado",
+        "Jogador indicado",
+        "Joueur désigné",
+        "Nominierter Spieler",
+        "Pemain yang ditunjuk",
+        "नामित खिलाड़ी",
+        "اللاعب المرشح"
+      ]
+    },
+    {
+      "Key": "찬성",
+      "Values": [
+        "찬성",
+        "Agree",
+        "赞成",
+        "贊成",
+        "賛成",
+        "A favor",
+        "A favor",
+        "Pour",
+        "Dafür",
+        "Setuju",
+        "सहमति",
+        "موافق"
+      ]
+    },
+    {
+      "Key": "반대",
+      "Values": [
+        "반대",
+        "Disagree",
+        "反对",
+        "反對",
+        "反対",
+        "En contra",
+        "Contra",
+        "Contre",
+        "Dagegen",
+        "Tidak setuju",
+        "असहमति",
+        "معارض"
+      ]
+    },
+    {
+      "Key": "찬성 {0} · 반대 {1}",
+      "Values": [
+        "찬성 {0} · 반대 {1}",
+        "Agree {0} · Disagree {1}",
+        "赞成 {0} · 反对 {1}",
+        "贊成 {0} · 反對 {1}",
+        "賛成 {0} · 反対 {1}",
+        "A favor {0} · En contra {1}",
+        "A favor {0} · Contra {1}",
+        "Pour {0} · Contre {1}",
+        "Dafür {0} · Dagegen {1}",
+        "Setuju {0} · Tidak setuju {1}",
+        "सहमत {0} · असहमत {1}",
+        "موافق {0} · معارض {1}"
+      ]
+    },
+    {
+      "Key": "찬반 투표 {0}/{1}",
+      "Values": [
+        "찬반 투표 {0}/{1}",
+        "Verdict votes {0}/{1}",
+        "赞成或反对 {0}/{1}",
+        "贊成或反對 {0}/{1}",
+        "賛否投票 {0}/{1}",
+        "Votos de veredicto {0}/{1}",
+        "Votos de veredito {0}/{1}",
+        "Votes de décision {0}/{1}",
+        "Entscheidungsstimmen {0}/{1}",
+        "Suara keputusan {0}/{1}",
+        "निर्णय मत {0}/{1}",
+        "أصوات القرار {0}/{1}"
+      ]
+    },
+    {
+      "Key": "찬성 제출 완료",
+      "Values": [
+        "찬성 제출 완료",
+        "Agreement submitted",
+        "已投赞成票",
+        "已投贊成票",
+        "賛成票を送信済み",
+        "Voto a favor enviado",
+        "Voto a favor enviado",
+        "Vote pour envoyé",
+        "Stimme dafür abgegeben",
+        "Suara setuju terkirim",
+        "सहमति मत भेजा गया",
+        "تم إرسال الموافقة"
+      ]
+    },
+    {
+      "Key": "반대 제출 완료",
+      "Values": [
+        "반대 제출 완료",
+        "Disagreement submitted",
+        "已投反对票",
+        "已投反對票",
+        "反対票を送信済み",
+        "Voto en contra enviado",
+        "Voto contra enviado",
+        "Vote contre envoyé",
+        "Stimme dagegen abgegeben",
+        "Suara tidak setuju terkirim",
+        "असहमति मत भेजा गया",
+        "تم إرسال المعارضة"
+      ]
+    },
+    {
+      "Key": "반론 중",
+      "Values": [
+        "반론 중",
+        "Defending",
+        "正在辩解",
+        "正在辯解",
+        "反論中",
+        "Defendiéndose",
+        "Defendendo-se",
+        "Se défend",
+        "Verteidigt sich",
+        "Sedang membela diri",
+        "सफ़ाई दे रहे हैं",
+        "يدافع عن نفسه"
+      ]
+    },
+    {
+      "Key": "반론 · 찬반",
+      "Values": [
+        "반론 · 찬반",
+        "Defense · Verdict",
+        "辩解 · 表决",
+        "辯解 · 表決",
+        "反論・賛否",
+        "Defensa · Veredicto",
+        "Defesa · Veredito",
+        "Défense · Décision",
+        "Verteidigung · Entscheidung",
+        "Pembelaan · Keputusan",
+        "सफ़ाई · निर्णय",
+        "الدفاع · القرار"
+      ]
+    },
+    {
+      "Key": "단위: 초",
+      "Values": [
+        "단위: 초",
+        "Unit: seconds",
+        "单位：秒",
+        "單位：秒",
+        "単位：秒",
+        "Unidad: segundos",
+        "Unidade: segundos",
+        "Unité : secondes",
+        "Einheit: Sekunden",
+        "Satuan: detik",
+        "इकाई: सेकंड",
+        "الوحدة: ثوانٍ"
+      ]
+    },
+    {
+      "Key": "지목이 부결되었어요. 토론과 지목 투표를 다시 진행해 주세요.",
+      "Values": [
+        "지목이 부결되었어요. 토론과 지목 투표를 다시 진행해 주세요.",
+        "The accusation was rejected. Resume the discussion and nominations.",
+        "指控被否决。请重新讨论并提名。",
+        "指控被否決。請重新討論並提名。",
+        "指名が否決されました。もう一度話し合って指名投票をしてください。",
+        "La acusación fue rechazada. Continúen el debate y las nominaciones.",
+        "A acusação foi rejeitada. Retomem a discussão e as indicações.",
+        "La désignation a été rejetée. Reprenez la discussion et les désignations.",
+        "Die Nominierung wurde abgelehnt. Diskutiert und nominiert erneut.",
+        "Penunjukan ditolak. Lanjutkan diskusi dan penunjukan.",
+        "नामांकन अस्वीकार हो गया। चर्चा और नामांकन फिर से शुरू करें।",
+        "رُفض الترشيح. استأنفوا النقاش والترشيحات."
+      ]
+    },
+    {
+      "Key": "지목된 친구의 연결이 끊겨 토론과 지목 투표를 다시 시작해요.",
+      "Values": [
+        "지목된 친구의 연결이 끊겨 토론과 지목 투표를 다시 시작해요.",
+        "The nominee disconnected. Restarting discussion and nominations.",
+        "被提名的玩家已断线。重新开始讨论和提名。",
+        "被提名的玩家已斷線。重新開始討論和提名。",
+        "指名されたプレイヤーが切断したため、話し合いと指名投票を再開します。",
+        "El jugador nominado se desconectó. Se reinician el debate y las nominaciones.",
+        "O jogador indicado se desconectou. Reiniciando a discussão e as indicações.",
+        "Le joueur désigné est déconnecté. La discussion et les désignations reprennent.",
+        "Der nominierte Spieler ist getrennt. Diskussion und Nominierungen starten neu.",
+        "Pemain yang ditunjuk terputus. Diskusi dan penunjukan dimulai kembali.",
+        "नामित खिलाड़ी का संपर्क टूट गया। चर्चा और नामांकन फिर शुरू हो रहे हैं।",
+        "انقطع اتصال اللاعب المرشح. يُستأنف النقاش والترشيح."
+      ]
+    },
+    {
+      "Key": "방 주소 복사",
+      "Values": [
+        "방 주소 복사",
+        "Copy room link",
+        "复制房间链接",
+        "複製房間連結",
+        "部屋リンクをコピー",
+        "Copiar enlace de sala",
+        "Copiar link da sala",
+        "Copier le lien de la salle",
+        "Raumlink kopieren",
+        "Salin tautan ruang",
+        "कमरे का लिंक कॉपी करें",
+        "نسخ رابط الغرفة"
+      ]
+    },
+    {
+      "Key": "방 주소를 복사했습니다.",
+      "Values": [
+        "방 주소를 복사했습니다.",
+        "Room link copied.",
+        "已复制房间链接。",
+        "已複製房間連結。",
+        "部屋リンクをコピーしました。",
+        "Enlace de sala copiado.",
+        "Link da sala copiado.",
+        "Lien de la salle copié.",
+        "Raumlink kopiert.",
+        "Tautan ruang disalin.",
+        "कमरे का लिंक कॉपी हो गया।",
+        "تم نسخ رابط الغرفة."
+      ]
+    },
+    {
+      "Key": "방 코드 또는 주소",
+      "Values": [
+        "방 코드 또는 주소",
+        "Room code or link",
+        "房间代码或链接",
+        "房間代碼或連結",
+        "部屋コードまたはリンク",
+        "Código o enlace de sala",
+        "Código ou link da sala",
+        "Code ou lien de la salle",
+        "Raumcode oder Link",
+        "Kode atau tautan ruang",
+        "कमरे का कोड या लिंक",
+        "رمز الغرفة أو رابطها"
+      ]
+    },
+    {
+      "Key": "방 코드 또는 주소를 확인하세요.",
+      "Values": [
+        "방 코드 또는 주소를 확인하세요.",
+        "Check the room code or link.",
+        "请检查房间代码或链接。",
+        "請檢查房間代碼或連結。",
+        "部屋コードまたはリンクを確認してください。",
+        "Revisa el código o enlace de sala.",
+        "Confira o código ou link da sala.",
+        "Vérifiez le code ou le lien de la salle.",
+        "Prüfe den Raumcode oder Link.",
+        "Periksa kode atau tautan ruang.",
+        "कमरे का कोड या लिंक जाँचें।",
+        "تحقق من رمز الغرفة أو رابطها."
+      ]
+    },
+    {
+      "Key": "알림",
+      "Values": [
+        "알림",
+        "Notifications",
+        "通知",
+        "通知",
+        "通知",
+        "Notificaciones",
+        "Notificações",
+        "Notifications",
+        "Benachrichtigungen",
+        "Notifikasi",
+        "सूचनाएँ",
+        "الإشعارات"
+      ]
+    },
+    {
+      "Key": "알림이 없습니다.",
+      "Values": [
+        "알림이 없습니다.",
+        "No notifications.",
+        "暂无通知。",
+        "暫無通知。",
+        "通知はありません。",
+        "No hay notificaciones.",
+        "Nenhuma notificação.",
+        "Aucune notification.",
+        "Keine Benachrichtigungen.",
+        "Tidak ada notifikasi.",
+        "कोई सूचना नहीं है।",
+        "لا توجد إشعارات."
+      ]
+    },
+    {
+      "Key": "방 초대",
+      "Values": [
+        "방 초대",
+        "Room invitations",
+        "房间邀请",
+        "房間邀請",
+        "部屋の招待",
+        "Invitaciones a salas",
+        "Convites para salas",
+        "Invitations à une salle",
+        "Raumeinladungen",
+        "Undangan ruang",
+        "कमरे के निमंत्रण",
+        "دعوات الغرف"
+      ]
+    },
+    {
+      "Key": "친구 초대",
+      "Values": [
+        "친구 초대",
+        "Invite friends",
+        "邀请好友",
+        "邀請好友",
+        "フレンドを招待",
+        "Invitar amigos",
+        "Convidar amigos",
+        "Inviter des amis",
+        "Freunde einladen",
+        "Undang teman",
+        "दोस्तों को बुलाएँ",
+        "دعوة الأصدقاء"
+      ]
+    },
+    {
+      "Key": "초대",
+      "Values": [
+        "초대",
+        "Invite",
+        "邀请",
+        "邀請",
+        "招待",
+        "Invitar",
+        "Convidar",
+        "Inviter",
+        "Einladen",
+        "Undang",
+        "बुलाएँ",
+        "دعوة"
+      ]
+    },
+    {
+      "Key": "초대됨",
+      "Values": [
+        "초대됨",
+        "Invited",
+        "已邀请",
+        "已邀請",
+        "招待済み",
+        "Invitado",
+        "Convidado",
+        "Invité",
+        "Eingeladen",
+        "Diundang",
+        "निमंत्रित",
+        "تمت الدعوة"
+      ]
+    },
+    {
+      "Key": "현재 방에서 나가 초대받은 방으로 이동할까요?",
+      "Values": [
+        "현재 방에서 나가 초대받은 방으로 이동할까요?",
+        "Leave this room and join the invited room?",
+        "要离开当前房间并加入受邀房间吗？",
+        "要離開目前房間並加入受邀房間嗎？",
+        "今の部屋を退出して招待された部屋に移動しますか？",
+        "¿Salir de esta sala y entrar en la sala invitada?",
+        "Sair desta sala e entrar na sala do convite?",
+        "Quitter cette salle et rejoindre la salle invitée ?",
+        "Diesen Raum verlassen und dem eingeladenen Raum beitreten?",
+        "Keluar dari ruang ini dan masuk ke ruang undangan?",
+        "इस कमरे से निकलकर आमंत्रित कमरे में जाना है?",
+        "هل تريد مغادرة هذه الغرفة والانضمام إلى الغرفة المدعو إليها؟"
+      ]
+    },
+    {
+      "Key": "이동",
+      "Values": [
+        "이동",
+        "Join",
+        "进入",
+        "進入",
+        "移動",
+        "Entrar",
+        "Entrar",
+        "Rejoindre",
+        "Beitreten",
+        "Masuk",
+        "जाएँ",
+        "انضمام"
+      ]
+    },
+    {
+      "Key": "{0}님이 친구 요청을 보냈습니다.",
+      "Values": [
+        "{0}님이 친구 요청을 보냈습니다.",
+        "{0} sent you a friend request.",
+        "{0} 向你发送了好友请求。",
+        "{0} 向你傳送了好友請求。",
+        "{0}からフレンド申請が届きました。",
+        "{0} te envió una solicitud de amistad.",
+        "{0} enviou uma solicitação de amizade.",
+        "{0} vous a envoyé une demande d’ami.",
+        "{0} hat dir eine Freundschaftsanfrage gesendet.",
+        "{0} mengirim permintaan pertemanan.",
+        "{0} ने दोस्ती का अनुरोध भेजा है।",
+        "أرسل إليك {0} طلب صداقة."
+      ]
+    },
+    {
+      "Key": "친구 요청 {0}개가 도착했습니다.",
+      "Values": [
+        "친구 요청 {0}개가 도착했습니다.",
+        "You have {0} new friend requests.",
+        "你收到 {0} 条好友请求。",
+        "你收到 {0} 則好友請求。",
+        "フレンド申請が{0}件届きました。",
+        "Tienes {0} nuevas solicitudes de amistad.",
+        "Você recebeu {0} solicitações de amizade.",
+        "Vous avez reçu {0} demandes d’ami.",
+        "Du hast {0} neue Freundschaftsanfragen.",
+        "Ada {0} permintaan pertemanan baru.",
+        "दोस्ती के {0} नए अनुरोध आए हैं।",
+        "لديك {0} طلبات صداقة جديدة."
+      ]
+    },
+    {
+      "Key": "{0}님이 방에 초대했습니다.",
+      "Values": [
+        "{0}님이 방에 초대했습니다.",
+        "{0} invited you to a room.",
+        "{0} 邀请你加入房间。",
+        "{0} 邀請你加入房間。",
+        "{0}から部屋に招待されました。",
+        "{0} te invitó a una sala.",
+        "{0} convidou você para uma sala.",
+        "{0} vous a invité dans une salle.",
+        "{0} hat dich in einen Raum eingeladen.",
+        "{0} mengundangmu ke ruang.",
+        "{0} ने आपको कमरे में बुलाया है।",
+        "دعاك {0} إلى غرفة."
+      ]
+    },
+    {
+      "Key": "방 초대 {0}개가 도착했습니다.",
+      "Values": [
+        "방 초대 {0}개가 도착했습니다.",
+        "You have {0} new room invitations.",
+        "你收到 {0} 条房间邀请。",
+        "你收到 {0} 則房間邀請。",
+        "部屋の招待が{0}件届きました。",
+        "Tienes {0} nuevas invitaciones a salas.",
+        "Você recebeu {0} convites para salas.",
+        "Vous avez reçu {0} invitations à une salle.",
+        "Du hast {0} neue Raumeinladungen.",
+        "Ada {0} undangan ruang baru.",
+        "कमरे के {0} नए निमंत्रण आए हैं।",
+        "لديك {0} دعوات جديدة إلى غرف."
+      ]
+    },
+    {
+      "Key": "방에 입장한 뒤 친구를 초대하세요.",
+      "Values": [
+        "방에 입장한 뒤 친구를 초대하세요.",
+        "Join a room before inviting friends.",
+        "请先加入房间再邀请好友。",
+        "請先加入房間再邀請好友。",
+        "部屋に入ってからフレンドを招待してください。",
+        "Entra en una sala antes de invitar amigos.",
+        "Entre em uma sala antes de convidar amigos.",
+        "Rejoignez une salle avant d’inviter des amis.",
+        "Tritt einem Raum bei, bevor du Freunde einlädst.",
+        "Masuk ke ruang sebelum mengundang teman.",
+        "दोस्तों को बुलाने से पहले कमरे में जाएँ।",
+        "انضم إلى غرفة قبل دعوة الأصدقاء."
+      ]
+    },
+    {
+      "Key": "친구를 초대했습니다.",
+      "Values": [
+        "친구를 초대했습니다.",
+        "Friend invited.",
+        "已邀请好友。",
+        "已邀請好友。",
+        "フレンドを招待しました。",
+        "Amigo invitado.",
+        "Amigo convidado.",
+        "Ami invité.",
+        "Freund eingeladen.",
+        "Teman diundang.",
+        "दोस्त को निमंत्रण भेज दिया।",
+        "تمت دعوة الصديق."
+      ]
+    },
+    {
+      "Key": "초대가 만료되었거나 취소되었습니다.",
+      "Values": [
+        "초대가 만료되었거나 취소되었습니다.",
+        "This invitation has expired or was canceled.",
+        "此邀请已过期或取消。",
+        "此邀請已過期或取消。",
+        "招待は期限切れか取り消されています。",
+        "Esta invitación ha caducado o se ha cancelado.",
+        "Este convite expirou ou foi cancelado.",
+        "Cette invitation a expiré ou a été annulée.",
+        "Diese Einladung ist abgelaufen oder wurde zurückgezogen.",
+        "Undangan ini kedaluwarsa atau dibatalkan.",
+        "यह निमंत्रण समाप्त हो गया है या रद्द किया गया है।",
+        "انتهت صلاحية هذه الدعوة أو تم إلغاؤها."
+      ]
+    },
+    {
+      "Key": "방 초대를 거절했습니다.",
+      "Values": [
+        "방 초대를 거절했습니다.",
+        "Room invitation declined.",
+        "已拒绝房间邀请。",
+        "已拒絕房間邀請。",
+        "部屋の招待を断りました。",
+        "Invitación a sala rechazada.",
+        "Convite para sala recusado.",
+        "Invitation à une salle refusée.",
+        "Raumeinladung abgelehnt.",
+        "Undangan ruang ditolak.",
+        "कमरे का निमंत्रण अस्वीकार किया।",
+        "تم رفض دعوة الغرفة."
+      ]
+    },
+    {
+      "Key": "친구로 추가된 상대만 초대할 수 있습니다.",
+      "Values": [
+        "친구로 추가된 상대만 초대할 수 있습니다.",
+        "You can only invite friends.",
+        "只能邀请已添加的好友。",
+        "只能邀請已加入的好友。",
+        "フレンドのみ招待できます。",
+        "Solo puedes invitar a tus amigos.",
+        "Você só pode convidar amigos.",
+        "Vous pouvez uniquement inviter des amis.",
+        "Du kannst nur Freunde einladen.",
+        "Kamu hanya bisa mengundang teman.",
+        "आप केवल दोस्तों को बुला सकते हैं।",
+        "يمكنك دعوة الأصدقاء فقط."
+      ]
+    },
+    {
+      "Key": "이미 같은 방에 있습니다.",
+      "Values": [
+        "이미 같은 방에 있습니다.",
+        "Already in this room.",
+        "已在此房间中。",
+        "已在此房間中。",
+        "すでに同じ部屋にいます。",
+        "Ya está en esta sala.",
+        "Já está nesta sala.",
+        "Déjà dans cette salle.",
+        "Bereits in diesem Raum.",
+        "Sudah berada di ruang ini.",
+        "पहले से इसी कमरे में हैं।",
+        "موجود في هذه الغرفة بالفعل."
+      ]
+    },
+    {
+      "Key": "잠시 후 다시 초대하세요.",
+      "Values": [
+        "잠시 후 다시 초대하세요.",
+        "Wait a moment before inviting again.",
+        "请稍后再次邀请。",
+        "請稍後再次邀請。",
+        "少し待ってからもう一度招待してください。",
+        "Espera un momento antes de volver a invitar.",
+        "Aguarde um momento antes de convidar novamente.",
+        "Patientez avant d’envoyer une nouvelle invitation.",
+        "Warte kurz, bevor du erneut einlädst.",
+        "Tunggu sebentar sebelum mengundang lagi.",
+        "दोबारा बुलाने से पहले थोड़ा रुकें।",
+        "انتظر قليلًا قبل إرسال دعوة أخرى."
+      ]
+    },
+    {
+      "Key": "보낸 초대가 많습니다. 잠시 후 다시 시도하세요.",
+      "Values": [
+        "보낸 초대가 많습니다. 잠시 후 다시 시도하세요.",
+        "Too many invitations. Try again shortly.",
+        "邀请过多，请稍后再试。",
+        "邀請過多，請稍後再試。",
+        "招待が多すぎます。少し待って再試行してください。",
+        "Demasiadas invitaciones. Inténtalo de nuevo en un momento.",
+        "Convites demais. Tente novamente em breve.",
+        "Trop d’invitations. Réessayez dans un instant.",
+        "Zu viele Einladungen. Versuche es gleich erneut.",
+        "Terlalu banyak undangan. Coba lagi sebentar lagi.",
+        "बहुत अधिक निमंत्रण हैं। थोड़ी देर बाद फिर कोशिश करें।",
+        "عدد الدعوات كبير. حاول مجددًا بعد قليل."
+      ]
+    },
+    {
+      "Key": "알림 {0}개",
+      "Values": [
+        "알림 {0}개",
+        "{0} notifications",
+        "{0} 条通知",
+        "{0} 則通知",
+        "通知{0}件",
+        "{0} notificaciones",
+        "{0} notificações",
+        "{0} notifications",
+        "{0} Benachrichtigungen",
+        "{0} notifikasi",
+        "{0} सूचनाएँ",
+        "{0} إشعارات"
+      ]
+    },
+    {
+      "Key": "방 비밀번호",
+      "Values": [
+        "방 비밀번호",
+        "Room password",
+        "房间密码",
+        "房間密碼",
+        "部屋のパスワード",
+        "Contraseña de la sala",
+        "Senha da sala",
+        "Mot de passe de la salle",
+        "Raumpasswort",
+        "Kata sandi ruang",
+        "कमरे का पासवर्ड",
+        "كلمة مرور الغرفة"
+      ]
+    },
+    {
+      "Key": "비밀번호 입력",
+      "Values": [
+        "비밀번호 입력",
+        "Enter password",
+        "输入密码",
+        "輸入密碼",
+        "パスワードを入力",
+        "Introduce la contraseña",
+        "Digite a senha",
+        "Saisir le mot de passe",
+        "Passwort eingeben",
+        "Masukkan kata sandi",
+        "पासवर्ड दर्ज करें",
+        "أدخل كلمة المرور"
+      ]
+    },
+    {
+      "Key": "비밀번호는 4~32자로 입력하세요.",
+      "Values": [
+        "비밀번호는 4~32자로 입력하세요.",
+        "Use a password of 4–32 characters.",
+        "请输入 4～32 个字符的密码。",
+        "請輸入 4～32 個字元的密碼。",
+        "パスワードは4～32文字で入力してください。",
+        "Usa una contraseña de 4 a 32 caracteres.",
+        "Use uma senha de 4 a 32 caracteres.",
+        "Utilisez un mot de passe de 4 à 32 caractères.",
+        "Verwende ein Passwort mit 4 bis 32 Zeichen.",
+        "Gunakan kata sandi 4–32 karakter.",
+        "पासवर्ड में 4–32 अक्षर होने चाहिए।",
+        "استخدم كلمة مرور من 4 إلى 32 حرفًا."
+      ]
+    },
+    {
+      "Key": "새 비밀번호",
+      "Values": [
+        "새 비밀번호",
+        "New password",
+        "新密码",
+        "新密碼",
+        "新しいパスワード",
+        "Nueva contraseña",
+        "Nova senha",
+        "Nouveau mot de passe",
+        "Neues Passwort",
+        "Kata sandi baru",
+        "नया पासवर्ड",
+        "كلمة مرور جديدة"
+      ]
+    },
+    {
+      "Key": "비워 두면 기존 비밀번호를 유지합니다.",
+      "Values": [
+        "비워 두면 기존 비밀번호를 유지합니다.",
+        "Leave blank to keep the current password.",
+        "留空以保留当前密码。",
+        "留空以保留目前密碼。",
+        "空欄なら現在のパスワードを維持します。",
+        "Deja el campo vacío para conservar la contraseña actual.",
+        "Deixe em branco para manter a senha atual.",
+        "Laissez vide pour conserver le mot de passe actuel.",
+        "Leer lassen, um das aktuelle Passwort zu behalten.",
+        "Biarkan kosong untuk mempertahankan kata sandi saat ini.",
+        "मौजूदा पासवर्ड रखने के लिए खाली छोड़ें।",
+        "اتركه فارغًا للاحتفاظ بكلمة المرور الحالية."
+      ]
+    },
+    {
+      "Key": "비밀번호가 올바르지 않습니다.",
+      "Values": [
+        "비밀번호가 올바르지 않습니다.",
+        "Incorrect password.",
+        "密码不正确。",
+        "密碼不正確。",
+        "パスワードが正しくありません。",
+        "Contraseña incorrecta.",
+        "Senha incorreta.",
+        "Mot de passe incorrect.",
+        "Falsches Passwort.",
+        "Kata sandi salah.",
+        "पासवर्ड गलत है।",
+        "كلمة المرور غير صحيحة."
+      ]
+    },
+    {
+      "Key": "비밀번호가 필요한 방입니다.",
+      "Values": [
+        "비밀번호가 필요한 방입니다.",
+        "This room requires a password.",
+        "此房间需要密码。",
+        "此房間需要密碼。",
+        "この部屋にはパスワードが必要です。",
+        "Esta sala requiere una contraseña.",
+        "Esta sala exige uma senha.",
+        "Cette salle nécessite un mot de passe.",
+        "Dieser Raum benötigt ein Passwort.",
+        "Ruang ini memerlukan kata sandi.",
+        "इस कमरे के लिए पासवर्ड चाहिए।",
+        "تتطلب هذه الغرفة كلمة مرور."
+      ]
+    },
+    {
+      "Key": "방 설정이 변경되었습니다. 다시 시도하세요.",
+      "Values": [
+        "방 설정이 변경되었습니다. 다시 시도하세요.",
+        "Room settings changed. Please try again.",
+        "房间设置已更改，请重试。",
+        "房間設定已變更，請重試。",
+        "部屋の設定が変更されました。もう一度お試しください。",
+        "La configuración de la sala cambió. Vuelve a intentarlo.",
+        "As configurações da sala mudaram. Tente novamente.",
+        "Les paramètres de la salle ont changé. Réessayez.",
+        "Die Raumeinstellungen wurden geändert. Versuche es erneut.",
+        "Pengaturan ruang berubah. Silakan coba lagi.",
+        "कमरे की सेटिंग बदल गई है। फिर कोशिश करें।",
+        "تغيرت إعدادات الغرفة. حاول مجددًا."
+      ]
+    },
+    {
+      "Key": "방장이 비밀번호를 설정한 뒤 입장할 수 있습니다.",
+      "Values": [
+        "방장이 비밀번호를 설정한 뒤 입장할 수 있습니다.",
+        "You can join after the host sets a password.",
+        "房主设置密码后才能加入。",
+        "房主設定密碼後才能加入。",
+        "ホストがパスワードを設定してから入室できます。",
+        "Podrás entrar cuando el anfitrión establezca una contraseña.",
+        "Você poderá entrar após o anfitrião definir uma senha.",
+        "Vous pourrez rejoindre la salle une fois que l’hôte aura défini un mot de passe.",
+        "Du kannst beitreten, sobald der Gastgeber ein Passwort festgelegt hat.",
+        "Kamu bisa masuk setelah pemilik ruang menetapkan kata sandi.",
+        "मेज़बान के पासवर्ड तय करने के बाद आप प्रवेश कर सकते हैं।",
+        "يمكنك الانضمام بعد أن يحدد المضيف كلمة مرور."
+      ]
+    },
+    {
+      "Key": "정답 입력",
+      "Values": [
+        "정답 입력",
+        "Enter answer",
+        "输入答案",
+        "輸入答案",
+        "答えを入力",
+        "Introducir respuesta",
+        "Digite a resposta",
+        "Saisir la réponse",
+        "Antwort eingeben",
+        "Masukkan jawaban",
+        "उत्तर दर्ज करें",
+        "أدخل الإجابة"
+      ]
+    },
+    {
+      "Key": "라이어 답변",
+      "Values": [
+        "라이어 답변",
+        "Liar answers",
+        "说谎者的答案",
+        "說謊者的答案",
+        "ライアーの回答",
+        "Respuestas de los mentirosos",
+        "Respostas dos mentirosos",
+        "Réponses des menteurs",
+        "Antworten der Lügner",
+        "Jawaban pembohong",
+        "झूठ बोलने वालों के उत्तर",
+        "إجابات الكاذبين"
+      ]
+    },
+    {
+      "Key": "정답",
+      "Values": [
+        "정답",
+        "Correct",
+        "正确",
+        "正確",
+        "正解",
+        "Correcto",
+        "Correto",
+        "Correct",
+        "Richtig",
+        "Benar",
+        "सही",
+        "صحيحة"
+      ]
+    },
+    {
+      "Key": "오답",
+      "Values": [
+        "오답",
+        "Incorrect",
+        "错误",
+        "錯誤",
+        "不正解",
+        "Incorrecto",
+        "Incorreto",
+        "Incorrect",
+        "Falsch",
+        "Salah",
+        "गलत",
+        "خاطئة"
+      ]
+    },
+    {
+      "Key": "미제출",
+      "Values": [
+        "미제출",
+        "No answer",
+        "未提交",
+        "未提交",
+        "未回答",
+        "Sin respuesta",
+        "Sem resposta",
+        "Sans réponse",
+        "Keine Antwort",
+        "Tidak menjawab",
+        "उत्तर नहीं दिया",
+        "لم يُقدّم إجابة"
+      ]
+    },
+    {
+      "Key": "의심스러운 사람을 지목하세요",
+      "Values": [
+        "의심스러운 사람을 지목하세요",
+        "Select the player you suspect",
+        "请指认你怀疑的玩家",
+        "請指認你懷疑的玩家",
+        "怪しいプレイヤーを指名してください",
+        "Señala al jugador del que sospechas",
+        "Indique o jogador de quem você suspeita",
+        "Désignez le joueur que vous suspectez",
+        "Wähle den Spieler, den du verdächtigst",
+        "Pilih pemain yang kamu curigai",
+        "जिस खिलाड़ी पर शक है, उसे चुनें",
+        "اختر اللاعب الذي تشتبه به"
+      ]
+    },
+    {
+      "Key": "내 선 지우기",
+      "Values": [
+        "내 선 지우기",
+        "Clear my strokes",
+        "清除我的笔画",
+        "清除我的筆畫",
+        "自分の線を消す",
+        "Borrar mis trazos",
+        "Apagar meus traços",
+        "Effacer mes traits",
+        "Meine Striche löschen",
+        "Hapus goresan saya",
+        "मेरी रेखाएँ मिटाएँ",
+        "امسح خطوطي"
+      ]
+    },
+    {
+      "Key": "흰색",
+      "Values": [
+        "흰색",
+        "White",
+        "白色",
+        "白色",
+        "白",
+        "Blanco",
+        "Branco",
+        "Blanc",
+        "Weiß",
+        "Putih",
+        "सफ़ेद",
+        "أبيض"
+      ]
+    },
+    {
+      "Key": "그리기 순서 {0}",
+      "Values": [
+        "그리기 순서 {0}",
+        "Drawing order {0}",
+        "绘画顺序 {0}",
+        "繪畫順序 {0}",
+        "描く順番 {0}",
+        "Turno de dibujo {0}",
+        "Ordem de desenho {0}",
+        "Ordre de dessin {0}",
+        "Zeichenreihenfolge {0}",
+        "Urutan menggambar {0}",
+        "चित्र बनाने का क्रम {0}",
+        "ترتيب الرسم {0}"
       ]
     }
   ]

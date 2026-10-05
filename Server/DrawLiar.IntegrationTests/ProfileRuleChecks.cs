@@ -143,11 +143,15 @@ internal static partial class Integration
         while (session.Phase == GamePhase.Drawing)
             Check(session.EndTurn(session.ArtistId, now += 0.1), "참가자가 그림 차례를 마칠 수 있어야 합니다.");
         Check(session.Phase == GamePhase.Discussion, "모든 그림 차례 뒤 토론해야 합니다.");
-        AdvanceProfilePhase(session, ref now);
-        Check(session.Phase == GamePhase.Voting, "토론 뒤 투표해야 합니다.");
         foreach (int id in active)
             Check(session.Vote(id, id == liar ? active.First(other => other != liar) : liar, now += 0.1), "정상 투표를 수락해야 합니다.");
-        Check(session.Phase == GamePhase.LiarReveal, "투표 완료 뒤 라이어를 공개해야 합니다.");
+        Check(session.Phase == GamePhase.Rebuttal && session.Snapshot(1, 1, now).AccusedPlayerId == liar,
+            "전원 지목 뒤 한 명의 반론으로 진행해야 합니다.");
+        Check(session.Snapshot(1, 1, now).Players.All(player => !player.IsLiar && player.RoundPoints == 0),
+            "반론 중 역할이나 올바른 찬반 보상을 노출하면 안 됩니다.");
+        foreach (int id in active.Where(id => id != liar))
+            Check(session.Judge(id, liar, true, now += 0.1), "후보 외의 참가자가 찬반에 참여해야 합니다.");
+        Check(session.Phase == GamePhase.LiarReveal, "찬반 가결 뒤 라이어를 공개해야 합니다.");
         AdvanceProfilePhase(session, ref now);
         Check(session.Guess(liar, "검증사과", now += 0.1), "라이어 정답을 채점해야 합니다.");
         foreach (int id in active)

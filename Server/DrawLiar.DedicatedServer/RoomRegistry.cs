@@ -84,12 +84,14 @@ internal sealed class RoomRegistry : BackgroundService
         lock (_resultGate) _pendingResults.Remove(matchId);
     }
 
-    public void AcknowledgeHeartbeat(RoomStatusData[] statuses, string[] roomIds)
+    public void AcknowledgeHeartbeat(RoomStatusData[] statuses, string[] roomIds, RoomConfigurationData[]? configurations = null)
     {
         lock (_gate)
         {
             foreach (var status in statuses)
                 if (_rooms.TryGetValue(status.RoomId, out var room)) room.AcknowledgeAdmissions(status.AdmissionIds);
+            foreach (var configuration in configurations ?? [])
+                if (_rooms.TryGetValue(configuration.RoomId, out var room)) room.ApplyConfiguration(configuration);
             foreach (string roomId in roomIds)
                 if (_rooms.TryGetValue(roomId, out var room) && room.Status().Closed) _rooms.Remove(roomId);
         }

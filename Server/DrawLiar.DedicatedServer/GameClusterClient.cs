@@ -1,4 +1,5 @@
 using System.Net.Http.Json;
+using System.Text.Json;
 using System.Security.Cryptography;
 using DrawLiar.Server;
 
@@ -14,6 +15,7 @@ internal sealed class GameClusterClient : BackgroundService
     private double _lastSuccess = RoomRegistry.Now;
     private double _nextResultAttempt;
     private int _resultFailures;
+    private readonly SemaphoreSlim _controlGate = new(1, 1);
 
     public bool IsReady => _registered && RoomRegistry.Now - _lastSuccess < 30;
     public string NodeId => _nodeId;
@@ -60,6 +62,51 @@ internal sealed class GameClusterClient : BackgroundService
         return result;
     }
 
+    public async Task<RoomConfigurationData> ConfigureAsync(ConfigureRoomRequest request, CancellationToken cancellationToken)
+    {
+        await _controlGate.WaitAsync(cancellationToken);
+        try
+        {
+            await HeartbeatAsync(cancellationToken);
+            request.NodeId = _nodeId;
+            using var response = await _http.PostAsJsonAsync("/internal/rooms/configure", request, GameplayWire.Json, cancellationToken);
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadFromJsonAsync<ApiError>(GameplayWire.Json, cancellationToken);
+                throw new ApiException(error?.Code ?? "ServerUnavailable", (int)response.StatusCode);
+            }
+            return await response.Content.ReadFromJsonAsync<RoomConfigurationData>(GameplayWire.Json, cancellationToken)
+                ?? throw new JsonException("방 설정 응답이 비어 있습니다.");
+        }
+        finally { _controlGate.Release(); }
+    }
+
+    public async Task<ProfileData> RefreshProfileAsync(SessionCheckRequest request, CancellationToken cancellationToken)
+    {
+        using var response = await _http.PostAsJsonAsync("/internal/profiles/refresh", request, GameplayWire.Json, cancellationToken);
+        if (!response.IsSuccessStatusCode)
+        {
+            var error = await response.Content.ReadFromJsonAsync<ApiError>(GameplayWire.Json, cancellationToken);
+            throw new ApiException(error?.Code ?? "ServerUnavailable", (int)response.StatusCode);
+        }
+        var profile = await response.Content.ReadFromJsonAsync<ProfileData>(GameplayWire.Json, cancellationToken);
+        if (profile == null || profile.AccountId != request.AccountId || string.IsNullOrEmpty(profile.DisplayName))
+            throw new JsonException("프로필 응답이 올바르지 않습니다.");
+        return profile;
+    }
+
+    private async Task HeartbeatAsync(CancellationToken cancellationToken)
+    {
+        var statuses = _rooms.Statuses();
+        using var heartbeat = await _http.PostAsJsonAsync("/internal/dedicated/heartbeat",
+            new DedicatedHeartbeatRequest { NodeId = _nodeId, Rooms = statuses }, GameplayWire.Json, cancellationToken);
+        heartbeat.EnsureSuccessStatusCode();
+        var acknowledged = await heartbeat.Content.ReadFromJsonAsync<DedicatedHeartbeatResponse>(GameplayWire.Json, cancellationToken)
+            ?? throw new JsonException("방 종료 승인 응답이 비어 있습니다.");
+        _rooms.AcknowledgeHeartbeat(statuses, acknowledged.ClosedRoomIds, acknowledged.Configurations);
+        _lastSuccess = RoomRegistry.Now;
+    }
+
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         var validation = ValidateSessionsAsync(stoppingToken);
@@ -76,14 +123,9 @@ internal sealed class GameClusterClient : BackgroundService
                     _registered = true;
                 }
                 await FlushResultsAsync(stoppingToken);
-                var statuses = _rooms.Statuses();
-                using var heartbeat = await _http.PostAsJsonAsync("/internal/dedicated/heartbeat",
-                    new DedicatedHeartbeatRequest { NodeId = _nodeId, Rooms = statuses }, GameplayWire.Json, stoppingToken);
-                heartbeat.EnsureSuccessStatusCode();
-                var acknowledged = await heartbeat.Content.ReadFromJsonAsync<DedicatedHeartbeatResponse>(GameplayWire.Json, stoppingToken)
-                    ?? throw new System.Text.Json.JsonException("방 종료 승인 응답이 비어 있습니다.");
-                _rooms.AcknowledgeHeartbeat(statuses, acknowledged.ClosedRoomIds);
-                _lastSuccess = RoomRegistry.Now;
+                await _controlGate.WaitAsync(stoppingToken);
+                try { await HeartbeatAsync(stoppingToken); }
+                finally { _controlGate.Release(); }
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested) { break; }
             catch (Exception exception) when (exception is HttpRequestException or OperationCanceledException or System.Text.Json.JsonException)
@@ -157,6 +199,7 @@ internal sealed class GameClusterClient : BackgroundService
     public override void Dispose()
     {
         _http.Dispose();
+        _controlGate.Dispose();
         base.Dispose();
     }
 }

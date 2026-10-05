@@ -30,8 +30,8 @@ public sealed partial class ServerDatabase
         {
             accountId = Guid.NewGuid();
             await using var create = Command(connection, transaction,
-                "INSERT INTO \"Account\" (\"Id\",\"DisplayName\",\"GuestId\",\"GuestSecretHash\") VALUES ($1,$2,$3,$4)",
-                accountId, GuestNicknameGenerator.Create(), guestId, GuestCredential.Hash(request.GuestSecret));
+                "INSERT INTO \"Account\" (\"Id\",\"DisplayName\",\"GuestId\",\"GuestSecretHash\",\"AvatarColor\") VALUES ($1,$2,$3,$4,$5)",
+                accountId, GuestNicknameGenerator.Create(), guestId, GuestCredential.Hash(request.GuestSecret), Random.Shared.Next(6));
             await create.ExecuteNonQueryAsync(cancellationToken);
         }
         else
