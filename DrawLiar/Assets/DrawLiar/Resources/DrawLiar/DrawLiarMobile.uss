@@ -183,7 +183,7 @@
 .mobile.in-game .palette .swatch.selected, .mobile.in-game .palette .swatch:focus { border-color: #78679E; }
 .mobile.in-game .mobile-swatch-dot { width: 28px; height: 28px; border-radius: 14px; flex-shrink: 0; }
 .mobile.in-game .mobile-swatch-dot.white-brush-dot { border-width: 1px; border-color: #D8D1DB; }
-.mobile.in-game .tool-row .clear-own-drawing { font-size: 14px; }
+.mobile.in-game .tool-row .clear-own-drawing { padding: 8px 7px; font-size: 14px; white-space: normal; }
 .mobile.in-game .player-drawing-order { top: 2px; right: 4px; width: 17px; height: 17px; margin: 0; border-radius: 9px; font-size: 10px; }
 .mobile.in-game .tools > .secret-label, .mobile.in-game .tools > .brush-sizes { display: none; }
 .mobile.in-game .context-info { background-color: #FFFFFF; padding: 10px 12px; border-width: 1px; border-color: #E3DDD4; border-radius: 12px; }
