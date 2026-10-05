@@ -91,12 +91,50 @@ namespace DrawLiar
 
         public static void DeleteCustomTopic(string name, string path = null) => SaveCustomTopics(ReadCustomTopics(path ?? CustomTopicsPath).Where(topic => topic.Name != name).ToArray(), path);
 
+        public static TopicData ImportWorkshopTopic(TopicWorkshopDetailResponse response, TopicWorkshopPolicy policy, string path = null)
+        {
+            var entry = response?.Topic;
+            if (entry == null || !Guid.TryParse(entry.Id, out var id) || !TopicWorkshopRules.ValidatePolicy(policy)
+                || string.IsNullOrWhiteSpace(entry.Name) || entry.Name != GameRules.CleanText(entry.Name, 40)
+                || !policy.LanguageCodes.Contains(entry.LanguageCode) || response.Words == null || response.Words.Length == 0
+                || entry.WordCount != response.Words.Length || response.Words.Length > 200
+                || response.Words.Any(word => string.IsNullOrWhiteSpace(word) || word != GameRules.CleanText(word, 40)))
+                throw new ArgumentException("주제 이름과 제시어를 확인하세요.");
+            var existing = ReadCustomTopics(path ?? CustomTopicsPath);
+            string workshopId = id.ToString();
+            var previous = existing.FirstOrDefault(topic => string.Equals(topic.WorkshopId, workshopId, StringComparison.OrdinalIgnoreCase));
+            string name = previous?.Name ?? entry.Name;
+            if (previous == null)
+            {
+                var asset = Resources.Load<TextAsset>("DrawLiar/GameData");
+                var builtin = asset != null ? JsonUtility.FromJson<GameData>(asset.text).Topics : Array.Empty<TopicData>();
+                var taken = new System.Collections.Generic.HashSet<string>(existing.Select(topic => topic.Name)
+                    .Concat(builtin.Select(topic => topic.Name)), StringComparer.Ordinal);
+                int suffix = 2;
+                while (taken.Contains(name))
+                {
+                    string number = (suffix++).ToString(System.Globalization.CultureInfo.InvariantCulture);
+                    int length = policy.Limits.NameMaxLength - number.Length;
+                    if (length < 0) throw new ArgumentException("주제 이름이 이미 사용 중입니다. 다른 이름을 입력하세요.");
+                    name = GameRules.CleanText(entry.Name, length) + number;
+                }
+            }
+            var imported = new TopicData
+            {
+                Name = name, Words = response.Words.ToArray(), WorkshopId = workshopId, LanguageCode = entry.LanguageCode
+            };
+            SaveCustomTopics(existing.Where(topic => topic != previous).Concat(new[] { imported }).ToArray(), path);
+            return imported;
+        }
+
         private static TopicData[] Sanitize(TopicData[] topics)
         {
             return (topics ?? Array.Empty<TopicData>()).Where(topic => topic != null)
                 .Select(topic => new TopicData
                 {
                     Name = GameRules.CleanText(topic.Name, 40),
+                    WorkshopId = Guid.TryParse(topic.WorkshopId, out var id) ? id.ToString() : "",
+                    LanguageCode = GameRules.CleanText(topic.LanguageCode, 16),
                     Words = (topic.Words ?? Array.Empty<string>()).Select(word => GameRules.CleanText(word, 40))
                         .Where(word => word.Length > 0).Distinct().Take(200).ToArray()
                 }).Where(topic => topic.Name.Length > 0 && topic.Words.Length > 0)

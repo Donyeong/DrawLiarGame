@@ -1,0 +1,9 @@
+{
+  "Limits": {
+    "NameMaxLength": 10,
+    "WordMaxLength": 10,
+    "MaxWordsPerTopic": 30,
+    "MaxUploadsPerAccount": 5
+  },
+  "LanguageCodes": ["ko-KR", "en", "zh-CN", "zh-TW", "ja-JP", "es", "pt-BR", "fr-FR", "de-DE", "id", "hi-IN", "ar"]
+}

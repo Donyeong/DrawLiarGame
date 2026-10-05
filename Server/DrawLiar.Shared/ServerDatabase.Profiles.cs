@@ -1,5 +1,4 @@
 using System.Data;
-using System.Text.Json;
 
 namespace DrawLiar.Server;
 
@@ -75,7 +74,7 @@ public sealed partial class ServerDatabase
         var normalized = ValidateMatchResult(request);
         Guid matchId = Guid.Parse(normalized.MatchId), roomId = Guid.Parse(normalized.RoomId);
         DateTimeOffset playedAt = DateTimeOffset.Parse(normalized.PlayedAt);
-        string payloadHash = ServerRuntime.Hash(JsonSerializer.Serialize(normalized, ServerRuntime.Json));
+        string payloadHash = MatchPayloadHash(normalized);
         await using var connection = await _source.OpenConnectionAsync(cancellationToken);
         await using var transaction = await connection.BeginTransactionAsync(cancellationToken);
         await using (var command = Command(connection, transaction,
@@ -108,11 +107,13 @@ public sealed partial class ServerDatabase
             await command.ExecuteNonQueryAsync(cancellationToken);
         foreach (var player in normalized.Players)
         {
+            Guid accountId = Guid.Parse(player.AccountId);
+            int coinReward = await CreditMatchRewardAsync(connection, transaction, accountId, player, cancellationToken);
             await using var command = Command(connection, transaction, """
-                INSERT INTO "AccountMatch" ("MatchId","AccountId","Score","Rank","Won","RoundsPlayed","CitizenRounds","LiarRounds","CorrectVotes","CorrectGuesses")
-                VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
-                """, matchId, Guid.Parse(player.AccountId), player.Score, player.Rank, player.Won,
-                player.RoundsPlayed, player.CitizenRounds, player.LiarRounds, player.CorrectVotes, player.CorrectGuesses);
+                INSERT INTO "AccountMatch" ("MatchId","AccountId","Score","Rank","Won","RoundsPlayed","CitizenRounds","LiarRounds","CorrectVotes","CorrectGuesses","CoinReward")
+                VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
+                """, matchId, accountId, player.Score, player.Rank, player.Won,
+                player.RoundsPlayed, player.CitizenRounds, player.LiarRounds, player.CorrectVotes, player.CorrectGuesses, coinReward);
             await command.ExecuteNonQueryAsync(cancellationToken);
         }
         await transaction.CommitAsync(cancellationToken);
@@ -126,7 +127,7 @@ public sealed partial class ServerDatabase
             || request.NodeId.Any(character => !char.IsAsciiLetterOrDigit(character) && character != '-' && character != '_')
             || !DateTimeOffset.TryParse(request.PlayedAt, out var playedAt) || playedAt < DateTimeOffset.UnixEpoch
             || playedAt > DateTimeOffset.UtcNow.AddMinutes(5) || request.Mode is < 0 or > 1 || request.RoundCount < 1
-            || request.Players == null || request.Players.Length is < 3 or > 8)
+            || request.Players == null || request.Players.Length is < 3 or > 64)
             throw new ApiException("InvalidMatchResult");
         var accounts = new HashSet<Guid>();
         var players = new List<MatchPlayerResult>();
@@ -137,13 +138,18 @@ public sealed partial class ServerDatabase
                 || player.RoundsPlayed < 1 || player.RoundsPlayed > request.RoundCount || player.CitizenRounds < 0 || player.LiarRounds < 0
                 || (long)player.CitizenRounds + player.LiarRounds != player.RoundsPlayed
                 || player.CorrectVotes < 0 || player.CorrectVotes > player.RoundsPlayed
-                || player.CorrectGuesses < 0 || player.CorrectGuesses > player.LiarRounds)
+                || player.CorrectGuesses < 0 || player.CorrectGuesses > player.LiarRounds
+                || player.WeightedRoundParticipants < 0 || player.WeightedRoundParticipants > (long)request.Players.Length * player.RoundsPlayed
+                || player.WeightedRoundScore < 0 || player.WeightedRoundScore > (long)request.Players.Length * player.Score
+                || player.WeightedRoundParticipants == 0 && player.WeightedRoundScore != 0
+                || player.WeightedRoundParticipants > 0 && (player.WeightedRoundParticipants < 2 || player.WeightedRoundScore < (long)2 * player.Score))
                 throw new ApiException("InvalidMatchResult");
             players.Add(new MatchPlayerResult
             {
                 AccountId = account.ToString(), Score = player.Score, Rank = player.Rank, Won = player.Won,
                 RoundsPlayed = player.RoundsPlayed, CitizenRounds = player.CitizenRounds, LiarRounds = player.LiarRounds,
-                CorrectVotes = player.CorrectVotes, CorrectGuesses = player.CorrectGuesses
+                CorrectVotes = player.CorrectVotes, CorrectGuesses = player.CorrectGuesses,
+                WeightedRoundParticipants = player.WeightedRoundParticipants, WeightedRoundScore = player.WeightedRoundScore
             });
         }
         if (players.Any(player => player.Rank != 1 + players.Count(other => other.Score > player.Score)))

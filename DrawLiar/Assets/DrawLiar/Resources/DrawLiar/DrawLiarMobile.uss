@@ -124,8 +124,8 @@
 .mobile .avatar-colors { flex-wrap: wrap; }
 .mobile .avatar-colors .swatch { width: 48px; height: 48px; min-height: 48px; margin: 0 8px 8px 0; padding: 0; }
 .mobile .equipment-option { min-height: 136px; margin: 0 2% 8px 0; padding: 8px; font-size: 16px; background-color: #FFFFFF; border-color: #E3DDD4; }
-.mobile .part-tabs { height: 56px; min-height: 56px; }
-.mobile .part-tabs .part-tab { min-width: 52px; height: 48px; min-height: 48px; margin: 0 6px 0 0; padding: 6px 10px; font-size: 14px; }
+.mobile .part-tabs { height: auto; min-height: 56px; }
+.mobile .part-tabs .part-tab { min-width: 52px; height: 48px; min-height: 48px; margin: 0 6px 6px 0; padding: 6px 10px; font-size: 14px; }
 .mobile .equipment-option.equipped { background-color: #E9E4F3; border-color: #78679E; }
 .mobile .equipment-state { white-space: normal; }
 .mobile .rules, .mobile .notice { font-size: 13px; color: #817A87; white-space: normal; }
@@ -384,3 +384,79 @@
 .app.mobile-landscape .create-basic-fields { flex-direction: row; align-items: flex-start; }
 .app.mobile-landscape #create-room-name { flex-basis: 0; }
 .app.mobile-landscape #create-privacy { width: 240px; margin-left: 16px; }
+.mobile.in-game .mobile-live-round { font-size: 12px; color: #817A87; margin: 0; }
+.mobile.in-game .mobile-waiting .mobile-action-row { flex-direction: column; }
+.mobile.in-game .mobile-playing { padding: 8px 12px; }
+.mobile.in-game .mobile-playing .room-hud { height: 44px; min-height: 44px; margin-bottom: 4px; }
+.mobile.in-game .mobile-playing .phase-bar { height: 44px; min-height: 44px; flex-direction: column; align-items: flex-start; justify-content: center; }
+.mobile.in-game .mobile-playing .phase-title { font-size: 17px; margin: 0; }
+.app.mobile .mobile-playing .hud-timer { width: 80px; min-width: 80px; margin-right: 4px; }
+.app.mobile .mobile-playing .button.social-bell { width: 44px; min-width: 44px; height: 44px; min-height: 44px; margin: 0 4px 0 0; padding: 4px; }
+.mobile.in-game .mobile-playing .room-hud .mobile-back { min-width: 56px; height: 44px; min-height: 44px; padding: 4px 8px; margin: 0; font-size: 14px; }
+.mobile.in-game .mobile-playing .mobile-secret { flex-direction: row; align-items: center; height: 44px; min-height: 44px; margin: 0 0 6px; padding: 0 8px; }
+.mobile.in-game .mobile-playing .topic { flex-grow: 1; flex-basis: auto; flex-shrink: 1; min-width: 0; font-size: 12px; margin: 0 8px 0 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mobile.in-game .mobile-playing .mobile-role-line { flex-grow: 0; flex-basis: auto; flex-shrink: 0; min-width: 0; max-width: 70%; }
+.mobile.in-game .mobile-playing .role { flex-shrink: 0; font-size: 12px; margin: 0 6px 0 0; white-space: nowrap; }
+.mobile.in-game .mobile-playing .word { flex-basis: auto; flex-shrink: 1; font-size: 14px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mobile.in-game .mobile-playing .secret-toggle { width: 60px; min-width: 60px; flex-shrink: 0; height: 44px; min-height: 44px; margin: 0 0 0 4px; padding: 2px 4px; font-size: 11px; white-space: normal; }
+.mobile .room-role-details .subtitle, .mobile .room-role-details .section-title { max-width: 100%; min-width: 0; white-space: normal; }
+.mobile.in-game .mobile-playing .mobile-workspace { flex-direction: column; }
+.mobile.in-game .mobile-playing .mobile-roster { width: 100%; flex-shrink: 0; margin-bottom: 6px; }
+.mobile.in-game .mobile-playing .mobile-roster > .mobile-small { display: none; }
+.mobile.in-game .mobile-playing .players-strip { width: 100%; height: auto; flex-direction: row; flex-wrap: wrap; }
+.mobile.in-game .mobile-playing .player { padding: 44px 4px 4px; margin: 0; flex-basis: auto; flex-grow: 0; flex-shrink: 0; }
+.mobile.in-game .button.player-profile-button { position: absolute; top: 0; right: 0; width: 44px; min-width: 44px; height: 44px; min-height: 44px; margin: 0; padding: 10px; border-width: 0; background-color: transparent; align-items: center; justify-content: center; color: #78679E; }
+.mobile.in-game .player-profile-button .draw-ui-icon { width: 20px; height: 20px; }
+.mobile.in-game .mobile-waiting .player { padding-top: 44px; }
+.mobile.in-game .player.preview-player { border-width: 2px; border-color: #537F70; background-color: #EDF5EF; }
+.mobile.in-game .mobile-playing .player-host-badge { top: 4px; left: 4px; width: 32px; max-width: 32px; height: 16px; margin: 0; padding: 1px 2px; font-size: 10px; -unity-text-align: middle-center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mobile.in-game .mobile-playing .player-drawing-order { top: 24px; left: 4px; right: auto; }
+.mobile.in-game .author-preview-guide { font-size: 12px; margin-bottom: 4px; }
+.app.mobile .topic-workshop .workshop-tabs .button { font-size: 16px; }
+.app.mobile .topic-workshop .workshop-editor-actions .button { padding: 8px; font-size: 14px; }
+.app.mobile .workshop-filters { flex-direction: column; align-items: stretch; }
+.app.mobile .workshop-filters .workshop-language { flex-basis: auto; margin-right: 0; }
+.app.mobile .home-panel .workshop-mine { max-width: 100%; min-height: 44px; align-self: flex-end; margin: 0 0 8px; }
+.app.mobile .workshop-local-scroll { max-height: 240px; }
+.app.mobile .workshop-browse-scroll { max-height: 400px; }
+.app.mobile .workshop-own-count { max-width: 55%; flex-shrink: 1; }
+.mobile.in-game .mobile-playing .player > .player-identity { flex-direction: column; align-items: center; justify-content: flex-end; }
+.mobile.in-game .mobile-playing .player .avatar { margin: 0; }
+.mobile.in-game .mobile-playing .player .grow { width: 100%; flex-grow: 0; flex-shrink: 0; height: 28px; }
+.mobile.in-game .mobile-playing .player .player-name { height: 16px; flex-shrink: 0; font-size: 12px; -unity-font-style: normal; -unity-text-align: middle-center; margin: 0; }
+.mobile.in-game .mobile-playing .player-status { height: 12px; flex-shrink: 0; font-size: 11px; -unity-text-align: middle-center; margin: 0; }
+.mobile.in-game .mobile-playing .mobile-play-stage { flex-grow: 1; flex-basis: 0; min-height: 0; width: 100%; }
+.mobile.in-game .mobile-playing .mobile-play-side { display: none; }
+.mobile.in-game .mobile-playing .canvas-frame { width: 100%; height: auto; min-height: 0; flex-grow: 1; flex-basis: 0; flex-shrink: 1; margin: 0 0 6px; align-items: center; justify-content: center; overflow: hidden; background-color: #F7F3EA; border-width: 0; border-radius: 0; }
+.mobile.in-game .mobile-playing .drawing-surface { flex-grow: 0; flex-shrink: 0; border-width: 1px; border-color: #E3DDD4; }
+.mobile.in-game .mobile-playing .mobile-controls { flex-shrink: 0; padding: 0; }
+.mobile.in-game .mobile-playing .mobile-controls > * { margin-bottom: 0; }
+.mobile.in-game .mobile-playing .tools { margin-bottom: 4px; }
+.mobile.in-game .mobile-playing .tool-row { margin-bottom: 0; align-items: center; }
+.mobile.in-game .mobile-playing .tool-row .button { height: 44px; min-height: 44px; margin: 0 6px 0 0; padding: 2px 6px; font-size: 14px; }
+.mobile.in-game .mobile-playing .tool-row .button.mobile-last { margin-right: 0; }
+.mobile.in-game .mobile-playing .tool-row .clear-own-drawing { padding: 2px 7px; font-size: 14px; white-space: normal; }
+.mobile.in-game .mobile-playing .palette { width: 100%; height: 44px; min-height: 44px; flex-wrap: nowrap; justify-content: space-between; margin: 0; }
+.mobile.in-game .mobile-playing .palette .swatch { width: 44px; height: 44px; min-height: 44px; margin: 0; padding: 0; }
+.mobile.in-game .mobile-playing .mobile-bottom-actions { width: 100%; flex-direction: column; align-items: stretch; margin: 0; padding: 0; }
+.mobile.in-game .mobile-playing .mobile-action-row { width: 100%; flex-direction: row; align-items: center; flex-shrink: 0; min-height: 44px; }
+.mobile.in-game .mobile-playing .phase-actions { flex-direction: row; flex-grow: 1; flex-basis: 0; min-width: 0; margin: 0 6px 0 0; }
+.mobile.in-game .mobile-playing .phase-actions .button { width: auto; flex-grow: 1; flex-basis: 0; min-width: 0; height: auto; min-height: 44px; margin: 0 4px 0 0; padding: 4px 8px; font-size: 16px; white-space: normal; }
+.mobile.in-game .mobile-playing .phase-actions .muted { font-size: 12px; margin: 0; }
+.mobile.in-game .mobile-playing .chat-open { width: 108px; flex-grow: 0; flex-shrink: 0; min-height: 44px; height: 44px; margin: 0; padding: 4px 8px; font-size: 14px; }
+.app.mobile .mobile-playing .judgment-panel { width: 100%; padding: 8px; margin: 0 0 6px; }
+.app.mobile .mobile-playing .nomination-prompt { font-size: 20px; margin-bottom: 4px; }
+.app.mobile .mobile-playing .nomination-target { font-size: 14px; margin-bottom: 4px; }
+.app.mobile .mobile-playing .nomination-submit { min-height: 48px; height: 48px; font-size: 18px; }
+.app.mobile .mobile-playing .nomination-progress { margin-top: 4px; font-size: 12px; }
+.app.mobile .mobile-playing .judgment-progress { margin: 2px 0 6px; font-size: 12px; }
+.app.mobile .mobile-playing .judgment-state { margin: 4px 0 0; font-size: 12px; }
+.app.mobile .mobile-playing .judgment-panel .judgment-actions .button { height: 52px; min-height: 52px; font-size: 20px; padding: 4px 8px; }
+.mobile-landscape.in-game .mobile-playing .mobile-workspace { flex-direction: row; }
+.mobile-landscape.in-game .mobile-playing .room-hud .mobile-secret { flex-grow: 2; flex-basis: 0; min-width: 0; margin: 0 8px; }
+.mobile-landscape.in-game .mobile-playing .room-hud .phase-bar { flex-grow: 1; flex-basis: 0; min-width: 100px; }
+.mobile-landscape.in-game .mobile-playing .mobile-play-stage { width: auto; flex-grow: 3; margin-right: 8px; }
+.mobile-landscape.in-game .mobile-playing .mobile-play-side { width: auto; flex-grow: 2; flex-basis: 0; min-width: 0; min-height: 0; }
+.mobile-landscape.in-game .mobile-playing .mobile-roster { margin-bottom: 6px; }
+.mobile-landscape.in-game .mobile-playing .mobile-bottom-actions { margin-top: auto; }
+.mobile-landscape.in-game .mobile-playing .canvas-frame { width: 100%; margin-right: 0; }

@@ -20,6 +20,37 @@ internal static partial class Integration
 
     public static async Task RunAsync(string[] args)
     {
+        if (args.Contains("--match-reward-only"))
+        {
+            await VerifyMatchRewardsAsync(args.FirstOrDefault(value => !value.StartsWith("--", StringComparison.Ordinal)) ?? "http://127.0.0.1:25550");
+            return;
+        }
+        if (args.Contains("--topic-workshop-only"))
+        {
+            await VerifyTopicWorkshopAsync(args.FirstOrDefault(value => !value.StartsWith("--", StringComparison.Ordinal)) ?? "http://127.0.0.1:25550");
+            return;
+        }
+        if (args.Contains("--mismatch-only"))
+        {
+            await VerifyMismatchAsync();
+            return;
+        }
+        if (args.Contains("--avatar-rules-only") || args.Contains("--avatar-database-only"))
+        {
+            VerifyAvatarPartRules();
+            if (args.Contains("--avatar-database-only")) await VerifyAvatarDatabaseAsync();
+            return;
+        }
+        if (args.Contains("--midround-only"))
+        {
+            await VerifyMidRoundAsync();
+            return;
+        }
+        if (args.Contains("--midround-database-only"))
+        {
+            await VerifyMidRoundDatabaseAsync();
+            return;
+        }
         if (args.Contains("--drawing-only"))
         {
             await VerifyDrawingHistoryAsync();
@@ -28,6 +59,11 @@ internal static partial class Integration
         if (args.Contains("--social-only"))
         {
             await VerifySocialAsync(args.FirstOrDefault(value => !value.StartsWith("--", StringComparison.Ordinal)) ?? "http://127.0.0.1:25550");
+            return;
+        }
+        if (args.Contains("--friend-cancel-only"))
+        {
+            await VerifyFriendCancellationAsync(args.FirstOrDefault(value => !value.StartsWith("--", StringComparison.Ordinal)) ?? "http://127.0.0.1:25550");
             return;
         }
         if (args.Contains("--room-password-only") || args.Contains("--legacy-room-password-only"))
@@ -51,6 +87,7 @@ internal static partial class Integration
         await VerifyRoomPolicyAsync();
         await VerifyConsensusWireAsync();
         await VerifyDrawingHistoryAsync();
+        await VerifyMidRoundAsync();
         await VerifyProfileRulesAsync();
         VerifyGuestCredentialRules();
         if (args.Contains("--lobby-chat-only"))
@@ -61,11 +98,6 @@ internal static partial class Integration
         if (args.Contains("--lobby-chat-database-only"))
         {
             await VerifyLobbyChatDatabaseAsync();
-            return;
-        }
-        if (args.Contains("--avatar-database-only"))
-        {
-            await VerifyAvatarDatabaseAsync();
             return;
         }
         if (args.Contains("--guest-database-only"))
@@ -118,7 +150,7 @@ internal static partial class Integration
             {
                 Settings = new ServerRoomSettings
                 {
-                    RoomName = "검증방" + runId, MaxPlayers = 8, LiarCount = 1,
+                    RoomName = "검증방" + runId, AllowMidRoundJoin = false, MaxPlayers = 8, LiarCount = 1,
                     Topics = new[] { "통합과일" }, RoleSeconds = 3, DrawSeconds = 30,
                     DiscussionSeconds = 5, RebuttalSeconds = 0, VoteSeconds = 5,
                     RevealSeconds = 3, GuessSeconds = 5, ResultSeconds = 5, RoundCount = 1
@@ -416,7 +448,7 @@ internal static partial class Integration
     {
         using var response = await SendAsync(client, path, body, token);
         response.EnsureSuccessStatusCode();
-        if (path == "/api/session/logout" || path == "/api/friends/request" || path == "/api/friends/respond")
+        if (path == "/api/session/logout" || path == "/api/friends/request" || path == "/api/friends/respond" || path == "/api/friends/cancel")
             Check(response.StatusCode == HttpStatusCode.NoContent, "완료 응답은 204를 반환해야 합니다: " + path);
     }
 

@@ -6,6 +6,7 @@ namespace DrawLiar
 {
     public enum GamePhase { Lobby, RoleReveal, Drawing, Discussion, Rebuttal, Voting, LiarReveal, Guessing, RoundResults, MatchResults }
     public enum DrawingMode { Relay, Individual }
+    public enum LiarMode { Classic = 0, Mismatch = 1 }
     public enum VictoryMode { RoundCount, TargetScore }
     public enum GuessOutcome { Hidden, Correct, Incorrect, Unanswered }
 
@@ -14,6 +15,7 @@ namespace DrawLiar
     {
         public int MaxPlayers = GameRules.MAX_PLAYERS;
         public int LiarCount = 1;
+        public LiarMode LiarMode;
         public int RoundCount = 5;
         public int TargetScore = 10;
         public DrawingMode Mode;
@@ -29,6 +31,7 @@ namespace DrawLiar
         public string[] Topics;
         public string RoomName = "우리들의 그림방";
         public bool IsPrivate;
+        public bool AllowMidRoundJoin = true;
 
         public RoomSettings Copy()
         {
@@ -40,7 +43,8 @@ namespace DrawLiar
         public void Validate()
         {
             MaxPlayers = GameRules.MAX_PLAYERS;
-            LiarCount = Clamp(LiarCount, 1, MaxPlayers - 1);
+            if (!Enum.IsDefined(typeof(LiarMode), LiarMode)) LiarMode = DrawLiar.LiarMode.Classic;
+            LiarCount = LiarMode == DrawLiar.LiarMode.Mismatch ? 1 : Clamp(LiarCount, 1, MaxPlayers - 1);
             RoundCount = Clamp(RoundCount, 1, 30);
             TargetScore = Clamp(TargetScore, 1, 1000);
             RoleSeconds = Clamp(RoleSeconds, 3, 30);
@@ -102,16 +106,22 @@ namespace DrawLiar
         public int LiarRounds;
         public int CorrectVotes;
         public int CorrectGuesses;
+        public long WeightedRoundParticipants;
+        public long WeightedRoundScore;
     }
 
     [Serializable]
     public sealed class RoomSnapshot
     {
+        public string MatchId = "";
+        public bool IsMatchComplete;
+        public bool LocalRewardEligible;
         public GamePhase Phase;
         public int Round;
         public int ArtistId = -1;
         public string Topic = "";
         public string Word = "";
+        public string MismatchWord = "";
         public bool LocalIsLiar;
         public bool LocalIsSpectator;
         public int LocalPlayerId = -1;
@@ -168,6 +178,8 @@ namespace DrawLiar
     {
         public string Name;
         public string[] Words;
+        public string WorkshopId = "";
+        public string LanguageCode = "";
     }
 
     [Serializable]

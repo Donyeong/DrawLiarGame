@@ -27,6 +27,11 @@ internal sealed partial class DedicatedRoom
                 return;
             }
             var settings = envelope.Settings.Copy();
+            if (!Enum.IsDefined(typeof(LiarMode), settings.LiarMode))
+            {
+                ConfigureReplyLocked(connection, requestId, false, "InvalidSettings");
+                return;
+            }
             settings.Validate();
             var known = _session.Snapshot(connection.PlayerId, -1, now).AvailableTopics;
             settings.Topics ??= known;

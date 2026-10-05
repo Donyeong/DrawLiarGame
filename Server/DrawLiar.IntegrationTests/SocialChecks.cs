@@ -75,7 +75,7 @@ internal static partial class Integration
                 Password = ROOM_PASSWORD,
                 Settings = new ServerRoomSettings
                 {
-                    RoomName = "소셜 검증", IsPrivate = true, Topics = new[] { "과일" },
+                    RoomName = "소셜 검증", IsPrivate = true, AllowMidRoundJoin = false, Topics = new[] { "과일" },
                     RoleSeconds = 15, DrawSeconds = 180, RoundCount = 1
                 }
             }, token);

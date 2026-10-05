@@ -12,7 +12,7 @@ internal static partial class Integration
 
     private static RoomSettings ProfileRoomSettings(int rounds = 3) => new()
     {
-        RoundCount = rounds, Topics = new[] { "전적검증" }, RoleSeconds = 3, DrawSeconds = 5,
+        RoundCount = rounds, AllowMidRoundJoin = false, Topics = new[] { "전적검증" }, RoleSeconds = 3, DrawSeconds = 5,
         DiscussionSeconds = 5, RebuttalSeconds = 0, VoteSeconds = 5, RevealSeconds = 3,
         GuessSeconds = 5, ResultSeconds = 5
     };

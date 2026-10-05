@@ -178,7 +178,7 @@ namespace DrawLiar
                 else DrawUIMotion.HideModal(popup, popup.Q<VisualElement>(className: "modal"));
             }
             if (returnFocus?.panel != null && root != null)
-                root.schedule.Execute(() => { if (_roomPasswordOverlay == null && this != null && isActiveAndEnabled && returnFocus.panel != null) returnFocus.Focus(); }).StartingIn(180);
+                root.schedule.Execute(() => { if (_roomPasswordOverlay == null && this != null && isActiveAndEnabled && returnFocus.panel != null && !ChatInputHasFocus()) returnFocus.Focus(); }).StartingIn(180);
         }
 
 #if ENABLE_INPUT_SYSTEM

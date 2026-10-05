@@ -18,6 +18,8 @@ public sealed partial class ServerDatabase : IDisposable
     {
         string connectionString = configuration.GetConnectionString("DrawLiarDatabase")
             ?? throw new InvalidOperationException("ConnectionStrings:DrawLiarDatabase가 필요합니다.");
+        _ = _workshopPolicy.Value;
+        _ = _matchRewardPolicy.Value;
         _source = NpgsqlDataSource.Create(connectionString);
     }
 

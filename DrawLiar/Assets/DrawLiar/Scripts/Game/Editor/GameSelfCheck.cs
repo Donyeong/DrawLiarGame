@@ -111,7 +111,7 @@ namespace DrawLiar.Editor
 
         private static void VerifyReconnectsAndSpectatorCapacity()
         {
-            var game = new GameSession(new RoomSettings { RebuttalSeconds = 0 }, Data(), 18);
+            var game = new GameSession(new RoomSettings { RebuttalSeconds = 0, AllowMidRoundJoin = false }, Data(), 18);
             for (int id = 1; id <= GameRules.MAX_PLAYERS; id++) Check(game.Join(id, "P" + id, 0, 0), "Active seat accepts player.");
             Check(!game.Join(9, "Full", 0, 0), "Full lobby rejects ninth active player.");
             Check(game.Start(0), "Full room starts.");
@@ -169,7 +169,7 @@ namespace DrawLiar.Editor
             Check(game.Start(200) && game.Snapshot(2, 1, 200).LocalIsSpectator && game.Snapshot(2, 1, 200).Word == "",
                 "Explicit spectator stays spectator in the next match.");
 
-            var vacancy = new GameSession(new RoomSettings(), Data(), 22);
+            var vacancy = new GameSession(new RoomSettings { AllowMidRoundJoin = false }, Data(), 22);
             for (int id = 1; id <= GameRules.MAX_PLAYERS; id++) Check(vacancy.Join(id, "P" + id, 0, 0), "Vacancy scenario fills active seats.");
             Check(vacancy.Start(0) && vacancy.Join(9, "Late", 0, 0), "Ordinary late join begins as temporary spectator.");
             Check(vacancy.Snapshot(9, 1, 0).LocalIsSpectator, "Temporary spectator does not join the current round.");
@@ -272,7 +272,7 @@ namespace DrawLiar.Editor
 
         private static void VerifyMatch(DrawingMode mode, VictoryMode victory)
         {
-            var game = new GameSession(new RoomSettings { RebuttalSeconds = 0, Mode = mode, Victory = victory, LiarCount = 2, RoundCount = 1, TargetScore = 5 }, Data(), 42);
+            var game = new GameSession(new RoomSettings { RebuttalSeconds = 0, AllowMidRoundJoin = false, Mode = mode, Victory = victory, LiarCount = 2, RoundCount = 1, TargetScore = 5 }, Data(), 42);
             Check(!game.Start(0), "Too few players cannot start.");
             for (int id = 0; id < 5; id++) Check(game.Join(id, "P" + id, id, 0), "Player joins.");
             Check(game.Start(0), "Valid match starts.");
@@ -351,7 +351,7 @@ namespace DrawLiar.Editor
 
         private static void VerifyDisconnectsAndNextRound()
         {
-            var game = new GameSession(new RoomSettings { RebuttalSeconds = 0, RoundCount = 2 }, Data(), 7);
+            var game = new GameSession(new RoomSettings { RebuttalSeconds = 0, AllowMidRoundJoin = false, RoundCount = 2 }, Data(), 7);
             for (int id = 0; id < 4; id++) game.Join(id, "P" + id, 0, 0);
             game.Start(0);
             game.Join(4, "Late", 0, 0);

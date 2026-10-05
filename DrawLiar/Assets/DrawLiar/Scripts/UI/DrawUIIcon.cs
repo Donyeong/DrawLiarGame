@@ -5,7 +5,7 @@ namespace DrawLiar
 {
     public sealed class DrawUIIcon : VisualElement
     {
-        public enum Kind { Refresh, Settings, Close, Bell }
+        public enum Kind { Refresh, Settings, Close, Bell, Profile }
         private readonly Kind _kind;
 
         public DrawUIIcon(Kind kind)
@@ -71,6 +71,20 @@ namespace DrawLiar
                 painter.LineTo(Point(.50f, .19f));
                 painter.Stroke();
                 return;
+            }
+
+            if(_kind==Kind.Profile)
+            {
+                painter.BeginPath();
+                for(int index=0;index<16;index++)
+                {
+                    float angle=index*Mathf.PI/8;var point=Point(.5f+Mathf.Cos(angle)*.15f,.3f+Mathf.Sin(angle)*.15f);
+                    if(index==0)painter.MoveTo(point);else painter.LineTo(point);
+                }
+                painter.ClosePath();painter.Stroke();
+                painter.BeginPath();painter.MoveTo(Point(.2f,.82f));
+                painter.BezierCurveTo(Point(.2f,.48f),Point(.8f,.48f),Point(.8f,.82f));
+                painter.LineTo(Point(.2f,.82f));painter.Stroke();return;
             }
 
             painter.BeginPath();

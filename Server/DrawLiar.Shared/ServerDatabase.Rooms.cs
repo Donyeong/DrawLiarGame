@@ -243,10 +243,10 @@ public sealed partial class ServerDatabase
                 if (!RoomPassword.Verify(password, reader.GetString(2))) throw new ApiException("InvalidRoomPassword", 403);
             }
         }
-        bool spectator = reconnectSpectator || !reconnectPlayer && (asSpectator || room.IsInProgress);
+        bool spectator = reconnectSpectator || !reconnectPlayer && (asSpectator || room.IsInProgress && !room.Settings.AllowMidRoundJoin);
         await Execute(connection, transaction, "DELETE FROM \"JoinTicket\" WHERE \"RoomId\"=$1 AND (\"ExpiresAt\"<=now() OR \"AccountId\"=$2)", roomId, session.AccountId);
         long reservations = await PendingReservations(connection, transaction, roomId, spectator, session.AccountId, players.Concat(spectators).ToArray());
-        if (!reconnectPlayer && !reconnectSpectator && (spectator ? Math.Max(room.SpectatorCount, spectators.Length) + reservations >= 32 : Math.Max(room.PlayerCount, players.Length) + reservations >= room.Settings.MaxPlayers))
+        if (!reconnectPlayer && !reconnectSpectator && OccupiedSeats(room, players, spectators, spectator, session.AccountId.ToString()) + reservations >= (spectator ? 32 : room.Settings.MaxPlayers))
             throw new ApiException("RoomFull", 409);
         return await CreateTicket(connection, transaction, session, roomId, room.RoomCode, url, spectator, asSpectator);
     }
@@ -258,6 +258,13 @@ public sealed partial class ServerDatabase
             UNION SELECT "AccountId" FROM "RoomAdmission" WHERE "RoomId"=$1 AND "IsSpectator"=$2 AND "ExpiresAt">now()
         ) pending WHERE "AccountId"<>$3 AND NOT ("AccountId"::text=ANY($4))
         """, roomId, spectator, accountId, admittedAccounts));
+
+    private static int OccupiedSeats(ServerRoomData room, string[] players, string[] spectators, bool spectator, string account)
+    {
+        var roster = spectator ? spectators : players;
+        int ownReservation = roster.Contains(account) ? 1 : 0;
+        return Math.Max((spectator ? room.SpectatorCount : room.PlayerCount) - ownReservation, roster.Length - ownReservation);
+    }
 
     private static async Task<DedicatedAssignment> CreateTicket(NpgsqlConnection connection, NpgsqlTransaction transaction, ServerSession session, Guid roomId, string roomCode, string url, bool spectator, bool spectatorOnly = false)
     {
@@ -313,17 +320,30 @@ public sealed partial class ServerDatabase
             spectators = JsonSerializer.Deserialize<string[]>(reader.GetString(9))!;
         }
         string accountKey = accountId.ToString();
-        if (players.Contains(accountKey)) spectator = false;
-        else if (spectators.Contains(accountKey)) spectator = true;
+        bool confirmedPlayer, confirmedSpectator;
+        await using (var command = Command(connection, transaction, "SELECT \"ConfirmedPlayerAccountIds\" ? $2::text,\"ConfirmedSpectatorAccountIds\" ? $2::text FROM \"Room\" WHERE \"RoomId\"=$1", roomId, accountKey))
+        await using (var reader = await command.ExecuteReaderAsync())
+        {
+            await reader.ReadAsync();
+            confirmedPlayer = reader.GetBoolean(0);
+            confirmedSpectator = reader.GetBoolean(1);
+        }
+        if (confirmedPlayer) spectator = false;
+        else if (confirmedSpectator) spectator = true;
         else
         {
-            spectator = spectator || room.IsInProgress;
+            spectator = spectatorOnly || room.IsInProgress && !room.Settings.AllowMidRoundJoin;
             string rosterColumn = spectator ? "SpectatorAccountIds" : "PlayerAccountIds";
             string countColumn = spectator ? "SpectatorCount" : "PlayerCount";
             // 참가 승인과 heartbeat 사이에도 새 입장을 예약하여 정원 초과 배정을 막는다.
-            long count = (spectator ? Math.Max(room.SpectatorCount, spectators.Length) : Math.Max(room.PlayerCount, players.Length))
+            long count = OccupiedSeats(room, players, spectators, spectator, accountKey)
                 + await PendingReservations(connection, transaction, roomId, spectator, accountId, players.Concat(spectators).ToArray());
             if (count >= (spectator ? 32 : room.Settings.MaxPlayers)) throw new ApiException("RoomFull", 409);
+            await Execute(connection, transaction, """
+                UPDATE "Room" SET "PlayerCount"=GREATEST(0,"PlayerCount"-CASE WHEN "PlayerAccountIds" ? $2::text THEN 1 ELSE 0 END),
+                    "SpectatorCount"=GREATEST(0,"SpectatorCount"-CASE WHEN "SpectatorAccountIds" ? $2::text THEN 1 ELSE 0 END),
+                    "PlayerAccountIds"="PlayerAccountIds"-$2::text,"SpectatorAccountIds"="SpectatorAccountIds"-$2::text WHERE "RoomId"=$1
+                """, roomId, accountKey);
             await Execute(connection, transaction, $"UPDATE \"Room\" SET \"{rosterColumn}\"=\"{rosterColumn}\"||$2::jsonb,\"{countColumn}\"=\"{countColumn}\"+1,\"UpdatedAt\"=now() WHERE \"RoomId\"=$1", roomId, JsonSerializer.Serialize(new[] { accountKey }));
         }
         await Execute(connection, transaction, "UPDATE \"RoomAdmission\" SET \"IsSpectator\"=$2 WHERE \"Id\"=$1", admissionId, spectator);
@@ -350,6 +370,8 @@ public sealed partial class ServerDatabase
     public static void ValidateSettings(ServerRoomSettings settings)
     {
         settings.MaxPlayers = ServerRoomSettings.MAX_PLAYERS;
+        if (settings.LiarMode is < 0 or > 1) throw new ApiException("InvalidSettings");
+        if (settings.LiarMode == 1) settings.LiarCount = 1;
         if (settings.LiarCount < 1 || settings.LiarCount >= settings.MaxPlayers || settings.RoundCount is < 1 or > 30 || settings.TargetScore is < 1 or > 1000
             || settings.Mode is < 0 or > 1 || settings.Victory is < 0 or > 1 || settings.RoleSeconds is < 3 or > 30 || settings.DrawSeconds is < 5 or > 180
             || settings.DiscussionSeconds is < 5 or > 300 || settings.RebuttalSeconds is < 0 or > 180 || settings.VoteSeconds is < 5 or > 120

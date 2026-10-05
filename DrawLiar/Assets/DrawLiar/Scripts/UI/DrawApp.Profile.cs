@@ -62,6 +62,7 @@ namespace DrawLiar
         {
             if (root == null || !lobby.IsAuthenticated || !Guid.TryParse(accountId, out _)) return;
             if (_profileOverlay != null && _profileAccountId == accountId) return;
+            surface?.CancelDrawing();
             var returnFocus = origin ?? root.focusController?.focusedElement as VisualElement;
             ClosePublicProfile(false);
             _profileReturnFocus = returnFocus;
@@ -228,7 +229,10 @@ namespace DrawLiar
                         Button(actions, "꾸미기", OpenSelfCustomization, "primary").name = "public-profile-customize";
                     break;
                 case "Friends": Text(actions, "친구", "public-profile-state"); break;
-                case "Outgoing": Text(actions, "수락 대기", "public-profile-state"); break;
+                case "Outgoing":
+                    Text(actions, "수락 대기", "public-profile-state");
+                    Button(actions, "신청 취소", () => StartPublicProfileFriendAction(() => lobby.CancelFriendRequestAsync(profile.AccountId)), "secondary").name = "public-profile-request-cancel";
+                    break;
                 case "Incoming":
                     Button(actions, "수락", () => StartPublicProfileFriendAction(() => lobby.RespondFriendAsync(profile.AccountId, true)), "primary").name = "public-profile-accept";
                     Button(actions, "거절", () => StartPublicProfileFriendAction(() => lobby.RespondFriendAsync(profile.AccountId, false)), "secondary").name = "public-profile-reject";
@@ -316,7 +320,7 @@ namespace DrawLiar
             if (!restoreFocus || root == null) return;
             root.schedule.Execute(() =>
             {
-                if (this == null || !isActiveAndEnabled || _roomCustomizeOverlay != null || overlay != null || _profileOverlay != null) return;
+                if (this == null || !isActiveAndEnabled || _roomCustomizeOverlay != null || overlay != null || _profileOverlay != null || ChatInputHasFocus()) return;
                 var target = returnFocus?.panel != null ? returnFocus : root.Q<VisualElement>("profile-open-" + accountId);
                 target?.Focus();
             }).StartingIn(180);
@@ -413,7 +417,7 @@ namespace DrawLiar
             if (!restoreFocus || root == null) return;
             root.schedule.Execute(() =>
             {
-                if (_profileOverlay != null) return;
+                if (_profileOverlay != null || ChatInputHasFocus()) return;
                 var target = returnFocus?.panel != null ? returnFocus : root.Q<VisualElement>("profile-open-" + accountId);
                 (target ?? overlay?.Q<Button>())?.Focus();
             }).StartingIn(180);

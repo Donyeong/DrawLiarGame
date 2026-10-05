@@ -80,6 +80,15 @@ public sealed partial class ServerDatabase
         if (await Execute(connection, null, sql, accountId, sender) != 1) throw new ApiException("FriendRequestNotFound", 404);
     }
 
+    public async Task CancelFriendRequestAsync(Guid accountId, Guid target, CancellationToken cancellationToken = default)
+    {
+        if (accountId == target) throw new ApiException("InvalidFriend");
+        await using var connection = await _source.OpenConnectionAsync(cancellationToken);
+        await using var command = Command(connection, null,
+            "DELETE FROM \"Friendship\" WHERE \"FromAccountId\"=$1 AND \"ToAccountId\"=$2 AND NOT \"Accepted\"", accountId, target);
+        if (await command.ExecuteNonQueryAsync(cancellationToken) != 1) throw new ApiException("FriendRequestNotFound", 404);
+    }
+
     public async Task RemoveFriendAsync(Guid accountId, Guid target)
     {
         await using var connection = await _source.OpenConnectionAsync();

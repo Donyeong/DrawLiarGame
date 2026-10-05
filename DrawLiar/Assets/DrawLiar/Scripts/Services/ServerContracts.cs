@@ -63,6 +63,18 @@ namespace DrawLiar
         public bool Won;
         public int RoundCount;
     }
+    [Serializable] public sealed class MatchRewardPolicy
+    {
+        public int BaseCoinsPerParticipantRound;
+        public int CoinsPerParticipantPoint;
+    }
+    [Serializable] public sealed class MatchRewardResponse
+    {
+        public string MatchId = "";
+        public bool Recorded;
+        public int CoinReward;
+        public ProfileData Profile = new ProfileData();
+    }
     [Serializable] public sealed class MatchResultRequest
     {
         public string NodeId = "";
@@ -84,6 +96,8 @@ namespace DrawLiar
         public int LiarRounds;
         public int CorrectVotes;
         public int CorrectGuesses;
+        public long WeightedRoundParticipants;
+        public long WeightedRoundScore;
     }
     [Serializable] public sealed class GoogleChallengeRequest { public string Platform = "desktop"; }
     [Serializable] public sealed class GoogleChallengeResponse { public string ChallengeId = ""; public string Nonce = ""; public string ClientId = ""; public string ExpiresAt = ""; }
@@ -115,6 +129,7 @@ namespace DrawLiar
         public const int MAX_PLAYERS = 8;
         public int MaxPlayers = MAX_PLAYERS;
         public int LiarCount = 1;
+        public int LiarMode;
         public int RoundCount = 5;
         public int TargetScore = 10;
         public int Mode;
@@ -130,6 +145,7 @@ namespace DrawLiar
         public string[] Topics = Array.Empty<string>();
         public string RoomName = "우리들의 그림방";
         public bool IsPrivate;
+        public bool AllowMidRoundJoin = true;
     }
     [Serializable] public sealed class ServerRoomData
     {
@@ -179,6 +195,50 @@ namespace DrawLiar
         public string DisplayName = "";
         public string Text = "";
         public string SentAt = "";
+    }
+    [Serializable] public sealed class TopicWorkshopLimits
+    {
+        public int NameMaxLength;
+        public int WordMaxLength;
+        public int MaxWordsPerTopic;
+        public int MaxUploadsPerAccount;
+    }
+    [Serializable] public sealed class TopicWorkshopPolicy
+    {
+        public TopicWorkshopLimits Limits = new TopicWorkshopLimits();
+        public string[] LanguageCodes = Array.Empty<string>();
+    }
+    [Serializable] public sealed class TopicWorkshopPublishRequest
+    {
+        public string Name = "";
+        public string LanguageCode = "";
+        public string[] Words = Array.Empty<string>();
+    }
+    [Serializable] public sealed class TopicWorkshopEntry
+    {
+        public string Id = "";
+        public string CreatorAccountId = "";
+        public string CreatorName = "";
+        public string Name = "";
+        public string LanguageCode = "";
+        public int WordCount;
+        public int DownloadCount;
+        public string CreatedAt = "";
+        public bool IsMine;
+    }
+    [Serializable] public sealed class TopicWorkshopDetailResponse
+    {
+        public TopicWorkshopEntry Topic = new TopicWorkshopEntry();
+        public string[] Words = Array.Empty<string>();
+    }
+    [Serializable] public sealed class TopicWorkshopListResponse
+    {
+        public TopicWorkshopEntry[] Items = Array.Empty<TopicWorkshopEntry>();
+        public int Total;
+        public int Offset;
+        public int Limit;
+        public int OwnCount;
+        public TopicWorkshopPolicy Policy = new TopicWorkshopPolicy();
     }
     [Serializable] public sealed class LobbyChatEnvelope
     {

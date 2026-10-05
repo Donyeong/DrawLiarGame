@@ -17,7 +17,9 @@ namespace DrawLiar
         public int Players;
         public int MaxPlayers;
         public int Spectators;
+        public LiarMode LiarMode;
         public bool IsInProgress;
+        public bool AllowMidRoundJoin = true;
     }
 
     public sealed class RoomPasswordPrompt
@@ -35,7 +37,7 @@ namespace DrawLiar
     }
 
     [DisallowMultipleComponent]
-    public sealed class LobbyServiceBridge : MonoBehaviour
+    public sealed partial class LobbyServiceBridge : MonoBehaviour
     {
         private readonly List<PublicRoomInfo> _publicRooms = new List<PublicRoomInfo>();
         private readonly DrawLobbyChatClient _lobbyChat = new DrawLobbyChatClient();
@@ -115,6 +117,7 @@ namespace DrawLiar
         private void OnRoomState(RoomSnapshot state)
         {
             if (state == null) _roomCode = "";
+            TrackMatchReward(state);
             if (IsOnlineRoom) StopLobbyChat(); else StartLobbyChat();
             Changed?.Invoke();
         }
@@ -131,6 +134,7 @@ namespace DrawLiar
         private void Update()
         {
             _lobbyChat.Drain();
+            PollPendingMatchRewards();
             if (IsAuthenticated && !_loggingOut && !_lobbyChatPaused && !IsBusy && !_socialPolling
                 && Time.realtimeSinceStartupAsDouble >= _nextSocialPoll)
                 _ = PollSocialAsync();
@@ -337,6 +341,15 @@ namespace DrawLiar
             SetStatus("친구 요청을 보냈습니다.");
         });
 
+        public Task CancelFriendRequestAsync(string accountId) => RunAsync(async () =>
+        {
+            RequireLogin();
+            ++_socialRevision;
+            await SendGameAsync<ApiError>("/api/friends/cancel", "POST", new FriendRequest { AccountId = accountId.Trim() });
+            await RefreshSocialAsync();
+            SetStatus("친구 요청을 취소했습니다.");
+        });
+
         public Task RespondFriendAsync(string accountId, bool accept) => RunAsync(async () =>
         {
             RequireLogin();
@@ -494,7 +507,8 @@ namespace DrawLiar
             _publicRooms.Clear();
             foreach (var room in response.Rooms)
                 _publicRooms.Add(new PublicRoomInfo { Id = room.RoomId, Code = room.RoomCode, Name = room.Name, Players = room.PlayerCount,
-                    MaxPlayers = room.Settings.MaxPlayers, Spectators = room.SpectatorCount, IsInProgress = room.IsInProgress });
+                    MaxPlayers = room.Settings.MaxPlayers, Spectators = room.SpectatorCount, LiarMode = (LiarMode)room.Settings.LiarMode, IsInProgress = room.IsInProgress,
+                    AllowMidRoundJoin = room.Settings.AllowMidRoundJoin });
             if (_publicRooms.Count == 0) SetStatus("공개 방이 없습니다.");
             else SetStatus("공개 방 {0}개를 찾았습니다.", _publicRooms.Count);
         });
@@ -520,7 +534,7 @@ namespace DrawLiar
                 _mainSession = _gameSession = _gameServerUrl = _roomCode = "";
                 StopLobbyChat(true);
                 _loggingOut = false;
-                Profile = null; Friends = new FriendListResponse(); Shop = new ShopResponse(); _publicRooms.Clear();
+                Profile = null; ResetTopicWorkshop(); ResetMatchRewards(); Friends = new FriendListResponse(); Shop = new ShopResponse(); _publicRooms.Clear();
                 ResetSocial();
                 ProfileChanged?.Invoke(); SetStatus("로그아웃했습니다.");
             }
@@ -540,7 +554,9 @@ namespace DrawLiar
         {
             if (profile == null || string.IsNullOrEmpty(profile.AccountId) || string.IsNullOrEmpty(profile.DisplayName))
                 throw new InvalidOperationException("서버 프로필 응답을 확인할 수 없습니다.");
+            if (Profile?.AccountId != profile.AccountId) { ResetTopicWorkshop(); ResetMatchRewards(); }
             Profile = profile;
+            ++_rewardProfileRevision;
             ProfileChanged?.Invoke();
         }
         private void SetStatus(string source, params object[] args)
@@ -613,8 +629,9 @@ namespace DrawLiar
 #endif
         }
 
-        private static string DescribeError(string code, long status)
+        private string DescribeError(string code, long status)
         {
+            if (code.StartsWith("TopicWorkshop", StringComparison.Ordinal)) return TopicWorkshopErrorMessage(code);
             switch (code)
             {
                 case "InvalidGuestCredential": return "게스트 인증 정보를 확인할 수 없습니다. Google 연동 계정은 Google로 로그인하세요.";

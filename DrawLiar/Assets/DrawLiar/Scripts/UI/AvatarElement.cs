@@ -38,7 +38,7 @@ namespace DrawLiar
             void RoundedBox(float x, float y, float width, float height, float radius, Color fill)
             {
                 p.fillColor=fill; p.BeginPath(); p.MoveTo(V(x+radius,y));
-                p.LineTo(V(x+width-radius,y)); p.QuadraticCurveTo(V(x+width,y),V(x+width,y+radius));
+                p.LineTo(V(x+width-radius,y)); p.BezierCurveTo(V(x+width-radius/3,y),V(x+width,y+radius/3),V(x+width,y+radius));
                 p.LineTo(V(x+width,y+height-radius)); p.QuadraticCurveTo(V(x+width,y+height),V(x+width-radius,y+height));
                 p.LineTo(V(x+radius,y+height)); p.QuadraticCurveTo(V(x,y+height),V(x,y+height-radius));
                 p.LineTo(V(x,y+radius)); p.QuadraticCurveTo(V(x,y),V(x+radius,y));
@@ -55,6 +55,24 @@ namespace DrawLiar
                     if(point==0)p.MoveTo(position);else p.LineTo(position);
                 }
                 p.ClosePath(); p.Fill(); if(outline)p.Stroke();
+            }
+            void Clothing(Color fill)
+            {
+                p.fillColor=fill; p.BeginPath(); p.MoveTo(V(.272f,.675f));
+                p.BezierCurveTo(V(.31f,.663f),V(.365f,.651f),V(.40f,.66f));
+                p.QuadraticCurveTo(V(.53f,.708f),V(.66f,.66f));
+                p.QuadraticCurveTo(V(.739f,.655f),V(.788f,.675f));
+                p.BezierCurveTo(V(.798f,.699f),V(.806f,.72f),V(.815f,.73f));
+                p.BezierCurveTo(V(.84f,.805f),V(.745f,.865f),V(.53f,.865f));
+                p.BezierCurveTo(V(.315f,.865f),V(.22f,.805f),V(.245f,.73f));
+                p.QuadraticCurveTo(V(.255f,.70f),V(.272f,.675f));
+                p.ClosePath(); p.Fill(); p.Stroke();
+            }
+            void Stripe(float x, float y, float width, float height, Color fill)
+            {
+                p.fillColor=fill; p.BeginPath(); p.MoveTo(V(x,y));
+                p.LineTo(V(x+width,y)); p.LineTo(V(x+width,y+height)); p.LineTo(V(x,y+height));
+                p.ClosePath(); p.Fill();
             }
             var ink = new Color32(64,53,83,255);
             var cream = new Color32(255,249,236,255);
@@ -88,10 +106,106 @@ namespace DrawLiar
             p.BezierCurveTo(V(.315f,.865f),V(.22f,.805f),V(.245f,.73f));
             p.BezierCurveTo(V(.237f,.69f),V(.215f,.635f),V(.215f,.535f));
             p.BezierCurveTo(V(.215f,.34f),V(.34f,.19f),V(.53f,.19f)); p.ClosePath(); p.Fill(); p.Stroke();
-            Ellipse(.53f,.625f,.235f,.2f,cream);
-            Ellipse(.43f,.48f,.021f,.03f,ink); Ellipse(.63f,.48f,.021f,.03f,ink);
+            var clothing=Equipment&(AvatarAccessory.PainterApron|AvatarAccessory.StripedShirt|AvatarAccessory.PolkaDotShirt|AvatarAccessory.Overalls|AvatarAccessory.StarSweater);
+            if(clothing==AvatarAccessory.PainterApron)
+            {
+                Clothing(new Color32(241,216,175,255));
+                p.fillColor=new Color32(110,173,164,255); p.BeginPath(); p.MoveTo(V(.397f,.638f));
+                p.BezierCurveTo(V(.437f,.65f),V(.475f,.655f),V(.53f,.655f));
+                p.BezierCurveTo(V(.585f,.655f),V(.623f,.65f),V(.663f,.638f));
+                p.LineTo(V(.717f,.808f)); p.QuadraticCurveTo(V(.735f,.812f),V(.74f,.816f));
+                p.BezierCurveTo(V(.685f,.846f),V(.625f,.852f),V(.53f,.852f));
+                p.BezierCurveTo(V(.435f,.852f),V(.375f,.846f),V(.32f,.816f));
+                p.QuadraticCurveTo(V(.325f,.812f),V(.343f,.808f)); p.LineTo(V(.397f,.638f));
+                p.ClosePath(); p.Fill(); p.Stroke();
+                RoundedBox(.425f,.741f,.21f,.092f,.016f,cream);
+                Ellipse(.480f,.794f,.019f,.018f,new Color32(239,155,142,255));
+                Ellipse(.558f,.770f,.023f,.018f,gold);
+            }
+            else if(clothing==AvatarAccessory.StripedShirt)
+            {
+                Clothing(new Color32(105,148,179,255));
+                Stripe(.284f,.704f,.492f,.026f,cream);
+                Stripe(.274f,.758f,.512f,.026f,cream);
+                Stripe(.352f,.810f,.356f,.022f,cream);
+            }
+            else if(clothing==AvatarAccessory.PolkaDotShirt)
+            {
+                Clothing(new Color32(226,140,158,255));
+                Ellipse(.352f,.718f,.024f,.023f,cream); Ellipse(.530f,.718f,.024f,.023f,cream); Ellipse(.708f,.718f,.024f,.023f,cream);
+                Ellipse(.432f,.765f,.024f,.023f,cream); Ellipse(.628f,.765f,.024f,.023f,cream);
+                Ellipse(.365f,.809f,.023f,.022f,cream); Ellipse(.530f,.811f,.024f,.023f,cream); Ellipse(.695f,.809f,.023f,.022f,cream);
+            }
+            else if(clothing==AvatarAccessory.Overalls)
+            {
+                var denim=new Color32(107,139,191,255);
+                Clothing(new Color32(241,201,125,255));
+                p.fillColor=denim; p.BeginPath(); p.MoveTo(V(.37f,.686f));
+                p.BezierCurveTo(V(.42f,.697f),V(.48f,.70f),V(.53f,.70f));
+                p.BezierCurveTo(V(.58f,.70f),V(.64f,.697f),V(.69f,.686f));
+                p.LineTo(V(.69f,.746f)); p.LineTo(V(.776f,.792f));
+                p.BezierCurveTo(V(.737f,.838f),V(.645f,.862f),V(.53f,.862f));
+                p.BezierCurveTo(V(.415f,.862f),V(.323f,.838f),V(.284f,.792f));
+                p.LineTo(V(.37f,.746f)); p.ClosePath(); p.Fill(); p.Stroke();
+                p.strokeColor=denim; p.lineWidth=size*.035f;
+                p.BeginPath(); p.MoveTo(V(.354f,.653f)); p.LineTo(V(.415f,.755f));
+                p.MoveTo(V(.706f,.653f)); p.LineTo(V(.645f,.755f)); p.Stroke();
+                p.strokeColor=ink; p.lineWidth=Mathf.Max(.65f,size*.0135f);
+                Ellipse(.412f,.744f,.019f,.019f,gold,true); Ellipse(.648f,.744f,.019f,.019f,gold,true);
+                p.BeginPath(); p.MoveTo(V(.46f,.775f)); p.LineTo(V(.46f,.809f));
+                p.QuadraticCurveTo(V(.53f,.833f),V(.60f,.809f)); p.LineTo(V(.60f,.775f));
+                p.MoveTo(V(.53f,.833f)); p.LineTo(V(.53f,.858f)); p.Stroke();
+            }
+            else if(clothing==AvatarAccessory.StarSweater)
+            {
+                Clothing(new Color32(137,121,183,255));
+                p.strokeColor=new Color32(191,181,224,255); p.lineWidth=size*.023f;
+                p.BeginPath(); p.MoveTo(V(.36f,.828f)); p.QuadraticCurveTo(V(.53f,.854f),V(.70f,.828f)); p.Stroke();
+                p.strokeColor=ink; p.lineWidth=Mathf.Max(.65f,size*.0135f);
+                Star(.53f,.756f,.077f,gold,true);
+            }
+            if(clothing==AvatarAccessory.None)Ellipse(.53f,.625f,.235f,.2f,cream);
+            else Ellipse(.53f,.555f,.235f,.13f,cream);
             Ellipse(.35f,.545f,.044f,.02f,new Color32(247,169,184,255)); Ellipse(.71f,.545f,.044f,.02f,new Color32(247,169,184,255));
-            p.BeginPath(); p.MoveTo(V(.49f,.555f)); p.QuadraticCurveTo(V(.53f,.605f),V(.57f,.555f)); p.Stroke();
+            if((Equipment&AvatarAccessory.Wink)!=0)
+            {
+                Ellipse(.43f,.48f,.021f,.03f,ink);
+                p.BeginPath(); p.MoveTo(V(.604f,.486f)); p.QuadraticCurveTo(V(.63f,.462f),V(.656f,.486f));
+                p.MoveTo(V(.492f,.555f)); p.QuadraticCurveTo(V(.537f,.605f),V(.582f,.547f)); p.Stroke();
+            }
+            else if((Equipment&AvatarAccessory.Happy)!=0)
+            {
+                p.BeginPath(); p.MoveTo(V(.402f,.486f)); p.QuadraticCurveTo(V(.43f,.452f),V(.458f,.486f));
+                p.MoveTo(V(.602f,.486f)); p.QuadraticCurveTo(V(.63f,.452f),V(.658f,.486f)); p.Stroke();
+                p.fillColor=ink; p.BeginPath(); p.MoveTo(V(.486f,.553f));
+                p.BezierCurveTo(V(.513f,.56f),V(.547f,.56f),V(.574f,.553f));
+                p.BezierCurveTo(V(.572f,.618f),V(.488f,.618f),V(.486f,.553f)); p.ClosePath(); p.Fill();
+                Ellipse(.53f,.592f,.024f,.011f,new Color32(247,169,184,255));
+            }
+            else if((Equipment&AvatarAccessory.Sleepy)!=0)
+            {
+                p.BeginPath(); p.MoveTo(V(.402f,.480f)); p.QuadraticCurveTo(V(.43f,.496f),V(.458f,.483f));
+                p.MoveTo(V(.602f,.483f)); p.QuadraticCurveTo(V(.63f,.496f),V(.658f,.480f));
+                p.MoveTo(V(.510f,.576f)); p.QuadraticCurveTo(V(.53f,.582f),V(.55f,.576f)); p.Stroke();
+            }
+            else if((Equipment&AvatarAccessory.Surprised)!=0)
+            {
+                Ellipse(.43f,.48f,.027f,.039f,ink); Ellipse(.63f,.48f,.027f,.039f,ink);
+                Ellipse(.53f,.576f,.030f,.040f,ink);
+                Ellipse(.53f,.576f,.015f,.023f,cream);
+            }
+            else if((Equipment&AvatarAccessory.Determined)!=0)
+            {
+                Ellipse(.43f,.483f,.019f,.026f,ink); Ellipse(.63f,.483f,.019f,.026f,ink);
+                p.BeginPath(); p.MoveTo(V(.397f,.431f)); p.LineTo(V(.461f,.458f));
+                p.MoveTo(V(.599f,.458f)); p.LineTo(V(.663f,.431f));
+                p.MoveTo(V(.494f,.582f)); p.QuadraticCurveTo(V(.53f,.564f),V(.566f,.582f)); p.Stroke();
+            }
+            else
+            {
+                Ellipse(.43f,.48f,.021f,.03f,ink); Ellipse(.63f,.48f,.021f,.03f,ink);
+                p.BeginPath(); p.MoveTo(V(.49f,.555f)); p.QuadraticCurveTo(V(.53f,.605f),V(.57f,.555f)); p.Stroke();
+            }
             if((Equipment & AvatarAccessory.Beret)!=0)
             {
                 p.fillColor=new Color32(112,150,156,255); p.BeginPath(); p.MoveTo(V(.27f,.23f));

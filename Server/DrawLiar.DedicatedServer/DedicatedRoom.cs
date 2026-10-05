@@ -62,7 +62,8 @@ internal sealed partial class DedicatedRoom
                 {
                     AccountId = accounts[player.PlayerId], Score = player.Score, Rank = player.Rank, Won = player.Won,
                     RoundsPlayed = player.RoundsPlayed, CitizenRounds = player.CitizenRounds, LiarRounds = player.LiarRounds,
-                    CorrectVotes = player.CorrectVotes, CorrectGuesses = player.CorrectGuesses
+                    CorrectVotes = player.CorrectVotes, CorrectGuesses = player.CorrectGuesses,
+                    WeightedRoundParticipants = player.WeightedRoundParticipants, WeightedRoundScore = player.WeightedRoundScore
                 }).ToArray()
             });
         };
@@ -76,13 +77,14 @@ internal sealed partial class DedicatedRoom
         {
             if (_admittedIds.Count >= MAX_PENDING_ADMISSIONS || _configurationPending || _configurationSyncRequired
                 || ticket.Room.AccessVersion != _accessVersion) return false;
+            _session.Tick(now);
             if (!_playerIds.TryGetValue(ticket.AccountId, out int playerId))
             {
                 playerId = _nextPlayerId++;
                 _playerIds[ticket.AccountId] = playerId;
             }
             if (!_session.Contains(playerId) && !_session.Join(playerId, ticket.Profile.DisplayName,
-                ticket.Profile.AvatarColor, ticket.Profile.Accessory, ticket.IsSpectator, ticket.SpectatorOnly)) return false;
+                ticket.Profile.AvatarColor, ticket.Profile.Accessory, ticket.SpectatorOnly, ticket.SpectatorOnly)) return false;
             if (_connections.TryGetValue(ticket.AccountId, out var previous)) previous.Abort();
             connection.PlayerId = playerId;
             _connections[ticket.AccountId] = connection;
@@ -104,13 +106,16 @@ internal sealed partial class DedicatedRoom
         {
             if (!_connections.TryGetValue(connection.AccountId, out var current) || current != connection) return;
             _connections.Remove(connection.AccountId);
-            _session.Disconnect(connection.PlayerId, now);
+            _session.Disconnect(connection.PlayerId, now, !connection.LeftVoluntarily);
             RemoveUnusedPlayerIdsLocked();
             if (connection.LeftVoluntarily) _reconnectUntil.Remove(connection.AccountId);
             else _reconnectUntil[connection.AccountId] = now + 120;
             foreach (string account in _reconnectUntil.Where(pair => pair.Value <= now || pair.Key != connection.AccountId
                 && (!_playerIds.TryGetValue(pair.Key, out int id) || !_session.HasParticipant(id))).Select(pair => pair.Key).ToArray())
+            {
+                if (_reconnectUntil[account] <= now && _playerIds.TryGetValue(account, out int expiredPlayerId)) _session.ReleaseSeat(expiredPlayerId);
                 _reconnectUntil.Remove(account);
+            }
             if (_connections.Count == 0)
             {
                 _closeAfter = _reconnectUntil.Values.DefaultIfEmpty(now).Max();
@@ -186,6 +191,13 @@ internal sealed partial class DedicatedRoom
         lock (_gate)
         {
             _session.Tick(now);
+            bool seatsReleased = false;
+            foreach (var account in _reconnectUntil.Where(pair => pair.Value <= now).Select(pair => pair.Key).ToArray())
+            {
+                if (_playerIds.TryGetValue(account, out int playerId)) seatsReleased |= _session.ReleaseSeat(playerId);
+                _reconnectUntil.Remove(account);
+            }
+            if (seatsReleased) _statusChanged();
             EnsureHostLocked();
             if (_dirty || now - _lastSnapshot >= 1) BroadcastSnapshotsLocked(now);
             if (!_closeRequested && _connections.Count == 0 && now >= _closeAfter)
@@ -206,9 +218,9 @@ internal sealed partial class DedicatedRoom
                 RoomId = RoomId, OwnerAccountId = _ownerAccountId,
                 PlayerCount = _session.ActiveCount, SpectatorCount = _session.SpectatorCount,
                 IsInProgress = _session.Phase != GamePhase.Lobby && _session.Phase != GamePhase.MatchResults,
-                PlayerAccountIds = _playerIds.Where(pair => _session.HasParticipant(pair.Value) && !_session.IsSpectator(pair.Value))
+                PlayerAccountIds = _playerIds.Where(pair => _session.HoldsPlayerSeat(pair.Value))
                     .Select(pair => pair.Key).ToArray(),
-                SpectatorAccountIds = _playerIds.Where(pair => _session.HasParticipant(pair.Value) && _session.IsSpectator(pair.Value))
+                SpectatorAccountIds = _playerIds.Where(pair => _session.HoldsSpectatorSeat(pair.Value))
                     .Select(pair => pair.Key).ToArray(),
                 AdmissionIds = _admittedIds.ToArray(),
                 Settings = System.Text.Json.JsonSerializer.Deserialize<ServerRoomSettings>(

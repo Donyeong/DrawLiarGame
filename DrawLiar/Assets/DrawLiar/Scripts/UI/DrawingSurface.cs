@@ -7,6 +7,7 @@ namespace DrawLiar
     public sealed class DrawingSurface : VisualElement
     {
         private const int Width=1200, Height=800;
+        private const int OTHER_STROKE_OPACITY_DIVISOR=4;
         private readonly Texture2D texture;
         private readonly Color32[] pixels = new Color32[Width*Height];
         private readonly DrawNetworkManager network;
@@ -26,6 +27,7 @@ namespace DrawLiar
         public float BrushSize = .009f;
         public bool Eraser;
         public bool HasAuthorPreview => _previewAuthorId.HasValue;
+        public static float AspectRatio => Width/(float)Height;
 
         public DrawingSurface(DrawNetworkManager manager)
         {
@@ -57,7 +59,6 @@ namespace DrawLiar
 
         public void ShowAuthorPreview(int authorId,DrawingMode mode,IReadOnlyList<DrawStroke> strokes)
         {
-            if(mode==DrawingMode.Relay&&(strokes==null||strokes.Count==0)){ClearAuthorPreview();return;}
             bool changed=_previewAuthorId!=authorId||_previewMode!=mode;
             StopDrawing();
             _previewAuthorId=authorId;_previewMode=mode;_previewStrokes=strokes??System.Array.Empty<DrawStroke>();
@@ -79,23 +80,33 @@ namespace DrawLiar
             MarkDirtyRepaint();
         }
 
-        private Vector2 Normalize(Vector2 p) => new Vector2(Mathf.Clamp01(p.x/contentRect.width),Mathf.Clamp01(p.y/contentRect.height));
+        public void FitTo(Vector2 availableSize)
+        {
+            float horizontalInset=resolvedStyle.borderLeftWidth+resolvedStyle.borderRightWidth+resolvedStyle.paddingLeft+resolvedStyle.paddingRight;
+            float verticalInset=resolvedStyle.borderTopWidth+resolvedStyle.borderBottomWidth+resolvedStyle.paddingTop+resolvedStyle.paddingBottom;
+            float width=Mathf.Max(0,Mathf.Min(availableSize.x-horizontalInset,(availableSize.y-verticalInset)*AspectRatio));
+            style.width=width+horizontalInset;
+            style.height=width/AspectRatio+verticalInset;
+        }
+
+        private Vector2 Normalize(Vector2 p) => new Vector2(Mathf.Clamp01((p.x-contentRect.xMin)/contentRect.width),Mathf.Clamp01((p.y-contentRect.yMin)/contentRect.height));
         private void Down(PointerDownEvent e)
         {
-            if(drawing || HasAuthorPreview || e.button!=0 || !network.CanDraw)return;
-            drawing=true;capturedPointer=e.pointerId;last=Normalize(e.localPosition);this.CapturePointer(e.pointerId);Emit(last);e.StopPropagation();
+            var point=this.WorldToLocal(e.position);
+            if(drawing || HasAuthorPreview || e.button!=0 || !network.CanDraw || !contentRect.Contains(point))return;
+            drawing=true;capturedPointer=e.pointerId;last=Normalize(point);this.CapturePointer(e.pointerId);Emit(last);e.StopPropagation();
         }
         private void Move(PointerMoveEvent e)
         {
             if(!drawing || e.pointerId!=capturedPointer)return;
             e.StopPropagation();
             if(Time.unscaledTime-lastSend<.025f)return;
-            Emit(Normalize(e.localPosition));
+            Emit(Normalize(this.WorldToLocal(e.position)));
         }
         private void Up(PointerUpEvent e)
         {
             if(e.pointerId!=capturedPointer)return;
-            if(drawing)Emit(Normalize(e.localPosition));StopDrawing();e.StopPropagation();
+            if(drawing)Emit(Normalize(this.WorldToLocal(e.position)));StopDrawing();e.StopPropagation();
         }
         private void StopDrawing()
         {
@@ -111,12 +122,12 @@ namespace DrawLiar
         }
         public void Apply(DrawStroke stroke)
         {
-            Rasterize(stroke,pixels,0,false);
+            Rasterize(stroke,pixels,0);
             dirty=true;
             if(HasAuthorPreview&&_previewMode==DrawingMode.Relay)_previewDirty=true;
         }
 
-        private void Rasterize(DrawStroke stroke,Color32[] target,float expansion,bool restore)
+        private void Rasterize(DrawStroke stroke,Color32[] target,float expansion)
         {
             var a=new Vector2(stroke.X1*Width,(1-stroke.Y1)*Height);
             var b=new Vector2(stroke.X2*Width,(1-stroke.Y2)*Height);
@@ -135,7 +146,7 @@ namespace DrawLiar
                     if(alpha>0)
                     {
                         int index=y*Width+x;
-                        target[index]=Color32.Lerp(target[index],restore?pixels[index]:color,alpha);
+                        target[index]=Color32.Lerp(target[index],color,alpha);
                     }
                 }
             }
@@ -145,14 +156,19 @@ namespace DrawLiar
         {
             if(_previewMode==DrawingMode.Relay)
             {
-                System.Array.Copy(pixels,_previewPixels,pixels.Length);
-                foreach(var stroke in _previewStrokes)if(stroke.AuthorPlayerId==_previewAuthorId)Rasterize(stroke,_previewPixels,3,false);
-                foreach(var stroke in _previewStrokes)if(stroke.AuthorPlayerId==_previewAuthorId)Rasterize(stroke,_previewPixels,0,true);
+                const int PAPER_BLEND=255*(OTHER_STROKE_OPACITY_DIVISOR-1)+OTHER_STROKE_OPACITY_DIVISOR/2;
+                for(int i=0;i<pixels.Length;i++)
+                {
+                    var pixel=pixels[i];
+                    _previewPixels[i]=new Color32((byte)((pixel.r+PAPER_BLEND)/OTHER_STROKE_OPACITY_DIVISOR),(byte)((pixel.g+PAPER_BLEND)/OTHER_STROKE_OPACITY_DIVISOR),(byte)((pixel.b+PAPER_BLEND)/OTHER_STROKE_OPACITY_DIVISOR),255);
+                }
+                foreach(var stroke in _previewStrokes)if(stroke.AuthorPlayerId==_previewAuthorId)Rasterize(stroke,_previewPixels,3);
+                foreach(var stroke in _previewStrokes)if(stroke.AuthorPlayerId==_previewAuthorId)Rasterize(stroke,_previewPixels,0);
             }
             else
             {
                 for(int i=0;i<_previewPixels.Length;i++)_previewPixels[i]=PaperColor;
-                foreach(var stroke in _previewStrokes)if(stroke.AuthorPlayerId==_previewAuthorId)Rasterize(stroke,_previewPixels,0,false);
+                foreach(var stroke in _previewStrokes)if(stroke.AuthorPlayerId==_previewAuthorId)Rasterize(stroke,_previewPixels,0);
             }
             _previewTexture.SetPixels32(_previewPixels);_previewTexture.Apply(false);
             if(panel!=null)RuntimePanelUtils.SetTextureDirty(panel,_previewTexture);

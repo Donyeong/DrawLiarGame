@@ -1174,20 +1174,20 @@
       ]
     },
     {
-      "Key": "대기실로",
+      "Key": "한 판 더",
       "Values": [
-        "대기실로",
-        "Back to room",
-        "返回等候室",
-        "返回等待室",
-        "待機室へ",
-        "Volver a la sala",
-        "Voltar à sala",
-        "Retour au salon",
-        "Zum Warteraum",
-        "Ke ruang tunggu",
-        "प्रतीक्षा कक्ष में जाएँ",
-        "إلى غرفة الانتظار"
+        "한 판 더",
+        "Play again",
+        "再玩一局",
+        "再玩一局",
+        "もう一戦",
+        "Jugar de nuevo",
+        "Jogar novamente",
+        "Rejouer",
+        "Noch eine Runde",
+        "Main lagi",
+        "फिर से खेलें",
+        "العب مجددًا"
       ]
     },
     {
@@ -6747,6 +6747,1077 @@
         "Urutan menggambar {0}",
         "चित्र बनाने का क्रम {0}",
         "ترتيب الرسم {0}"
+      ]
+    },
+    {
+      "Key": "라운드 도중 난입 허용",
+      "Values": [
+        "라운드 도중 난입 허용",
+        "Allow mid-round joining",
+        "允许中途加入回合",
+        "允許中途加入回合",
+        "ラウンド途中の参加を許可",
+        "Permitir entrar durante la ronda",
+        "Permitir entrada durante a rodada",
+        "Autoriser l’arrivée en cours de manche",
+        "Einstieg während der Runde erlauben",
+        "Izinkan bergabung di tengah ronde",
+        "राउंड के बीच शामिल होने दें",
+        "السماح بالانضمام أثناء الجولة"
+      ]
+    },
+    {
+      "Key": "라이어 {0}명 · {1}라운드 · 난입 허용",
+      "Values": [
+        "라이어 {0}명 · {1}라운드 · 난입 허용",
+        "{0} liars · {1} rounds · Mid-round join on",
+        "说谎者{0}人 · {1}回合 · 允许中途加入",
+        "說謊者 {0} 人 · {1} 回合 · 允許中途加入",
+        "ライアー{0}人 · {1}ラウンド · 途中参加可",
+        "Mentirosos {0} · Rondas {1} · Entrada en curso: sí",
+        "Mentirosos {0} · Rodadas {1} · Entrada em andamento: sim",
+        "Menteurs {0} · Manches {1} · Arrivée en cours : oui",
+        "Lügner {0} · Runden {1} · Quereinstieg an",
+        "Pembohong {0} · Ronde {1} · Gabung di tengah ronde: aktif",
+        "झूठे {0} · राउंड {1} · बीच में प्रवेश: चालू",
+        "الكاذبون {0} · الجولات {1} · الانضمام أثناء الجولة: مسموح"
+      ]
+    },
+    {
+      "Key": "라이어 {0}명 · {1}라운드 · 난입 제한",
+      "Values": [
+        "라이어 {0}명 · {1}라운드 · 난입 제한",
+        "{0} liars · {1} rounds · Mid-round join off",
+        "说谎者{0}人 · {1}回合 · 禁止中途加入",
+        "說謊者 {0} 人 · {1} 回合 · 禁止中途加入",
+        "ライアー{0}人 · {1}ラウンド · 途中参加不可",
+        "Mentirosos {0} · Rondas {1} · Entrada en curso: no",
+        "Mentirosos {0} · Rodadas {1} · Entrada em andamento: não",
+        "Menteurs {0} · Manches {1} · Arrivée en cours : non",
+        "Lügner {0} · Runden {1} · Quereinstieg aus",
+        "Pembohong {0} · Ronde {1} · Gabung di tengah ronde: nonaktif",
+        "झूठे {0} · राउंड {1} · बीच में प्रवेश: बंद",
+        "الكاذبون {0} · الجولات {1} · الانضمام أثناء الجولة: ممنوع"
+      ]
+    },
+    {
+      "Key": "라이어 {0}명 · 목표 {1}점 · 난입 허용",
+      "Values": [
+        "라이어 {0}명 · 목표 {1}점 · 난입 허용",
+        "{0} liars · Target {1} pts · Mid-round join on",
+        "说谎者{0}人 · 目标{1}分 · 允许中途加入",
+        "說謊者 {0} 人 · 目標 {1} 分 · 允許中途加入",
+        "ライアー{0}人 · 目標{1}点 · 途中参加可",
+        "Mentirosos {0} · Objetivo {1} puntos · Entrada en curso: sí",
+        "Mentirosos {0} · Meta {1} pontos · Entrada em andamento: sim",
+        "Menteurs {0} · Objectif {1} points · Arrivée en cours : oui",
+        "Lügner {0} · Ziel {1} Punkte · Quereinstieg an",
+        "Pembohong {0} · Target {1} poin · Gabung di tengah ronde: aktif",
+        "झूठे {0} · लक्ष्य {1} अंक · बीच में प्रवेश: चालू",
+        "الكاذبون {0} · الهدف {1} نقاط · الانضمام أثناء الجولة: مسموح"
+      ]
+    },
+    {
+      "Key": "라이어 {0}명 · 목표 {1}점 · 난입 제한",
+      "Values": [
+        "라이어 {0}명 · 목표 {1}점 · 난입 제한",
+        "{0} liars · Target {1} pts · Mid-round join off",
+        "说谎者{0}人 · 目标{1}分 · 禁止中途加入",
+        "說謊者 {0} 人 · 目標 {1} 分 · 禁止中途加入",
+        "ライアー{0}人 · 目標{1}点 · 途中参加不可",
+        "Mentirosos {0} · Objetivo {1} puntos · Entrada en curso: no",
+        "Mentirosos {0} · Meta {1} pontos · Entrada em andamento: não",
+        "Menteurs {0} · Objectif {1} points · Arrivée en cours : non",
+        "Lügner {0} · Ziel {1} Punkte · Quereinstieg aus",
+        "Pembohong {0} · Target {1} poin · Gabung di tengah ronde: nonaktif",
+        "झूठे {0} · लक्ष्य {1} अंक · बीच में प्रवेश: बंद",
+        "الكاذبون {0} · الهدف {1} نقاط · الانضمام أثناء الجولة: ممنوع"
+      ]
+    },
+    {
+      "Key": "캐릭터에 마우스를 올려 그 사람의 그림을 확인하세요.",
+      "Values": [
+        "캐릭터에 마우스를 올려 그 사람의 그림을 확인하세요.",
+        "Hover over a character to view their drawing.",
+        "将鼠标悬停在角色上即可查看其绘画。",
+        "將滑鼠移到角色上即可查看其繪畫。",
+        "キャラクターにマウスを重ねると、その人の絵を確認できます。",
+        "Pasa el cursor sobre un personaje para ver su dibujo.",
+        "Passe o mouse sobre um personagem para ver o desenho dele.",
+        "Survolez un personnage pour voir son dessin.",
+        "Fahre mit der Maus über eine Figur, um ihre Zeichnung zu sehen.",
+        "Arahkan kursor ke karakter untuk melihat gambarnya.",
+        "किसी पात्र का चित्र देखने के लिए उस पर माउस ले जाएँ।",
+        "مرّر مؤشر الفأرة فوق الشخصية لرؤية رسمها."
+      ]
+    },
+    {
+      "Key": "캐릭터를 터치해 그 사람의 그림을 확인하세요.",
+      "Values": [
+        "캐릭터를 터치해 그 사람의 그림을 확인하세요.",
+        "Tap a character to view their drawing.",
+        "触摸角色即可查看其绘画。",
+        "點擊角色即可查看其繪畫。",
+        "キャラクターをタップすると、その人の絵を確認できます。",
+        "Toca un personaje para ver su dibujo.",
+        "Toque em um personagem para ver o desenho dele.",
+        "Touchez un personnage pour voir son dessin.",
+        "Tippe auf eine Figur, um ihre Zeichnung zu sehen.",
+        "Ketuk karakter untuk melihat gambarnya.",
+        "किसी पात्र का चित्र देखने के लिए उस पर टैप करें।",
+        "المس الشخصية لرؤية رسمها."
+      ]
+    },
+    {
+      "Key": "얼굴 장식",
+      "Values": [
+        "얼굴 장식",
+        "Face accessories",
+        "面部饰品",
+        "臉部飾品",
+        "顔飾り",
+        "Accesorios faciales",
+        "Acessórios faciais",
+        "Accessoires du visage",
+        "Gesichtsschmuck",
+        "Aksesori wajah",
+        "चेहरे की सजावट",
+        "زينة الوجه"
+      ]
+    },
+    {
+      "Key": "표정",
+      "Values": [
+        "표정",
+        "Expression",
+        "表情",
+        "表情",
+        "表情",
+        "Expresión",
+        "Expressão",
+        "Expression",
+        "Mimik",
+        "Ekspresi",
+        "भाव",
+        "التعبير"
+      ]
+    },
+    {
+      "Key": "몸통",
+      "Values": [
+        "몸통",
+        "Body",
+        "身体",
+        "身體",
+        "胴体",
+        "Torso",
+        "Tronco",
+        "Torse",
+        "Oberkörper",
+        "Badan",
+        "शरीर",
+        "الجسم"
+      ]
+    },
+    {
+      "Key": "윙크",
+      "Values": [
+        "윙크",
+        "Wink",
+        "眨眼",
+        "眨眼",
+        "ウインク",
+        "Guiño",
+        "Piscadela",
+        "Clin d’œil",
+        "Zwinkern",
+        "Kedipan",
+        "आँख मारना",
+        "غمزة"
+      ]
+    },
+    {
+      "Key": "활짝 웃음",
+      "Values": [
+        "활짝 웃음",
+        "Big smile",
+        "灿烂笑容",
+        "燦爛笑容",
+        "にっこり笑顔",
+        "Sonrisa amplia",
+        "Sorriso largo",
+        "Grand sourire",
+        "Breites Lächeln",
+        "Senyum lebar",
+        "खिली मुस्कान",
+        "ابتسامة عريضة"
+      ]
+    },
+    {
+      "Key": "졸린 표정",
+      "Values": [
+        "졸린 표정",
+        "Sleepy face",
+        "困倦表情",
+        "睏倦表情",
+        "眠そうな顔",
+        "Cara soñolienta",
+        "Rosto sonolento",
+        "Visage endormi",
+        "Schläfriger Blick",
+        "Wajah mengantuk",
+        "उनींदा चेहरा",
+        "وجه نعسان"
+      ]
+    },
+    {
+      "Key": "놀란 표정",
+      "Values": [
+        "놀란 표정",
+        "Surprised face",
+        "惊讶表情",
+        "驚訝表情",
+        "驚き顔",
+        "Cara sorprendida",
+        "Rosto surpreso",
+        "Visage surpris",
+        "Überraschter Blick",
+        "Wajah terkejut",
+        "हैरान चेहरा",
+        "وجه متفاجئ"
+      ]
+    },
+    {
+      "Key": "단호한 표정",
+      "Values": [
+        "단호한 표정",
+        "Determined face",
+        "坚定表情",
+        "堅定表情",
+        "決意の顔",
+        "Cara decidida",
+        "Rosto determinado",
+        "Visage déterminé",
+        "Entschlossener Blick",
+        "Wajah bertekad",
+        "दृढ़ चेहरा",
+        "وجه حازم"
+      ]
+    },
+    {
+      "Key": "화가 앞치마",
+      "Values": [
+        "화가 앞치마",
+        "Painter's apron",
+        "画家围裙",
+        "畫家圍裙",
+        "画家のエプロン",
+        "Delantal de pintor",
+        "Avental de pintor",
+        "Tablier de peintre",
+        "Malerschürze",
+        "Celemek pelukis",
+        "चित्रकार का एप्रन",
+        "مئزر الرسام"
+      ]
+    },
+    {
+      "Key": "줄무늬 셔츠",
+      "Values": [
+        "줄무늬 셔츠",
+        "Striped shirt",
+        "条纹衬衫",
+        "條紋襯衫",
+        "ボーダーシャツ",
+        "Camisa a rayas",
+        "Camisa listrada",
+        "Chemise rayée",
+        "Gestreiftes Hemd",
+        "Kemeja bergaris",
+        "धारीदार कमीज़",
+        "قميص مخطط"
+      ]
+    },
+    {
+      "Key": "물방울 셔츠",
+      "Values": [
+        "물방울 셔츠",
+        "Polka-dot shirt",
+        "波点衬衫",
+        "圓點襯衫",
+        "ドットシャツ",
+        "Camisa de lunares",
+        "Camisa de bolinhas",
+        "Chemise à pois",
+        "Gepunktetes Hemd",
+        "Kemeja polkadot",
+        "बिंदियों वाली कमीज़",
+        "قميص منقط"
+      ]
+    },
+    {
+      "Key": "멜빵 바지",
+      "Values": [
+        "멜빵 바지",
+        "Overalls",
+        "背带裤",
+        "吊帶褲",
+        "オーバーオール",
+        "Peto",
+        "Jardineira",
+        "Salopette",
+        "Latzhose",
+        "Celana kodok",
+        "डंगरी",
+        "بنطال بحمالات"
+      ]
+    },
+    {
+      "Key": "별 스웨터",
+      "Values": [
+        "별 스웨터",
+        "Star sweater",
+        "星星毛衣",
+        "星星毛衣",
+        "星柄セーター",
+        "Suéter de estrellas",
+        "Suéter de estrelas",
+        "Pull à étoiles",
+        "Sternenpullover",
+        "Sweter bintang",
+        "सितारों वाला स्वेटर",
+        "سترة بنجوم"
+      ]
+    },
+    {
+      "Key": "기본",
+      "Values": [
+        "기본",
+        "Default",
+        "默认",
+        "預設",
+        "標準",
+        "Predeterminado",
+        "Padrão",
+        "Par défaut",
+        "Standard",
+        "Bawaan",
+        "डिफ़ॉल्ट",
+        "افتراضي"
+      ]
+    },
+    {
+      "Key": "신청 취소",
+      "Values": [
+        "신청 취소",
+        "Cancel request",
+        "取消申请",
+        "取消申請",
+        "申請を取り消す",
+        "Cancelar solicitud",
+        "Cancelar solicitação",
+        "Annuler la demande",
+        "Anfrage zurückziehen",
+        "Batalkan permintaan",
+        "अनुरोध रद्द करें",
+        "إلغاء الطلب"
+      ]
+    },
+    {
+      "Key": "친구 요청을 취소했습니다.",
+      "Values": [
+        "친구 요청을 취소했습니다.",
+        "Friend request canceled.",
+        "已取消好友申请。",
+        "已取消好友申請。",
+        "フレンド申請を取り消しました。",
+        "Se ha cancelado la solicitud de amistad.",
+        "Solicitação de amizade cancelada.",
+        "Demande d’amitié annulée.",
+        "Freundschaftsanfrage zurückgezogen.",
+        "Permintaan pertemanan dibatalkan.",
+        "मित्रता का अनुरोध रद्द कर दिया गया।",
+        "تم إلغاء طلب الصداقة."
+      ]
+    },
+    {
+      "Key": "라이어 방식",
+      "Values": [
+        "라이어 방식",
+        "Liar mode",
+        "说谎者模式",
+        "說謊者模式",
+        "ライアーモード",
+        "Modo del mentiroso",
+        "Modo do mentiroso",
+        "Mode du menteur",
+        "Lügner-Modus",
+        "Mode pembohong",
+        "झूठे का मोड",
+        "نمط الكاذب"
+      ]
+    },
+    {
+      "Key": "일반",
+      "Values": [
+        "일반",
+        "Classic",
+        "经典",
+        "經典",
+        "通常",
+        "Clásico",
+        "Clássico",
+        "Classique",
+        "Klassisch",
+        "Klasik",
+        "सामान्य",
+        "كلاسيكي"
+      ]
+    },
+    {
+      "Key": "미스매치",
+      "Values": [
+        "미스매치",
+        "Mismatch",
+        "异词模式",
+        "異詞模式",
+        "ミスマッチ",
+        "Palabra distinta",
+        "Palavra diferente",
+        "Mot différent",
+        "Anderes Wort",
+        "Kata berbeda",
+        "अलग शब्द",
+        "الكلمة المختلفة"
+      ]
+    },
+    {
+      "Key": "제시어 확인",
+      "Values": [
+        "제시어 확인",
+        "Check your word",
+        "查看词语",
+        "查看詞語",
+        "単語確認",
+        "Ver tu palabra",
+        "Ver sua palavra",
+        "Voir votre mot",
+        "Wort ansehen",
+        "Lihat kata",
+        "अपना शब्द देखें",
+        "عرض كلمتك"
+      ]
+    },
+    {
+      "Key": "미스매치 · {0}라운드 · 난입 허용",
+      "Values": [
+        "미스매치 · {0}라운드 · 난입 허용",
+        "Mismatch · {0} rounds · Joining allowed",
+        "异词模式 · {0}轮 · 可中途加入",
+        "異詞模式 · {0}回合 · 可中途加入",
+        "ミスマッチ · {0}ラウンド · 途中参加可",
+        "Palabra distinta · {0} rondas · Entrada permitida",
+        "Palavra diferente · {0} rodadas · Entrada permitida",
+        "Mot différent · {0} manches · Rejoindre autorisé",
+        "Anderes Wort · {0} Runden · Beitritt erlaubt",
+        "Kata berbeda · {0} ronde · Boleh bergabung",
+        "अलग शब्द · {0} राउंड · बीच में जुड़ना चालू",
+        "الكلمة المختلفة · {0} جولات · الانضمام مسموح"
+      ]
+    },
+    {
+      "Key": "미스매치 · {0}라운드 · 난입 제한",
+      "Values": [
+        "미스매치 · {0}라운드 · 난입 제한",
+        "Mismatch · {0} rounds · Joining restricted",
+        "异词模式 · {0}轮 · 限制中途加入",
+        "異詞模式 · {0}回合 · 限制中途加入",
+        "ミスマッチ · {0}ラウンド · 途中参加不可",
+        "Palabra distinta · {0} rondas · Entrada restringida",
+        "Palavra diferente · {0} rodadas · Entrada restrita",
+        "Mot différent · {0} manches · Rejoindre restreint",
+        "Anderes Wort · {0} Runden · Beitritt gesperrt",
+        "Kata berbeda · {0} ronde · Bergabung dibatasi",
+        "अलग शब्द · {0} राउंड · बीच में जुड़ना बंद",
+        "الكلمة المختلفة · {0} جولات · الانضمام مقيّد"
+      ]
+    },
+    {
+      "Key": "미스매치 · 목표 {0}점 · 난입 허용",
+      "Values": [
+        "미스매치 · 목표 {0}점 · 난입 허용",
+        "Mismatch · Target {0} points · Joining allowed",
+        "异词模式 · 目标{0}分 · 可中途加入",
+        "異詞模式 · 目標{0}分 · 可中途加入",
+        "ミスマッチ · 目標{0}点 · 途中参加可",
+        "Palabra distinta · Meta {0} puntos · Entrada permitida",
+        "Palavra diferente · Meta {0} pontos · Entrada permitida",
+        "Mot différent · Objectif {0} points · Rejoindre autorisé",
+        "Anderes Wort · Ziel {0} Punkte · Beitritt erlaubt",
+        "Kata berbeda · Target {0} poin · Boleh bergabung",
+        "अलग शब्द · लक्ष्य {0} अंक · बीच में जुड़ना चालू",
+        "الكلمة المختلفة · الهدف {0} نقاط · الانضمام مسموح"
+      ]
+    },
+    {
+      "Key": "미스매치 · 목표 {0}점 · 난입 제한",
+      "Values": [
+        "미스매치 · 목표 {0}점 · 난입 제한",
+        "Mismatch · Target {0} points · Joining restricted",
+        "异词模式 · 目标{0}分 · 限制中途加入",
+        "異詞模式 · 目標{0}分 · 限制中途加入",
+        "ミスマッチ · 目標{0}点 · 途中参加不可",
+        "Palabra distinta · Meta {0} puntos · Entrada restringida",
+        "Palavra diferente · Meta {0} pontos · Entrada restrita",
+        "Mot différent · Objectif {0} points · Rejoindre restreint",
+        "Anderes Wort · Ziel {0} Punkte · Beitritt gesperrt",
+        "Kata berbeda · Target {0} poin · Bergabung dibatasi",
+        "अलग शब्द · लक्ष्य {0} अंक · बीच में जुड़ना बंद",
+        "الكلمة المختلفة · الهدف {0} نقاط · الانضمام مقيّد"
+      ]
+    },
+    {
+      "Key": "미스매치 · {0}라운드",
+      "Values": [
+        "미스매치 · {0}라운드",
+        "Mismatch · {0} rounds",
+        "异词模式 · {0}轮",
+        "異詞模式 · {0}回合",
+        "ミスマッチ · {0}ラウンド",
+        "Palabra distinta · {0} rondas",
+        "Palavra diferente · {0} rodadas",
+        "Mot différent · {0} manches",
+        "Anderes Wort · {0} Runden",
+        "Kata berbeda · {0} ronde",
+        "अलग शब्द · {0} राउंड",
+        "الكلمة المختلفة · {0} جولات"
+      ]
+    },
+    {
+      "Key": "미스매치 · 목표 {0}점",
+      "Values": [
+        "미스매치 · 목표 {0}점",
+        "Mismatch · Target {0} points",
+        "异词模式 · 目标{0}分",
+        "異詞模式 · 目標{0}分",
+        "ミスマッチ · 目標{0}点",
+        "Palabra distinta · Meta {0} puntos",
+        "Palavra diferente · Meta {0} pontos",
+        "Mot différent · Objectif {0} points",
+        "Anderes Wort · Ziel {0} Punkte",
+        "Kata berbeda · Target {0} poin",
+        "अलग शब्द · लक्ष्य {0} अंक",
+        "الكلمة المختلفة · الهدف {0} نقاط"
+      ]
+    },
+    {
+      "Key": "미스매치는 서로 다른 단어가 2개 이상인 주제가 필요합니다.",
+      "Values": [
+        "미스매치는 서로 다른 단어가 2개 이상인 주제가 필요합니다.",
+        "Mismatch requires a topic with at least two different words.",
+        "异词模式需要至少包含两个不同词语的主题。",
+        "異詞模式需要至少包含兩個不同詞語的主題。",
+        "ミスマッチには異なる単語が2つ以上あるテーマが必要です。",
+        "El modo Palabra distinta requiere un tema con al menos dos palabras diferentes.",
+        "O modo Palavra diferente exige um tema com pelo menos duas palavras distintas.",
+        "Le mode Mot différent nécessite un thème avec au moins deux mots différents.",
+        "Anderes Wort erfordert ein Thema mit mindestens zwei verschiedenen Wörtern.",
+        "Kata berbeda memerlukan topik dengan setidaknya dua kata berbeda.",
+        "अलग शब्द मोड के लिए कम से कम दो अलग शब्दों वाला विषय चाहिए।",
+        "يتطلب نمط الكلمة المختلفة موضوعًا يحتوي على كلمتين مختلفتين على الأقل."
+      ]
+    },
+    {
+      "Key": "다른 제시어 · {0}",
+      "Values": [
+        "다른 제시어 · {0}",
+        "Different word · {0}",
+        "不同词语 · {0}",
+        "不同詞語 · {0}",
+        "別の単語 · {0}",
+        "Palabra distinta · {0}",
+        "Palavra diferente · {0}",
+        "Autre mot · {0}",
+        "Anderes Wort · {0}",
+        "Kata berbeda · {0}",
+        "अलग शब्द · {0}",
+        "الكلمة المختلفة · {0}"
+      ]
+    },
+    {
+      "Key": "내 주제",
+      "Values": [
+        "내 주제",
+        "My topics",
+        "我的主题",
+        "我的主題",
+        "自分のテーマ",
+        "Mis temas",
+        "Meus temas",
+        "Mes thèmes",
+        "Meine Themen",
+        "Topik saya",
+        "मेरे विषय",
+        "مواضيعي"
+      ]
+    },
+    {
+      "Key": "창작마당",
+      "Values": [
+        "창작마당",
+        "Workshop",
+        "创意工坊",
+        "創作工坊",
+        "ワークショップ",
+        "Taller",
+        "Oficina",
+        "Atelier",
+        "Workshop",
+        "Workshop",
+        "कार्यशाला",
+        "ورشة الإبداع"
+      ]
+    },
+    {
+      "Key": "게시 언어",
+      "Values": [
+        "게시 언어",
+        "Publish language",
+        "发布语言",
+        "發布語言",
+        "投稿言語",
+        "Idioma de publicación",
+        "Idioma da publicação",
+        "Langue de publication",
+        "Sprache des Beitrags",
+        "Bahasa publikasi",
+        "प्रकाशन भाषा",
+        "لغة النشر"
+      ]
+    },
+    {
+      "Key": "게시",
+      "Values": [
+        "게시",
+        "Publish",
+        "发布",
+        "發布",
+        "投稿",
+        "Publicar",
+        "Publicar",
+        "Publier",
+        "Veröffentlichen",
+        "Publikasikan",
+        "प्रकाशित करें",
+        "نشر"
+      ]
+    },
+    {
+      "Key": "다운로드",
+      "Values": [
+        "다운로드",
+        "Download",
+        "下载",
+        "下載",
+        "ダウンロード",
+        "Descargar",
+        "Baixar",
+        "Télécharger",
+        "Herunterladen",
+        "Unduh",
+        "डाउनलोड",
+        "تنزيل"
+      ]
+    },
+    {
+      "Key": "내 게시물",
+      "Values": [
+        "내 게시물",
+        "My uploads",
+        "我的发布",
+        "我的發布",
+        "自分の投稿",
+        "Mis publicaciones",
+        "Minhas publicações",
+        "Mes publications",
+        "Meine Beiträge",
+        "Publikasi saya",
+        "मेरी पोस्ट",
+        "منشوراتي"
+      ]
+    },
+    {
+      "Key": "게시물 삭제",
+      "Values": [
+        "게시물 삭제",
+        "Delete upload",
+        "删除发布",
+        "刪除發布",
+        "投稿を削除",
+        "Eliminar publicación",
+        "Excluir publicação",
+        "Supprimer la publication",
+        "Beitrag löschen",
+        "Hapus publikasi",
+        "पोस्ट हटाएँ",
+        "حذف المنشور"
+      ]
+    },
+    {
+      "Key": "새 주제",
+      "Values": [
+        "새 주제",
+        "New topic",
+        "新主题",
+        "新主題",
+        "新しいテーマ",
+        "Nuevo tema",
+        "Novo tema",
+        "Nouveau thème",
+        "Neues Thema",
+        "Topik baru",
+        "नया विषय",
+        "موضوع جديد"
+      ]
+    },
+    {
+      "Key": "게시된 주제가 없습니다.",
+      "Values": [
+        "게시된 주제가 없습니다.",
+        "No topics published.",
+        "暂无发布的主题。",
+        "尚無已發布的主題。",
+        "投稿されたテーマはありません。",
+        "No hay temas publicados.",
+        "Nenhum tema publicado.",
+        "Aucun thème publié.",
+        "Keine Themen veröffentlicht.",
+        "Belum ada topik yang dipublikasikan.",
+        "कोई विषय प्रकाशित नहीं है।",
+        "لا توجد مواضيع منشورة."
+      ]
+    },
+    {
+      "Key": "주제를 게시했습니다.",
+      "Values": [
+        "주제를 게시했습니다.",
+        "Topic published.",
+        "主题已发布。",
+        "主題已發布。",
+        "テーマを投稿しました。",
+        "Tema publicado.",
+        "Tema publicado.",
+        "Thème publié.",
+        "Thema veröffentlicht.",
+        "Topik dipublikasikan.",
+        "विषय प्रकाशित हो गया।",
+        "تم نشر الموضوع."
+      ]
+    },
+    {
+      "Key": "주제를 다운로드했습니다.",
+      "Values": [
+        "주제를 다운로드했습니다.",
+        "Topic downloaded.",
+        "主题已下载。",
+        "主題已下載。",
+        "テーマをダウンロードしました。",
+        "Tema descargado.",
+        "Tema baixado.",
+        "Thème téléchargé.",
+        "Thema heruntergeladen.",
+        "Topik diunduh.",
+        "विषय डाउनलोड हो गया।",
+        "تم تنزيل الموضوع."
+      ]
+    },
+    {
+      "Key": "게시물을 삭제했습니다.",
+      "Values": [
+        "게시물을 삭제했습니다.",
+        "Upload deleted.",
+        "发布已删除。",
+        "發布已刪除。",
+        "投稿を削除しました。",
+        "Publicación eliminada.",
+        "Publicação excluída.",
+        "Publication supprimée.",
+        "Beitrag gelöscht.",
+        "Publikasi dihapus.",
+        "पोस्ट हटा दी गई।",
+        "تم حذف المنشور."
+      ]
+    },
+    {
+      "Key": "제시어 {0}개 · 다운로드 {1}회",
+      "Values": [
+        "제시어 {0}개 · 다운로드 {1}회",
+        "{0} words · {1} downloads",
+        "{0} 个词语 · {1} 次下载",
+        "{0} 個詞語 · {1} 次下載",
+        "単語 {0}個 · ダウンロード {1}回",
+        "{0} palabras · {1} descargas",
+        "{0} palavras · {1} downloads",
+        "{0} mots · {1} téléchargements",
+        "{0} Wörter · {1} Downloads",
+        "{0} kata · {1} unduhan",
+        "{0} शब्द · {1} डाउनलोड",
+        "{0} كلمات · {1} تنزيلات"
+      ]
+    },
+    {
+      "Key": "내 게시물 {0} / {1}",
+      "Values": [
+        "내 게시물 {0} / {1}",
+        "My uploads {0} / {1}",
+        "我的发布 {0} / {1}",
+        "我的發布 {0} / {1}",
+        "自分の投稿 {0} / {1}",
+        "Mis publicaciones {0} / {1}",
+        "Minhas publicações {0} / {1}",
+        "Mes publications {0} / {1}",
+        "Meine Beiträge {0} / {1}",
+        "Publikasi saya {0} / {1}",
+        "मेरी पोस्ट {0} / {1}",
+        "منشوراتي {0} / {1}"
+      ]
+    },
+    {
+      "Key": "게시물 {0}개",
+      "Values": [
+        "게시물 {0}개",
+        "{0} uploads",
+        "{0} 个发布",
+        "{0} 個發布",
+        "投稿 {0}件",
+        "{0} publicaciones",
+        "{0} publicações",
+        "{0} publications",
+        "{0} Beiträge",
+        "{0} publikasi",
+        "{0} पोस्ट",
+        "{0} منشورات"
+      ]
+    },
+    {
+      "Key": "이전",
+      "Values": [
+        "이전",
+        "Previous",
+        "上一页",
+        "上一頁",
+        "前へ",
+        "Anterior",
+        "Anterior",
+        "Précédent",
+        "Zurück",
+        "Sebelumnya",
+        "पिछला",
+        "السابق"
+      ]
+    },
+    {
+      "Key": "이름 {0}자 · 제시어 {1}자 · 최대 {2}개",
+      "Values": [
+        "이름 {0}자 · 제시어 {1}자 · 최대 {2}개",
+        "Name: {0} characters · Word: {1} characters · Up to {2} words",
+        "名称 {0} 字 · 词语 {1} 字 · 最多 {2} 个",
+        "名稱 {0} 字 · 詞語 {1} 字 · 最多 {2} 個",
+        "名前 {0}文字 · 単語 {1}文字 · 最大 {2}個",
+        "Nombre: {0} caracteres · Palabra: {1} caracteres · Hasta {2} palabras",
+        "Nome: {0} caracteres · Palavra: {1} caracteres · Até {2} palavras",
+        "Nom : {0} caractères · Mot : {1} caractères · {2} mots maximum",
+        "Name: {0} Zeichen · Wort: {1} Zeichen · Max. {2} Wörter",
+        "Nama: {0} karakter · Kata: {1} karakter · Maks. {2} kata",
+        "नाम: {0} अक्षर · शब्द: {1} अक्षर · अधिकतम {2} शब्द",
+        "الاسم: {0} أحرف · الكلمة: {1} أحرف · حتى {2} كلمات"
+      ]
+    },
+    {
+      "Key": "현재 제한을 초과한 기존 주제는 읽기 전용입니다.",
+      "Values": [
+        "현재 제한을 초과한 기존 주제는 읽기 전용입니다.",
+        "Existing topics exceeding the current limits are read-only.",
+        "超过当前限制的已有主题仅可查看。",
+        "超過目前限制的既有主題僅供檢視。",
+        "現在の制限を超える既存テーマは閲覧のみ可能です。",
+        "Los temas existentes que superan los límites actuales son de solo lectura.",
+        "Temas existentes que excedem os limites atuais são somente leitura.",
+        "Les thèmes existants dépassant les limites actuelles sont en lecture seule.",
+        "Bestehende Themen über den aktuellen Grenzen sind schreibgeschützt.",
+        "Topik lama yang melampaui batas saat ini hanya dapat dibaca.",
+        "वर्तमान सीमा से अधिक वाले पुराने विषय केवल पढ़े जा सकते हैं।",
+        "المواضيع الحالية التي تتجاوز الحدود الجديدة للقراءة فقط."
+      ]
+    },
+    {
+      "Key": "주제 이름은 1~{0}자로 입력하세요.",
+      "Values": [
+        "주제 이름은 1~{0}자로 입력하세요.",
+        "Enter a topic name of 1–{0} characters.",
+        "主题名称须为 1～{0} 个字符。",
+        "主題名稱須為 1～{0} 個字元。",
+        "テーマ名は1～{0}文字で入力してください。",
+        "Escribe un nombre de 1 a {0} caracteres.",
+        "Digite um nome de 1 a {0} caracteres.",
+        "Saisissez un nom de 1 à {0} caractères.",
+        "Gib einen Themennamen mit 1–{0} Zeichen ein.",
+        "Masukkan nama topik sepanjang 1–{0} karakter.",
+        "विषय का नाम 1–{0} अक्षरों में लिखें।",
+        "أدخل اسم موضوع من 1 إلى {0} أحرف."
+      ]
+    },
+    {
+      "Key": "제시어는 1~{0}자로 입력하세요.",
+      "Values": [
+        "제시어는 1~{0}자로 입력하세요.",
+        "Enter words of 1–{0} characters each.",
+        "每个词语须为 1～{0} 个字符。",
+        "每個詞語須為 1～{0} 個字元。",
+        "各単語は1～{0}文字で入力してください。",
+        "Escribe palabras de 1 a {0} caracteres cada una.",
+        "Digite palavras de 1 a {0} caracteres cada.",
+        "Saisissez des mots de 1 à {0} caractères chacun.",
+        "Gib Wörter mit jeweils 1–{0} Zeichen ein.",
+        "Masukkan setiap kata sepanjang 1–{0} karakter.",
+        "हर शब्द 1–{0} अक्षरों में लिखें।",
+        "أدخل كلمات من 1 إلى {0} أحرف لكل كلمة."
+      ]
+    },
+    {
+      "Key": "제시어는 최대 {0}개까지 입력할 수 있습니다.",
+      "Values": [
+        "제시어는 최대 {0}개까지 입력할 수 있습니다.",
+        "You can enter up to {0} words.",
+        "最多可输入 {0} 个词语。",
+        "最多可輸入 {0} 個詞語。",
+        "単語は最大{0}個まで入力できます。",
+        "Puedes introducir hasta {0} palabras.",
+        "Você pode inserir até {0} palavras.",
+        "Vous pouvez saisir jusqu’à {0} mots.",
+        "Du kannst bis zu {0} Wörter eingeben.",
+        "Anda dapat memasukkan hingga {0} kata.",
+        "अधिकतम {0} शब्द लिख सकते हैं।",
+        "يمكنك إدخال حتى {0} كلمات."
+      ]
+    },
+    {
+      "Key": "게시할 수 있는 주제는 최대 {0}개입니다.",
+      "Values": [
+        "게시할 수 있는 주제는 최대 {0}개입니다.",
+        "You can publish up to {0} topics.",
+        "最多可发布 {0} 个主题。",
+        "最多可發布 {0} 個主題。",
+        "テーマは最大{0}件まで投稿できます。",
+        "Puedes publicar hasta {0} temas.",
+        "Você pode publicar até {0} temas.",
+        "Vous pouvez publier jusqu’à {0} thèmes.",
+        "Du kannst bis zu {0} Themen veröffentlichen.",
+        "Anda dapat mempublikasikan hingga {0} topik.",
+        "अधिकतम {0} विषय प्रकाशित कर सकते हैं।",
+        "يمكنك نشر حتى {0} مواضيع."
+      ]
+    },
+    {
+      "Key": "게시 언어를 선택하세요.",
+      "Values": [
+        "게시 언어를 선택하세요.",
+        "Select a publish language.",
+        "请选择发布语言。",
+        "請選擇發布語言。",
+        "投稿言語を選択してください。",
+        "Selecciona un idioma de publicación.",
+        "Selecione o idioma da publicação.",
+        "Choisissez la langue de publication.",
+        "Wähle die Sprache des Beitrags.",
+        "Pilih bahasa publikasi.",
+        "प्रकाशन भाषा चुनें।",
+        "اختر لغة النشر."
+      ]
+    },
+    {
+      "Key": "주제 이름이 이미 사용 중입니다. 다른 이름을 입력하세요.",
+      "Values": [
+        "주제 이름이 이미 사용 중입니다. 다른 이름을 입력하세요.",
+        "This topic name is already in use. Enter a different name.",
+        "该主题名称已被使用，请输入其他名称。",
+        "此主題名稱已被使用，請輸入其他名稱。",
+        "このテーマ名は使用中です。別の名前を入力してください。",
+        "Este nombre ya está en uso. Escribe otro.",
+        "Este nome já está em uso. Digite outro.",
+        "Ce nom est déjà utilisé. Saisissez un autre nom.",
+        "Dieser Themenname wird bereits verwendet. Gib einen anderen ein.",
+        "Nama topik ini sudah digunakan. Masukkan nama lain.",
+        "यह विषय नाम पहले से उपयोग में है। दूसरा नाम लिखें।",
+        "اسم الموضوع مستخدم بالفعل. أدخل اسمًا آخر."
+      ]
+    },
+    {
+      "Key": "게시물을 찾지 못했습니다. 목록을 새로고침하세요.",
+      "Values": [
+        "게시물을 찾지 못했습니다. 목록을 새로고침하세요.",
+        "Upload not found. Refresh the list.",
+        "找不到该发布，请刷新列表。",
+        "找不到此發布，請重新整理清單。",
+        "投稿が見つかりません。リストを更新してください。",
+        "No se encontró la publicación. Actualiza la lista.",
+        "Publicação não encontrada. Atualize a lista.",
+        "Publication introuvable. Actualisez la liste.",
+        "Beitrag nicht gefunden. Aktualisiere die Liste.",
+        "Publikasi tidak ditemukan. Muat ulang daftar.",
+        "पोस्ट नहीं मिली। सूची रीफ़्रेश करें।",
+        "لم يتم العثور على المنشور. حدّث القائمة."
+      ]
+    },
+    {
+      "Key": "창작마당 설정을 불러오지 못했습니다.",
+      "Values": [
+        "창작마당 설정을 불러오지 못했습니다.",
+        "Could not load workshop settings.",
+        "无法加载创意工坊设置。",
+        "無法載入創作工坊設定。",
+        "ワークショップの設定を読み込めませんでした。",
+        "No se pudo cargar la configuración del taller.",
+        "Não foi possível carregar as configurações da oficina.",
+        "Impossible de charger les paramètres de l’atelier.",
+        "Workshop-Einstellungen konnten nicht geladen werden.",
+        "Tidak dapat memuat pengaturan workshop.",
+        "कार्यशाला की सेटिंग लोड नहीं हो सकी।",
+        "تعذّر تحميل إعدادات ورشة الإبداع."
+      ]
+    },
+    {
+      "Key": "보상 정산 중…",
+      "Values": [
+        "보상 정산 중…",
+        "Reward pending…",
+        "奖励结算中…",
+        "獎勵結算中…",
+        "報酬を集計中…",
+        "Liquidando recompensa…",
+        "Calculando recompensa…",
+        "Récompense en cours…",
+        "Belohnung wird berechnet…",
+        "Menghitung hadiah…",
+        "इनाम की गणना हो रही है…",
+        "جارٍ احتساب المكافأة…"
+      ]
+    },
+    {
+      "Key": "획득 {0} 코인",
+      "Values": [
+        "획득 {0} 코인",
+        "Earned {0} coins",
+        "获得 {0} 金币",
+        "獲得 {0} 金幣",
+        "{0}コイン獲得",
+        "{0} monedas obtenidas",
+        "{0} moedas recebidas",
+        "{0} pièces gagnées",
+        "{0} Münzen erhalten",
+        "Mendapat {0} koin",
+        "{0} सिक्के मिले",
+        "حصلت على {0} عملات"
       ]
     }
   ]

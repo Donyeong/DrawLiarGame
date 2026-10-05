@@ -182,7 +182,7 @@ internal static partial class Integration
         var current = await ProfileChecksAsync(owner);
         Check(!current.ContainsKey("ProfileTest_LegacyRenamed")
             && current["AccountMatch_JudgmentBounds"] == "\"CorrectVotes\"<=\"RoundsPlayed\"AND\"CorrectGuesses\"<=\"LiarRounds\""
-            && previous.Where(pair => pair.Key != "ProfileTest_LegacyRenamed").All(pair => current.TryGetValue(pair.Key, out string? expression) && expression == pair.Value),
+            && previous.Where(pair => pair.Key != "ProfileTest_LegacyRenamed" && pair.Value != "\"Rank\">=1AND\"Rank\"<=8").All(pair => current.TryGetValue(pair.Key, out string? expression) && expression == pair.Value),
             "이름이 바뀐 기존 시민 한도만 교체하고 다른 점수·역할 CHECK는 반복 실행 후에도 그대로 보존해야 합니다.");
         await using var version = new NpgsqlCommand("SELECT count(*) FROM \"SchemaVersion\" WHERE \"Version\"=7", owner);
         Check(Convert.ToInt32(await version.ExecuteScalarAsync()) == 1, "정답 찬반 집계 마이그레이션7을 한 번 적용해야 합니다.");

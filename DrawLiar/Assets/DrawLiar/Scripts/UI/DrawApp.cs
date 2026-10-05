@@ -64,7 +64,7 @@ namespace DrawLiar
         private bool _webRenderedMode, _webLayoutRebuildPending;
 #endif
         private VisualElement _mobileRoomStack, _mobileWorkspace, _mobileControls, _mobileSecret, _mobileCanvas, _mobileRoster, _mobileActions, _mobileChatSheet;
-        private Label _mobileRoundInfo, _mobileRoundHint;
+        private Label _mobileRoundInfo, _mobileRoundHint, _mobileLiveRound;
         private Button _mobileRoomCode;
         private ScrollView _mobileRoomScroll;
         private ScrollView _mobileRosterScroll;
@@ -112,6 +112,8 @@ namespace DrawLiar
             L.LanguageChanged+=OnLanguageChanged;
             AttachSocialEvents();
             AttachRoomPasswordEvents();
+            AttachTopicWorkshopEvents();
+            AttachMatchRewardEvents();
 #if UNITY_WEBGL && !UNITY_EDITOR
             if(root!=null)_browserTextInput=new DrawBrowserTextInput(root);
 #endif
@@ -128,6 +130,7 @@ namespace DrawLiar
             L.LanguageChanged-=OnLanguageChanged;
             DetachSocialEvents();
             DetachRoomPasswordEvents();
+            DetachTopicWorkshopEvents();SuspendTopicWorkshopPage();DetachMatchRewardEvents();
             ClearRoomPasswordSecrets();
 #if UNITY_WEBGL && !UNITY_EDITOR
             _browserTextInput?.Dispose();_browserTextInput=null;
@@ -168,6 +171,7 @@ namespace DrawLiar
 #endif
             _mobileLayout.LayoutChanged+=OnMobileLayoutChanged;
             root.RegisterCallback<GeometryChangedEvent>(_=>root.EnableInClassList("compact",root.contentRect.width<1400||root.contentRect.height<880));
+            root.RegisterCallback<KeyDownEvent>(ChatFocusShortcut,TrickleDown.TrickleDown);
             root.RegisterCallback<KeyDownEvent>(RoomShortcut);
             network.StateChanged+=RefreshState;network.Notice+=message=>
             {
@@ -184,10 +188,12 @@ namespace DrawLiar
             network.ChatReceived+=OnChat;
             lobby.Changed+=RefreshServiceStatus;
             lobby.ProfileChanged+=OnProfileChanged;
+            AttachMatchRewardEvents();
             lobby.LobbyChatChanged+=RefreshLobbyChat;
             lobby.LobbyChatNotice+=Toast;
             AttachSocialEvents();
             AttachRoomPasswordEvents();
+            AttachTopicWorkshopEvents();
             content=Box(root,"grow app-content");Home();
             root.schedule.Execute(Tick).Every(100);
             root.schedule.Execute(RefreshRoomsInBackground).Every(1000);
@@ -230,6 +236,7 @@ namespace DrawLiar
 
         private void Home()
         {
+            if(lobbyScreen!=LobbyScreen.Topics||!lobby.IsAuthenticated||_workshopAccountId!=lobby.Profile?.AccountId)EndTopicWorkshopPage();else ClearTopicWorkshopView();
             ClearDrawingPreview();_clearOwnButton=null;_clearOwnPending=false;
             _timerClock.Reset();_hudTimer=null;
             ResetGuessingInput(true);
@@ -244,7 +251,7 @@ namespace DrawLiar
             CloseModal();
             SyncProfile();
             ResetLobbyChatView();_mobileLobbyChatButton=null;
-            inRoom=false;surface=null;publicRoomList=null;_roomSearchField=null;friendList=null;shopList=null;avatarStage=null;serviceNotice=null;_shopPreviewStatus=null;_shopPreviewReset=null;chatHistory=null;chatInput=null;content.Clear();playerCards.Clear();playerStatuses.Clear();previousPhase=(GamePhase)(-1);
+            inRoom=false;ResetMobileRoomView();surface=null;publicRoomList=null;_roomSearchField=null;friendList=null;shopList=null;avatarStage=null;serviceNotice=null;_shopPreviewStatus=null;_shopPreviewReset=null;chatHistory=null;chatInput=null;content.Clear();playerCards.Clear();playerStatuses.Clear();previousPhase=(GamePhase)(-1);
             _speeches.Clear();_speechVisuals.Clear();_speechLayer=null;_pcLeftPlayers=_pcRightPlayers=_pcCenter=_accusedSpotlight=null;
             if(!lobby.IsAuthenticated)lobbyScreen=LobbyScreen.Login;
             if(!lobby.IsAuthenticated)_lobbyChatDraft="";
@@ -274,8 +281,25 @@ namespace DrawLiar
             serviceNotice=null;
             var top=Box(panel,"screen-heading");
             if(lobbyScreen!=LobbyScreen.Login)Button(top,"← 뒤로",Back,"back-button",DrawSound.UiCancel);
-            var body=Box(panel,"screen-body");
-            BuildLobbyScreen(body);
+            VisualElement body;
+            if(lobbyScreen==LobbyScreen.Topics)
+            {
+                panel.AddToClassList("topic-workshop-panel");
+                body=Box(panel,"screen-body");Text(body,"나만의 주제","screen-title");
+                var scroll=DrawSmoothScroll.Create(ScrollViewMode.Vertical);scroll.name="workshop-page-scroll";scroll.AddToClassList("workshop-page-scroll");body.Add(scroll);
+                TopicsForm(Box(scroll,"workshop-page-form"));
+                float previousHeight=-1;
+                void SizeWorkshopPanel()
+                {
+                    if(panel.panel==null||home.parent!=content)return;
+                    float height=content.contentRect.height;
+                    if(height<=0||Mathf.Approximately(height,previousHeight))return;
+                    previousHeight=height;panel.style.height=height;panel.style.maxHeight=height;
+                }
+                home.RegisterCallback<GeometryChangedEvent>(_=>SizeWorkshopPanel());SizeWorkshopPanel();
+            }
+            else body=Box(panel,"screen-body");
+            if(lobbyScreen!=LobbyScreen.Topics)BuildLobbyScreen(body);
             if(lobbyScreen==LobbyScreen.Login)CreateServiceNotice(body);
             Enter(panel,260,14);
         }
@@ -529,7 +553,7 @@ namespace DrawLiar
                 Text(header,LobbyTitle(lobbyScreen),"mobile-workspace-title grow");
             }
             if(lobbyScreen==LobbyScreen.Main||lobbyScreen==LobbyScreen.Shop)
-                Text(header,"{0} 코인","mobile-status-pill",lobby.Profile?.Coins??0);
+                Text(header,"{0} 코인","mobile-status-pill lobby-coins",lobby.Profile?.Coins??0);
             SocialBell(header);
             if(lobbyScreen==LobbyScreen.Main)IconButton(header,"설정",DrawUIIcon.Kind.Settings,()=>Navigate(LobbyScreen.Options),"lobby-settings");
         }
@@ -660,7 +684,13 @@ namespace DrawLiar
             foreach(var friend in lobby.Friends.Outgoing)
             {
                 var row=Box(friendList,"room-entry");FriendProfileIdentity(row,friend);
-                Text(row,"수락 대기","muted friend-pending");
+                var pending=Box(row,"friend-outgoing-actions");pending.style.width=160;pending.style.maxWidth=Length.Percent(55);pending.style.minWidth=0;pending.style.flexShrink=0;pending.style.marginLeft=8;
+                var state=Text(pending,"수락 대기","muted friend-pending");state.style.marginLeft=0;state.style.marginBottom=4;
+                var cancel=Button(pending,"신청 취소",()=>RunSocialAction(async()=>
+                {
+                    await lobby.CancelFriendRequestAsync(friend.AccountId);RefreshFriends();
+                }),"secondary social-action");cancel.name="friend-request-cancel-"+friend.AccountId;
+                cancel.style.marginLeft=0;cancel.style.height=StyleKeyword.Auto;cancel.style.whiteSpace=WhiteSpace.Normal;
             }
         }
 
@@ -703,7 +733,8 @@ namespace DrawLiar
             if(grid?.panel==null||width<=0)return;
             float gap=IsMobile?12:16;
             int columns=IsMobile?Mathf.Clamp(Mathf.FloorToInt((width+gap)/180),2,4):Mathf.Clamp(Mathf.FloorToInt((width+gap)/226),3,4);
-            float cardWidth=Mathf.Floor((width-gap*(columns-1))/columns);
+            // 픽셀 반올림 후에도 마지막 카드가 같은 줄에 들어가도록 여유를 둔다.
+            float cardWidth=Mathf.Max(0,Mathf.Floor((width-gap*(columns-1))/columns)-1);
             int index=0;
             foreach(var card in grid.Children())
             {
@@ -816,6 +847,8 @@ namespace DrawLiar
             }
             if(screen==LobbyScreen.CreateRoom&&lobbyScreen!=LobbyScreen.CreateRoom&&lobbyScreen!=LobbyScreen.Topics)
             {_createRulesExpanded=false;_createTimeExpanded=false;_createTopicsExpanded=false;_createRoomScrollOffset=Vector2.zero;_createRoomPassword="";}
+            if(screen==LobbyScreen.Topics&&lobbyScreen!=LobbyScreen.Topics)BeginTopicWorkshopPage();
+            else if(screen!=LobbyScreen.Topics&&lobbyScreen==LobbyScreen.Topics)EndTopicWorkshopPage();
             if(screen!=LobbyScreen.Shop||lobbyScreen!=LobbyScreen.Shop)_shopPreviewParts.Clear();
             lobbyScreen=screen;Home();
         }
@@ -858,6 +891,11 @@ namespace DrawLiar
             password.RegisterValueChangedCallback(e=>{if(!ReferenceEquals(e.target,password))return;_createRoomPassword=e.newValue;refreshCreate?.Invoke();});
             Choice(basic,"공개 설정",new[]{"누구나 · 공개방","친구끼리 · 사설방"},draft.IsPrivate?1:0,i=>{draft.IsPrivate=i==1;RefreshPasswordField();}).name="create-privacy";
             RefreshPasswordField();
+            VisualElement liarCount=null;
+            Choice(form,"라이어 방식",new[]{"일반","미스매치"},(int)draft.LiarMode,index=>
+            {
+                draft.LiarMode=(LiarMode)index;RefreshRoomLiarCount(draft,liarCount);refreshCreate?.Invoke();
+            }).name="create-liar-mode";
             var mode=Box(form,"create-mode");Text(mode,"그리기 방식","create-label");
             var modes=Box(mode,"row create-modes");var modeButtons=new List<Button>();
             void SelectMode(int index)
@@ -872,17 +910,37 @@ namespace DrawLiar
             var rules=CreateRoomSection(form,"게임 규칙","create-rules",_createRulesExpanded,value=>_createRulesExpanded=value,out var rulesSummary);
             var time=CreateRoomSection(form,"시간 설정","create-time",_createTimeExpanded,value=>_createTimeExpanded=value,out var timeSummary);
             var topics=CreateRoomSection(form,"주제 선택","create-topics",_createTopicsExpanded,value=>_createTopicsExpanded=value,out var topicSummary);
-            var names=GameDataStore.Load().Topics.Select(entry=>entry.Name).Distinct().ToArray();
+            var topicData=GameDataStore.Load().Topics;
+            var names=topicData.Select(entry=>entry.Name).Distinct().ToArray();
+            var mismatchTopics=new HashSet<string>(topicData.Where(entry=>(entry.Words??Array.Empty<string>()).Select(value=>GameRules.CleanText(value,40))
+                .Where(value=>value.Length>0).Select(GameRules.NormalizeGuess).Distinct().Take(2).Count()>=2).Select(entry=>entry.Name));
             var selected=new HashSet<string>((draft.Topics??names).Intersect(names));var topicButtons=new Dictionary<string,Button>();
             void RefreshSummaries()
             {
-                SetText(rulesSummary,draft.Victory==VictoryMode.RoundCount?"라이어 {0}명 · {1}라운드":"라이어 {0}명 · 목표 {1}점",draft.LiarCount,draft.Victory==VictoryMode.RoundCount?draft.RoundCount:draft.TargetScore);
+                int limit=draft.Victory==VictoryMode.RoundCount?draft.RoundCount:draft.TargetScore;
+                if(draft.LiarMode==LiarMode.Mismatch)
+                {
+                    string source=draft.Victory==VictoryMode.RoundCount?
+                        draft.AllowMidRoundJoin?"미스매치 · {0}라운드 · 난입 허용":"미스매치 · {0}라운드 · 난입 제한":
+                        draft.AllowMidRoundJoin?"미스매치 · 목표 {0}점 · 난입 허용":"미스매치 · 목표 {0}점 · 난입 제한";
+                    SetText(rulesSummary,source,limit);
+                }
+                else
+                {
+                    string source=draft.Victory==VictoryMode.RoundCount?
+                        draft.AllowMidRoundJoin?"라이어 {0}명 · {1}라운드 · 난입 허용":"라이어 {0}명 · {1}라운드 · 난입 제한":
+                        draft.AllowMidRoundJoin?"라이어 {0}명 · 목표 {1}점 · 난입 허용":"라이어 {0}명 · 목표 {1}점 · 난입 제한";
+                    SetText(rulesSummary,source,draft.LiarCount,limit);
+                }
                 SetText(timeSummary,"그림 {0}초 · 토론 {1}초",draft.DrawSeconds,draft.DiscussionSeconds);
                 SetText(topicSummary,"{0} / {1}개 선택",selected.Count,names.Length);
-                create.SetEnabled(selected.Count>0&&(!draft.IsPrivate||IsValidRoomPassword(_createRoomPassword)));topicError.style.display=selected.Count>0?DisplayStyle.None:DisplayStyle.Flex;
+                bool validTopics=selected.Count>0&&(draft.LiarMode!=LiarMode.Mismatch||selected.Any(mismatchTopics.Contains));
+                SetText(topicError,selected.Count==0?"주제를 하나 이상 선택하세요.":"미스매치는 서로 다른 단어가 2개 이상인 주제가 필요합니다.");
+                create.SetEnabled(validTopics&&(!draft.IsPrivate||IsValidRoomPassword(_createRoomPassword)));topicError.style.display=validTopics?DisplayStyle.None:DisplayStyle.Flex;
             }
             refreshCreate=RefreshSummaries;
-            Int(rules.contentContainer,"라이어 수",draft.LiarCount,1,GameRules.MAX_PLAYERS-1,value=>{draft.LiarCount=value;RefreshSummaries();}).name="create-liars";
+            liarCount=Int(rules.contentContainer,"라이어 수",draft.LiarCount,1,GameRules.MAX_PLAYERS-1,value=>{draft.LiarCount=draft.LiarMode==LiarMode.Mismatch?1:value;RefreshSummaries();});liarCount.name="create-liars";
+            RefreshRoomLiarCount(draft,liarCount);
             VisualElement victoryLimit=null;
             void BuildVictoryLimit()
             {
@@ -892,6 +950,7 @@ namespace DrawLiar
             }
             Choice(rules.contentContainer,"승리 조건",new[]{"정해진 판수 후 최고점","목표 점수 먼저 달성"},(int)draft.Victory,index=>{draft.Victory=(VictoryMode)index;BuildVictoryLimit();RefreshSummaries();}).name="create-victory";
             victoryLimit=Box(rules.contentContainer,"create-victory-limit");BuildVictoryLimit();
+            MidRoundJoinToggle(rules.contentContainer,draft,"create-mid-round-join",RefreshSummaries);
             var timeGrid=Box(time.contentContainer,"create-time-grid");TimeFields(timeGrid,draft);
             timeGrid.RegisterCallback<ChangeEvent<int>>(_=>RefreshSummaries());
             var bulk=Box(topics.contentContainer,"row create-topic-actions");
@@ -931,6 +990,24 @@ namespace DrawLiar
                 changed(e.newValue);if(e.newValue)Enter(foldout.contentContainer,160,4);
             });
             return foldout;
+        }
+        private static Toggle MidRoundJoinToggle(VisualElement parent,RoomSettings settings,string name,Action changed=null)
+        {
+            var toggle=new Toggle(L.Text("라운드 도중 난입 허용")){name=name,value=settings.AllowMidRoundJoin};
+            SetText(toggle.labelElement,"라운드 도중 난입 허용");Classes(toggle,"field mid-round-join");parent.Add(toggle);
+            toggle.RegisterValueChangedCallback(e=>{if(ReferenceEquals(e.target,toggle)){settings.AllowMidRoundJoin=e.newValue;changed?.Invoke();}});
+            return toggle;
+        }
+        private static void RefreshRoomLiarCount(RoomSettings settings,VisualElement field)
+        {
+            bool mismatch=settings.LiarMode==LiarMode.Mismatch;
+            if(mismatch)settings.LiarCount=1;
+            field?.SetEnabled(!mismatch);
+#if UNITY_WEBGL && !UNITY_EDITOR
+            if(field is TextField text)text.SetValueWithoutNotify(settings.LiarCount.ToString(System.Globalization.CultureInfo.InvariantCulture));
+#else
+            if(field is IntegerField number)number.SetValueWithoutNotify(settings.LiarCount);
+#endif
         }
 
         private void JoinForm(VisualElement panel)
@@ -974,14 +1051,19 @@ namespace DrawLiar
                     var heading=Box(info,"mobile-room-top row");RawText(heading,room.Name,"player-name grow");Text(heading,room.IsInProgress?"진행 중":"대기 중","mobile-room-state");
                     var metadata=Box(info,"mobile-room-metadata row");Text(metadata,"{0} / {1}명","muted mobile-small mobile-room-meta",room.Players,room.MaxPlayers);
                     if(room.Spectators>0)Text(metadata,"관전 {0}명","muted mobile-small mobile-room-meta",room.Spectators);
+                    if(room.LiarMode==LiarMode.Mismatch)Text(metadata,"미스매치","muted mobile-small mobile-room-meta").name="room-liar-mode-"+room.Id;
                 }
-                else{RawText(info,room.Name,"player-name");Text(info,room.IsInProgress?"{0} / {1}명 · 관전 {2}명 · 진행 중":"{0} / {1}명 · 관전 {2}명 · 대기 중","muted mobile-small",room.Players,room.MaxPlayers,room.Spectators);}
-                var actions=IsMobile?Box(entry,"mobile-room-entry-actions mobile-room-action row"):entry;
-                if(!IsMobile||!room.IsInProgress)
+                else
                 {
-                    var enter=Button(actions,"참가",()=>Run(()=>lobby.JoinLobbyAsync(room.Id)),"primary");enter.SetEnabled(room.Players<room.MaxPlayers);
+                    RawText(info,room.Name,"player-name");Text(info,room.IsInProgress?"{0} / {1}명 · 관전 {2}명 · 진행 중":"{0} / {1}명 · 관전 {2}명 · 대기 중","muted mobile-small",room.Players,room.MaxPlayers,room.Spectators);
+                    if(room.LiarMode==LiarMode.Mismatch)Text(info,"미스매치","muted mobile-small").name="room-liar-mode-"+room.Id;
                 }
-                Button(actions,"관전",()=>Run(()=>lobby.JoinLobbyAsync(room.Id,true)),IsMobile&&room.IsInProgress?"primary":"secondary");
+                var actions=IsMobile?Box(entry,"mobile-room-entry-actions mobile-room-action row"):entry;
+                if(!room.IsInProgress||room.AllowMidRoundJoin)
+                {
+                    var enter=Button(actions,"참가",()=>Run(()=>lobby.JoinLobbyAsync(room.Id)),"primary");enter.name="room-join-"+room.Id;enter.SetEnabled(room.Players<room.MaxPlayers);
+                }
+                Button(actions,"관전",()=>Run(()=>lobby.JoinLobbyAsync(room.Id,true)),room.IsInProgress&&!room.AllowMidRoundJoin?"primary":"secondary").name="room-spectate-"+room.Id;
                 if(IsMobile)actions.ElementAt(0).AddToClassList("mobile-room-entry-first");
             }
             list.schedule.Execute(()=>{if(list==publicRoomList&&list.panel!=null)list.scrollOffset=offset;}).StartingIn(20);
@@ -1019,7 +1101,7 @@ namespace DrawLiar
             ClearRoomPasswordSecrets();
             ClosePublicProfile(false);
             ResetLobbyChatView();_mobileLobbyChatButton=null;
-            inRoom=true;content.Clear();publicRoomList=null;serviceNotice=null;playerKey="";actionKey="";contextKey="";
+            inRoom=true;ResetMobileRoomView();content.Clear();publicRoomList=null;serviceNotice=null;playerKey="";actionKey="";contextKey="";
             playerCards.Clear();playerStatuses.Clear();selectedPlayerId=-1;secretHidden=false;voteSubmitted=false;
             _hasSelectedPlayer=_judgmentSubmitted=false;_ballotVersion=-1;_accusedKey="";_speechVisuals.Clear();
             _pcLeftPlayers=_pcRightPlayers=_pcCenter=_accusedSpotlight=null;_spectatorCount=null;
@@ -1043,11 +1125,7 @@ namespace DrawLiar
             secretToggle=Button(secret,"숨기기",()=>{secretHidden=!secretHidden;RefreshSecret(network.State);},"secret-toggle");
             _spectatorCount=Text(secret,"","spectator-count");
             var frame=Box(center,"canvas-frame pc-canvas-frame");frame.name="pc-game-canvas";surface=new DrawingSurface(network);frame.Add(surface);
-            frame.RegisterCallback<GeometryChangedEvent>(_=>
-            {
-                var width=Mathf.Max(0,Mathf.Min(frame.contentRect.width,frame.contentRect.height*1.5f));
-                surface.style.width=width;surface.style.height=width/1.5f;
-            });
+            frame.RegisterCallback<GeometryChangedEvent>(_=>surface.FitTo(frame.contentRect.size));
             CreateAccusedSpotlight(frame);CreateDrawingPreviewName(frame);
             var controls=Box(center,"pc-game-controls");CreateDrawingTools(controls);CreateJudgmentPanel(controls);
             var judgment=Box(controls,"pc-phase-controls row");contextInfo=Box(judgment,"context-info grow");phaseActions=Box(judgment,"phase-actions");
@@ -1075,9 +1153,7 @@ namespace DrawLiar
             var toolRow=Box(drawingTools,"tool-row");Button(toolRow,"펜",()=>surface.Eraser=false,"secondary tool-selected");
             _clearOwnButton=Button(toolRow,"내 선 지우기",ClearOwnDrawing,"secondary clear-own-drawing");_clearOwnButton.name="clear-own-drawing";
             if(IsMobile)Button(toolRow,"굵기",BrushOptions,"secondary mobile-last");
-            VisualElement paletteParent=drawingTools;
-            if(IsMobile){var scroll=DrawSmoothScroll.Create(ScrollViewMode.Horizontal);scroll.AddToClassList("mobile-palette-scroll");drawingTools.Add(scroll);paletteParent=scroll;}
-            var palette=Box(paletteParent,"palette");
+            var palette=Box(drawingTools,"palette");
             var colors=new[]{new Color32(40,43,39,255),new Color32(225,127,103,255),new Color32(228,182,107,255),new Color32(246,241,230,255),DrawingSurface.PaperColor,
                 new Color32(83,110,130,255),new Color32(166,171,159,255),new Color32(35,124,98,255),new Color32(157,147,219,255)};
             var swatches=new List<Button>();
@@ -1116,25 +1192,29 @@ namespace DrawLiar
         {
             _mobileLayout.Refresh();
             _mobileRoomStack=Box(content,"mobile-room");
-            var hud=Box(_mobileRoomStack,"room-hud");phaseBanner=Box(hud,"phase-bar");phaseTitle=Text(phaseBanner,"대기실","phase-title");phaseDetail=Text(phaseBanner,"","phase-detail");
+            var hud=_mobileHud=Box(_mobileRoomStack,"room-hud");phaseBanner=Box(hud,"phase-bar");phaseTitle=Text(phaseBanner,"대기실","phase-title");_mobileLiveRound=Text(phaseBanner,"","mobile-live-round");phaseDetail=Text(phaseBanner,"","phase-detail");
             _hudTimer=new DrawGameTimer{name="hud-timer"};_hudTimer.AddToClassList("hud-timer");hud.Add(_hudTimer);timer=_hudTimer.Value;SocialBell(hud);Button(hud,"메뉴",RoomMenu,"secondary mobile-back");
             timer.languageDirection=LanguageDirection.LTR;
-            var metadata=Box(_mobileRoomStack,"mobile-round-card row");var round=Box(metadata,"grow");
+            _mobileRoundCard=Box(_mobileRoomStack,"mobile-round-card row");var round=Box(_mobileRoundCard,"grow");
             _mobileRoundInfo=Text(round,"","mobile-card-title");_mobileRoundHint=Text(round,"","muted mobile-small");
             roomBadge=Text(round,"","mobile-hidden");roundCaption=Text(round,"","mobile-hidden");
             roomBadge.languageDirection=LanguageDirection.LTR;
-            _mobileRoomCode=Button(metadata,"",CopyRoomInvite,"secondary mobile-code-copy");SetRawText(_mobileRoomCode,DisplayRoomCode(lobby.RoomCode));SetTooltip(_mobileRoomCode,RoomCopyLabel);
+            _mobileRoomCode=Button(_mobileRoundCard,"",CopyRoomInvite,"secondary mobile-code-copy");SetRawText(_mobileRoomCode,DisplayRoomCode(lobby.RoomCode));SetTooltip(_mobileRoomCode,RoomCopyLabel);
             _mobileRoomCode.languageDirection=LanguageDirection.LTR;
             _mobileSecret=Box(_mobileRoomStack,"secret-bar mobile-secret");topic=Text(_mobileSecret,"","topic");
             var identity=Box(_mobileSecret,"mobile-role-line row");role=Text(identity,"","role");word=Text(identity,"","word grow");secretToggle=Button(identity,"숨기기",()=>{secretHidden=!secretHidden;RefreshSecret(network.State);},"secret-toggle");
-            _mobileWorkspace=Box(_mobileRoomStack,"mobile-workspace");_mobileCanvas=Box(_mobileWorkspace,"canvas-frame");
+            BindMobileSecretDetails();
+            _mobileWorkspace=Box(_mobileRoomStack,"mobile-workspace");_mobilePlayStage=Box(_mobileWorkspace,"mobile-play-stage");
+            _mobileCanvas=Box(_mobilePlayStage,"canvas-frame");_mobilePlaySide=Box(_mobileWorkspace,"mobile-play-side");
             surface=new DrawingSurface(network);_mobileCanvas.Add(surface);CreateAccusedSpotlight(_mobileCanvas);CreateDrawingPreviewName(_mobileCanvas);_mobileCanvas.RegisterCallback<GeometryChangedEvent>(_=>SizeMobileCanvas());
             _mobileRoomScroll=DrawSmoothScroll.Create(ScrollViewMode.Vertical);_mobileRoomScroll.AddToClassList("mobile-controls-scroll");_mobileWorkspace.Add(_mobileRoomScroll);
             _mobileControls=Box(_mobileRoomScroll,"mobile-controls");CreateDrawingTools(_mobileControls);contextInfo=Box(_mobileControls,"context-info");
             _mobileRoster=Box(_mobileControls,"mobile-roster");_mobileRosterTitle=Text(_mobileRoster,"참가자","muted mobile-small");
             _mobileRosterScroll=DrawSmoothScroll.Create(ScrollViewMode.Horizontal);_mobileRosterScroll.AddToClassList("mobile-roster-scroll");_mobileRoster.Add(_mobileRosterScroll);playerStrip=Box(_mobileRosterScroll,"players players-strip");
             _mobileRosterScroll.contentViewport.RegisterCallback<GeometryChangedEvent>(_=>SizeMobileWaitingPlayers());
-            _mobileActions=Box(_mobileWorkspace,"mobile-bottom-actions");CreateJudgmentPanel(_mobileActions);phaseActions=Box(_mobileActions,"phase-actions");chatOpen=Button(_mobileActions,"채팅 열기",OpenChat,"secondary chat-open");
+            _mobileActions=Box(_mobileWorkspace,"mobile-bottom-actions");CreateJudgmentPanel(_mobileActions);var actionRow=Box(_mobileActions,"mobile-action-row");phaseActions=Box(actionRow,"phase-actions");chatOpen=Button(actionRow,"채팅 열기",OpenChat,"secondary chat-open");
+            _mobileWorkspace.RegisterCallback<GeometryChangedEvent>(_=>RefreshMobileRoomGeometry());
+            _mobileRoster.RegisterCallback<GeometryChangedEvent>(_=>RefreshMobileRoomGeometry());
             _mobileChatSheet=Box(content,"overlay mobile-chat-layer");_mobileChatSheet.style.display=DisplayStyle.None;
             var sheet=Box(_mobileChatSheet,"modal mobile-chat-sheet");var chatHeading=Box(sheet,"row mobile-page-heading");Text(chatHeading,"채팅","title grow");Button(chatHeading,"닫기",CloseChat,"secondary mobile-back",DrawSound.UiCancel);
             chatHistory=DrawSmoothScroll.Create(ScrollViewMode.Vertical);chatHistory.AddToClassList("chat-history");sheet.Add(chatHistory);
@@ -1160,18 +1240,7 @@ namespace DrawLiar
             }
 #endif
             if(!inRoom||_mobileWorkspace==null||!IsMobile)return;
-            if(_mobileLayout.IsPortrait||network.State?.Phase==GamePhase.Lobby)
-            {
-                if(_mobileSecret.parent!=_mobileRoomStack)_mobileRoomStack.Insert(2,_mobileSecret);
-                if(_mobileActions.parent!=_mobileWorkspace)_mobileWorkspace.Add(_mobileActions);
-            }
-            else
-            {
-                if(_mobileSecret.parent!=_mobileControls)_mobileControls.Insert(0,_mobileSecret);
-                if(_mobileActions.parent!=_mobileControls)_mobileControls.Add(_mobileActions);
-            }
-            SizeMobileCanvas();
-            SizeMobileWaitingPlayers();
+            ArrangeMobileRoom(network.State);
         }
 
 #if UNITY_WEBGL && !UNITY_EDITOR
@@ -1224,7 +1293,7 @@ namespace DrawLiar
             int index=0;
             foreach(var card in playerStrip.Children())
             {
-                card.style.width=cardWidth;card.style.height=Mathf.Max(cardWidth+24,avatarSize+76);
+                card.style.width=cardWidth;card.style.height=Mathf.Max(cardWidth+56,avatarSize+108);
                 card.style.marginRight=++index%columns==0?0:GAP;
                 var avatar=card.Q<AvatarElement>();
                 if(avatar!=null){avatar.style.width=avatarSize;avatar.style.height=avatarSize;}
@@ -1234,15 +1303,7 @@ namespace DrawLiar
         private void SizeMobileCanvas()
         {
             if(_mobileCanvas==null||surface==null)return;
-            if(_mobileLayout.IsPortrait&&_mobileCanvas.contentRect.width>0)
-            {
-                float height=_mobileCanvas.contentRect.width/1.5f;
-                if(root.ClassListContains("keyboard-open"))height=Mathf.Min(height,_mobileLayout.AvailableSize.y*.2f);
-                _mobileCanvas.style.height=height;
-            }
-            else if(!_mobileLayout.IsPortrait)_mobileCanvas.style.height=StyleKeyword.Null;
-            float width=Mathf.Max(0,Mathf.Min(_mobileCanvas.contentRect.width,_mobileCanvas.contentRect.height*1.5f));
-            if(width>0){surface.style.width=width;surface.style.height=width/1.5f;}
+            surface.FitTo(_mobileCanvas.contentRect.size);
         }
 
         private static string NormalizeRoomCodeInput(string value)
@@ -1284,7 +1345,57 @@ namespace DrawLiar
                 DrawUIMotion.Enter(_mobileChatSheet,160,0);
                 DrawUIMotion.ShowSheet(_mobileChatSheet.Q<VisualElement>(className:"mobile-chat-sheet"));
             }
-            chatbar.style.display=DisplayStyle.Flex;chatOpen.style.display=DisplayStyle.None;chatInput.Focus();
+            chatbar.style.display=DisplayStyle.Flex;chatOpen.style.display=DisplayStyle.None;FocusChatInput(chatInput);
+        }
+        private void FocusChatInput(TextField input)
+        {
+            if(input==null)return;
+            var previousFocus=root.focusController?.focusedElement;
+            var expectedOverlay=overlay;
+            bool roomAtRequest=inRoom;
+            input.Focus();
+            input.schedule.Execute(()=>
+            {
+                if(this==null||!isActiveAndEnabled||roomAtRequest!=inRoom||overlay!=expectedOverlay
+                    ||input!=(inRoom?chatInput:_lobbyChatInput)||input.panel==null||!IsVisible(input))return;
+                if(root.focusController?.focusedElement==previousFocus)input.Focus();
+            }).StartingIn(20);
+        }
+        private TextField FocusedTextField()
+        {
+            var focused=root?.focusController?.focusedElement as VisualElement;
+            return focused as TextField??focused?.GetFirstAncestorOfType<TextField>();
+        }
+        private bool ChatInputHasFocus()
+        {
+            var focused=FocusedTextField();
+            return focused!=null&&(focused==chatInput||focused==_lobbyChatInput);
+        }
+        private void ChatFocusShortcut(KeyDownEvent e)
+        {
+            if((e.keyCode!=KeyCode.Return&&e.keyCode!=KeyCode.KeypadEnter)||e.altKey||e.ctrlKey||e.commandKey)return;
+            if(_roomPasswordOverlay!=null||_roomCustomizeOverlay!=null||_profileOverlay!=null)return;
+            bool lobbyChatModal=_lobbyChatPanel?.ClassListContains("lobby-chat-in-modal")==true&&overlay?.Contains(_lobbyChatPanel)==true;
+            if(overlay!=null&&!lobbyChatModal)return;
+            var target=e.target as VisualElement;
+            if(target is TextField||target?.GetFirstAncestorOfType<TextField>()!=null||FocusedTextField()!=null)return;
+            if(inRoom)
+            {
+                if(chatInput?.panel==null)return;
+                OpenChat();
+            }
+            else
+            {
+                if(!lobby.IsAuthenticated||lobbyScreen!=LobbyScreen.Main)return;
+                if(_lobbyChatInput?.panel==null||!IsVisible(_lobbyChatInput))
+                {
+                    if(!IsMobile||overlay!=null)return;
+                    OpenLobbyChat();
+                }
+                FocusChatInput(_lobbyChatInput);
+            }
+            root.focusController?.IgnoreEvent(e);
+            e.StopImmediatePropagation();
         }
         private void CloseChat()
         {
@@ -1313,13 +1424,9 @@ namespace DrawLiar
             if(e.keyCode==KeyCode.Escape&&_roomOptionsSaving){e.StopPropagation();return;}
             if(e.keyCode==KeyCode.Escape)
             {
-                var focused=root.focusController?.focusedElement as VisualElement;
-                bool chatFocused=focused==chatInput||focused?.GetFirstAncestorOfType<TextField>()==chatInput;
+                bool chatFocused=ChatInputHasFocus();
                 if(overlay!=null)CloseModal();else if(IsMobile&&chatbar.resolvedStyle.display!=DisplayStyle.None||chatFocused)CloseChat();else RoomMenu();e.StopPropagation();
             }
-            else if((e.keyCode==KeyCode.Return||e.keyCode==KeyCode.KeypadEnter)&&overlay==null&&(!IsMobile||chatbar.resolvedStyle.display==DisplayStyle.None)
-                &&!(e.target is TextField)&&!((e.target as VisualElement)?.GetFirstAncestorOfType<TextField>()!=null))
-            {OpenChat();e.StopPropagation();}
         }
         private void RoomMenu()
         {
@@ -1395,11 +1502,15 @@ namespace DrawLiar
                 }
                 else if(index==1)
                 {
+                    VisualElement liarCount=null;
+                    Choice(body,"라이어 방식",new[]{"일반","미스매치"},(int)settings.LiarMode,i=>{settings.LiarMode=(LiarMode)i;RefreshRoomLiarCount(settings,liarCount);}).name="room-options-liar-mode";
                     Choice(body,"그리기 방식",new[]{"릴레이 그리기","한 명씩 그리기"},(int)settings.Mode,i=>settings.Mode=(DrawingMode)i);
-                    Int(body,"라이어 수",settings.LiarCount,1,GameRules.MAX_PLAYERS-1,v=>settings.LiarCount=v);
+                    liarCount=Int(body,"라이어 수",settings.LiarCount,1,GameRules.MAX_PLAYERS-1,v=>settings.LiarCount=settings.LiarMode==LiarMode.Mismatch?1:v);liarCount.name="room-options-liars";
+                    RefreshRoomLiarCount(settings,liarCount);
                     Choice(body,"승리 조건",new[]{"정해진 판수 후 최고점","목표 점수 먼저 달성"},(int)settings.Victory,i=>{settings.Victory=(VictoryMode)i;SelectTab(1);});
                     if(settings.Victory==VictoryMode.RoundCount)Int(body,"진행 판수",settings.RoundCount,1,30,v=>settings.RoundCount=v);
                     else Int(body,"목표 점수",settings.TargetScore,1,1000,v=>settings.TargetScore=v);
+                    MidRoundJoinToggle(body,settings,"room-options-mid-round-join");
                 }
                 else if(index==2)TimeFields(body,settings);
                 else
@@ -1428,7 +1539,7 @@ namespace DrawLiar
         {
             if(state==null)return;
             if(state.Phase==GamePhase.Lobby)SetText(topic,"게임 대기");else if(IsMobile)SetText(topic,"주제 · {0}",state.Topic);else SetRawText(topic,state.Topic);
-            SetText(role,state.Phase==GamePhase.Lobby?"":state.LocalIsSpectator?"관전":state.LocalIsLiar?"라이어":"시민");
+            SetText(role,state.Phase==GamePhase.Lobby?"":LocalRoleName(state));
             if(state.Phase==GamePhase.Lobby)SetRawText(word,"—");
             else if(string.IsNullOrEmpty(state.Word))SetText(word,"비공개");
             else SetRawText(word,secretHidden?"•••":state.Word);
@@ -1451,14 +1562,15 @@ namespace DrawLiar
             SetText(roundCaption,state.Phase==GamePhase.Lobby?"대기실":"라운드");
             RefreshSecret(state);
             UpdateGameTimers(state);
-            SetText(phaseTitle,IsMobile&&state.Phase==GamePhase.Drawing?"그림 차례":PhaseName(state.Phase));
+            SetText(phaseTitle,IsMobile&&state.Phase==GamePhase.Drawing?"그림 차례":PhaseName(state));
             if(IsMobile&&_mobileRoundInfo!=null)
             {
                 bool waiting=state.Phase==GamePhase.Lobby;
                 _mobileRoomStack.EnableInClassList("mobile-waiting",waiting);
+                _mobileRoomStack.EnableInClassList("mobile-playing",!waiting);
                 _mobileCanvas.style.display=waiting?DisplayStyle.None:DisplayStyle.Flex;
                 _mobileSecret.style.display=waiting?DisplayStyle.None:DisplayStyle.Flex;
-                var rosterMode=waiting?ScrollViewMode.Vertical:ScrollViewMode.Horizontal;
+                var rosterMode=ScrollViewMode.Vertical;
                 if(_mobileRosterScroll.mode!=rosterMode)
                 {
                     _mobileRosterScroll.mode=rosterMode;
@@ -1468,15 +1580,18 @@ namespace DrawLiar
                 if(waiting)
                 {
                     SetText(_mobileRoundInfo,"{0} / {1}명",state.Players.Count(p=>!p.IsSpectator&&p.IsConnected),state.Settings.MaxPlayers);
-                    if(state.Settings.Victory==VictoryMode.RoundCount)SetText(_mobileRoundHint,"라이어 {0}명 · {1}라운드",state.Settings.LiarCount,state.Settings.RoundCount);
+                    if(state.Settings.LiarMode==LiarMode.Mismatch)
+                        SetText(_mobileRoundHint,state.Settings.Victory==VictoryMode.RoundCount?"미스매치 · {0}라운드":"미스매치 · 목표 {0}점",state.Settings.Victory==VictoryMode.RoundCount?state.Settings.RoundCount:state.Settings.TargetScore);
+                    else if(state.Settings.Victory==VictoryMode.RoundCount)SetText(_mobileRoundHint,"라이어 {0}명 · {1}라운드",state.Settings.LiarCount,state.Settings.RoundCount);
                     else SetText(_mobileRoundHint,"라이어 {0}명 · 목표 {1}점",state.Settings.LiarCount,state.Settings.TargetScore);
                 }
                 else
                 {
                     SetText(_mobileRoundInfo,"라운드 {0}",state.Round);
+                    SetText(_mobileLiveRound,"라운드 {0}",state.Round);
                     if(state.Phase==GamePhase.Drawing&&network.CanDraw)SetText(_mobileRoundHint,"내 차례");
                     else if(state.Phase==GamePhase.Drawing)SetRawText(_mobileRoundHint,state.Players.FirstOrDefault(p=>p.Id==state.ArtistId)?.Name);
-                    else SetText(_mobileRoundHint,PhaseName(state.Phase));
+                    else SetText(_mobileRoundHint,PhaseName(state));
                 }
                 SetRawText(_mobileRoomCode,DisplayRoomCode(lobby.RoomCode));
             }
@@ -1498,7 +1613,7 @@ namespace DrawLiar
             PrepareGuessingInput(state,local);
             if(local?.HasVoted==true)voteSubmitted=false;
             if(local?.HasJudged==true)_judgmentSubmitted=false;
-            var actions=$"{state.Phase}/{state.BallotVersion}/{state.HasAccused}/{state.AccusedPlayerId}/{state.ArtistId}/{state.CanStart}/{state.IsHost}/{state.LocalPlayerId}/{state.LocalIsLiar}/{state.LocalIsSpectator}/{local?.IsConnected}/{local?.HasVoted}/{local?.HasJudged}/{local?.HasGuessed}/{selectedPlayerId}/{_hasSelectedPlayer}/{voteSubmitted}/{_judgmentSubmitted}/{_guessSubmitted}/{CanGuess(state,local)}";
+            var actions=$"{state.Phase}/{state.Settings.LiarMode}/{state.Players.Count(player=>player.IsConnected&&!player.IsSpectator)}/{state.BallotVersion}/{state.HasAccused}/{state.AccusedPlayerId}/{state.ArtistId}/{state.CanStart}/{state.IsHost}/{state.LocalPlayerId}/{state.LocalIsLiar}/{state.LocalIsSpectator}/{local?.IsConnected}/{local?.HasVoted}/{local?.HasJudged}/{local?.HasGuessed}/{selectedPlayerId}/{_hasSelectedPlayer}/{voteSubmitted}/{_judgmentSubmitted}/{_guessSubmitted}/{CanGuess(state,local)}";
             if(actions!=actionKey){actionKey=actions;PhaseActions(state,local);if(IsMobile)Enter(phaseActions,160,4);}
             RefreshContext(state);RefreshPlayerStates(state);RefreshAccusedSpotlight(state);RefreshSpeeches();
             if(phaseChanged)
@@ -1513,7 +1628,9 @@ namespace DrawLiar
                 if(resumedDiscussion)Toast(state.Summary);
             }
             RefreshJudgmentPanel(state,local);
+            RefreshAuthorPreviewGuide(state);
             RefreshGuessingInput(state,local);
+            if(IsMobile)ArrangeMobileRoom(state);
         }
         private bool CanSelectVote(RoomSnapshot state,PlayerView player)
         {
@@ -1530,7 +1647,8 @@ namespace DrawLiar
             ClearDrawingPreview();
             int previousCount=playerCards.Count;
             playerStrip?.Clear();_pcLeftPlayers?.Clear();_pcRightPlayers?.Clear();playerCards.Clear();playerStatuses.Clear();
-            var players=state.Players.Where(p=>!p.IsSpectator).ToArray();
+            bool currentPlayersOnly=state.Phase==GamePhase.RoundResults||state.Phase==GamePhase.MatchResults;
+            var players=state.Players.Where(p=>!p.IsSpectator&&(!currentPlayersOnly||p.IsConnected)).ToArray();
             playerStrip?.EnableInClassList("crowded",players.Length>8);
             for(var i=0;i<players.Length;i++)
             {
@@ -1538,33 +1656,39 @@ namespace DrawLiar
                 var card=Box(parent,"player");card.name="player-slot-"+p.Id;card.userData=p.Id;card.focusable=true;card.tabIndex=0;
                 card.EnableInClassList("last-player",i==players.Length-1);playerCards[p.Id]=card;
                 var row=Box(card,"row player-identity");var avatar=new AvatarElement(p.AvatarColor,p.Accessory);avatar.AddToClassList("player-avatar");row.Add(avatar);
-                BindProfileTarget(avatar,p.AccountId,()=>!IsNominationPhase(network.State));
+                if(!IsMobile)BindProfileTarget(avatar,p.AccountId,()=>!IsNominationPhase(network.State));
                 var info=Box(row,"grow");
                 var name=p.Id==state.LocalPlayerId?Text(info,"{0} · 나","player-name",p.Name):RawText(info,p.Name,"player-name");
-                name.name="player-name-"+p.Id;BindProfileTarget(name,p.AccountId,()=>!IsNominationPhase(network.State));card.tooltip=p.Name;
+                name.name="player-name-"+p.Id;if(!IsMobile)BindProfileTarget(name,p.AccountId,()=>!IsNominationPhase(network.State));card.tooltip=p.Name;
+                if(IsMobile)CreatePlayerProfileButton(card,p);
                 if(CanSelectVote(state,p))SetTooltip(card,"지목하기");
                 playerStatuses[p.Id]=Text(info,"","player-status");
                 var host=Text(card,"방장","player-host-badge");host.style.display=p.Id==state.HostPlayerId?DisplayStyle.Flex:DisplayStyle.None;
                 card.EnableInClassList("host-player",p.Id==state.HostPlayerId);
                 var order=RawText(card,"","player-drawing-order");order.name="drawing-order-"+p.Id;order.pickingMode=PickingMode.Ignore;
                 card.RegisterCallback<PointerEnterEvent>(e=>{if(ReferenceEquals(e.target,card)&&!IsMobile)PreviewAuthorDrawing(p.Id);});
-                card.RegisterCallback<PointerLeaveEvent>(e=>{if(ReferenceEquals(e.target,card)&&_previewAuthorId==p.Id)ClearDrawingPreview();});
+                card.RegisterCallback<PointerLeaveEvent>(e=>{if(!IsMobile&&ReferenceEquals(e.target,card)&&_previewAuthorId==p.Id)ClearDrawingPreview();});
                 void Activate()
                 {
                     var current=network.State;var player=current?.Players.FirstOrDefault(value=>value.Id==p.Id);if(player==null)return;
+                    if(IsMobile)
+                    {
+                        if(_previewAuthorId==player.Id)ClearDrawingPreview();else PreviewAuthorDrawing(player.Id);
+                        RefreshDrawingInteractions(current);
+                    }
                     if(IsNominationPhase(current))
                     {
                         if(!CanSelectVote(current,player))return;
                         DrawAudio.Instance?.Play(DrawSound.UiClick);selectedPlayerId=player.Id;_hasSelectedPlayer=true;RefreshState(current);
                     }
                 }
-                card.RegisterCallback<ClickEvent>(e=>{if(e.button==0)Activate();});
-                card.RegisterCallback<KeyDownEvent>(e=>{if(e.keyCode==KeyCode.Return||e.keyCode==KeyCode.KeypadEnter||e.keyCode==KeyCode.Space){Activate();e.StopPropagation();}});
-                card.RegisterCallback<NavigationSubmitEvent>(e=>{Activate();e.StopPropagation();});
+                card.RegisterCallback<ClickEvent>(e=>{if(e.button==0&&!IsPlayerProfileTarget(e))Activate();});
+                card.RegisterCallback<KeyDownEvent>(e=>{if(e.keyCode==KeyCode.Return||e.keyCode==KeyCode.KeypadEnter||e.keyCode==KeyCode.Space){if(!IsPlayerProfileTarget(e))Activate();e.StopPropagation();}});
+                card.RegisterCallback<NavigationSubmitEvent>(e=>{if(!IsPlayerProfileTarget(e))Activate();e.StopPropagation();});
             }
             if(IsMobile)
             {
-                SizeMobileWaitingPlayers();
+                RefreshMobileRoomGeometry();
                 if(state.Phase==GamePhase.Lobby&&players.Length!=previousCount)
                 {_mobileRosterScroll.scrollOffset=Vector2.zero;_mobileRoomScroll.scrollOffset=Vector2.zero;}
             }
@@ -1588,18 +1712,18 @@ namespace DrawLiar
                     order.EnableInClassList("drawing-order-current",state.Phase==GamePhase.Drawing&&player.Id==state.ArtistId);
                 }
                 foreach(var target in card.Query<VisualElement>(className:"profile-trigger").ToList())
-                    SetTooltip(target,IsNominationPhase(state)?CanSelectVote(state,player)?"지목하기":"":"프로필 보기");
+                    SetTooltip(target,target.ClassListContains("player-profile-button")?"프로필 보기":IsNominationPhase(state)?CanSelectVote(state,player)?"지목하기":"":"프로필 보기");
                 var label=playerStatuses[player.Id];
                 if(player.IsConnected&&!player.IsLiar&&(state.Phase==GamePhase.Lobby||state.Phase==GamePhase.RoundResults||state.Phase==GamePhase.MatchResults))SetText(label,"{0}점",player.Score);
                 else SetText(label,!player.IsConnected?"연결 끊김":IsNominationPhase(state)?(player.HasVoted?"지목 완료":_hasSelectedPlayer&&player.Id==selectedPlayerId?"선택됨":""):
                     state.Phase==GamePhase.Rebuttal?(state.HasAccused&&player.Id==state.AccusedPlayerId?"반론 중":player.HasJudged?"투표 완료":""):
-                    player.IsLiar?"라이어":state.Phase==GamePhase.Drawing?(player.Id==state.ArtistId?"그리는 중":""):"");
+                    player.IsLiar&&!HasHiddenMismatchRole(state)?"라이어":state.Phase==GamePhase.Drawing?(player.Id==state.ArtistId?"그리는 중":""):"");
             }
         }
         private void RefreshContext(RoomSnapshot state)
         {
             string key=state.Phase+"/"+state.BallotVersion+"/"+selectedPlayerId+"/"+_hasSelectedPlayer;
-            if(state.Phase==GamePhase.Lobby)key+="/"+state.Players.Length+"/"+state.CanStart+"/"+state.Settings.LiarCount+"/"+state.Settings.Victory+"/"+state.Settings.RoundCount+"/"+state.Settings.TargetScore;
+            if(state.Phase==GamePhase.Lobby)key+="/"+state.Players.Length+"/"+state.CanStart+"/"+state.Settings.LiarMode+"/"+state.Settings.LiarCount+"/"+state.Settings.Victory+"/"+state.Settings.RoundCount+"/"+state.Settings.TargetScore;
             if(key!=contextKey)
             {
                 contextKey=key;contextInfo.Clear();
@@ -1608,6 +1732,7 @@ namespace DrawLiar
                     if(!IsMobile)
                     {
                         Text(contextInfo,"{0} / {1}명","context-name",state.Players.Count(p=>!p.IsSpectator&&p.IsConnected),state.Settings.MaxPlayers);
+                        if(state.Settings.LiarMode==LiarMode.Mismatch)Text(contextInfo,"미스매치","muted");
                         Text(contextInfo,"라이어 {0}명","muted",state.Settings.LiarCount);
                         if(state.Settings.Victory==VictoryMode.RoundCount)Text(contextInfo,"{0}라운드","muted",state.Settings.RoundCount);
                         else Text(contextInfo,"목표 {0}점","muted",state.Settings.TargetScore);
@@ -1639,7 +1764,12 @@ namespace DrawLiar
                 case GamePhase.Lobby:
                     if(state.IsHost){var b=Button(phaseActions,"게임 시작",network.StartMatch,"primary",DrawSound.UiConfirm);b.SetEnabled(state.CanStart);}else Text(phaseActions,"방장 시작 대기","muted");
                     if(state.IsHost)Button(phaseActions,"방 옵션",RoomOptions,"secondary").name="room-options-open";
-                    if(state.IsHost&&!state.CanStart)Text(phaseActions,"참가자 {0}명 필요","rules",GameRules.MIN_START_PLAYERS);
+                    if(state.IsHost&&!state.CanStart)
+                    {
+                        if(state.Settings.LiarMode==LiarMode.Mismatch&&state.Players.Count(player=>player.IsConnected&&!player.IsSpectator)>=GameRules.MIN_START_PLAYERS)
+                            Text(phaseActions,"미스매치는 서로 다른 단어가 2개 이상인 주제가 필요합니다.","rules");
+                        else Text(phaseActions,"참가자 {0}명 필요","rules",GameRules.MIN_START_PLAYERS);
+                    }
                     if(!IsMobile){Button(phaseActions,RoomCopyLabel,CopyRoomInvite,"secondary");RoomFriendInviteButton(phaseActions,"secondary");}break;
                 case GamePhase.Drawing:if(network.CanDraw)Button(phaseActions,"그리기 완료",network.EndTurn,"primary",DrawSound.UiConfirm);break;
                 case GamePhase.Discussion:
@@ -1651,26 +1781,38 @@ namespace DrawLiar
                     else if(_guessSubmitted)Text(phaseActions,"제출 중","muted");
                     else Text(phaseActions,local!=null&&local.HasGuessed?"제출 완료":"라이어 답변 대기","muted");break;
                 case GamePhase.RoundResults:Button(phaseActions,"결과 보기",()=>Results(state),"secondary");break;
-                case GamePhase.MatchResults:Button(phaseActions,"최종 결과",()=>Results(state),"secondary");if(state.IsHost)Button(phaseActions,"대기실로",network.ReturnToLobby,"primary");break;
+                case GamePhase.MatchResults:Button(phaseActions,"최종 결과",()=>Results(state),"secondary");if(state.IsHost)Button(phaseActions,"한 판 더",network.ReturnToLobby,"primary");break;
             }
         }
         private static string PhaseName(GamePhase phase)
         {
             switch(phase){case GamePhase.Lobby:return "대기실";case GamePhase.RoleReveal:return "역할 확인";case GamePhase.Drawing:return "그리기";case GamePhase.Discussion:return "토론";case GamePhase.Rebuttal:return "반론";case GamePhase.Voting:return "투표";case GamePhase.LiarReveal:return "라이어 공개";case GamePhase.Guessing:return "정답 추측";case GamePhase.RoundResults:return "라운드 결과";default:return "최종 결과";}
         }
+        private static bool HasHiddenMismatchRole(RoomSnapshot state)=>state.Settings.LiarMode==LiarMode.Mismatch
+            &&state.Phase>=GamePhase.RoleReveal&&state.Phase<=GamePhase.Voting;
+        private static string LocalRoleName(RoomSnapshot state)=>state.LocalIsSpectator?"관전":HasHiddenMismatchRole(state)?"제시어":state.LocalIsLiar?"라이어":"시민";
+        private static string PhaseName(RoomSnapshot state)=>state.Phase==GamePhase.RoleReveal&&HasHiddenMismatchRole(state)?"제시어 확인":PhaseName(state.Phase);
 
         private void RoleReveal(RoomSnapshot state)
         {
-            var modal=Modal(state.LocalIsSpectator?"관전":state.LocalIsLiar?"라이어":"시민");
+            RoleInformation(state,true);
+        }
+        private void RoleInformation(RoomSnapshot state,bool showWord)
+        {
+            var modal=Modal(LocalRoleName(state));
+            modal.AddToClassList("room-role-details");
             var avatar=new AvatarElement(avatarColor,accessory);avatar.AddToClassList("avatar-preview");modal.Add(avatar);
             Text(modal,"주제 · {0}","subtitle",state.Topic);
-            if(!string.IsNullOrEmpty(state.Word))Text(modal,"제시어 · {0}","section-title",state.Word);
+            if(showWord&&!string.IsNullOrEmpty(state.Word))Text(modal,"제시어 · {0}","section-title",state.Word);
             Button(modal,"확인",CloseModal,"primary");
         }
         private void Results(RoomSnapshot state)
         {
             var modal=Modal(state.Phase==GamePhase.MatchResults?"최종 결과":"라운드 결과");
+            MatchRewardSummary(modal,state);
             Text(modal,"정답 · {0}","subtitle",state.Word);
+            if(state.Settings.LiarMode==LiarMode.Mismatch&&(state.Phase==GamePhase.RoundResults||state.Phase==GamePhase.MatchResults)&&!string.IsNullOrEmpty(state.MismatchWord))
+                Text(modal,"다른 제시어 · {0}","subtitle",state.MismatchWord).name="results-mismatch-word";
             var list=DrawSmoothScroll.Create();list.style.maxHeight=380;modal.Add(list);
             GuessResults(list,state);
             foreach(var p in state.Players.Where(p=>!p.IsSpectator).OrderByDescending(p=>p.Score))
@@ -1814,7 +1956,8 @@ namespace DrawLiar
                     var icon=new AvatarElement(selectedColor,(int)item);icon.AddToClassList("equipment-preview");button.Add(icon);
                     Text(button,name,"equipment-name");Text(button,"","equipment-state");equipmentButtons[item]=button;
                 }
-                AddEquipment(AvatarAccessory.None,"없음","none");
+                string defaultName=_customizePartSlot==AvatarPartSlot.Expression||_customizePartSlot==AvatarPartSlot.Body?"기본":"없음";
+                AddEquipment(AvatarAccessory.None,defaultName,"none");
                 foreach(var item in AvatarParts.Items.Where(part=>part.Slot==_customizePartSlot&&(ownedMask&(int)part.Accessory)==(int)part.Accessory))AddEquipment(item.Accessory,item.Name,item.Id);
                 UpdateAvatar();
             }
@@ -1840,12 +1983,11 @@ namespace DrawLiar
 
         private static void PartTabs(VisualElement parent,int selected,Action<int> changed,bool all)
         {
-            var scroll=DrawSmoothScroll.Create(ScrollViewMode.Horizontal);scroll.AddToClassList("part-tabs");
-            scroll.horizontalScrollerVisibility=ScrollerVisibility.Hidden;scroll.verticalScrollerVisibility=ScrollerVisibility.Hidden;parent.Add(scroll);
+            var tabs=Box(parent,"part-tabs");
             var buttons=new Dictionary<int,Button>();
             void AddTab(int index,string title,string name)
             {
-                var button=Button(scroll,title,()=>
+                var button=Button(tabs,title,()=>
                 {
                     if(selected==index)return;
                     selected=index;foreach(var entry in buttons)entry.Value.EnableInClassList("part-selected",entry.Key==index);
@@ -1870,29 +2012,7 @@ namespace DrawLiar
         }
         private void TopicsForm(VisualElement panel)
         {
-            var nameField=Field(panel,"주제 이름","");nameField.maxLength=40;
-            var words=new TextField(L.Text("제시어")){multiline=true};SetText(words.labelElement,"제시어");words.AddToClassList("field");words.style.height=130;panel.Add(words);
-            Text(panel,"쉼표 또는 줄바꿈으로 구분","rules");
-            Button(panel,"주제 저장",()=>
-            {
-                try
-                {
-                    var builtin=JsonUtility.FromJson<GameData>(Resources.Load<TextAsset>("DrawLiar/GameData").text);
-                    if(builtin.Topics.Any(topic=>topic.Name==GameRules.CleanText(nameField.value,40)))
-                        throw new ArgumentException("기본 주제와 다른 이름을 입력하세요.");
-                    GameDataStore.UpsertCustomTopic(nameField.value,words.value);
-                    draft.Topics=(draft.Topics??Array.Empty<string>()).Append(GameRules.CleanText(nameField.value,40)).Distinct().ToArray();
-                    Navigate(LobbyScreen.CreateRoom);Toast("새 주제를 저장했습니다.");
-                }
-                catch(Exception exception){DrawAudio.Instance?.Play(DrawSound.UiError);Toast(exception.Message);}
-            },"primary");
-            var list=DrawSmoothScroll.Create();list.style.maxHeight=150;panel.Add(list);
-            foreach(var customTopic in GameDataStore.LoadCustomTopics())
-            {
-                var row=Box(list,"room-entry");
-                var edit=Button(row,"",()=>{nameField.value=customTopic.Name;words.value=string.Join("\n",customTopic.Words);},"secondary");SetRawText(edit,customTopic.Name);
-                Button(row,"삭제",()=>{GameDataStore.DeleteCustomTopic(customTopic.Name);draft.Topics=draft.Topics?.Where(name=>name!=customTopic.Name).ToArray();Home();},"danger");
-            }
+            BuildTopicWorkshopForm(panel);
         }
         private void OnChat(ChatLine line)
         {
@@ -1964,7 +2084,11 @@ namespace DrawLiar
                 }
                 bool visible=!IsMobile||_mobileChatSheet?.style.display==DisplayStyle.None;
                 Rect cardBounds=card.worldBound;
-                if(IsMobile)visible&=_mobileRosterScroll!=null&&_mobileRosterScroll.contentViewport.worldBound.Overlaps(cardBounds);
+                if(IsMobile)
+                {
+                    var viewport=_mobileRoomStack.ClassListContains("mobile-waiting")?_mobileRosterScroll?.contentViewport:_mobileRoster;
+                    visible&=viewport!=null&&viewport.worldBound.Overlaps(cardBounds);
+                }
                 bubble.style.display=visible?DisplayStyle.Flex:DisplayStyle.None;
                 if(!visible)continue;
                 SetRawText(bubble.Q<Label>(),SpeechPreview(speech.Value.Text));
@@ -2033,9 +2157,10 @@ namespace DrawLiar
             root.Query<Button>(className:"google-link").ForEach(button=>button.SetEnabled(GoogleAccountProvider.IsSupported&&!lobby.IsBusy));
             root.Query<Button>(className:"google-cancel").ForEach(button=>button.style.display=lobby.IsGoogleSigningIn?DisplayStyle.Flex:DisplayStyle.None);
             if(serviceNotice!=null){SetRawText(serviceNotice,lobby.Status);serviceNotice.style.display=string.IsNullOrWhiteSpace(lobby.Status)?DisplayStyle.None:DisplayStyle.Flex;}
-            else if(!_roomRefreshRunning&&lastServiceStatus!=lobby.Status)Toast(lobby.Status);
+            else if(!_roomRefreshRunning&&_workshopPendingCalls==0&&lastServiceStatus!=lobby.Status)Toast(lobby.Status);
             lastServiceStatus=lobby.Status;
             if(!lobby.IsBusy){RefreshPublicRooms();RefreshFriends();RefreshShop();}
+            RefreshTopicWorkshopControls();
         }
         private async void Run(Func<Task> action)
         {
@@ -2072,7 +2197,7 @@ namespace DrawLiar
             ClearRoomOptionsPassword();
             DrawAudio.Instance?.FlushSettings();
             if(overlay!=null){var previous=overlay;overlay=null;DrawUIMotion.HideModal(previous,previous.Q<VisualElement>(className:"modal"));}
-            if(returnFocus!=null)root.schedule.Execute(()=>{if(overlay==null&&returnFocus.panel!=null)returnFocus.Focus();}).StartingIn(180);
+            if(returnFocus!=null)root.schedule.Execute(()=>{if(overlay==null&&returnFocus.panel!=null&&!ChatInputHasFocus())returnFocus.Focus();}).StartingIn(180);
             RestoreRoomCustomizationFocus();
         }
         private void Enter(VisualElement element,int duration,float offset,int delay=0)
@@ -2120,6 +2245,7 @@ namespace DrawLiar
             if(inRoom&&network.State!=null)RefreshState(network.State);
             lastServiceStatus=lobby.Status;if(serviceNotice!=null)SetRawText(serviceNotice,lastServiceStatus);
             RefreshLobbyChat();
+            OnTopicWorkshopLanguageChanged();
             DrawLocalizedTypography.Apply(root);
             if(_profileOverlay!=null)BeginPublicProfileLoad();
             shopList?.schedule.Execute(()=>shopList?.Query<VisualElement>(className:"shop-entry").ForEach(card=>SizeShopActions(card,card.Q<VisualElement>(className:"shop-actions")))).StartingIn(1);
@@ -2133,6 +2259,7 @@ namespace DrawLiar
             ResetLobbyChatView();
             DetachSocialEvents();
             DetachRoomPasswordEvents();
+            DetachTopicWorkshopEvents();EndTopicWorkshopPage();DetachMatchRewardEvents();
             ClearRoomPasswordSecrets();
             if(network!=null){network.StateChanged-=RefreshState;network.ChatReceived-=OnChat;network.AuthorDrawingChanged-=OnAuthorDrawingChanged;}
             if(lobby!=null){lobby.Changed-=RefreshServiceStatus;lobby.ProfileChanged-=OnProfileChanged;lobby.LobbyChatChanged-=RefreshLobbyChat;lobby.LobbyChatNotice-=Toast;}

@@ -25,6 +25,8 @@ app.Map("/ws/lobby", lobbyChat.HandleAsync);
 app.MapPost("/api/session/enter", (EnterGameRequest request) => database.EnterGameAsync(request.AssignmentToken, nodeId));
 app.MapPost("/api/session/logout", (Func<HttpContext, Task<IResult>>)(async context => { await database.LogoutAsync(await Authenticate(context)); return Results.NoContent(); }));
 app.MapGet("/api/profile", (Func<HttpContext, Task<ProfileData>>)(async context => await database.ProfileAsync((await Authenticate(context)).AccountId)));
+app.MapGet("/api/matches/{matchId}/reward", async (HttpContext context, string matchId) =>
+    await database.MatchRewardAsync((await Authenticate(context)).AccountId, matchId, context.RequestAborted));
 app.MapGet("/api/profiles/{accountId}", async (HttpContext context, string accountId) =>
     await database.PublicProfileAsync((await Authenticate(context)).AccountId, ServerRuntime.AccountId(accountId), context.RequestAborted));
 app.MapPatch("/api/profile", async (HttpContext context, UpdateProfileRequest request) => await database.UpdateProfileAsync((await Authenticate(context)).AccountId, request));
@@ -32,10 +34,22 @@ app.MapGet("/api/friends", (Func<HttpContext, Task<FriendListResponse>>)(async c
 app.MapGet("/api/social/inbox", (Func<HttpContext, Task<SocialInboxResponse>>)(async context =>
     await database.SocialInboxAsync((await Authenticate(context)).AccountId, context.RequestAborted)));
 app.MapPost("/api/friends/request", async (HttpContext context, FriendRequest request) => { await database.RequestFriendAsync((await Authenticate(context)).AccountId, ServerRuntime.AccountId(request.AccountId)); return Results.NoContent(); });
+app.MapPost("/api/friends/cancel", async (HttpContext context, FriendRequest request) => { await database.CancelFriendRequestAsync((await Authenticate(context)).AccountId, ServerRuntime.AccountId(request.AccountId), context.RequestAborted); return Results.NoContent(); });
 app.MapPost("/api/friends/respond", async (HttpContext context, FriendRespondRequest request) => { await database.RespondFriendAsync((await Authenticate(context)).AccountId, ServerRuntime.AccountId(request.AccountId), request.Accept); return Results.NoContent(); });
 app.MapDelete("/api/friends/{accountId}", async (HttpContext context, string accountId) => { await database.RemoveFriendAsync((await Authenticate(context)).AccountId, ServerRuntime.AccountId(accountId)); return Results.NoContent(); });
 app.MapGet("/api/shop", (Func<HttpContext, Task<ShopResponse>>)(async context => { await Authenticate(context); return new ShopResponse { Products = ServerDatabase.ShopProducts }; }));
 app.MapPost("/api/shop/purchase", async (HttpContext context, PurchaseRequest request) => await database.PurchaseAsync((await Authenticate(context)).AccountId, request));
+app.MapGet("/api/topic-workshop", async (HttpContext context, string? language, bool? mine, int? offset, int? limit) =>
+    await database.ListWorkshopTopicsAsync((await Authenticate(context)).AccountId, language, mine ?? false, offset ?? 0, limit ?? 20, context.RequestAborted));
+app.MapPost("/api/topic-workshop", async (HttpContext context, TopicWorkshopPublishRequest request) =>
+    await database.PublishWorkshopTopicAsync((await Authenticate(context)).AccountId, request, context.RequestAborted));
+app.MapGet("/api/topic-workshop/{topicId}", async (HttpContext context, string topicId) =>
+    await database.DownloadWorkshopTopicAsync((await Authenticate(context)).AccountId, topicId, context.RequestAborted));
+app.MapDelete("/api/topic-workshop/{topicId}", async (HttpContext context, string topicId) =>
+{
+    await database.DeleteWorkshopTopicAsync((await Authenticate(context)).AccountId, topicId, context.RequestAborted);
+    return Results.NoContent();
+});
 app.MapGet("/api/rooms", async (HttpContext context, string? search) => { await Authenticate(context); return await database.RoomsAsync(search); });
 app.MapPost("/api/rooms", async (HttpContext context, CreateRoomRequest request) => await database.CreateRoomAsync(await Authenticate(context), request));
 app.MapPost("/api/rooms/{roomId}/join", async (HttpContext context, string roomId, JoinRoomRequest request) => await database.JoinRoomAsync(await Authenticate(context), roomId, request.AsSpectator, request.Password)).RequireRateLimiting("room-join");
