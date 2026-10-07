@@ -26,12 +26,17 @@ internal static partial class Integration
                 ALTER TABLE "AccountMatch" DROP CONSTRAINT "AccountMatch_RankBounds";
                 ALTER TABLE "AccountMatch" ADD CONSTRAINT "MidRound_LegacyRank" CHECK ("Rank" BETWEEN 1 AND 8);
                 ALTER TABLE "AccountMatch" ADD CONSTRAINT "MidRound_UnrelatedScore" CHECK ("Score"<100000);
-                DELETE FROM "SchemaVersion" WHERE "Version"=10;
+                DELETE FROM "SchemaVersion" WHERE "Version" IN (10,13);
                 """, owner)) await downgrade.ExecuteNonQueryAsync();
             await database.InitializeAsync(); await database.InitializeAsync();
             for (int index = 0; index < 2; index++)
-            { await using var migration = new NpgsqlCommand(ProfileMigration("010_MidRoundStatistics.sql"), owner); await migration.ExecuteNonQueryAsync(); }
+            {
+                foreach (string migrationName in new[] { "010_MidRoundStatistics.sql", "013_TwoPlayerMatches.sql" })
+                { await using var migration = new NpgsqlCommand(ProfileMigration(migrationName), owner); await migration.ExecuteNonQueryAsync(); }
+            }
             var checks = await ProfileChecksAsync(owner);
+            await using (var bounds = new NpgsqlCommand("SELECT regexp_replace(pg_get_expr(conbin,conrelid),'[[:space:]()]','','g') FROM pg_constraint WHERE conrelid='\"MatchRecord\"'::regclass AND conname='MatchRecord_PlayerCountBounds'", owner))
+                Check((string?)await bounds.ExecuteScalarAsync() == "\"PlayerCount\">=2AND\"PlayerCount\"<=64", "난입 업그레이드 뒤 2인 경기 제약을 유지해야 합니다.");
             Check(checks["AccountMatch_RankBounds"] == "\"Rank\">=1AND\"Rank\"<=64" && checks.ContainsKey("MidRound_UnrelatedScore")
                 && !checks.ContainsKey("MidRound_LegacyRank"), "마이그레이션은 이름이 바뀐 기존8명 순위 제한만 교체하고 다른 점수 제약을 유지해야 합니다.");
             var sessions = new List<ServerSession>();

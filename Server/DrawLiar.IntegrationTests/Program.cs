@@ -20,6 +20,20 @@ internal static partial class Integration
 
     public static async Task RunAsync(string[] args)
     {
+        if (args.Contains("--room-custom-topics-only") || args.Contains("--room-custom-topics-database-only"))
+        {
+            await VerifyRoomCustomTopicsAsync();
+            if (args.Contains("--room-custom-topics-database-only"))
+                await VerifyRoomCustomTopicsDatabaseAsync(args.FirstOrDefault(value => !value.StartsWith("--", StringComparison.Ordinal)) ?? "http://127.0.0.1:25550");
+            return;
+        }
+        if (args.Contains("--optional-liar-only") || args.Contains("--optional-liar-database-only"))
+        {
+            await VerifyOptionalLiarAsync();
+            if (args.Contains("--optional-liar-database-only"))
+                await VerifyOptionalLiarDatabaseAsync(args.FirstOrDefault(value => !value.StartsWith("--", StringComparison.Ordinal)) ?? "http://127.0.0.1:25550");
+            return;
+        }
         if (args.Contains("--match-reward-only"))
         {
             await VerifyMatchRewardsAsync(args.FirstOrDefault(value => !value.StartsWith("--", StringComparison.Ordinal)) ?? "http://127.0.0.1:25550");
@@ -35,10 +49,12 @@ internal static partial class Integration
             await VerifyMismatchAsync();
             return;
         }
-        if (args.Contains("--avatar-rules-only") || args.Contains("--avatar-database-only"))
+        if (args.Contains("--avatar-rules-only") || args.Contains("--avatar-database-only") || args.Contains("--avatar-http-database-only"))
         {
             VerifyAvatarPartRules();
-            if (args.Contains("--avatar-database-only")) await VerifyAvatarDatabaseAsync();
+            if (args.Contains("--avatar-database-only") || args.Contains("--avatar-http-database-only")) await VerifyAvatarDatabaseAsync();
+            if (args.Contains("--avatar-http-database-only"))
+                await VerifyAvatarHttpAsync(args.FirstOrDefault(value => !value.StartsWith("--", StringComparison.Ordinal)) ?? "http://127.0.0.1:25550");
             return;
         }
         if (args.Contains("--midround-only"))
@@ -85,9 +101,11 @@ internal static partial class Integration
         DrawLiar.Editor.GameSelfCheck.Run();
         VerifyAvatarPartRules();
         await VerifyRoomPolicyAsync();
+        await VerifyRoomCustomTopicsAsync();
         await VerifyConsensusWireAsync();
         await VerifyDrawingHistoryAsync();
         await VerifyMidRoundAsync();
+        await VerifyOptionalLiarAsync();
         await VerifyProfileRulesAsync();
         VerifyGuestCredentialRules();
         if (args.Contains("--lobby-chat-only"))
@@ -325,23 +343,23 @@ internal static partial class Integration
         var shop = await GetAsync<ShopResponse>(game, "/api/shop", token);
         Check(shop.Products.Any(product => product.Id == "beret") && shop.Products.Any(product => product.Id == "brush"), "상점 상품을 조회해야 합니다.");
         string operation = Guid.NewGuid().ToString();
-        var request = new PurchaseRequest { ProductId = "beret", OperationId = operation };
+        var request = new PurchaseRequest { ProductId = "crown", OperationId = operation };
         int initialCoins = users[0].Login.Profile.Coins;
         var first = await PostAsync<ProfileData>(game, "/api/shop/purchase", request, token);
         var repeated = await PostAsync<ProfileData>(game, "/api/shop/purchase", request, token);
-        Check(first.Coins == initialCoins - 100 && repeated.Coins == first.Coins, "동일 구매 재시도는 한 번만 차감해야 합니다.");
+        Check(first.Coins == initialCoins - 150 && repeated.Coins == first.Coins, "동일 구매 재시도는 한 번만 차감해야 합니다.");
         using (var conflict = await SendAsync(game, "/api/shop/purchase", new PurchaseRequest { ProductId = "brush", OperationId = operation }, token))
             Check(conflict.StatusCode == HttpStatusCode.Conflict, "동일 작업 ID의 다른 상품은 거부해야 합니다.");
         var brush = await PostAsync<ProfileData>(game, "/api/shop/purchase", new PurchaseRequest
         {
             ProductId = "brush", OperationId = Guid.NewGuid().ToString()
         }, token);
-        Check(brush.Coins == initialCoins - 200, "두 상품을 각각 차감해야 합니다.");
+        Check(brush.Coins == initialCoins - 250, "두 상품을 각각 차감해야 합니다.");
         using (var patch = new HttpRequestMessage(HttpMethod.Patch, "/api/profile")
         {
             Content = JsonContent.Create(new UpdateProfileRequest
             {
-                DisplayName = brush.DisplayName, AvatarColor = 2, Accessory = 3
+                DisplayName = brush.DisplayName, AvatarColor = 2, Accessory = 6
             }, options: Json)
         })
         {
@@ -350,7 +368,7 @@ internal static partial class Integration
             response.EnsureSuccessStatusCode();
         }
         var saved = await GetAsync<ProfileData>(game, "/api/profile", token);
-        Check(saved.Accessory == 3 && saved.AvatarColor == 2 && saved.Coins == initialCoins - 200,
+        Check(saved.Accessory == 6 && saved.AvatarColor == 2 && saved.Coins == initialCoins - 250,
             "구매한 액세서리의 조합과 커스터마이징을 저장해야 합니다.");
         await PostNoContentAsync(game, "/api/friends/request", new FriendRequest { AccountId = users[1].Login.AccountId }, token);
         var incoming = await GetAsync<FriendListResponse>(game, "/api/friends", users[1].Session.SessionToken);

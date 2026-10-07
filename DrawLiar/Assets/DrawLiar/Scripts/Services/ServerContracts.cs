@@ -22,19 +22,19 @@ namespace DrawLiar
         public string AccountId = "";
         public string DisplayName = "";
         public int AvatarColor;
-        public int Accessory;
+        public long Accessory;
         public int Coins;
         public bool IsGuest;
         public bool HasGoogleAccount;
-        public int[] OwnedAccessories = Array.Empty<int>();
+        public long[] OwnedAccessories = Array.Empty<long>();
     }
-    [Serializable] public sealed class UpdateProfileRequest { public string DisplayName = ""; public int AvatarColor; public int Accessory; }
+    [Serializable] public sealed class UpdateProfileRequest { public string DisplayName = ""; public int AvatarColor; public long Accessory; }
     [Serializable] public sealed class PublicProfileData
     {
         public string AccountId = "";
         public string DisplayName = "";
         public int AvatarColor;
-        public int Accessory;
+        public long Accessory;
         public string JoinedAt = "";
         public string Friendship = "None";
         public ProfileStatsData Stats = new ProfileStatsData();
@@ -102,7 +102,7 @@ namespace DrawLiar
     [Serializable] public sealed class GoogleChallengeRequest { public string Platform = "desktop"; }
     [Serializable] public sealed class GoogleChallengeResponse { public string ChallengeId = ""; public string Nonce = ""; public string ClientId = ""; public string ExpiresAt = ""; }
     [Serializable] public sealed class GoogleAuthRequest { public string ChallengeId = ""; public string IdToken = ""; public string Code = ""; public string CodeVerifier = ""; public string RedirectUri = ""; }
-    [Serializable] public sealed class FriendData { public string AccountId = ""; public string DisplayName = ""; public int AvatarColor; public int Accessory; }
+    [Serializable] public sealed class FriendData { public string AccountId = ""; public string DisplayName = ""; public int AvatarColor; public long Accessory; }
     [Serializable] public sealed class FriendListResponse { public FriendData[] Friends = Array.Empty<FriendData>(); public FriendData[] Incoming = Array.Empty<FriendData>(); public FriendData[] Outgoing = Array.Empty<FriendData>(); }
     [Serializable] public sealed class FriendRequest { public string AccountId = ""; }
     [Serializable] public sealed class FriendRespondRequest { public string AccountId = ""; public bool Accept; }
@@ -121,7 +121,7 @@ namespace DrawLiar
         public string ExpiresAt = "";
     }
     [Serializable] public sealed class RoomInvitationRespondRequest { public bool Accept; public string Password = ""; }
-    [Serializable] public sealed class ShopProduct { public string Id = ""; public string Name = ""; public int Price; public int Accessory; }
+    [Serializable] public sealed class ShopProduct { public string Id = ""; public string Name = ""; public int Price; public long Accessory; }
     [Serializable] public sealed class ShopResponse { public ShopProduct[] Products = Array.Empty<ShopProduct>(); }
     [Serializable] public sealed class PurchaseRequest { public string ProductId = ""; public string OperationId = ""; }
     [Serializable] public sealed class ServerRoomSettings
@@ -180,9 +180,10 @@ namespace DrawLiar
         public string OperationId = "";
         public long ExpectedVersion;
         public ServerRoomSettings Settings = new ServerRoomSettings();
+        public ServerTopicData[] CustomTopics = Array.Empty<ServerTopicData>();
         public string Password = "";
     }
-    [Serializable] public sealed class RoomConfigurationData { public string RoomId = ""; public ServerRoomSettings Settings = new ServerRoomSettings(); public long Version; public long AccessVersion; }
+    [Serializable] public sealed class RoomConfigurationData { public string RoomId = ""; public ServerRoomSettings Settings = new ServerRoomSettings(); public ServerTopicData[] CustomTopics = null!; public long Version; public long AccessVersion; }
     [Serializable] public sealed class RedeemTicketRequest { public string JoinTicket = ""; public string NodeId = ""; public string RoomId = ""; }
     [Serializable] public sealed class RedeemTicketResponse { public string AccountId = ""; public string AdmissionId = ""; public ProfileData Profile = new ProfileData(); public ServerRoomData Room = new ServerRoomData(); public string SessionToken = ""; public bool IsSpectator; public bool SpectatorOnly; public ServerTopicData[] CustomTopics = Array.Empty<ServerTopicData>(); }
     [Serializable] public sealed class SessionCheckRequest { public string SessionToken = ""; public string AccountId = ""; }

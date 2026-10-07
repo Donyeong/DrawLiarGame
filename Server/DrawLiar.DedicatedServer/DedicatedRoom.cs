@@ -7,6 +7,8 @@ internal sealed partial class DedicatedRoom
     private const int MAX_PENDING_ADMISSIONS = 128;
     private readonly object _gate = new();
     private readonly GameSession _session;
+    private readonly GameData _builtInData;
+    private ServerTopicData[] _customTopics;
     private readonly Dictionary<string, int> _playerIds = new(StringComparer.Ordinal);
     private readonly Dictionary<string, GameConnection> _connections = new(StringComparer.Ordinal);
     private readonly List<DrawStroke> _canvas = new();
@@ -32,6 +34,8 @@ internal sealed partial class DedicatedRoom
     {
         _statusChanged = statusChanged;
         _canRecordMatch = canRecordMatch ?? (() => true);
+        _builtInData = data;
+        _customTopics = DrawLiar.Server.ServerDatabase.MergeCustomTopics(null, customTopics);
         RoomId = room.RoomId;
         _ownerAccountId = room.OwnerAccountId;
         _configurationVersion = room.ConfigurationVersion;
@@ -42,14 +46,7 @@ internal sealed partial class DedicatedRoom
             System.Text.Json.JsonSerializer.Serialize(room.Settings, GameplayWire.Json), GameplayWire.Json)!;
         if (settings.Topics == null || settings.Topics.Length == 0)
             settings.Topics = data.Topics.Select(topic => topic.Name).ToArray();
-        var roomData = new GameData
-        {
-            Scoring = data.Scoring,
-            Topics = data.Topics.Concat((customTopics ?? Array.Empty<ServerTopicData>()).Select(topic => new TopicData
-            {
-                Name = topic.Name, Words = topic.Words.ToArray()
-            })).ToArray()
-        };
+        var roomData = RoomGameData(_customTopics);
         _session = new GameSession(settings, roomData);
         _session.MatchCompleted += completed =>
         {
@@ -70,6 +67,13 @@ internal sealed partial class DedicatedRoom
         _session.Changed += () => _dirty = true;
         _session.CanvasCleared += ClearCanvasLocked;
     }
+
+    private GameData RoomGameData(ServerTopicData[] customTopics) => new()
+    {
+        Scoring = _builtInData.Scoring,
+        Topics = _builtInData.Topics.Select(topic => new TopicData { Name = topic.Name, Words = topic.Words.ToArray() })
+            .Concat(customTopics.Select(topic => new TopicData { Name = topic.Name, Words = topic.Words.ToArray() })).ToArray()
+    };
 
     public bool Join(GameConnection connection, RedeemTicketResponse ticket, double now)
     {
@@ -267,7 +271,7 @@ internal sealed partial class DedicatedRoom
         foreach (var connection in _connections.Values.Where(connection => !connection.IsAlive).ToArray())
             Disconnect(connection, now);
         return _connections.Values.Count(connection => connection.IsAlive && !_session.IsSpectator(connection.PlayerId))
-            >= GameRules.MIN_START_PLAYERS && _session.Start(now);
+            >= GameRules.MinimumPlayers(_session.Settings.LiarMode) && _session.Start(now);
     }
 
     private bool ReturnToLobbyLocked(bool host)

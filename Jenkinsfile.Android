@@ -14,6 +14,7 @@ pipeline {
         string(name: 'BUNDLE_VERSION', defaultValue: '0.1.0', description: 'Android 표시 버전')
         booleanParam(name: 'DEVELOPMENT_BUILD', defaultValue: false, description: 'Unity Development Build')
         booleanParam(name: 'UPLOAD_FIREBASE', defaultValue: true, description: 'APK를 DrawLiar Firebase 앱에 업로드하고 테스터 그룹에 배포')
+        booleanParam(name: 'UPLOAD_GOOGLE_PLAY', defaultValue: false, description: 'AAB를 Google Play 내부 테스트 트랙에 초안으로 업로드 (첫 AAB 수동 업로드 및 게시자 자격 증명 설정 후 사용)')
         booleanParam(name: 'NOTIFY_DISCORD', defaultValue: true, description: '지정한 DrawLiar Discord 채널에 빌드 결과 전송')
     }
     environment {
@@ -33,12 +34,22 @@ pipeline {
                 script {
                     env.DRAWLIAR_UPLOAD_RESULT = 'NOT_STARTED'
                     env.DRAWLIAR_DISTRIBUTION_RESULT = 'NOT_STARTED'
+                    env.DRAWLIAR_PLAY_UPLOAD_RESULT = 'NOT_STARTED'
+                    env.DRAWLIAR_PLAY_RELEASE_STATUS = ''
+                    env.DRAWLIAR_VERSION_CODE = env.BUILD_NUMBER
                     env.DRAWLIAR_SOURCE_READY = 'false'
                     env.DRAWLIAR_BUILD_ARTIFACT_READY = 'false'
+                    env.DRAWLIAR_ARTIFACT_URL = ''
+                    env.DRAWLIAR_FIREBASE_CONSOLE_URL = ''
+                    env.DRAWLIAR_JENKINS_ARTIFACT_URL = ''
+                    currentBuild.description = ''
                     if (!(params.BUILD_FORMAT in ['APK', 'AAB'])) { error('Android 빌드 형식은 APK 또는 AAB여야 합니다.') }
                     if (!(params.SIGNING_PROFILE in ['TEST', 'PLAY_UPLOAD'])) { error('Android 서명 프로필은 TEST 또는 PLAY_UPLOAD여야 합니다.') }
                     if (params.SIGNING_PROFILE == 'PLAY_UPLOAD' && (params.BUILD_FORMAT != 'AAB' || params.DEVELOPMENT_BUILD)) {
                         error('PLAY_UPLOAD 서명은 AAB 일반 빌드에서만 사용할 수 있습니다.')
+                    }
+                    if (params.UPLOAD_GOOGLE_PLAY && (params.BUILD_FORMAT != 'AAB' || params.SIGNING_PROFILE != 'PLAY_UPLOAD' || params.DEVELOPMENT_BUILD)) {
+                        error('Google Play 업로드에는 AAB, PLAY_UPLOAD 서명, DEVELOPMENT_BUILD=false가 필요합니다.')
                     }
                     env.BUILD_FORMAT = params.BUILD_FORMAT
                     env.BUNDLE_VERSION = params.BUNDLE_VERSION
@@ -56,6 +67,35 @@ pipeline {
                         $source = Get-Content -Raw -LiteralPath 'Build/Logs/AndroidSource.json' | ConvertFrom-Json
                         if ($source.UncommittedChanges) { Write-Output ($source.Revision + ' (local changes)') }
                         else { Write-Output $source.Revision }
+                    ''').trim()
+                }
+            }
+        }
+        stage('Prepare Google Play Upload') {
+            when { expression { params.UPLOAD_GOOGLE_PLAY } }
+            steps {
+                script { env.DRAWLIAR_PLAY_UPLOAD_RESULT = 'RUNNING' }
+                withCredentials([file(credentialsId: 'drawliar-google-play-publisher', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                    withEnv(["GOOGLE_PLAY_PLAN=${env.WORKSPACE}\\Build\\Logs\\GooglePlayPlan.json", "GOOGLE_PLAY_RESULT=${env.WORKSPACE}\\Build\\Logs\\GooglePlayUploadResult.json", "GOOGLE_PLAY_VERSION_STATE=${env.DRAWLIAR_CACHE}\\GooglePlayVersionCode.json"]) {
+                        powershell '''
+                            $ErrorActionPreference = 'Stop'
+                            & 'C:/Program Files/nodejs/npm.cmd' ci --prefix './Tools/GooglePlay' --no-audit --no-fund
+                            if ($LASTEXITCODE -ne 0) { throw 'Google Play dependencies installation failed.' }
+                            & 'C:/Program Files/nodejs/node.exe' './Tools/GooglePlay/upload.cjs' --plan
+                            if ($LASTEXITCODE -ne 0) { throw 'Google Play upload preparation failed.' }
+                        '''
+                    }
+                }
+                script {
+                    env.DRAWLIAR_VERSION_CODE = powershell(returnStdout: true, script: '''
+                        $ErrorActionPreference = 'Stop'
+                        $plan = Get-Content -Raw -LiteralPath 'Build/Logs/GooglePlayPlan.json' | ConvertFrom-Json
+                        $versionCode = 0
+                        if ($plan.PackageName -ne 'com.rascallab.liargame' -or [string]$plan.BuildNumber -ne $env:BUILD_NUMBER -or
+                            ![int]::TryParse([string]$plan.VersionCode, [ref]$versionCode) -or $versionCode -lt 1 -or $versionCode -gt 2100000000) {
+                            throw 'Google Play upload plan does not match this build.'
+                        }
+                        Write-Output $versionCode
                     ''').trim()
                 }
             }
@@ -82,7 +122,7 @@ pipeline {
                                 if ($env:DRAWLIAR_SIGNING_PROFILE -eq 'PLAY_UPLOAD') {
                                     & './Tools/Jenkins/Verify-AndroidUploadKey.ps1' -UnityPath $env:DRAWLIAR_UNITY_PATH
                                 }
-                                & './Tools/Jenkins/Build-Android.ps1' -UnityPath $env:DRAWLIAR_UNITY_PATH -ProjectPath "$env:WORKSPACE/DrawLiar" -BuildFormat $env:BUILD_FORMAT -BundleVersion $env:BUNDLE_VERSION -BuildNumber ([int]$env:BUILD_NUMBER) -Development ([bool]::Parse($env:DRAWLIAR_DEVELOPMENT_BUILD)) | Out-Null
+                                & './Tools/Jenkins/Build-Android.ps1' -UnityPath $env:DRAWLIAR_UNITY_PATH -ProjectPath "$env:WORKSPACE/DrawLiar" -BuildFormat $env:BUILD_FORMAT -BundleVersion $env:BUNDLE_VERSION -BuildNumber ([int]$env:DRAWLIAR_VERSION_CODE) -Development ([bool]::Parse($env:DRAWLIAR_DEVELOPMENT_BUILD)) | Out-Null
                                 if ($env:DRAWLIAR_SIGNING_PROFILE -eq 'PLAY_UPLOAD') {
                                     & './Tools/Jenkins/Verify-AndroidUploadKey.ps1' -UnityPath $env:DRAWLIAR_UNITY_PATH -ArtifactPath "$env:WORKSPACE/Build/Android/DrawLiar.aab"
                                 }
@@ -90,7 +130,10 @@ pipeline {
                         }
                     }
                 }
-                script { env.DRAWLIAR_BUILD_ARTIFACT_READY = 'true' }
+                script {
+                    env.DRAWLIAR_BUILD_ARTIFACT_READY = 'true'
+                    env.DRAWLIAR_JENKINS_ARTIFACT_URL = "${env.BUILD_URL}artifact/Build/Android/DrawLiar.${env.BUILD_FORMAT.toLowerCase()}"
+                }
             }
         }
         stage('Upload and Distribute to Firebase') {
@@ -98,12 +141,12 @@ pipeline {
             steps {
                 script { env.DRAWLIAR_UPLOAD_RESULT = 'RUNNING' }
                 withCredentials([file(credentialsId: 'drawliar-firebase-app-distribution', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
-                    withEnv(["UPLOAD_RESULT=${env.WORKSPACE}\\Build\\Logs\\FirebaseUploadResult.json", "DOWNLOAD_RESULT=${env.WORKSPACE}\\.jenkins-private\\FirebaseDownload.json", "BUILD_FILE=${env.WORKSPACE}\\Build\\Android\\DrawLiar.apk", 'FIREBASE_UPLOAD_ONLY=false', 'FIREBASE_ALLOW_TESTER_EMAIL=true']) {
+                    withEnv(["UPLOAD_RESULT=${env.WORKSPACE}\\Build\\Logs\\FirebaseUploadResult.json", "DOWNLOAD_RESULT=${env.WORKSPACE}\\.jenkins-private\\FirebaseDownload.json", "BUILD_FILE=${env.WORKSPACE}\\Build\\Android\\DrawLiar.${env.BUILD_FORMAT.toLowerCase()}", 'FIREBASE_UPLOAD_ONLY=false', 'FIREBASE_ALLOW_TESTER_EMAIL=true']) {
                         powershell '''
                             $ErrorActionPreference = 'Stop'
                             & 'C:/Program Files/nodejs/npm.cmd' ci --prefix './Tools/Firebase' --no-audit --no-fund
                             if ($LASTEXITCODE -ne 0) { throw 'Firebase dependencies installation failed.' }
-                            & 'C:/Program Files/nodejs/node.exe' './Tools/Firebase/distribute.cjs' './Build/Android/DrawLiar.apk'
+                            & 'C:/Program Files/nodejs/node.exe' './Tools/Firebase/distribute.cjs'
                             if ($LASTEXITCODE -ne 0) { throw 'DrawLiar Firebase upload failed.' }
                         '''
                     }
@@ -111,9 +154,10 @@ pipeline {
                 script {
                     env.DRAWLIAR_ARTIFACT_URL = powershell(returnStdout: true, script: '''
                         $upload = Get-Content -Raw -LiteralPath 'Build/Logs/FirebaseUploadResult.json' | ConvertFrom-Json
-                        if (!$upload.Success -or $upload.AppId -ne $env:FIREBASE_APP_ID -or $upload.PackageName -ne 'com.rascallab.drawliar' -or $upload.BuildVersion -ne $env:BUILD_NUMBER -or $upload.DisplayVersion -ne $env:BUNDLE_VERSION) { throw 'Firebase release does not match this build.' }
+                        if (!$upload.Success -or $upload.AppId -ne $env:FIREBASE_APP_ID -or $upload.PackageName -ne 'com.rascallab.liargame' -or $upload.BuildVersion -ne $env:DRAWLIAR_VERSION_CODE -or $upload.DisplayVersion -ne $env:BUNDLE_VERSION -or $upload.Format -ne $env:BUILD_FORMAT) { throw 'Firebase release does not match this build.' }
                         if ($upload.Distribution -notin @('DISTRIBUTED', 'EMPTY_GROUP') -or @($upload.Groups).Count -ne 1 -or $upload.Groups[0] -ne 'drawliar-testers') { throw 'Firebase tester group distribution was not completed.' }
-                        Write-Output $upload.testingUri
+                        if ($upload.TestingUri -notmatch '^https://appdistribution\\.firebase\\.google\\.com/testerapps/[^/?#]+/releases/[A-Za-z0-9_-]+/?(?:\\?[^#]*)?$') { throw 'Firebase 테스터 다운로드 링크가 잘못되었습니다.' }
+                        Write-Output $upload.TestingUri
                     ''').trim()
                     env.DRAWLIAR_FIREBASE_CONSOLE_URL = powershell(returnStdout: true, script: '''
                         $upload = Get-Content -Raw -LiteralPath 'Build/Logs/FirebaseUploadResult.json' | ConvertFrom-Json
@@ -124,6 +168,37 @@ pipeline {
                         $upload = Get-Content -Raw -LiteralPath 'Build/Logs/FirebaseUploadResult.json' | ConvertFrom-Json
                         Write-Output $upload.Distribution
                     ''').trim()
+                    currentBuild.description = "Firebase 다운로드: ${env.DRAWLIAR_ARTIFACT_URL}"
+                    echo "Firebase 다운로드: ${env.DRAWLIAR_ARTIFACT_URL}"
+                }
+            }
+        }
+        stage('Upload to Google Play Internal Testing') {
+            when { expression { params.UPLOAD_GOOGLE_PLAY && params.BUILD_FORMAT == 'AAB' } }
+            steps {
+                withCredentials([file(credentialsId: 'drawliar-google-play-publisher', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                    withEnv(["GOOGLE_PLAY_PLAN=${env.WORKSPACE}\\Build\\Logs\\GooglePlayPlan.json", "GOOGLE_PLAY_RESULT=${env.WORKSPACE}\\Build\\Logs\\GooglePlayUploadResult.json", "GOOGLE_PLAY_VERSION_STATE=${env.DRAWLIAR_CACHE}\\GooglePlayVersionCode.json", "BUILD_FILE=${env.WORKSPACE}\\Build\\Android\\DrawLiar.aab", "ANDROID_BUILD_RESULT=${env.WORKSPACE}\\Build\\Logs\\AndroidBuildResult.json"]) {
+                        powershell '''
+                            $ErrorActionPreference = 'Stop'
+                            & 'C:/Program Files/nodejs/node.exe' './Tools/GooglePlay/upload.cjs'
+                            if ($LASTEXITCODE -ne 0) { throw 'DrawLiar Google Play upload failed.' }
+                        '''
+                    }
+                }
+                script {
+                    powershell '''
+                        $ErrorActionPreference = 'Stop'
+                        $upload = Get-Content -Raw -LiteralPath 'Build/Logs/GooglePlayUploadResult.json' | ConvertFrom-Json
+                        if (!$upload.Success -or !$upload.Committed -or $upload.PackageName -ne 'com.rascallab.liargame' -or
+                            [string]$upload.BuildNumber -ne $env:BUILD_NUMBER -or [string]$upload.VersionCode -ne $env:DRAWLIAR_VERSION_CODE -or
+                            $upload.Track -ne 'internal' -or $upload.Status -ne 'draft') {
+                            throw 'Google Play internal testing draft does not match this build.'
+                        }
+                    '''
+                    env.DRAWLIAR_PLAY_UPLOAD_RESULT = 'SUCCESS'
+                    env.DRAWLIAR_PLAY_RELEASE_STATUS = 'DRAFT'
+                    currentBuild.description = 'Google Play 내부 테스트 초안 업로드 완료'
+                    echo 'Google Play 내부 테스트 초안 업로드 완료'
                 }
             }
         }
@@ -140,18 +215,28 @@ pipeline {
                 if (env.DRAWLIAR_DISTRIBUTION_RESULT == 'NOT_STARTED') {
                     env.DRAWLIAR_DISTRIBUTION_RESULT = env.DRAWLIAR_UPLOAD_RESULT == 'SKIPPED' ? 'SKIPPED' : 'FAILURE'
                 }
+                if (env.DRAWLIAR_PLAY_UPLOAD_RESULT == 'RUNNING') {
+                    env.DRAWLIAR_PLAY_UPLOAD_RESULT = currentBuild.currentResult == 'ABORTED' ? 'ABORTED' : 'FAILURE'
+                }
+                else if (env.DRAWLIAR_PLAY_UPLOAD_RESULT == 'NOT_STARTED') {
+                    env.DRAWLIAR_PLAY_UPLOAD_RESULT = 'SKIPPED'
+                }
                 if (env.DRAWLIAR_BUILD_ARTIFACT_READY == 'true') {
                     archiveArtifacts artifacts: 'Build/Android/*.apk,Build/Android/*.aab', allowEmptyArchive: false, fingerprint: true
+                    if (!env.DRAWLIAR_ARTIFACT_URL) {
+                        currentBuild.description = env.DRAWLIAR_PLAY_UPLOAD_RESULT == 'SUCCESS' ? "Google Play 내부 테스트 초안 업로드 완료 · Jenkins 다운로드: ${env.DRAWLIAR_JENKINS_ARTIFACT_URL}" : "Jenkins 다운로드: ${env.DRAWLIAR_JENKINS_ARTIFACT_URL}"
+                        echo "Jenkins 다운로드: ${env.DRAWLIAR_JENKINS_ARTIFACT_URL}"
+                    }
                 }
                 if (env.DRAWLIAR_SOURCE_READY == 'true') {
-                    archiveArtifacts artifacts: 'Build/Logs/AndroidBuildResult.json,Build/Logs/AndroidSource.json,Build/Logs/FirebaseUploadResult.json,Build/Logs/AndroidBuild.log', allowEmptyArchive: true
+                    archiveArtifacts artifacts: 'Build/Logs/AndroidBuildResult.json,Build/Logs/AndroidSource.json,Build/Logs/FirebaseUploadResult.json,Build/Logs/GooglePlayPlan.json,Build/Logs/GooglePlayUploadResult.json,Build/Logs/AndroidBuild.log', allowEmptyArchive: true
                 }
                 if (params.NOTIFY_DISCORD && fileExists('Tools/Jenkins/Notify-AndroidBuild.ps1')) {
                     catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
                         timeout(time: 35, unit: 'SECONDS') {
                             withCredentials([string(credentialsId: 'drawliar-discord-build-webhook', variable: 'DRAWLIAR_DISCORD_WEBHOOK')]) {
                                 def downloadResult = env.DRAWLIAR_UPLOAD_RESULT == 'SUCCESS' && env.DRAWLIAR_BUILD_ARTIFACT_READY == 'true' ? "${env.WORKSPACE}\\.jenkins-private\\FirebaseDownload.json" : ''
-                                withEnv(["DRAWLIAR_NOTIFY_RESULT=${currentBuild.currentResult}", "DRAWLIAR_NOTIFY_DURATION=${currentBuild.durationString}", "DRAWLIAR_VERSION_CODE=${env.BUILD_NUMBER}", "DRAWLIAR_DOWNLOAD_RESULT=${downloadResult}"]) {
+                                withEnv(["DRAWLIAR_NOTIFY_RESULT=${currentBuild.currentResult}", "DRAWLIAR_NOTIFY_DURATION=${currentBuild.durationString}", "DRAWLIAR_DOWNLOAD_RESULT=${downloadResult}"]) {
                                     powershell '''
                                         $receipt = './Build/Logs/DiscordNotification.json'
                                         if (Test-Path -LiteralPath $receipt -PathType Leaf) { Remove-Item -LiteralPath $receipt -Force }

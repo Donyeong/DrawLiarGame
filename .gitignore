@@ -97,6 +97,7 @@ sysinfo.txt
 /Server/**/obj/
 /Tools/**/__pycache__/
 /Tools/Firebase/node_modules/
+/Tools/GooglePlay/node_modules/
 /Tools/Docker/.env
 *.pfx
 *.p12

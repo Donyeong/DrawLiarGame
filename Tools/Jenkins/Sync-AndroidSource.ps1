@@ -39,7 +39,7 @@ if (Test-Path -LiteralPath $unityLock) {
     catch { throw 'The Android CI Unity project is in use or its lock cannot be inspected.' }
 }
 # Mirror only these source directories; preserve the CI Library and Gradle caches.
-$directories = @('DrawLiar/Assets', 'DrawLiar/Packages', 'DrawLiar/ProjectSettings', 'Tools/Jenkins', 'Tools/Firebase')
+$directories = @('DrawLiar/Assets', 'DrawLiar/Packages', 'DrawLiar/ProjectSettings', 'Tools/Jenkins', 'Tools/Firebase', 'Tools/GooglePlay')
 foreach ($relative in $directories) {
     $from = [IO.Path]::GetFullPath((Join-Path $source $relative))
     $to = [IO.Path]::GetFullPath((Join-Path $destination $relative))

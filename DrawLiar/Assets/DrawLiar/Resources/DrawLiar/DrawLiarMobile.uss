@@ -376,6 +376,10 @@
 .app.mobile .create-room-panel .field { margin-bottom: 12px; }
 .app.mobile .create-mode { margin-bottom: 16px; }
 .app.mobile .create-modes .button { font-size: 14px; }
+.app.mobile .liar-mode-choices .button { min-height: 56px; margin-right: 8px; padding: 8px 6px; }
+.app.mobile .liar-mode-choices .button.mode-choice-last { margin-right: 0; }
+.app.mobile .nomination-actions .button { height: auto; min-height: 48px; font-size: 18px; padding: 8px; }
+.app.mobile .nomination-actions .nomination-none { margin-right: 8px; }
 .app.mobile .create-section-fields { padding: 12px 10px 0; }
 .app.mobile .create-time-grid .field { margin-right: 2%; }
 .app.mobile .create-footer { padding-top: 12px; }

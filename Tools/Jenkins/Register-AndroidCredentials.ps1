@@ -7,7 +7,8 @@ param(
     [string]$UploadKeystoreFile,
     [string]$UploadKeystorePasswordFile,
     [string]$UploadKeyAliasFile,
-    [string]$UploadKeyPasswordFile
+    [string]$UploadKeyPasswordFile,
+    [string]$GooglePlayServiceAccountFile
 )
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
@@ -63,4 +64,7 @@ if ($UploadKeystoreFile) {
     Save-AndroidCredential 'drawliar-android-upload-keystore-password' $UploadKeystorePasswordFile $false
     Save-AndroidCredential 'drawliar-android-upload-key-alias' $UploadKeyAliasFile $false
     Save-AndroidCredential 'drawliar-android-upload-key-password' $UploadKeyPasswordFile $false
+}
+if ($GooglePlayServiceAccountFile) {
+    Save-AndroidCredential 'drawliar-google-play-publisher' $GooglePlayServiceAccountFile $true
 }

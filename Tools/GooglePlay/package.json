@@ -1,0 +1,6 @@
+{
+  "name": "drawliar-google-play-upload",
+  "private": true,
+  "scripts": { "test": "node --test upload.test.cjs" },
+  "dependencies": { "google-auth-library": "10.9.0" }
+}

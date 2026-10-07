@@ -2,7 +2,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { GoogleAuth } = require('google-auth-library');
 
-const PACKAGE_NAME = 'com.rascallab.drawliar';
+const PACKAGE_NAME = 'com.rascallab.liargame';
 const ORIGIN = 'https://firebaseappdistribution.googleapis.com';
 
 function booleanSetting(value, fallback = false) {
@@ -26,9 +26,12 @@ async function main(env = process.env, argv = process.argv) {
     const checkOnly = argv.includes('--check');
     const resultFile = path.resolve(env.UPLOAD_RESULT || 'Build/Logs/UploadResult.json');
     const downloadFile = env.DOWNLOAD_RESULT ? path.resolve(env.DOWNLOAD_RESULT) : '';
+    const file = path.resolve(env.BUILD_FILE || '');
+    const format = checkOnly ? (env.BUILD_FORMAT || 'APK').toUpperCase() : path.extname(file).slice(1).toUpperCase();
+    const pendingResult = { Success: false, AppId: appId, PackageName: PACKAGE_NAME, Format: format };
     if (!checkOnly) {
         fs.mkdirSync(path.dirname(resultFile), { recursive: true });
-        fs.writeFileSync(resultFile, JSON.stringify({ Success: false, AppId: appId, PackageName: PACKAGE_NAME }) + '\n');
+        fs.writeFileSync(resultFile, JSON.stringify(pendingResult) + '\n');
         if (downloadFile) {
             if (downloadFile === resultFile || !downloadFile.split(path.sep).includes('.jenkins-private'))
                 throw new Error('서명된 다운로드 링크는 .jenkins-private 폴더의 별도 파일에만 저장할 수 있습니다.');
@@ -36,6 +39,7 @@ async function main(env = process.env, argv = process.argv) {
             fs.writeFileSync(downloadFile, '{}\n');
         }
     }
+    if (!['APK', 'AAB'].includes(format)) throw new Error('Firebase 배포에는 APK 또는 AAB를 선택하세요.');
     if (!/^1:\d+:android:[a-f0-9]+$/.test(appId)) throw new Error('Firebase App ID가 잘못되었습니다.');
     const groups = [...new Set((env.FIREBASE_GROUPS || 'drawliar-testers').split(',').map(value => value.trim()).filter(Boolean))];
     if (!groups.length || groups.length > 999 || groups.some(value => !/^drawliar-[a-z0-9][a-z0-9-]{0,53}$/.test(value)))
@@ -72,13 +76,25 @@ async function main(env = process.env, argv = process.argv) {
         return total;
     }
     await countTesters();
-    if (checkOnly) { console.log('Firebase DrawLiar 앱·전용 테스터 그룹 접근 확인 완료'); return; }
-    const file = path.resolve(env.BUILD_FILE || '');
+    if (format === 'AAB') {
+        const aabInfo = await request(`/v1/${app}/aabInfo`);
+        if (aabInfo.name !== `${app}/aabInfo`) throw new Error('Firebase AAB 연동 응답의 앱이 DrawLiar와 다릅니다.');
+        const reasons = {
+            PLAY_ACCOUNT_NOT_LINKED: 'Firebase 프로젝트를 Google Play 개발자 계정에 연결하세요.',
+            NO_APP_WITH_GIVEN_BUNDLE_ID_IN_PLAY_ACCOUNT: `연결된 Google Play 계정에 ${PACKAGE_NAME} 앱을 등록하세요.`,
+            APP_NOT_PUBLISHED: 'Google Play 앱 심사와 내부 테스트 이상의 게시를 완료하세요.',
+            PLAY_IAS_TERMS_NOT_ACCEPTED: 'Google Play 내부 앱 공유 약관에 동의하세요.',
+        };
+        if (!['INTEGRATED', 'AAB_STATE_UNAVAILABLE'].includes(aabInfo.integrationState)) {
+            if (!checkOnly) fs.writeFileSync(resultFile, JSON.stringify({ ...pendingResult, AabIntegrationState: aabInfo.integrationState || 'AAB_INTEGRATION_STATE_UNSPECIFIED' }) + '\n');
+            throw new Error(`Firebase AAB 배포 준비가 필요합니다. ${reasons[aabInfo.integrationState] || 'Firebase 콘솔에서 Google Play 연결 상태를 확인하세요.'} 바로 테스트하려면 APK를 선택하세요.`);
+        }
+    }
+    if (checkOnly) { console.log(`Firebase DrawLiar ${format}·전용 테스터 그룹 접근 확인 완료`); return; }
     let size;
-    try { size = fs.statSync(file).size; } catch { throw new Error('업로드할 APK 파일을 찾을 수 없습니다.'); }
-    if (path.extname(file).toLowerCase() !== '.apk') throw new Error('Firebase 배포에는 APK를 선택하세요.');
-    if (!size || size > 2048 * 1024 * 1024) throw new Error('APK 크기는 0 초과 2048MiB 이하여야 합니다.');
-    console.log('Firebase DrawLiar APK 업로드 시작');
+    try { size = fs.statSync(file).size; } catch { throw new Error(`업로드할 ${format} 파일을 찾을 수 없습니다.`); }
+    if (!size || size > 2048 * 1024 * 1024) throw new Error(`${format} 크기는 0 초과 2048MiB 이하여야 합니다.`);
+    console.log(`Firebase DrawLiar ${format} 업로드 시작`);
     let operation = await request(`/upload/v1/${app}/releases:upload`, {
         method: 'POST', timeout: 20 * 60000,
         headers: { 'X-Goog-Upload-Protocol': 'raw', 'X-Goog-Upload-File-Name': encodeURIComponent(path.basename(file)), 'Content-Type': 'application/octet-stream', 'Content-Length': String(size) },
@@ -91,7 +107,7 @@ async function main(env = process.env, argv = process.argv) {
         await new Promise(resolve => setTimeout(resolve, 5000));
         operation = await request(`/v1/${operation.name}`);
     }
-    if (!operation.done || operation.error) throw new Error('Firebase APK 처리 실패 또는 시간 초과입니다. 패키지명·서명을 확인하세요.');
+    if (!operation.done || operation.error) throw new Error(`Firebase ${format} 처리 실패 또는 시간 초과입니다. 패키지명·서명${format === 'AAB' ? '·Google Play 연결' : ''}을 확인하세요.`);
     const release = operation.response?.release;
     const releasePrefix = `${app}/releases/`;
     if (!release?.name?.startsWith(releasePrefix) || !/^[A-Za-z0-9_-]+$/.test(release.name.slice(releasePrefix.length)))
@@ -118,14 +134,14 @@ async function main(env = process.env, argv = process.argv) {
         fs.writeFileSync(downloadFile, JSON.stringify({ BinaryDownloadUri: binaryUri, ExpiresUtc: new Date(Date.now() + 55 * 60000).toISOString() }) + '\n');
     }
     const result = {
-        Success: true, AppId: appId, PackageName: PACKAGE_NAME, ReleaseName: release.name,
+        Success: true, AppId: appId, PackageName: PACKAGE_NAME, Format: format, ReleaseName: release.name,
         DisplayVersion: release.displayVersion || '', BuildVersion: release.buildVersion || '',
         TestingUri: testingUri, FirebaseConsoleUri: consoleUri, InviteUri: inviteUri,
         Groups: groups, Distribution: distribution, TesterCount: testerCount,
         CompletedUtc: new Date().toISOString(),
     };
     fs.writeFileSync(resultFile, JSON.stringify(result, null, 2) + '\n');
-    console.log(distribution === 'SKIPPED_TESTER_EMAIL' ? 'Firebase APK 업로드 완료 · 테스터 이메일 전송 권한 없이 그룹 배포 생략' : 'Firebase APK 업로드 완료');
+    console.log(`Firebase ${format} 업로드 완료${distribution === 'SKIPPED_TESTER_EMAIL' ? ' · 테스터 이메일 전송 권한 없이 그룹 배포 생략' : ''}`);
     return result;
 }
 

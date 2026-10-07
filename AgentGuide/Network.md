@@ -12,7 +12,8 @@
 - 경기 코인은 서버가 완료 라운드 참가·점수로 계산하고, 전적 기록과 함께 원자적으로 한 번만 지급한다. 클라이언트는 확정된 지급 내역만 표시한다.
 - 배포는 Ubuntu 24.04 x64의 `drawliar-dev` Compose와 `DrawLiar-Server` Jenkins 작업을 사용한다. 같은 머신의 Kona 서비스·DB·배포 경로를 변경하지 않는다. DB 볼륨과 `/srv/drawliar/dev/.env`, 인증서를 배포물에 포함하거나 삭제하지 않는다.
 - 개발 인증·HTTP/WS는 명시적으로 허용한 로컬 개발 환경에만 사용한다. 공개 연결은 HTTPS/WSS로 유지하며 비밀 키·토큰·비밀번호를 로그에 남기지 않는다.
-- Android CI는 로컬 작업 트리를 별도 작업 폴더에 복사한다. 이를 원격 커밋 빌드로 취급하지 않는다. 서명 키·웹후크는 Jenkins Credentials로 전달하고, Firebase의 임시 APK 다운로드 링크는 Discord 전송 뒤 삭제하며 로그·보관 산출물에 넣지 않는다.
+- Android CI는 로컬 작업 트리를 별도 작업 폴더에 복사한다. 이를 원격 커밋 빌드로 취급하지 않는다. 서명 키·웹후크는 Jenkins Credentials로 전달하고, Firebase의 임시 APK/AAB 다운로드 링크는 Discord 전송 뒤 삭제하며 로그·보관 산출물에 넣지 않는다. Firebase AAB 배포에는 동일 패키지의 Google Play 앱 연결과 게시 상태가 필요하다.
+- Google Play 자동 업로드는 최초 콘솔 빌드 등록 이후 DrawLiar의 내부 테스트 초안에만 수행한다. 출시용 업로드 키·게시 서비스 계정은 테스트 서명·Firebase 자격 증명과 분리하고, CI 캐시의 예약된 Play 버전 코드를 재사용하지 않는다. 기존 초안·심사 중인 릴리스를 자동 교체하거나 정식 출시하지 않는다.
 - Unity Mono는 `ClientWebSocket`의 인증서 콜백을 적용하지 않는다. WSS는 `DrawWebSocketClient`의 `SslStream` 검증과 관리형 WebSocket을 사용한다.
 - WebGL은 브라우저 WebSocket과 동일 원점 HTTPS 프록시를 사용하며 Google 웹 인증은 서버의 일회용 nonce를 검증한다. 프록시는 공개 API와 채팅·게임 경로만 전달하며 전달 IP는 설정한 프록시에서만 신뢰한다.
 - 웹사이트 Git 작업과 배포 원본은 `C:\RacallabWebGit` 저장소를 사용한다. 정적 파일은 운영 `WEB_ROOT`가 우선하므로 기존 릴리스를 보존해 변경 파일만 반영하고, 경로 전환 뒤 `rascallab` 서비스를 재시작한다.

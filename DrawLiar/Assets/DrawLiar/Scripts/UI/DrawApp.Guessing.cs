@@ -39,12 +39,13 @@ namespace DrawLiar
             _judgmentPanel.EnableInClassList("nomination-panel", nomination);
             if (!visible) { _judgmentPanelKey = ""; _judgmentCounts = _judgmentProgress = null; voteProgress = null; return; }
             if (nomination) { RefreshNominationPanel(state, local); return; }
-            string key = $"judgment/{state.BallotVersion}/{state.AccusedPlayerId}/{state.LocalPlayerId}/{state.LocalIsSpectator}/{local?.IsConnected}/{local?.HasJudged}/{_judgmentSubmitted}/{state.LocalJudgmentApprove}";
+            string key = $"judgment/{state.BallotVersion}/{state.AccusedPlayerId}/{state.Settings.LiarMode}/{state.LocalPlayerId}/{state.LocalIsSpectator}/{local?.IsConnected}/{local?.HasJudged}/{_judgmentSubmitted}/{state.LocalJudgmentApprove}";
             if (key != _judgmentPanelKey)
             {
                 _judgmentPanelKey = key;
                 _judgmentPanel.Clear();
                 voteProgress = null;
+                if (IsNoLiarAccused(state)) Text(_judgmentPanel, "라이어가 없다고 생각하나요?", "nomination-prompt").name = "judgment-no-liar-prompt";
                 _judgmentCounts = Text(_judgmentPanel, "", "judgment-counts");
                 _judgmentCounts.name = "judgment-counts";
                 _judgmentProgress = Text(_judgmentPanel, "", "judgment-progress");
@@ -71,21 +72,33 @@ namespace DrawLiar
         private void RefreshNominationPanel(RoomSnapshot state, PlayerView local)
         {
             var target = _hasSelectedPlayer ? state.Players.FirstOrDefault(player => player.Id == selectedPlayerId) : null;
-            string key = $"nomination/{state.Phase}/{state.BallotVersion}/{state.LocalPlayerId}/{state.LocalIsSpectator}/{local?.IsConnected}/{local?.IsSpectator}/{local?.HasVoted}/{selectedPlayerId}/{_hasSelectedPlayer}/{target?.Name}/{voteSubmitted}";
+            bool noLiarSelected = IsNoLiarSelected(state);
+            string key = $"nomination/{state.Phase}/{state.BallotVersion}/{state.Settings.LiarMode}/{state.LocalPlayerId}/{state.LocalIsSpectator}/{local?.IsConnected}/{local?.IsSpectator}/{local?.HasVoted}/{selectedPlayerId}/{_hasSelectedPlayer}/{target?.Name}/{voteSubmitted}";
             if (key != _judgmentPanelKey)
             {
                 _judgmentPanelKey = key;
                 _judgmentPanel.Clear();
                 _judgmentCounts = _judgmentProgress = null;
                 bool spectator = state.LocalIsSpectator || local?.IsSpectator == true;
-                string prompt = spectator ? "관전 중" : local?.HasVoted == true ? "지목 완료" : voteSubmitted ? "제출 중" : "의심스러운 사람을 지목하세요";
+                string prompt = spectator ? "관전 중" : local?.HasVoted == true ? "지목 완료" : voteSubmitted ? "제출 중"
+                    : state.Settings.LiarMode == LiarMode.Optional ? "의심스러운 사람 또는 ‘라이어 없음’을 선택하세요" : "의심스러운 사람을 지목하세요";
                 Text(_judgmentPanel, prompt, "nomination-prompt").name = "nomination-guidance";
                 if (!spectator && local?.IsConnected == true && !local.HasVoted)
                 {
                     if (target != null) RawText(_judgmentPanel, target.Name, "nomination-target").name = "nomination-target";
-                    var submit = Button(_judgmentPanel, voteSubmitted ? "제출 중" : "지목하기", SubmitVote, "primary nomination-submit", DrawSound.UiConfirm);
+                    else if (noLiarSelected) Text(_judgmentPanel, "라이어 없음", "nomination-target").name = "nomination-target";
+                    VisualElement actions = _judgmentPanel;
+                    if (state.Settings.LiarMode == LiarMode.Optional)
+                    {
+                        actions = Box(_judgmentPanel, "row nomination-actions");
+                        var none = Button(actions, "라이어 없음", SelectNoLiar, "secondary grow nomination-none");
+                        none.name = "nomination-no-liar";
+                        none.EnableInClassList("create-mode-selected", noLiarSelected);
+                        none.SetEnabled(CanSelectNoLiar(state));
+                    }
+                    var submit = Button(actions, voteSubmitted ? "제출 중" : "지목하기", SubmitVote, "primary nomination-submit", DrawSound.UiConfirm);
                     submit.name = "nomination-submit";
-                    submit.SetEnabled(target != null && CanSelectVote(state, target));
+                    submit.SetEnabled(noLiarSelected ? CanSelectNoLiar(state) : target != null && CanSelectVote(state, target));
                 }
                 voteProgress = Text(_judgmentPanel, "", "nomination-progress");
                 voteProgress.name = "nomination-progress";

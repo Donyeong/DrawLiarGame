@@ -13,7 +13,11 @@ async function run(options = {}) {
     const client = { request: async request => {
         calls.push(request);
         if (options.failure && request.url.includes(options.failure)) throw { response: { status: 403, data: 'SECRET_HTTP_BODY' }, message: 'SECRET_AUTH_SIGNATURE' };
-        if (request.url.includes('/androidApps/')) return { data: { packageName: options.wrongPackage ? 'com.rascallab.konasurvival' : 'com.rascallab.drawliar' } };
+        if (request.url.includes('/androidApps/')) return { data: { packageName: options.wrongPackage ? 'com.rascallab.konasurvival' : 'com.rascallab.liargame' } };
+        if (request.url.endsWith('/aabInfo')) return { data: {
+            name: options.wrongAabApp ? 'projects/999/apps/other/aabInfo' : `${app}/aabInfo`,
+            integrationState: options.aabState || 'INTEGRATED',
+        } };
         if (request.url.includes('/groups/')) {
             groupReads++;
             return { data: { name: 'projects/123/groups/drawliar-testers', testerCount: groupReads > 1 && options.joinedDuringUpload ? 1 : options.testers || 0 } };
@@ -52,6 +56,7 @@ test('빈 전용 그룹 배포와 APK 스트리밍, 버전·안전한 링크만 
     const value = await run();
     assert.equal(value.error, undefined);
     assert.equal(value.result.Success, true);
+    assert.equal(value.result.Format, 'APK');
     assert.equal(value.result.Distribution, 'EMPTY_GROUP');
     assert.equal(value.result.DisplayVersion, '1.0.0');
     assert.equal(value.result.BuildVersion, '5');
@@ -61,6 +66,47 @@ test('빈 전용 그룹 배포와 APK 스트리밍, 버전·안전한 링크만 
     assert.equal(upload.retry, false);
     assert.equal(value.calls.at(-1).data.groupAliases[0], 'drawliar-testers');
     assert.doesNotMatch(JSON.stringify(value.writes) + value.logs.join(), /SECRET_SIGNED_URL|binaryDownloadUri/);
+    assert.equal(value.calls.some(call => call.url.endsWith('/aabInfo')), false);
+});
+test('연결된 AAB는 그룹 배포와 다운로드 링크까지 처리', async () => {
+    for (const aabState of ['INTEGRATED', 'AAB_STATE_UNAVAILABLE']) {
+        const value = await run({ aabState, testers: 2, env: {
+            BUILD_FILE: 'DrawLiar.AAB', FIREBASE_ALLOW_TESTER_EMAIL: 'true',
+            DOWNLOAD_RESULT: '.jenkins-private/FirebaseDownload.json',
+        } });
+        assert.equal(value.error, undefined);
+        assert.equal(value.result.Format, 'AAB');
+        assert.equal(value.result.Distribution, 'DISTRIBUTED');
+        assert.equal(value.result.TestingUri, value.testingUri);
+        assert.ok(value.calls.findIndex(call => call.url.endsWith('/aabInfo')) < value.calls.findIndex(call => call.url.includes('/upload/')));
+        assert.equal(value.calls.find(call => call.url.includes('/upload/')).headers['X-Goog-Upload-File-Name'], 'DrawLiar.AAB');
+        assert.doesNotMatch(JSON.stringify(value.writes.filter(write => !write.file.includes('.jenkins-private'))) + value.logs.join(), /SECRET_SIGNED_URL|BinaryDownloadUri/);
+    }
+});
+test('AAB 연결 미완료는 상태를 기록하고 업로드·배포 전 중단', async () => {
+    for (const aabState of ['PLAY_ACCOUNT_NOT_LINKED', 'NO_APP_WITH_GIVEN_BUNDLE_ID_IN_PLAY_ACCOUNT', 'APP_NOT_PUBLISHED', 'PLAY_IAS_TERMS_NOT_ACCEPTED', 'AAB_INTEGRATION_STATE_UNSPECIFIED']) {
+        const value = await run({ aabState, env: { BUILD_FILE: 'DrawLiar.aab' } });
+        assert.match(value.error.message, /Firebase AAB 배포 준비/);
+        assert.equal(value.calls.some(call => call.method), false);
+        const result = JSON.parse(value.writes.at(-1).content);
+        assert.equal(result.Success, false);
+        assert.equal(result.AabIntegrationState, aabState);
+    }
+    const wrong = await run({ wrongAabApp: true, env: { BUILD_FILE: 'DrawLiar.aab' } });
+    assert.ok(wrong.error);
+    assert.equal(wrong.calls.some(call => call.method), false);
+});
+test('AAB 사전 검사는 Play 연결도 조회하며 클라우드·파일 수정 없음', async () => {
+    const value = await run({ check: true, env: { BUILD_FORMAT: 'AAB' } });
+    assert.equal(value.error, undefined);
+    assert.equal(value.calls.some(call => call.url.endsWith('/aabInfo')), true);
+    assert.equal(value.calls.every(call => !call.method), true);
+    assert.equal(value.writes.length, 0);
+});
+test('지원하지 않는 파일 형식은 인증·업로드 전 중단', async () => {
+    const value = await run({ env: { BUILD_FILE: 'DrawLiar.zip' } });
+    assert.match(value.error.message, /APK 또는 AAB/);
+    assert.equal(value.calls.length, 0);
 });
 test('테스터가 있으면 기본값으로 이메일 없이 업로드만 유지', async () => {
     const value = await run({ testers: 2 });

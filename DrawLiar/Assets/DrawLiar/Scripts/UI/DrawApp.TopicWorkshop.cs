@@ -74,11 +74,11 @@ namespace DrawLiar
             _workshopPublishLanguageField = _workshopBrowseLanguageField = null;
             _workshopLimits = _workshopError = _workshopOwnCount = _workshopTotal = _workshopPage = null;
             _workshopSave = _workshopPublish = _workshopPrevious = _workshopNext = _workshopRefresh = null;
-            _workshopMineField = null;
+            _workshopMineField = null; _workshopTitle = null;
         }
 
         private bool IsCurrentTopicWorkshop(int version, string accountId, VisualElement view = null) => this != null && isActiveAndEnabled
-            && _workshopActive && _workshopVersion == version && lobbyScreen == LobbyScreen.Topics && lobby.IsAuthenticated
+            && _workshopActive && _workshopVersion == version && (!inRoom && lobbyScreen == LobbyScreen.Topics || IsRoomTopicWorkshop) && lobby.IsAuthenticated
             && lobby.Profile?.AccountId == accountId && _workshopAccountId == accountId
             && (view == null || ReferenceEquals(_workshopView, view) && view.panel != null);
 
@@ -175,6 +175,7 @@ namespace DrawLiar
             if (!_workshopActive || _workshopView == null) return;
             bool entering = browse && !_workshopBrowse;
             _workshopBrowse = browse;
+            if (_workshopTitle != null) SetText(_workshopTitle, browse ? "창작마당" : "나만의 주제");
             _workshopEditor.style.display = browse ? DisplayStyle.None : DisplayStyle.Flex;
             _workshopBrowser.style.display = browse ? DisplayStyle.Flex : DisplayStyle.None;
             _workshopView.Q<Button>("workshop-local-tab").EnableInClassList("workshop-tab-selected", !browse);
@@ -250,7 +251,13 @@ namespace DrawLiar
             catch (Exception exception) { DrawAudio.Instance?.Play(DrawSound.UiError); Toast(exception.Message); }
         }
 
-        private void SelectWorkshopTopic(string name) => draft.Topics = (draft.Topics ?? Array.Empty<string>()).Append(name).Distinct().ToArray();
+        private void SelectWorkshopTopic(string name)
+        {
+            var settings = TopicWorkshopSettings;
+            if (settings == null) return;
+            settings.Topics = (settings.Topics ?? Array.Empty<string>()).Append(name).Distinct().ToArray();
+            SelectWorkshopRoomTopic(name);
+        }
 
         private void RenderWorkshopLocalTopics()
         {
@@ -267,7 +274,10 @@ namespace DrawLiar
                     if (_workshopBusy || _workshopLoading || lobby.IsBusy || !IsCurrentTopicWorkshop(_workshopVersion, _workshopAccountId, _workshopView)) return;
                     try
                     {
-                        GameDataStore.DeleteCustomTopic(topic.Name); draft.Topics = draft.Topics?.Where(value => value != topic.Name).ToArray();
+                        GameDataStore.DeleteCustomTopic(topic.Name);
+                        var settings = TopicWorkshopSettings;
+                        if (settings != null) settings.Topics = settings.Topics?.Where(value => value != topic.Name).ToArray();
+                        if (IsRoomTopicWorkshop) _roomOptionsCustomTopics.Remove(topic.Name);
                         if (_workshopSelectedLocal?.Name == topic.Name) NewWorkshopTopic();
                         RenderWorkshopLocalTopics(); RefreshTopicWorkshopControls();
                     }

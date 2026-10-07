@@ -18,7 +18,7 @@ public sealed partial class ServerDatabase
         Guid currentOwner;
         bool inProgress;
         Guid? lastOperation;
-        string[] customTopics;
+        ServerTopicData[] customTopics;
         await using (var command = Command(connection, transaction, """
             SELECT r."OwnerAccountId",r."IsInProgress",r."Settings"::text,r."PasswordHash",r."ConfigurationVersion",
                 r."AccessVersion",r."LastConfigurationId",r."CustomTopics"::text
@@ -36,16 +36,16 @@ public sealed partial class ServerDatabase
             version = reader.GetInt64(4);
             accessVersion = reader.GetInt64(5);
             lastOperation = reader.IsDBNull(6) ? null : reader.GetGuid(6);
-            customTopics = (JsonSerializer.Deserialize<ServerTopicData[]>(reader.GetString(7), ServerRuntime.Json) ?? []).Select(topic => topic.Name).ToArray();
+            customTopics = JsonSerializer.Deserialize<ServerTopicData[]>(reader.GetString(7), ServerRuntime.Json) ?? [];
         }
         if (lastOperation == operationId)
-            return new RoomConfigurationData { RoomId = request.RoomId, Settings = current, Version = version, AccessVersion = accessVersion };
+            return new RoomConfigurationData { RoomId = request.RoomId, Settings = current, CustomTopics = customTopics, Version = version, AccessVersion = accessVersion };
         if (currentOwner != owner || inProgress) throw new ApiException("RoomConfigurationDenied", 403);
         await using (var account = Command(connection, transaction, "SELECT \"Id\" FROM \"Account\" WHERE \"Id\"=$1 AND NOT \"IsBanned\" FOR SHARE", owner))
             if (await account.ExecuteScalarAsync(cancellationToken) == null) throw new ApiException("AccountUnavailable", 403);
         if (version != request.ExpectedVersion) throw new ApiException("RoomConfigurationChanged", 409);
-        var knownTopics = new HashSet<string>(_builtInTopicNames.Value.Concat(customTopics), StringComparer.Ordinal);
-        if (settings.Topics.Length == 0 || settings.Topics.Any(topic => !knownTopics.Contains(topic))) throw new ApiException("InvalidTopics");
+        customTopics = MergeCustomTopics(customTopics, request.CustomTopics);
+        ValidateSelectedTopics(settings, customTopics);
         string? passwordHash = null;
         if (settings.IsPrivate)
         {
@@ -57,8 +57,9 @@ public sealed partial class ServerDatabase
         version++;
         await using (var update = Command(connection, transaction, """
             UPDATE "Room" SET "Settings"=$2::jsonb,"PasswordHash"=$3,"ConfigurationVersion"=$4,
-                "AccessVersion"=$5,"LastConfigurationId"=$6,"UpdatedAt"=now() WHERE "RoomId"=$1
-            """, roomId, JsonSerializer.Serialize(settings, ServerRuntime.Json), passwordHash, version, accessVersion, operationId))
+                "AccessVersion"=$5,"LastConfigurationId"=$6,"CustomTopics"=$7::jsonb,"UpdatedAt"=now() WHERE "RoomId"=$1
+            """, roomId, JsonSerializer.Serialize(settings, ServerRuntime.Json), passwordHash, version, accessVersion, operationId,
+            JsonSerializer.Serialize(customTopics, ServerRuntime.Json)))
             await update.ExecuteNonQueryAsync(cancellationToken);
         if (changeAccess)
         {
@@ -78,6 +79,6 @@ public sealed partial class ServerDatabase
             await roster.ExecuteNonQueryAsync(cancellationToken);
         }
         await transaction.CommitAsync(cancellationToken);
-        return new RoomConfigurationData { RoomId = request.RoomId, Settings = settings, Version = version, AccessVersion = accessVersion };
+        return new RoomConfigurationData { RoomId = request.RoomId, Settings = settings, CustomTopics = customTopics, Version = version, AccessVersion = accessVersion };
     }
 }

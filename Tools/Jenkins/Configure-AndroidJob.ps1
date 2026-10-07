@@ -10,7 +10,7 @@ $headers = @{ Authorization = 'Basic ' + [Convert]::ToBase64String([Text.Encodin
 $pipeline = [IO.File]::ReadAllText((Join-Path $repository 'Jenkinsfile.Android'))
 $validation = Invoke-RestMethod "$base/pipeline-model-converter/validate" -Headers $headers -Method Post -Body @{ jenkinsfile = $pipeline }
 if ($validation -notmatch 'Jenkinsfile successfully validated') { throw 'Jenkins rejected the Android pipeline definition.' }
-$document = [xml]'<flow-definition plugin="workflow-job"><description>DrawLiar Android APK/AAB. Local working-tree snapshot into C:\DrawLiarJenkins; daily 01:00 Asia/Seoul; Firebase and Discord.</description><keepDependencies>false</keepDependencies><properties/><definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps"><script/><sandbox>true</sandbox></definition><triggers/><disabled>false</disabled></flow-definition>'
+$document = [xml]'<flow-definition plugin="workflow-job"><description>DrawLiar Android APK/AAB. Local working-tree snapshot into C:\DrawLiarJenkins; daily 01:00 Asia/Seoul; Firebase APK and Google Play AAB.</description><keepDependencies>false</keepDependencies><properties/><definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps"><script/><sandbox>true</sandbox></definition><triggers/><disabled>false</disabled></flow-definition>'
 $document.'flow-definition'.definition.script = $pipeline
 $jobs = (Invoke-RestMethod "$base/api/json?tree=jobs[name]" -Headers $headers).jobs.name
 if ($jobs -contains $JobName) {

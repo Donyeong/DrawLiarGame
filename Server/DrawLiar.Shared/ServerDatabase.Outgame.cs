@@ -22,7 +22,7 @@ public sealed partial class ServerDatabase
         }
         else
         {
-            int ownedMask = Convert.ToInt32(await Scalar(connection, transaction, "SELECT COALESCE(bit_or(\"Accessory\"),0) FROM \"OwnedAccessory\" WHERE \"AccountId\"=$1", accountId));
+            long ownedMask = Convert.ToInt64(await Scalar(connection, transaction, "SELECT COALESCE(bit_or(\"Accessory\"),0) FROM \"OwnedAccessory\" WHERE \"AccountId\"=$1", accountId));
             if ((ownedMask & product.Accessory) == product.Accessory)
                 throw new ApiException("AlreadyOwned", 409);
             int changed = await Execute(connection, transaction, "UPDATE \"Account\" SET \"Coins\"=\"Coins\"-$2 WHERE \"Id\"=$1 AND \"Coins\">=$2 AND NOT \"IsBanned\"", accountId, product.Price);
@@ -50,7 +50,7 @@ public sealed partial class ServerDatabase
         await using var reader = await command.ExecuteReaderAsync();
         while (await reader.ReadAsync())
         {
-            var friend = new FriendData { AccountId = reader.GetGuid(0).ToString(), DisplayName = reader.GetString(1), AvatarColor = reader.GetInt32(2), Accessory = reader.GetInt32(3) };
+            var friend = new FriendData { AccountId = reader.GetGuid(0).ToString(), DisplayName = reader.GetString(1), AvatarColor = reader.GetInt32(2), Accessory = AvatarParts.Sanitize(reader.GetInt64(3)) };
             if (reader.GetBoolean(4)) friends.Add(friend);
             else if (reader.GetGuid(5) == accountId) outgoing.Add(friend);
             else incoming.Add(friend);

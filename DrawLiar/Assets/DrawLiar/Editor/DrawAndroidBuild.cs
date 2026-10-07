@@ -13,7 +13,7 @@ namespace DrawLiar.Editor
     {
         private const string UNITY_VERSION = "6000.3.20f1";
         private const string SCENE_PATH = "Assets/DrawLiar/Scenes/DrawLiar.unity";
-        private const string APPLICATION_ID = "com.rascallab.drawliar";
+        private const string APPLICATION_ID = "com.rascallab.liargame";
         private const long MIN_FREE_DISK_BYTES = 10L * 1024 * 1024 * 1024;
 
         [Serializable]

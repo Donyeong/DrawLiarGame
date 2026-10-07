@@ -5,12 +5,14 @@ namespace DrawLiar.Server;
 
 public sealed partial class ServerDatabase
 {
-    private static readonly Lazy<HashSet<string>> _builtInTopicNames = new(() =>
+    private static readonly Lazy<ServerTopicData[]> _builtInTopics = new(() =>
     {
         using var stream = typeof(ServerDatabase).Assembly.GetManifestResourceStream("DrawLiar.BuiltInGameData.json")!;
         using var document = JsonDocument.Parse(stream);
-        return document.RootElement.GetProperty("Topics").EnumerateArray().Select(topic => topic.GetProperty("Name").GetString()!).ToHashSet(StringComparer.Ordinal);
+        return document.RootElement.GetProperty("Topics").Deserialize<ServerTopicData[]>(ServerRuntime.Json)!;
     });
+    private static readonly Lazy<HashSet<string>> _builtInTopicNames = new(() => _builtInTopics.Value
+        .Select(topic => topic.Name).ToHashSet(StringComparer.Ordinal));
     public async Task RegisterGameAsync(RegisterGameRequest request, bool allowHttp)
     {
         ValidateNode(request.NodeId, request.PublicUrl, false, allowHttp);
@@ -105,10 +107,11 @@ public sealed partial class ServerDatabase
                 "Established"="Established" OR $10 WHERE "RoomId"=$1 AND "NodeId"=$2
                 """, roomId, request.NodeId, room.PlayerCount, room.SpectatorCount, room.IsInProgress, owner,
                 JsonSerializer.Serialize(room.PlayerAccountIds), JsonSerializer.Serialize(room.SpectatorAccountIds), JsonSerializer.Serialize(room.Settings, ServerRuntime.Json), room.AdmissionIds.Length > 0 || room.PlayerCount + room.SpectatorCount > 0, room.ConfigurationVersion);
-            await using (var configuration = Command(connection, transaction, "SELECT \"Settings\"::text,\"ConfigurationVersion\",\"AccessVersion\" FROM \"Room\" WHERE \"RoomId\"=$1 AND \"NodeId\"=$2 AND \"ConfigurationVersion\"<>$3", roomId, request.NodeId, room.ConfigurationVersion))
+            await using (var configuration = Command(connection, transaction, "SELECT \"Settings\"::text,\"ConfigurationVersion\",\"AccessVersion\",\"CustomTopics\"::text FROM \"Room\" WHERE \"RoomId\"=$1 AND \"NodeId\"=$2 AND \"ConfigurationVersion\"<>$3", roomId, request.NodeId, room.ConfigurationVersion))
             await using (var reader = await configuration.ExecuteReaderAsync())
                 if (await reader.ReadAsync()) configurations.Add(new RoomConfigurationData { RoomId = room.RoomId,
-                    Settings = JsonSerializer.Deserialize<ServerRoomSettings>(reader.GetString(0), ServerRuntime.Json)!, Version = reader.GetInt64(1), AccessVersion = reader.GetInt64(2) });
+                    Settings = JsonSerializer.Deserialize<ServerRoomSettings>(reader.GetString(0), ServerRuntime.Json)!, Version = reader.GetInt64(1), AccessVersion = reader.GetInt64(2),
+                    CustomTopics = JsonSerializer.Deserialize<ServerTopicData[]>(reader.GetString(3), ServerRuntime.Json)! });
             if (room.Closed)
             {
                 // 발급·교환 중인 입장권이 끝난 뒤 GS가 방 종료를 승인한다.
@@ -370,8 +373,8 @@ public sealed partial class ServerDatabase
     public static void ValidateSettings(ServerRoomSettings settings)
     {
         settings.MaxPlayers = ServerRoomSettings.MAX_PLAYERS;
-        if (settings.LiarMode is < 0 or > 1) throw new ApiException("InvalidSettings");
-        if (settings.LiarMode == 1) settings.LiarCount = 1;
+        if (settings.LiarMode is < 0 or > 2) throw new ApiException("InvalidSettings");
+        if (settings.LiarMode != 0) settings.LiarCount = 1;
         if (settings.LiarCount < 1 || settings.LiarCount >= settings.MaxPlayers || settings.RoundCount is < 1 or > 30 || settings.TargetScore is < 1 or > 1000
             || settings.Mode is < 0 or > 1 || settings.Victory is < 0 or > 1 || settings.RoleSeconds is < 3 or > 30 || settings.DrawSeconds is < 5 or > 180
             || settings.DiscussionSeconds is < 5 or > 300 || settings.RebuttalSeconds is < 0 or > 180 || settings.VoteSeconds is < 5 or > 120
@@ -397,5 +400,30 @@ public sealed partial class ServerDatabase
             topic.Name = topic.Name.Trim();
             topic.Words = topic.Words.Select(word => word.Trim()).Distinct().ToArray();
         }
+    }
+
+    public static ServerTopicData[] MergeCustomTopics(ServerTopicData[]? existing, ServerTopicData[]? updates)
+    {
+        static ServerTopicData[] Copy(ServerTopicData[]? topics) => (topics ?? []).Select(topic => topic == null ? null!
+            : new ServerTopicData { Name = topic.Name, Words = topic.Words?.ToArray()! }).ToArray();
+        var additions = Copy(updates);
+        ValidateCustomTopics(additions);
+        var current = Copy(existing);
+        ValidateCustomTopics(current);
+        var merged = current.ToDictionary(topic => topic.Name, StringComparer.Ordinal);
+        foreach (var topic in additions) merged[topic.Name] = topic;
+        var result = merged.Values.ToArray();
+        ValidateCustomTopics(result);
+        return result;
+    }
+
+    private static void ValidateSelectedTopics(ServerRoomSettings settings, ServerTopicData[] customTopics)
+    {
+        var available = _builtInTopics.Value.Concat(customTopics).ToDictionary(topic => topic.Name, StringComparer.Ordinal);
+        if (settings.Topics.Length == 0 || settings.Topics.Any(topic => !available.ContainsKey(topic))) throw new ApiException("InvalidTopics");
+        if (settings.LiarMode == 1 && !settings.Topics.Any(name => available[name].Words.Select(word => new string(word
+                .Normalize(System.Text.NormalizationForm.FormKC).Where(character => !char.IsWhiteSpace(character)).ToArray()).ToLowerInvariant())
+                .Where(word => word.Length > 0).Distinct().Take(2).Count() >= 2))
+            throw new ApiException("InvalidTopics");
     }
 }

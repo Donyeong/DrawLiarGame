@@ -106,7 +106,7 @@ internal static partial class Integration
             AddInvalid(request => request.Players[0].CorrectGuesses = 2);
             AddInvalid(request => request.Players[0].Rank = 2);
             AddInvalid(request => request.Players[1].AccountId = request.Players[0].AccountId);
-            AddInvalid(request => request.Players = request.Players.Take(2).ToArray());
+            AddInvalid(request => request.Players = request.Players.Take(1).ToArray());
             AddInvalid(request => request.RoundCount = 0);
             AddInvalid(request => request.Mode = 2);
             AddInvalid(request => request.MatchId = Guid.Empty.ToString());

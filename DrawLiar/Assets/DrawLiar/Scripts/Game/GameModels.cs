@@ -6,7 +6,7 @@ namespace DrawLiar
 {
     public enum GamePhase { Lobby, RoleReveal, Drawing, Discussion, Rebuttal, Voting, LiarReveal, Guessing, RoundResults, MatchResults }
     public enum DrawingMode { Relay, Individual }
-    public enum LiarMode { Classic = 0, Mismatch = 1 }
+    public enum LiarMode { Classic = 0, Mismatch = 1, Optional = 2 }
     public enum VictoryMode { RoundCount, TargetScore }
     public enum GuessOutcome { Hidden, Correct, Incorrect, Unanswered }
 
@@ -44,7 +44,7 @@ namespace DrawLiar
         {
             MaxPlayers = GameRules.MAX_PLAYERS;
             if (!Enum.IsDefined(typeof(LiarMode), LiarMode)) LiarMode = DrawLiar.LiarMode.Classic;
-            LiarCount = LiarMode == DrawLiar.LiarMode.Mismatch ? 1 : Clamp(LiarCount, 1, MaxPlayers - 1);
+            LiarCount = LiarMode == DrawLiar.LiarMode.Classic ? Clamp(LiarCount, 1, MaxPlayers - 1) : 1;
             RoundCount = Clamp(RoundCount, 1, 30);
             TargetScore = Clamp(TargetScore, 1, 1000);
             RoleSeconds = Clamp(RoleSeconds, 3, 30);
@@ -78,7 +78,7 @@ namespace DrawLiar
         public bool IsLiar;
         public bool IsCaught;
         public int AvatarColor;
-        public int Accessory;
+        public long Accessory;
         public bool HasVoted;
         public bool HasJudged;
         public bool HasGuessed;
@@ -123,6 +123,7 @@ namespace DrawLiar
         public string Word = "";
         public string MismatchWord = "";
         public bool LocalIsLiar;
+        public int RevealedLiarCount = -1;
         public bool LocalIsSpectator;
         public int LocalPlayerId = -1;
         public int HostPlayerId;

@@ -33,6 +33,7 @@ public sealed partial class ServerDatabase
                 "INSERT INTO \"Account\" (\"Id\",\"DisplayName\",\"GuestId\",\"GuestSecretHash\",\"AvatarColor\") VALUES ($1,$2,$3,$4,$5)",
                 accountId, GuestNicknameGenerator.Create(), guestId, GuestCredential.Hash(request.GuestSecret), Random.Shared.Next(6));
             await create.ExecuteNonQueryAsync(cancellationToken);
+            await GrantDefaultAccessories(connection, transaction, accountId, cancellationToken);
         }
         else
         {

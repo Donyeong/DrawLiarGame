@@ -19,6 +19,7 @@ namespace DrawLiar
         public bool Approve;
         public int BallotVersion;
         public RoomSettings Settings;
+        public ServerTopicData[] CustomTopics;
         public RoomSnapshot State;
         public DrawStroke Stroke;
         public int Version;

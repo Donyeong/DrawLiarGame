@@ -6886,23 +6886,6 @@
       ]
     },
     {
-      "Key": "표정",
-      "Values": [
-        "표정",
-        "Expression",
-        "表情",
-        "表情",
-        "表情",
-        "Expresión",
-        "Expressão",
-        "Expression",
-        "Mimik",
-        "Ekspresi",
-        "भाव",
-        "التعبير"
-      ]
-    },
-    {
       "Key": "몸통",
       "Values": [
         "몸통",
@@ -6954,139 +6937,54 @@
       ]
     },
     {
-      "Key": "졸린 표정",
+      "Key": "졸린 얼굴",
       "Values": [
-        "졸린 표정",
-        "Sleepy face",
-        "困倦表情",
-        "睏倦表情",
-        "眠そうな顔",
+        "졸린 얼굴",
+        "Sleepy Face",
+        "困倦脸",
+        "困倦臉",
+        "ねむい顔",
         "Cara soñolienta",
         "Rosto sonolento",
-        "Visage endormi",
-        "Schläfriger Blick",
-        "Wajah mengantuk",
-        "उनींदा चेहरा",
+        "Visage somnolent",
+        "Schläfriges Gesicht",
+        "Wajah Mengantuk",
+        "नींद भरा चेहरा",
         "وجه نعسان"
       ]
     },
     {
-      "Key": "놀란 표정",
+      "Key": "놀란 얼굴",
       "Values": [
-        "놀란 표정",
-        "Surprised face",
-        "惊讶表情",
-        "驚訝表情",
-        "驚き顔",
+        "놀란 얼굴",
+        "Surprised Face",
+        "惊讶脸",
+        "驚訝臉",
+        "びっくり顔",
         "Cara sorprendida",
         "Rosto surpreso",
         "Visage surpris",
-        "Überraschter Blick",
-        "Wajah terkejut",
+        "Überraschtes Gesicht",
+        "Wajah Terkejut",
         "हैरान चेहरा",
-        "وجه متفاجئ"
+        "وجه مندهش"
       ]
     },
     {
-      "Key": "단호한 표정",
+      "Key": "단호한 얼굴",
       "Values": [
-        "단호한 표정",
-        "Determined face",
-        "坚定表情",
-        "堅定表情",
-        "決意の顔",
+        "단호한 얼굴",
+        "Determined Face",
+        "坚定脸",
+        "堅定臉",
+        "きりっとした顔",
         "Cara decidida",
         "Rosto determinado",
         "Visage déterminé",
-        "Entschlossener Blick",
-        "Wajah bertekad",
+        "Entschlossenes Gesicht",
+        "Wajah Tegas",
         "दृढ़ चेहरा",
         "وجه حازم"
-      ]
-    },
-    {
-      "Key": "화가 앞치마",
-      "Values": [
-        "화가 앞치마",
-        "Painter's apron",
-        "画家围裙",
-        "畫家圍裙",
-        "画家のエプロン",
-        "Delantal de pintor",
-        "Avental de pintor",
-        "Tablier de peintre",
-        "Malerschürze",
-        "Celemek pelukis",
-        "चित्रकार का एप्रन",
-        "مئزر الرسام"
-      ]
-    },
-    {
-      "Key": "줄무늬 셔츠",
-      "Values": [
-        "줄무늬 셔츠",
-        "Striped shirt",
-        "条纹衬衫",
-        "條紋襯衫",
-        "ボーダーシャツ",
-        "Camisa a rayas",
-        "Camisa listrada",
-        "Chemise rayée",
-        "Gestreiftes Hemd",
-        "Kemeja bergaris",
-        "धारीदार कमीज़",
-        "قميص مخطط"
-      ]
-    },
-    {
-      "Key": "물방울 셔츠",
-      "Values": [
-        "물방울 셔츠",
-        "Polka-dot shirt",
-        "波点衬衫",
-        "圓點襯衫",
-        "ドットシャツ",
-        "Camisa de lunares",
-        "Camisa de bolinhas",
-        "Chemise à pois",
-        "Gepunktetes Hemd",
-        "Kemeja polkadot",
-        "बिंदियों वाली कमीज़",
-        "قميص منقط"
-      ]
-    },
-    {
-      "Key": "멜빵 바지",
-      "Values": [
-        "멜빵 바지",
-        "Overalls",
-        "背带裤",
-        "吊帶褲",
-        "オーバーオール",
-        "Peto",
-        "Jardineira",
-        "Salopette",
-        "Latzhose",
-        "Celana kodok",
-        "डंगरी",
-        "بنطال بحمالات"
-      ]
-    },
-    {
-      "Key": "별 스웨터",
-      "Values": [
-        "별 스웨터",
-        "Star sweater",
-        "星星毛衣",
-        "星星毛衣",
-        "星柄セーター",
-        "Suéter de estrellas",
-        "Suéter de estrelas",
-        "Pull à étoiles",
-        "Sternenpullover",
-        "Sweter bintang",
-        "सितारों वाला स्वेटर",
-        "سترة بنجوم"
       ]
     },
     {
@@ -7818,6 +7716,499 @@
         "Mendapat {0} koin",
         "{0} सिक्के मिले",
         "حصلت على {0} عملات"
+      ]
+    },
+    {
+      "Key": "불확정",
+      "Values": [
+        "불확정",
+        "Uncertainty",
+        "不确定",
+        "不確定",
+        "不確定",
+        "Incertidumbre",
+        "Incerteza",
+        "Incertitude",
+        "Ungewissheit",
+        "Ketidakpastian",
+        "अनिश्चितता",
+        "عدم اليقين"
+      ]
+    },
+    {
+      "Key": "라이어 없음",
+      "Values": [
+        "라이어 없음",
+        "No Liar",
+        "没有说谎者",
+        "沒有說謊者",
+        "ライアーなし",
+        "Sin mentiroso",
+        "Sem mentiroso",
+        "Aucun menteur",
+        "Kein Lügner",
+        "Tidak Ada Pembohong",
+        "कोई झूठा नहीं",
+        "لا يوجد كاذب"
+      ]
+    },
+    {
+      "Key": "의심스러운 사람 또는 ‘라이어 없음’을 선택하세요",
+      "Values": [
+        "의심스러운 사람 또는 ‘라이어 없음’을 선택하세요",
+        "Choose a suspect or “No Liar”",
+        "选择可疑的人或“没有说谎者”",
+        "選擇可疑的人或「沒有說謊者」",
+        "怪しい人か「ライアーなし」を選んでください",
+        "Elige a un sospechoso o «Sin mentiroso»",
+        "Escolha um suspeito ou “Sem mentiroso”",
+        "Choisissez un suspect ou « Aucun menteur »",
+        "Wähle einen Verdächtigen oder „Kein Lügner“",
+        "Pilih tersangka atau “Tidak Ada Pembohong”",
+        "किसी संदिग्ध या “कोई झूठा नहीं” को चुनें",
+        "اختر شخصًا مشتبهًا به أو «لا يوجد كاذب»"
+      ]
+    },
+    {
+      "Key": "라이어가 없다고 생각하나요?",
+      "Values": [
+        "라이어가 없다고 생각하나요?",
+        "Do you think there is no liar?",
+        "你认为没有说谎者吗？",
+        "你認為沒有說謊者嗎？",
+        "ライアーはいないと思いますか？",
+        "¿Crees que no hay mentiroso?",
+        "Você acha que não há mentiroso?",
+        "Pensez-vous qu’il n’y a aucun menteur ?",
+        "Glaubst du, dass es keinen Lügner gibt?",
+        "Menurutmu tidak ada pembohong?",
+        "क्या आपको लगता है कि कोई झूठा नहीं है?",
+        "هل تعتقد أنه لا يوجد كاذب؟"
+      ]
+    },
+    {
+      "Key": "이번 라운드에는 라이어가 없습니다.",
+      "Values": [
+        "이번 라운드에는 라이어가 없습니다.",
+        "There is no liar this round.",
+        "本轮没有说谎者。",
+        "本輪沒有說謊者。",
+        "このラウンドにはライアーがいません。",
+        "No hay mentiroso en esta ronda.",
+        "Não há mentiroso nesta rodada.",
+        "Il n’y a aucun menteur dans cette manche.",
+        "In dieser Runde gibt es keinen Lügner.",
+        "Tidak ada pembohong di ronde ini.",
+        "इस राउंड में कोई झूठा नहीं है।",
+        "لا يوجد كاذب في هذه الجولة."
+      ]
+    },
+    {
+      "Key": "확인 투표",
+      "Values": [
+        "확인 투표",
+        "Confirmation Vote",
+        "确认投票",
+        "確認投票",
+        "確認投票",
+        "Voto de confirmación",
+        "Votação de confirmação",
+        "Vote de confirmation",
+        "Bestätigungsabstimmung",
+        "Voting Konfirmasi",
+        "पुष्टि मतदान",
+        "تصويت التأكيد"
+      ]
+    },
+    {
+      "Key": "라이어는 제시어를 모릅니다. 그림을 보고 라이어를 찾으세요.\n최소 {0}명",
+      "Values": [
+        "라이어는 제시어를 모릅니다. 그림을 보고 라이어를 찾으세요.\n최소 {0}명",
+        "Liars do not know the word. Find them through their drawings.\nMinimum: {0} players",
+        "说谎者不知道提示词。通过绘画找出说谎者。\n至少 {0} 人",
+        "說謊者不知道提示詞。透過繪畫找出說謊者。\n至少 {0} 人",
+        "ライアーはお題の単語を知りません。絵を見て見つけましょう。\n最低 {0} 人",
+        "Los mentirosos no conocen la palabra. Encuéntralos por sus dibujos.\nMínimo: {0} jugadores",
+        "Os mentirosos não sabem a palavra. Encontre-os pelos desenhos.\nMínimo: {0} jogadores",
+        "Les menteurs ne connaissent pas le mot. Repérez-les grâce aux dessins.\nMinimum : {0} joueurs",
+        "Lügner kennen das Wort nicht. Finde sie anhand der Zeichnungen.\nMindestens {0} Spieler",
+        "Pembohong tidak tahu kata yang diberikan. Temukan mereka lewat gambar.\nMinimal: {0} pemain",
+        "झूठों को दिया गया शब्द नहीं पता। चित्र देखकर उन्हें पहचानें।\nकम से कम {0} खिलाड़ी",
+        "الكاذبون لا يعرفون الكلمة. اكتشفهم من رسوماتهم.\nالحد الأدنى: {0} لاعبين"
+      ]
+    },
+    {
+      "Key": "한 명에게만 다른 제시어가 주어집니다. 누구도 자신의 역할을 알 수 없습니다.\n최소 {0}명",
+      "Values": [
+        "한 명에게만 다른 제시어가 주어집니다. 누구도 자신의 역할을 알 수 없습니다.\n최소 {0}명",
+        "One player receives a different word. Nobody knows their own role.\nMinimum: {0} players",
+        "只有一人得到不同的提示词。所有人都不知道自己的身份。\n至少 {0} 人",
+        "只有一人得到不同的提示詞。所有人都不知道自己的身分。\n至少 {0} 人",
+        "1人だけ違う単語が与えられます。誰も自分の役割を知りません。\n最低 {0} 人",
+        "Un jugador recibe otra palabra. Nadie conoce su propio rol.\nMínimo: {0} jugadores",
+        "Um jogador recebe outra palavra. Ninguém sabe seu próprio papel.\nMínimo: {0} jogadores",
+        "Un joueur reçoit un mot différent. Personne ne connaît son rôle.\nMinimum : {0} joueurs",
+        "Ein Spieler erhält ein anderes Wort. Niemand kennt seine eigene Rolle.\nMindestens {0} Spieler",
+        "Satu pemain mendapat kata berbeda. Tidak ada yang tahu perannya sendiri.\nMinimal: {0} pemain",
+        "एक खिलाड़ी को अलग शब्द मिलता है। किसी को अपनी भूमिका नहीं पता।\nकम से कम {0} खिलाड़ी",
+        "يحصل لاعب واحد على كلمة مختلفة. لا أحد يعرف دوره.\nالحد الأدنى: {0} لاعبين"
+      ]
+    },
+    {
+      "Key": "라운드마다 라이어가 0명 또는 1명입니다. ‘라이어 없음’에도 투표할 수 있습니다.\n최소 {0}명",
+      "Values": [
+        "라운드마다 라이어가 0명 또는 1명입니다. ‘라이어 없음’에도 투표할 수 있습니다.\n최소 {0}명",
+        "Each round has zero or one liar. You can also vote “No Liar”.\nMinimum: {0} players",
+        "每轮有零名或一名说谎者。也可以投票选择“没有说谎者”。\n至少 {0} 人",
+        "每輪有零名或一名說謊者。也可以投票選擇「沒有說謊者」。\n至少 {0} 人",
+        "各ラウンドのライアーは0人か1人です。「ライアーなし」にも投票できます。\n最低 {0} 人",
+        "Cada ronda tiene cero o un mentiroso. También puedes votar «Sin mentiroso».\nMínimo: {0} jugadores",
+        "Cada rodada tem zero ou um mentiroso. Você também pode votar “Sem mentiroso”.\nMínimo: {0} jogadores",
+        "Chaque manche a zéro ou un menteur. Vous pouvez voter « Aucun menteur ».\nMinimum : {0} joueurs",
+        "Jede Runde hat keinen oder einen Lügner. Du kannst auch „Kein Lügner“ wählen.\nMindestens {0} Spieler",
+        "Setiap ronde memiliki nol atau satu pembohong. Kamu juga bisa memilih “Tidak Ada Pembohong”.\nMinimal: {0} pemain",
+        "हर राउंड में शून्य या एक झूठा होता है। “कोई झूठा नहीं” पर भी वोट कर सकते हैं।\nकम से कम {0} खिलाड़ी",
+        "كل جولة تضم صفرًا أو كاذبًا واحدًا. يمكنك أيضًا التصويت «لا يوجد كاذب».\nالحد الأدنى: {0} لاعبين"
+      ]
+    },
+    {
+      "Key": "같은 캔버스에 차례로 이어 그립니다.\n최소 {0}명",
+      "Values": [
+        "같은 캔버스에 차례로 이어 그립니다.\n최소 {0}명",
+        "Take turns drawing on the same canvas.\nMinimum: {0} players",
+        "轮流在同一画布上接着画。\n至少 {0} 人",
+        "輪流在同一畫布上接著畫。\n至少 {0} 人",
+        "同じキャンバスに順番で描き足します。\n最低 {0} 人",
+        "Dibujen por turnos en el mismo lienzo.\nMínimo: {0} jugadores",
+        "Desenhem por turnos na mesma tela.\nMínimo: {0} jogadores",
+        "Dessinez à tour de rôle sur la même toile.\nMinimum : {0} joueurs",
+        "Zeichnet abwechselnd auf derselben Leinwand.\nMindestens {0} Spieler",
+        "Bergiliran menggambar di kanvas yang sama.\nMinimal: {0} pemain",
+        "एक ही कैनवास पर बारी-बारी से चित्र बनाएं।\nकम से कम {0} खिलाड़ी",
+        "تناوبوا على الرسم على اللوحة نفسها.\nالحد الأدنى: {0} لاعبين"
+      ]
+    },
+    {
+      "Key": "각자 캔버스에 차례로 그립니다. 토론 때 참가자의 그림을 비교하세요.\n최소 {0}명",
+      "Values": [
+        "각자 캔버스에 차례로 그립니다. 토론 때 참가자의 그림을 비교하세요.\n최소 {0}명",
+        "Take turns on individual canvases. Compare drawings during discussion.\nMinimum: {0} players",
+        "轮流在各自的画布上画。讨论时比较大家的画。\n至少 {0} 人",
+        "輪流在各自的畫布上畫。討論時比較大家的畫。\n至少 {0} 人",
+        "各自のキャンバスに順番で描きます。討論でみんなの絵を比べましょう。\n最低 {0} 人",
+        "Dibujen por turnos en lienzos individuales. Comparen los dibujos durante el debate.\nMínimo: {0} jugadores",
+        "Desenhem por turnos em telas individuais. Comparem os desenhos na discussão.\nMínimo: {0} jogadores",
+        "Dessinez à tour de rôle sur vos propres toiles. Comparez les dessins pendant la discussion.\nMinimum : {0} joueurs",
+        "Zeichnet abwechselnd auf eigenen Leinwänden. Vergleicht die Bilder in der Diskussion.\nMindestens {0} Spieler",
+        "Bergiliran menggambar di kanvas masing-masing. Bandingkan gambar saat diskusi.\nMinimal: {0} pemain",
+        "बारी-बारी से अपने कैनवास पर चित्र बनाएं। चर्चा में चित्रों की तुलना करें।\nकम से कम {0} खिलाड़ी",
+        "تناوبوا على الرسم على لوحاتكم الخاصة. قارنوا الرسومات أثناء النقاش.\nالحد الأدنى: {0} لاعبين"
+      ]
+    },
+    {
+      "Key": "라이어가 없다는 의견에 찬반을 투표해 주세요.",
+      "Values": [
+        "라이어가 없다는 의견에 찬반을 투표해 주세요.",
+        "Vote for or against the claim that there is no liar.",
+        "请投票赞成或反对“没有说谎者”的判断。",
+        "請投票贊成或反對「沒有說謊者」的判斷。",
+        "「ライアーなし」に賛成か反対か投票してください。",
+        "Vota a favor o en contra de que no haya mentiroso.",
+        "Vote a favor ou contra a ideia de que não há mentiroso.",
+        "Votez pour ou contre l’idée qu’il n’y a aucun menteur.",
+        "Stimmt dafür oder dagegen, dass es keinen Lügner gibt.",
+        "Pilih setuju atau tidak setuju bahwa tidak ada pembohong.",
+        "कोई झूठा नहीं है, इस राय के पक्ष या विपक्ष में वोट दें।",
+        "صوّت بالموافقة أو الرفض على رأي أنه لا يوجد كاذب."
+      ]
+    },
+    {
+      "Key": "라이어가 없다는 의견이 가결되었어요. 실제 역할을 공개해요.",
+      "Values": [
+        "라이어가 없다는 의견이 가결되었어요. 실제 역할을 공개해요.",
+        "“No Liar” was approved. The actual roles will now be revealed.",
+        "“没有说谎者”的判断已通过。现在揭晓真实身份。",
+        "「沒有說謊者」的判斷已通過。現在揭曉真實身分。",
+        "「ライアーなし」が可決されました。実際の役割を公開します。",
+        "Se aprobó «Sin mentiroso». Ahora se revelan los roles reales.",
+        "“Sem mentiroso” foi aprovado. Os papéis reais serão revelados.",
+        "« Aucun menteur » a été approuvé. Les rôles réels vont être révélés.",
+        "„Kein Lügner“ wurde angenommen. Die tatsächlichen Rollen werden aufgedeckt.",
+        "“Tidak Ada Pembohong” disetujui. Peran sebenarnya akan diungkap.",
+        "“कोई झूठा नहीं” स्वीकार हुआ। अब वास्तविक भूमिकाएं दिखाई जाएंगी।",
+        "تمت الموافقة على «لا يوجد كاذب». ستُكشف الأدوار الحقيقية الآن."
+      ]
+    },
+    {
+      "Key": "최다 득표 동률은 무작위로 결정 · 찬반 동수는 가결",
+      "Values": [
+        "최다 득표 동률은 무작위로 결정 · 찬반 동수는 가결",
+        "Nomination ties are decided randomly · Confirmation ties pass",
+        "最高票平票时随机决定 · 确认票平票时通过",
+        "最高票平票時隨機決定 · 確認票平票時通過",
+        "最多票が同数ならランダムで決定 · 賛否同数は可決",
+        "Los empates de nominación se deciden al azar · Los empates de confirmación se aprueban",
+        "Empates na indicação são decididos ao acaso · Empates na confirmação aprovam",
+        "Les égalités de nomination sont tranchées au hasard · Les égalités de confirmation sont approuvées",
+        "Bei Nominierungsgleichstand entscheidet der Zufall · Bei Bestätigungsgleichstand wird angenommen",
+        "Nominasi seri diputuskan secara acak · Konfirmasi seri disetujui",
+        "नामांकन में बराबरी का फैसला यादृच्छिक होगा · पुष्टि में बराबरी पर स्वीकार",
+        "يُحسم تعادل الترشيح عشوائيًا · التعادل في التأكيد يعني الموافقة"
+      ]
+    },
+    {
+      "Key": "동그란 몸통",
+      "Values": [
+        "동그란 몸통",
+        "Round Body",
+        "圆圆的身体",
+        "圓圓的身體",
+        "まるいボディ",
+        "Cuerpo redondo",
+        "Corpo redondo",
+        "Corps rond",
+        "Runder Körper",
+        "Badan Bulat",
+        "गोल शरीर",
+        "جسم مستدير"
+      ]
+    },
+    {
+      "Key": "말랑 네모 몸통",
+      "Values": [
+        "말랑 네모 몸통",
+        "Soft Square Body",
+        "软方形身体",
+        "軟方形身體",
+        "やわらか四角ボディ",
+        "Cuerpo cuadrado suave",
+        "Corpo quadrado macio",
+        "Corps carré souple",
+        "Weicher quadratischer Körper",
+        "Badan Kotak Lembut",
+        "मुलायम चौकोर शरीर",
+        "جسم مربع ناعم"
+      ]
+    },
+    {
+      "Key": "물방울 몸통",
+      "Values": [
+        "물방울 몸통",
+        "Droplet Body",
+        "水滴身体",
+        "水滴身體",
+        "しずくボディ",
+        "Cuerpo de gota",
+        "Corpo de gota",
+        "Corps en goutte",
+        "Tropfenkörper",
+        "Badan Tetesan",
+        "बूंद जैसा शरीर",
+        "جسم قطرة"
+      ]
+    },
+    {
+      "Key": "콩알 몸통",
+      "Values": [
+        "콩알 몸통",
+        "Bean Body",
+        "豆豆身体",
+        "豆豆身體",
+        "まめボディ",
+        "Cuerpo de frijol",
+        "Corpo de feijão",
+        "Corps haricot",
+        "Bohnenkörper",
+        "Badan Kacang",
+        "बीन्स जैसा शरीर",
+        "جسم حبة فاصوليا"
+      ]
+    },
+    {
+      "Key": "고양이 몸통",
+      "Values": [
+        "고양이 몸통",
+        "Cat Body",
+        "猫咪身体",
+        "貓咪身體",
+        "ねこボディ",
+        "Cuerpo de gato",
+        "Corpo de gato",
+        "Corps de chat",
+        "Katzenkörper",
+        "Badan Kucing",
+        "बिल्ली का शरीर",
+        "جسم قطة"
+      ]
+    },
+    {
+      "Key": "곰돌이 몸통",
+      "Values": [
+        "곰돌이 몸통",
+        "Bear Body",
+        "小熊身体",
+        "小熊身體",
+        "くまボディ",
+        "Cuerpo de osito",
+        "Corpo de ursinho",
+        "Corps d’ourson",
+        "Bärenkörper",
+        "Badan Beruang",
+        "भालू का शरीर",
+        "جسم دب"
+      ]
+    },
+    {
+      "Key": "수줍은 얼굴",
+      "Values": [
+        "수줍은 얼굴",
+        "Shy Face",
+        "害羞脸",
+        "害羞臉",
+        "てれ顔",
+        "Cara tímida",
+        "Rosto tímido",
+        "Visage timide",
+        "Schüchternes Gesicht",
+        "Wajah Malu",
+        "शर्मीला चेहरा",
+        "وجه خجول"
+      ]
+    },
+    {
+      "Key": "장난스러운 얼굴",
+      "Values": [
+        "장난스러운 얼굴",
+        "Mischievous Face",
+        "调皮脸",
+        "調皮臉",
+        "いたずら顔",
+        "Cara traviesa",
+        "Rosto travesso",
+        "Visage malicieux",
+        "Freches Gesicht",
+        "Wajah Jahil",
+        "शरारती चेहरा",
+        "وجه مشاكس"
+      ]
+    },
+    {
+      "Key": "울먹이는 얼굴",
+      "Values": [
+        "울먹이는 얼굴",
+        "Teary Face",
+        "委屈脸",
+        "委屈臉",
+        "なみだ顔",
+        "Cara llorosa",
+        "Rosto choroso",
+        "Visage larmoyant",
+        "Tränenreiches Gesicht",
+        "Wajah Berkaca-kaca",
+        "आँसू भरा चेहरा",
+        "وجه دامع"
+      ]
+    },
+    {
+      "Key": "하트 눈",
+      "Values": [
+        "하트 눈",
+        "Heart Eyes",
+        "爱心眼",
+        "愛心眼",
+        "ハートの目",
+        "Ojos de corazón",
+        "Olhos de coração",
+        "Yeux en cœur",
+        "Herzaugen",
+        "Mata Hati",
+        "दिल वाली आँखें",
+        "عيون قلوب"
+      ]
+    },
+    {
+      "Key": "반짝 눈",
+      "Values": [
+        "반짝 눈",
+        "Star Eyes",
+        "星星眼",
+        "星星眼",
+        "きらきらの目",
+        "Ojos de estrella",
+        "Olhos de estrela",
+        "Yeux étoilés",
+        "Sternenaugen",
+        "Mata Bintang",
+        "तारों वाली आँखें",
+        "عيون نجوم"
+      ]
+    },
+    {
+      "Key": "빙글 눈",
+      "Values": [
+        "빙글 눈",
+        "Spiral Eyes",
+        "螺旋眼",
+        "螺旋眼",
+        "ぐるぐるの目",
+        "Ojos en espiral",
+        "Olhos em espiral",
+        "Yeux en spirale",
+        "Spiralaugen",
+        "Mata Spiral",
+        "घुमावदार आँखें",
+        "عيون حلزونية"
+      ]
+    },
+    {
+      "Key": "픽셀 얼굴",
+      "Values": [
+        "픽셀 얼굴",
+        "Pixel Face",
+        "像素脸",
+        "像素臉",
+        "ピクセル顔",
+        "Cara de píxeles",
+        "Rosto de pixels",
+        "Visage pixelisé",
+        "Pixelgesicht",
+        "Wajah Piksel",
+        "पिक्सेल चेहरा",
+        "وجه بكسل"
+      ]
+    },
+    {
+      "Key": "해골 얼굴",
+      "Values": [
+        "해골 얼굴",
+        "Skull Face",
+        "骷髅脸",
+        "骷髏臉",
+        "ドクロ顔",
+        "Cara de calavera",
+        "Rosto de caveira",
+        "Visage de crâne",
+        "Totenkopfgesicht",
+        "Wajah Tengkorak",
+        "खोपड़ी वाला चेहरा",
+        "وجه جمجمة"
+      ]
+    },
+    {
+      "Key": "냥냥 얼굴",
+      "Values": [
+        "냥냥 얼굴",
+        "Kitty Face",
+        "猫咪脸",
+        "貓咪臉",
+        "にゃんこ顔",
+        "Cara de gatito",
+        "Rosto de gatinho",
+        "Visage de chaton",
+        "Kätzchengesicht",
+        "Wajah Kucing",
+        "बिल्ली का चेहरा",
+        "وجه قطة"
       ]
     }
   ]

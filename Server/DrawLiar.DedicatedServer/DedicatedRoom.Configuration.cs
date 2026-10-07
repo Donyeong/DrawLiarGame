@@ -33,9 +33,22 @@ internal sealed partial class DedicatedRoom
                 return;
             }
             settings.Validate();
-            var known = _session.Snapshot(connection.PlayerId, -1, now).AvailableTopics;
-            settings.Topics ??= known;
-            if (settings.Topics.Length == 0 || settings.Topics.Any(topic => !known.Contains(topic)))
+            ServerTopicData[] additions;
+            GameData gameData;
+            try
+            {
+                additions = ServerDatabase.MergeCustomTopics(null, envelope.CustomTopics);
+                gameData = RoomGameData(ServerDatabase.MergeCustomTopics(_customTopics, additions));
+            }
+            catch (ApiException)
+            {
+                ConfigureReplyLocked(connection, requestId, false, "InvalidTopics");
+                return;
+            }
+            settings.Topics ??= gameData.Topics.Where(topic => !string.IsNullOrWhiteSpace(topic.Name)
+                && topic.Words != null && topic.Words.Any(word => !string.IsNullOrWhiteSpace(word)))
+                .Select(topic => topic.Name).Distinct().Take(128).ToArray();
+            if (!_session.CanConfigure(settings, gameData))
             {
                 ConfigureReplyLocked(connection, requestId, false, "InvalidTopics");
                 return;
@@ -44,7 +57,8 @@ internal sealed partial class DedicatedRoom
             {
                 RoomId = RoomId, OwnerAccountId = _ownerAccountId, OperationId = Guid.NewGuid().ToString(),
                 ExpectedVersion = _configurationVersion, Password = envelope.Password ?? "",
-                Settings = JsonSerializer.Deserialize<ServerRoomSettings>(JsonSerializer.Serialize(settings, GameplayWire.Json), GameplayWire.Json)!
+                Settings = JsonSerializer.Deserialize<ServerRoomSettings>(JsonSerializer.Serialize(settings, GameplayWire.Json), GameplayWire.Json)!,
+                CustomTopics = additions
             };
             _configurationPending = true;
             BroadcastSnapshotsLocked(now);
@@ -111,7 +125,11 @@ internal sealed partial class DedicatedRoom
         if (configuration.RoomId != RoomId || configuration.Version < _configurationVersion || configuration.Settings == null) return false;
         if (!pending && !_configurationSyncRequired && configuration.Version == _configurationVersion) return true;
         var settings = JsonSerializer.Deserialize<RoomSettings>(JsonSerializer.Serialize(configuration.Settings, GameplayWire.Json), GameplayWire.Json)!;
-        if (!_session.Configure(settings)) return false;
+        ServerTopicData[] customTopics;
+        try { customTopics = configuration.CustomTopics == null ? _customTopics : ServerDatabase.MergeCustomTopics(null, configuration.CustomTopics); }
+        catch (ApiException) { return false; }
+        if (!_session.Configure(settings, RoomGameData(customTopics))) return false;
+        _customTopics = customTopics;
         _configurationVersion = configuration.Version;
         _accessVersion = configuration.AccessVersion;
         _configurationSyncRequired = false;

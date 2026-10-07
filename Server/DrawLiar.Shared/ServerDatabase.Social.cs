@@ -149,7 +149,7 @@ public sealed partial class ServerDatabase
     private static RoomInvitationData ReadInvitation(NpgsqlDataReader reader) => new()
     {
         InvitationId = reader.GetGuid(0).ToString(), RoomId = reader.GetGuid(1).ToString(), RoomCode = reader.GetString(2), RoomName = reader.GetString(3),
-        Sender = new FriendData { AccountId = reader.GetGuid(4).ToString(), DisplayName = reader.GetString(5), AvatarColor = reader.GetInt32(6), Accessory = reader.GetInt32(7) },
+        Sender = new FriendData { AccountId = reader.GetGuid(4).ToString(), DisplayName = reader.GetString(5), AvatarColor = reader.GetInt32(6), Accessory = AvatarParts.Sanitize(reader.GetInt64(7)) },
         ExpiresAt = ServerRuntime.Timestamp(reader.GetFieldValue<DateTimeOffset>(8))
     };
 

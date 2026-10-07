@@ -56,7 +56,7 @@ internal static partial class Integration
         Check(restored.LiarMode == 1 && dedicated.LiarMode == LiarMode.Mismatch
             && JsonSerializer.Deserialize<ServerRoomSettings>("{}", ServerRuntime.Json)!.LiarMode == 0,
             "저장·서버 재로드·DS 변환은 모드를 유지하고 기존 JSON은 기본 모드로 읽어야 합니다.");
-        foreach (int value in new[] { -1, 2, 99 })
+        foreach (int value in new[] { -1, 3, 99 })
         {
             restored.LiarMode = value;
             bool rejected = false;

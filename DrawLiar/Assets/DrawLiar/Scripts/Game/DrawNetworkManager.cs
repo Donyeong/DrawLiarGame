@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
@@ -83,13 +84,15 @@ namespace DrawLiar
             }
         }
 
-        public async Task ConfigureRoomAsync(RoomSettings settings, string password = "")
+        public async Task ConfigureRoomAsync(RoomSettings settings, string password = "", ServerTopicData[] customTopics = null)
         {
             if (!CanConfigureRoom(State)) throw new InvalidOperationException(DrawLocalization.Text("방 옵션 변경 권한이 없습니다."));
             if (settings == null || _configuringRoom) throw new InvalidOperationException(DrawLocalization.Text("방 옵션을 저장하지 못했습니다. 다시 시도하세요."));
             var valid = settings.Copy();
             valid.Validate();
             if (valid.Topics == null || valid.Topics.Length == 0) throw new InvalidOperationException(DrawLocalization.Text("주제를 하나 이상 선택하세요."));
+            var topics = (customTopics ?? Array.Empty<ServerTopicData>()).Select(topic => topic == null ? null
+                : new ServerTopicData { Name = topic.Name, Words = topic.Words?.ToArray() }).ToArray();
             password ??= "";
             if (!valid.IsPrivate) password = "";
             string requestId = Guid.NewGuid().ToString("N");
@@ -113,7 +116,7 @@ namespace DrawLiar
                 using (var timeout = CancellationTokenSource.CreateLinkedTokenSource(_lifetime.Token))
                 {
                     DrawAsync.CancelAfter(timeout, TimeSpan.FromSeconds(10));
-                    await SendAsync(new GameplayEnvelope { Type = "request", Kind = "configure", Settings = valid, Password = password, RequestId = requestId }, _generation, timeout.Token);
+                    await SendAsync(new GameplayEnvelope { Type = "request", Kind = "configure", Settings = valid, CustomTopics = topics, Password = password, RequestId = requestId }, _generation, timeout.Token);
                     using (timeout.Token.Register(() => completion.TrySetCanceled())) await completion.Task;
                 }
             }

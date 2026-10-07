@@ -11,7 +11,8 @@ namespace DrawLiar
         {
             public int Id;
             public string Name, Guess = "";
-            public int Score, RoundPoints, Color, Accessory;
+            public int Score, RoundPoints, Color;
+            public long Accessory;
             public bool Connected = true, SeatReserved = true, Spectator, SpectatorOnly, Liar, Caught, Guessed;
             public int? Vote;
             public bool? Judgment;
@@ -48,7 +49,7 @@ namespace DrawLiar
         public int ActiveCount => players.Values.Count(player => player.Connected && !player.Spectator);
         public int SpectatorCount => players.Values.Count(player => player.Connected && player.Spectator);
         public bool CanStart => (Phase == GamePhase.Lobby || Phase == GamePhase.MatchResults)
-            && ActiveCount >= GameRules.MIN_START_PLAYERS && AvailableTopics().Any();
+            && ActiveCount >= GameRules.MinimumPlayers(Settings.LiarMode) && AvailableTopics().Any();
         public event Action Changed;
         public event Action CanvasCleared;
         public event Action<CompletedMatchData> MatchCompleted;
@@ -68,7 +69,7 @@ namespace DrawLiar
         public bool HoldsPlayerSeat(int id) => players.TryGetValue(id, out var player) && !player.Spectator && (player.Connected || player.SeatReserved);
         public bool HoldsSpectatorSeat(int id) => players.TryGetValue(id, out var player) && player.Spectator && (player.Connected || player.SeatReserved);
 
-        public bool Join(int id, string name, int color, int accessory, bool spectator = false, bool spectatorOnly = false)
+        public bool Join(int id, string name, int color, long accessory, bool spectator = false, bool spectatorOnly = false)
         {
             if (players.TryGetValue(id, out var existing))
             {
@@ -97,7 +98,7 @@ namespace DrawLiar
             return true;
         }
 
-        public void UpdateProfile(int id, string name, int color, int accessory)
+        public void UpdateProfile(int id, string name, int color, long accessory)
         {
             if (!players.TryGetValue(id, out var player)) return;
             player.Name = GameRules.CleanText(name, 16, "그림친구");
@@ -157,22 +158,36 @@ namespace DrawLiar
             if (Phase == GamePhase.RoleReveal || Phase == GamePhase.Drawing) turns = turns.Concat(new[] { player.Id }).ToArray();
         }
 
-        public bool Configure(RoomSettings settings)
+        public bool CanConfigure(RoomSettings settings, GameData gameData = null) => TryConfiguration(settings, gameData, out _);
+
+        public bool Configure(RoomSettings settings, GameData gameData = null)
         {
-            if (Phase != GamePhase.Lobby && Phase != GamePhase.MatchResults) return false;
-            var valid = settings.Copy();
-            valid.Validate();
-            var knownTopics = KnownTopicNames();
-            valid.Topics ??= knownTopics.Take(128).ToArray();
-            if (valid.Topics.Length == 0 || valid.Topics.Any(value => !knownTopics.Contains(value))) return false;
+            if (!TryConfiguration(settings, gameData, out var valid)) return false;
+            data = gameData ?? data;
             Settings = valid;
             Changed?.Invoke();
             return true;
         }
 
+        private bool TryConfiguration(RoomSettings settings, GameData gameData, out RoomSettings valid)
+        {
+            valid = null;
+            if (settings == null || Phase != GamePhase.Lobby && Phase != GamePhase.MatchResults) return false;
+            var candidate = gameData ?? data;
+            valid = settings.Copy();
+            valid.Validate();
+            var topics = (candidate?.Topics ?? Array.Empty<TopicData>()).Where(IsValidTopic).ToArray();
+            var knownTopics = topics.Select(topic => topic.Name).Distinct().ToArray();
+            valid.Topics ??= knownTopics.Take(128).ToArray();
+            if (valid.Topics.Length == 0 || valid.Topics.Any(value => !knownTopics.Contains(value))) return false;
+            var selected = valid;
+            return topics.Any(topic => selected.Topics.Contains(topic.Name)
+                && (selected.LiarMode != LiarMode.Mismatch || MismatchWords(topic).Length >= 2));
+        }
+
         public bool Start(double now, GameData gameData = null)
         {
-            if (Phase != GamePhase.Lobby && Phase != GamePhase.MatchResults || ActiveCount < GameRules.MIN_START_PLAYERS) return false;
+            if (Phase != GamePhase.Lobby && Phase != GamePhase.MatchResults || ActiveCount < GameRules.MinimumPlayers(Settings.LiarMode)) return false;
             if (gameData != null) data = gameData;
             if (!AvailableTopics().Any()) return false;
             foreach (var id in players.Values.Where(player => !player.Connected).Select(player => player.Id).ToArray()) players.Remove(id);
@@ -231,7 +246,7 @@ namespace DrawLiar
 
         public bool Vote(int id, int target, double now)
         {
-            if (Phase != GamePhase.Discussion || !IsActive(id) || !IsActive(target) || id == target) return false;
+            if (Phase != GamePhase.Discussion || !IsActive(id) || !IsNominationTarget(target) || id == target) return false;
             if (now >= deadline) { Tick(now); return false; }
             var player = players[id];
             if (player.Vote.HasValue) return false;
@@ -244,7 +259,7 @@ namespace DrawLiar
         public bool Judge(int id, int target, bool approve, double now)
         {
             if (Phase != GamePhase.Rebuttal || !_hasAccused || target != _accusedPlayerId
-                || id == target || !IsActive(id) || !IsActive(target)) return false;
+                || id == target || !IsActive(id) || !IsNominationTarget(target)) return false;
             if (now >= deadline) { Tick(now); return false; }
             var player = players[id];
             if (player.Judgment.HasValue) return false;
@@ -281,7 +296,10 @@ namespace DrawLiar
                 case GamePhase.Drawing: NextArtist(now); break;
                 case GamePhase.Discussion: ResolveNomination(now); break;
                 case GamePhase.Rebuttal: ResolveJudgment(now); break;
-                case GamePhase.LiarReveal: SetPhase(GamePhase.Guessing, Settings.GuessSeconds, now); break;
+                case GamePhase.LiarReveal:
+                    if (ActivePlayers().Any(player => player.Liar)) SetPhase(GamePhase.Guessing, Settings.GuessSeconds, now);
+                    else ScoreRound(now);
+                    break;
                 case GamePhase.Guessing: ScoreRound(now); break;
                 case GamePhase.RoundResults:
                     if (matchDecided) FinishMatch();
@@ -307,6 +325,7 @@ namespace DrawLiar
                 Word = PlayerWord(local, result),
                 MismatchWord = result && mismatch ? _mismatchWord : "",
                 LocalIsLiar = !spectator && local.Liar && (!mismatch || reveal), LocalIsSpectator = spectator,
+                RevealedLiarCount = reveal ? players.Values.Count(player => player.Liar) : -1,
                 LocalPlayerId = id, HostPlayerId = hostId, IsHost = id == hostId, CanStart = CanStart, CanvasVersion = CanvasVersion,
                 DrawingEpoch = DrawingEpoch, DrawingOrder = Round > 0 ? turns.ToArray() : Array.Empty<int>(),
                 HasAccused = _hasAccused, AccusedPlayerId = _accusedPlayerId, BallotVersion = BallotVersion,
@@ -339,8 +358,10 @@ namespace DrawLiar
         }
 
         private IEnumerable<Participant> ActivePlayers() => players.Values.Where(player => player.Connected && !player.Spectator);
-        private IEnumerable<Participant> JudgmentVoters() => ActivePlayers().Where(player => player.Id != _accusedPlayerId);
-        private bool HasValidVote(Participant player) => player.Vote.HasValue && IsActive(player.Vote.Value);
+        private IEnumerable<Participant> JudgmentVoters() => ActivePlayers().Where(player => IsNoLiarTarget(_accusedPlayerId) || player.Id != _accusedPlayerId);
+        private bool HasValidVote(Participant player) => player.Vote.HasValue && IsNominationTarget(player.Vote.Value);
+        private bool IsNoLiarTarget(int id) => Settings.LiarMode == LiarMode.Optional && id == GameRules.NO_LIAR_TARGET;
+        private bool IsNominationTarget(int id) => IsNoLiarTarget(id) || IsActive(id);
         private void AssignSeats()
         {
             var eligible = players.Values.Where(player => !player.SpectatorOnly)
@@ -388,7 +409,8 @@ namespace DrawLiar
             }
             var participants = ActivePlayers().ToArray();
             Shuffle(participants);
-            foreach (var player in participants.Take(Math.Min(Settings.LiarCount, participants.Length - 1))) player.Liar = true;
+            int liarCount = Settings.LiarMode == LiarMode.Optional ? random.Next(2) : Settings.LiarCount;
+            foreach (var player in participants.Take(Math.Min(liarCount, participants.Length - 1))) player.Liar = true;
             _roundParticipants = participants.Select(player => player.Id).ToArray();
             Shuffle(participants);
             turns = participants.Select(player => player.Id).ToArray();
@@ -453,28 +475,32 @@ namespace DrawLiar
             _accusedPlayerId = accused.Value;
             BallotVersion++;
             foreach (var player in players.Values) player.Judgment = null;
-            summary = "지목된 친구를 제외하고 찬반을 투표해 주세요.";
+            summary = IsNoLiarTarget(_accusedPlayerId)
+                ? "라이어가 없다는 의견에 찬반을 투표해 주세요."
+                : "지목된 친구를 제외하고 찬반을 투표해 주세요.";
             SetPhase(GamePhase.Rebuttal, Settings.RebuttalSeconds > 0 ? Settings.RebuttalSeconds : Settings.VoteSeconds, now);
         }
 
         private void ResolveJudgment(double now)
         {
-            if (!_hasAccused || !IsActive(_accusedPlayerId))
+            if (!_hasAccused || !IsNominationTarget(_accusedPlayerId))
             {
                 BeginDiscussion(now, "지목된 친구의 연결이 끊겨 토론과 지목 투표를 다시 시작해요.");
                 return;
             }
-            var accused = players[_accusedPlayerId];
+            bool noLiarAccused = IsNoLiarTarget(_accusedPlayerId);
+            bool accusationCorrect = noLiarAccused ? !players.Values.Any(player => player.Liar) : players[_accusedPlayerId].Liar;
             var voters = JudgmentVoters().ToArray();
-            foreach (var voter in voters.Where(voter => voter.Judgment.HasValue && voter.Judgment.Value == accused.Liar))
+            foreach (var voter in voters.Where(voter => voter.Judgment.HasValue && voter.Judgment.Value == accusationCorrect))
                 voter.CorrectJudgment = true;
             if (voters.Count(voter => voter.Judgment == true) < voters.Count(voter => voter.Judgment == false))
             {
                 BeginDiscussion(now, "지목이 부결되었어요. 토론과 지목 투표를 다시 진행해 주세요.");
                 return;
             }
-            accused.Caught = true;
-            summary = "지목이 가결되었어요. 라이어 모두에게 정답 기회가 있어요.";
+            if (!noLiarAccused) players[_accusedPlayerId].Caught = true;
+            summary = noLiarAccused ? "라이어가 없다는 의견이 가결되었어요. 실제 역할을 공개해요."
+                : "지목이 가결되었어요. 라이어 모두에게 정답 기회가 있어요.";
             RevealLiars(now);
         }
 

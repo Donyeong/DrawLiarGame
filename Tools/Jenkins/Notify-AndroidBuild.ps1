@@ -115,6 +115,12 @@ try {
     $Number = Get-NotificationText $env:BUILD_NUMBER 20
     $ArtifactUrl = Get-PublicLink $env:DRAWLIAR_ARTIFACT_URL
     $BuildUrl = Get-PublicLink $env:BUILD_URL
+    $JenkinsArtifactUrl = $null
+    if ($env:DRAWLIAR_BUILD_ARTIFACT_READY -eq 'true' -and $BuildUrl -and $Format -in @('APK', 'AAB')) {
+        $CandidateUrl = Get-PublicLink $env:DRAWLIAR_JENKINS_ARTIFACT_URL
+        $ExpectedUrl = "$($BuildUrl.TrimEnd('/'))/artifact/Build/Android/DrawLiar.$($Format.ToLowerInvariant())"
+        if ($CandidateUrl -ceq $ExpectedUrl) { $JenkinsArtifactUrl = $CandidateUrl }
+    }
     $TesterDownloadUrl = $null
     if ($env:DRAWLIAR_DISTRIBUTION_RESULT -in @('DISTRIBUTED', 'EMPTY_GROUP')) {
         $TesterDownloadUrl = Get-FirebaseLink $ArtifactUrl @('appdistribution.firebase.google.com')
@@ -136,9 +142,14 @@ try {
     if ($BuildUrl) { $Embed.url = $BuildUrl }
     if ($TesterDownloadUrl) {
         $Embed.url = $TesterDownloadUrl
+        $InstallText = if ($Format -eq 'AAB') {
+            "[Firebase 테스터 페이지에서 설치]($TesterDownloadUrl)`n초대된 Google 계정으로 로그인하세요. AAB는 Google Play 내부 앱 공유로 설치되며, 최초 설치 전에 Play 스토어에서 내부 앱 공유를 활성화해야 합니다."
+        } else {
+            "[테스터 앱에서 다운로드]($TesterDownloadUrl)`n테스터 그룹에 등록된 Google 계정으로 로그인해 설치하세요."
+        }
         $Embed.fields = @(@{
             name = '앱 설치'
-            value = "[테스터 앱에서 다운로드]($TesterDownloadUrl)`n테스터 그룹에 등록된 Google 계정으로 로그인해 설치하세요."
+            value = $InstallText
             inline = $false
         }) + $Embed.fields
     }
@@ -146,22 +157,32 @@ try {
     $SentDirectDownload = $false
     if ($Download) {
         $Expiry = $Download.ExpiresUtc.ToOffset([TimeSpan]::FromHours(9)).ToString('MM/dd HH:mm')
-        $DownloadText = "[다운로드]($($Download.Uri))`n**1시간 제한** · 한국 시간 $Expiry 까지"
+        $DownloadLabel = if ($Format -eq 'AAB') { 'AAB 파일 다운로드' } else { "$Format 직접 다운로드" }
+        $DownloadText = "[$DownloadLabel]($($Download.Uri))`n**1시간 제한** · 한국 시간 $Expiry 까지"
+        if ($Format -eq 'AAB') { $DownloadText += "`nAAB 파일은 기기에서 직접 설치할 수 없습니다." }
         if ($TesterDownloadUrl) {
             if ($DownloadText.Length -le 1024) {
-                $Embed.fields += @{ name = "$Format 직접 다운로드 (임시)"; value = $DownloadText; inline = $false }
+                $Embed.fields += @{ name = "$DownloadLabel (임시)"; value = $DownloadText; inline = $false }
                 $SentDirectDownload = $true
             }
         } else {
             if ($DownloadText.Length -gt 1024) {
                 $DownloadText = "위 카드 제목을 누르면 다운로드됩니다.`n**1시간 제한** · 한국 시간 $Expiry 까지"
+                if ($Format -eq 'AAB') { $DownloadText += "`nAAB 파일은 기기에서 직접 설치할 수 없습니다." }
             }
             $Embed.url = $Download.Uri
-            $Embed.fields = @(@{ name = "$Format 바로 다운로드"; value = $DownloadText; inline = $false }) + $Embed.fields
+            $Embed.fields = @(@{ name = "$DownloadLabel (임시)"; value = $DownloadText; inline = $false }) + $Embed.fields
             $SentDirectDownload = $true
         }
     } elseif ($env:DRAWLIAR_DOWNLOAD_RESULT) {
-        Write-Output 'APK 직접 다운로드 링크를 확인하지 못했습니다.'
+        Write-Output 'Android 직접 다운로드 링크를 확인하지 못했습니다.'
+    }
+    if (!$TesterDownloadUrl -and !$SentDirectDownload -and $JenkinsArtifactUrl) {
+        $DownloadLabel = if ($Format -eq 'AAB') { 'AAB 원본 다운로드' } else { "$Format 다운로드" }
+        $ArtifactText = "[Jenkins에서 $DownloadLabel]($JenkinsArtifactUrl)"
+        if ($Format -eq 'AAB') { $ArtifactText += "`nAAB 파일은 기기에서 직접 설치할 수 없습니다." }
+        $Embed.url = $JenkinsArtifactUrl
+        $Embed.fields = @(@{ name = '빌드 아티팩트'; value = $ArtifactText; inline = $false }) + $Embed.fields
     }
     if ($env:DRAWLIAR_UPLOAD_RESULT) {
         $UploadText = switch ($env:DRAWLIAR_UPLOAD_RESULT) {
@@ -174,6 +195,16 @@ try {
             default { '확인 불가' }
         }
         $Embed.fields += @{ name = 'Firebase 업로드'; value = $UploadText; inline = $true }
+    }
+    if ($env:DRAWLIAR_PLAY_UPLOAD_RESULT -and $env:DRAWLIAR_PLAY_UPLOAD_RESULT -ne 'SKIPPED') {
+        $PlayUploadText = switch ($env:DRAWLIAR_PLAY_UPLOAD_RESULT) {
+            'SUCCESS' { '내부 테스트 초안 저장 완료 · Play Console에서 검토 가능' }
+            'FAILURE' { '업로드 실패' }
+            'ABORTED' { '업로드 중단' }
+            'RUNNING' { '업로드 완료 확인 필요' }
+            default { '업로드 시작 전' }
+        }
+        $Embed.fields += @{ name = 'Google Play 업로드'; value = $PlayUploadText; inline = $false }
     }
     $TesterInviteUrl = Get-FirebaseLink $env:DRAWLIAR_TESTER_INVITE_URL @('appdistribution.firebase.dev', 'appdistribution.firebase.google.com')
     if ($TesterInviteUrl) {

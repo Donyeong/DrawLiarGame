@@ -168,7 +168,7 @@ PlayerSettings:
   androidMaxAspectRatio: 2.4
   androidMinAspectRatio: 1
   applicationIdentifier:
-    Android: com.rascallab.drawliar
+    Android: com.rascallab.liargame
     Standalone: com.rascallab.drawliar
     iPhone: com.rascallab.drawliar
   buildNumber:
@@ -298,7 +298,14 @@ PlayerSettings:
   AndroidAppBundleSizeToValidate: 150
   AndroidReportGooglePlayAppDependencies: 1
   androidSymbolsSizeThreshold: 800
-  m_BuildTargetIcons: []
+  m_BuildTargetIcons:
+  - m_BuildTarget: 
+    m_Icons:
+    - serializedVersion: 2
+      m_Icon: {fileID: 2800000, guid: 03580b039265e8749a88955b0ee6f802, type: 3}
+      m_Width: 128
+      m_Height: 128
+      m_Kind: 0
   m_BuildTargetPlatformIcons:
   - m_BuildTarget: iPhone
     m_Icons:
@@ -565,6 +572,9 @@ PlayerSettings:
   - serializedVersion: 3
     m_BuildTarget: Android
     m_Formats: 03000000
+  - serializedVersion: 3
+    m_BuildTarget: WebGL
+    m_Formats: 05000000
   playModeTestRunnerEnabled: 0
   runPlayModeTestAsEditModeTest: 0
   actionOnDotNetUnhandledException: 1
@@ -842,7 +852,7 @@ PlayerSettings:
     PS4: DOTWEEN;TextMeshPro
     PS5: DOTWEEN;TextMeshPro
     QNX: DOTWEEN;TextMeshPro
-    Standalone: APP_UI_EDITOR_ONLY;MIRROR;MIRROR_89_OR_NEWER;MIRROR_90_OR_NEWER;MIRROR_93_OR_NEWER;MIRROR_96_OR_NEWER;EDGEGAP_PLUGIN_SERVERS;DOTWEEN;MOREMOUNTAINS_NICEVIBRATIONS_INSTALLED;STEAMWORKS_NET;TextMeshPro
+    Standalone: APP_UI_EDITOR_ONLY;MIRROR;MIRROR_89_OR_NEWER;MIRROR_90_OR_NEWER;MIRROR_93_OR_NEWER;MIRROR_96_OR_NEWER;EDGEGAP_PLUGIN_SERVERS;DOTWEEN;MOREMOUNTAINS_NICEVIBRATIONS_INSTALLED;STEAMWORKS_NET;TextMeshPro;SENTIS_ANALYTICS_ENABLED
     VisionOS: DOTWEEN;TextMeshPro
     WebGL: DOTWEEN;TextMeshPro
     Windows Store Apps: DOTWEEN

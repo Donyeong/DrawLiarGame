@@ -293,7 +293,7 @@ namespace DrawLiar
 
         public void CancelGoogleLogin() => _googleCancellation?.Cancel();
 
-        public Task SaveProfileAsync(string displayName, int avatarColor, int accessory) => RunAsync(async () =>
+        public Task SaveProfileAsync(string displayName, int avatarColor, long accessory) => RunAsync(async () =>
         {
             RequireLogin();
             string session = _gameSession, accountId = Profile?.AccountId;

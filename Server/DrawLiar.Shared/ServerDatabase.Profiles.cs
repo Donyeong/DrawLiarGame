@@ -16,7 +16,7 @@ public sealed partial class ServerDatabase
             if (!await reader.ReadAsync(cancellationToken)) throw new ApiException("AccountNotFound", 404);
             profile.DisplayName = reader.GetString(0);
             profile.AvatarColor = reader.GetInt32(1);
-            profile.Accessory = reader.GetInt32(2);
+            profile.Accessory = AvatarParts.Sanitize(reader.GetInt64(2));
             profile.JoinedAt = ServerRuntime.Timestamp(reader.GetFieldValue<DateTimeOffset>(3));
         }
         if (requester == target) profile.Friendship = "Self";
@@ -127,7 +127,7 @@ public sealed partial class ServerDatabase
             || request.NodeId.Any(character => !char.IsAsciiLetterOrDigit(character) && character != '-' && character != '_')
             || !DateTimeOffset.TryParse(request.PlayedAt, out var playedAt) || playedAt < DateTimeOffset.UnixEpoch
             || playedAt > DateTimeOffset.UtcNow.AddMinutes(5) || request.Mode is < 0 or > 1 || request.RoundCount < 1
-            || request.Players == null || request.Players.Length is < 3 or > 64)
+            || request.Players == null || request.Players.Length is < 2 or > 64)
             throw new ApiException("InvalidMatchResult");
         var accounts = new HashSet<Guid>();
         var players = new List<MatchPlayerResult>();

@@ -37,7 +37,8 @@ namespace DrawLiar
         private ScrollView publicRoomList;
         private string lastServiceStatus="";
         private string nickname;
-        private int avatarColor, accessory;
+        private int avatarColor;
+        private long accessory;
         private enum LobbyScreen { Login, Main, JoinCode, CreateRoom, Topics, Options, Customize, Account, Friends, Shop, Notifications, InviteFriends }
         private LobbyScreen lobbyScreen = LobbyScreen.Login;
         private bool inRoom;
@@ -53,7 +54,7 @@ namespace DrawLiar
         private bool _createRulesExpanded, _createTimeExpanded, _createTopicsExpanded;
         private VisualElement friendList;
         private VisualElement shopList;
-        private readonly Dictionary<AvatarPartSlot,int> _shopPreviewParts=new Dictionary<AvatarPartSlot,int>();
+        private readonly Dictionary<AvatarPartSlot,long> _shopPreviewParts=new Dictionary<AvatarPartSlot,long>();
         private int _shopPartFilter=-1;
         private AvatarPartSlot _customizePartSlot=AvatarPartSlot.Head;
         private Label _shopPreviewStatus;
@@ -123,6 +124,8 @@ namespace DrawLiar
         }
         private void OnDisable()
         {
+            HideModeTooltip();
+            CloseRoomTopicWorkshop(false);
             ClearDrawingPreview();
             ResetGuessingInput(true);
             CloseRoomCustomization(false,true);
@@ -148,7 +151,7 @@ namespace DrawLiar
             draft.Topics=GameDataStore.Load().Topics.Select(t=>t.Name).ToArray();
             nickname=PlayerPrefs.GetString("DrawLiar.Name","동글이"+UnityEngine.Random.Range(10,99));
             avatarColor=Mathf.Clamp(PlayerPrefs.GetInt("DrawLiar.Color",0),0,AvatarElement.Colors.Length-1);
-            accessory=AvatarParts.Sanitize(PlayerPrefs.GetInt("DrawLiar.Equipment",(int)AvatarAccessory.Painter));
+            accessory=DrawAvatarEquipmentStore.Load();
 #if UNITY_WEBGL && !UNITY_EDITOR
             var panel=panelSettings=DrawLocalizedTypography.CreateBrowserPanel();
 #else
@@ -285,7 +288,7 @@ namespace DrawLiar
             if(lobbyScreen==LobbyScreen.Topics)
             {
                 panel.AddToClassList("topic-workshop-panel");
-                body=Box(panel,"screen-body");Text(body,"나만의 주제","screen-title");
+                body=Box(panel,"screen-body");TopicWorkshopHeading(body,"screen-title");
                 var scroll=DrawSmoothScroll.Create(ScrollViewMode.Vertical);scroll.name="workshop-page-scroll";scroll.AddToClassList("workshop-page-scroll");body.Add(scroll);
                 TopicsForm(Box(scroll,"workshop-page-form"));
                 float previousHeight=-1;
@@ -310,8 +313,13 @@ namespace DrawLiar
                 {
                     case LobbyScreen.Login:Text(body,"시작하기","screen-title");LoginForm(body);break;
                     case LobbyScreen.JoinCode:Text(body,"코드로 참가","screen-title");JoinForm(body);break;
-                    case LobbyScreen.Topics:Text(body,"나만의 주제","screen-title");TopicsForm(body);break;
-                    case LobbyScreen.Customize:Text(body,"커스터마이징","screen-title");ProfileForm(body);break;
+                    case LobbyScreen.Topics:TopicWorkshopHeading(body,"screen-title");TopicsForm(body);break;
+                    case LobbyScreen.Customize:
+                        var customizeHeading=Box(body,"row spread customize-heading");
+                        Text(customizeHeading,"커스터마이징","screen-title");
+                        if(!IsMobile||Application.platform==RuntimePlatform.WebGLPlayer)
+                            Button(customizeHeading,"상점",()=>{Navigate(LobbyScreen.Shop);Run(lobby.RefreshShopAsync);},"secondary").name="customize-shop";
+                        ProfileForm(body);break;
                 }
         }
 
@@ -590,7 +598,7 @@ namespace DrawLiar
             switch(screen){case LobbyScreen.JoinCode:return "방 코드로 입장";case LobbyScreen.CreateRoom:return "방 만들기";case LobbyScreen.Friends:return "친구";case LobbyScreen.Shop:return "상점";case LobbyScreen.Customize:return "캐릭터 꾸미기";case LobbyScreen.Account:return "내 계정";case LobbyScreen.Options:return "옵션";case LobbyScreen.Topics:return "나만의 주제";default:return "함께 플레이";}
         }
 
-        private void UpdateLobbyAvatar(int color,int decoration)
+        private void UpdateLobbyAvatar(int color,long decoration)
         {
             avatarStage.Clear();var avatar=new AvatarElement(color,decoration);avatar.AddToClassList("lobby-avatar");avatarStage.Add(avatar);
         }
@@ -617,7 +625,7 @@ namespace DrawLiar
             SyncProfile();
             if(lobby.Profile!=null)
             {
-                PlayerPrefs.SetString("DrawLiar.Name",nickname);PlayerPrefs.SetInt("DrawLiar.Color",avatarColor);PlayerPrefs.SetInt("DrawLiar.Equipment",accessory);
+                PlayerPrefs.SetString("DrawLiar.Name",nickname);PlayerPrefs.SetInt("DrawLiar.Color",avatarColor);DrawAvatarEquipmentStore.Save(accessory);
                 PlayerPrefs.Save();
             }
             if(!inRoom&&content!=null)
@@ -696,6 +704,8 @@ namespace DrawLiar
 
         private void ShopPage()
         {
+            if(_shopPartFilter>=0&&!AvatarParts.Slots.Contains((AvatarPartSlot)_shopPartFilter))_shopPartFilter=-1;
+            foreach(var slot in _shopPreviewParts.Keys.Where(slot=>!AvatarParts.Slots.Contains(slot)).ToArray())_shopPreviewParts.Remove(slot);
             if(!IsMobile)panelSettings.referenceResolution=new Vector2Int(1600,900);
             var page=Box(content,"shop-page grow");page.name="shop-page";
             var header=Box(page,"row shop-header");
@@ -757,7 +767,7 @@ namespace DrawLiar
         {
             if(shopList?.panel==null)return;
             shopList.Clear();
-            int ownedMask=lobby.Profile?.OwnedAccessories?.Aggregate(0,(mask,item)=>mask|item)??0;
+            long ownedMask=lobby.Profile?.OwnedAccessories?.Aggregate(0L,(mask,item)=>mask|item)??0L;
             var serverProducts=(lobby.Shop.Products??Array.Empty<ShopProduct>()).Where(item=>item!=null).ToArray();
             int displayed=0;
             var products=AvatarParts.CreateShopProducts().Select(product=>serverProducts.FirstOrDefault(item=>item.Id==product.Id&&item.Accessory==product.Accessory)??product)
@@ -798,7 +808,7 @@ namespace DrawLiar
         {
             foreach(var slot in AvatarParts.Slots)
             {
-                int part=product.Accessory&AvatarParts.Mask(slot);
+                long part=product.Accessory&AvatarParts.Mask(slot);
                 if(part!=0)_shopPreviewParts[slot]=part;
             }
             UpdateShopPreview();RevealAvatarPreview();
@@ -809,16 +819,16 @@ namespace DrawLiar
             _shopPreviewParts.Clear();UpdateShopPreview();RevealAvatarPreview();
         }
 
-        private int CurrentShopPreview()
+        private long CurrentShopPreview()
         {
-            int result=accessory;
+            long result=accessory;
             foreach(var part in _shopPreviewParts.Values)result=AvatarParts.Equip(result,part);
             return result;
         }
 
         private void UpdateShopPreview()
         {
-            int preview=CurrentShopPreview();
+            long preview=CurrentShopPreview();
             if(avatarStage!=null)UpdateLobbyAvatar(avatarColor,preview);
             SetText(_shopPreviewStatus,_shopPreviewParts.Count==0?"착용 중":"입혀보기 중");
             _shopPreviewReset?.SetEnabled(_shopPreviewParts.Count!=0);
@@ -892,20 +902,10 @@ namespace DrawLiar
             Choice(basic,"공개 설정",new[]{"누구나 · 공개방","친구끼리 · 사설방"},draft.IsPrivate?1:0,i=>{draft.IsPrivate=i==1;RefreshPasswordField();}).name="create-privacy";
             RefreshPasswordField();
             VisualElement liarCount=null;
-            Choice(form,"라이어 방식",new[]{"일반","미스매치"},(int)draft.LiarMode,index=>
+            RoomModeChoices(form,draft,"create",()=>
             {
-                draft.LiarMode=(LiarMode)index;RefreshRoomLiarCount(draft,liarCount);refreshCreate?.Invoke();
-            }).name="create-liar-mode";
-            var mode=Box(form,"create-mode");Text(mode,"그리기 방식","create-label");
-            var modes=Box(mode,"row create-modes");var modeButtons=new List<Button>();
-            void SelectMode(int index)
-            {
-                draft.Mode=(DrawingMode)Mathf.Clamp(index,0,1);
-                for(int i=0;i<modeButtons.Count;i++)modeButtons[i].EnableInClassList("create-mode-selected",i==(int)draft.Mode);
-            }
-            modeButtons.Add(Button(modes,"릴레이 그리기",()=>SelectMode(0),"secondary grow create-mode-button"));modeButtons[0].name="create-mode-relay";
-            modeButtons.Add(Button(modes,"한 명씩 그리기",()=>SelectMode(1),"secondary grow create-mode-button"));modeButtons[1].name="create-mode-individual";
-            SelectMode((int)draft.Mode);
+                RefreshRoomLiarCount(draft,liarCount);refreshCreate?.Invoke();
+            });
 
             var rules=CreateRoomSection(form,"게임 규칙","create-rules",_createRulesExpanded,value=>_createRulesExpanded=value,out var rulesSummary);
             var time=CreateRoomSection(form,"시간 설정","create-time",_createTimeExpanded,value=>_createTimeExpanded=value,out var timeSummary);
@@ -930,7 +930,7 @@ namespace DrawLiar
                     string source=draft.Victory==VictoryMode.RoundCount?
                         draft.AllowMidRoundJoin?"라이어 {0}명 · {1}라운드 · 난입 허용":"라이어 {0}명 · {1}라운드 · 난입 제한":
                         draft.AllowMidRoundJoin?"라이어 {0}명 · 목표 {1}점 · 난입 허용":"라이어 {0}명 · 목표 {1}점 · 난입 제한";
-                    SetText(rulesSummary,source,draft.LiarCount,limit);
+                    SetText(rulesSummary,source,draft.LiarMode==LiarMode.Optional?(object)"0~1":draft.LiarCount,limit);
                 }
                 SetText(timeSummary,"그림 {0}초 · 토론 {1}초",draft.DrawSeconds,draft.DiscussionSeconds);
                 SetText(topicSummary,"{0} / {1}개 선택",selected.Count,names.Length);
@@ -939,7 +939,7 @@ namespace DrawLiar
                 create.SetEnabled(validTopics&&(!draft.IsPrivate||IsValidRoomPassword(_createRoomPassword)));topicError.style.display=validTopics?DisplayStyle.None:DisplayStyle.Flex;
             }
             refreshCreate=RefreshSummaries;
-            liarCount=Int(rules.contentContainer,"라이어 수",draft.LiarCount,1,GameRules.MAX_PLAYERS-1,value=>{draft.LiarCount=draft.LiarMode==LiarMode.Mismatch?1:value;RefreshSummaries();});liarCount.name="create-liars";
+            liarCount=Int(rules.contentContainer,"라이어 수",draft.LiarCount,1,GameRules.MAX_PLAYERS-1,value=>{draft.LiarCount=draft.LiarMode==LiarMode.Classic?value:1;RefreshSummaries();});liarCount.name="create-liars";
             RefreshRoomLiarCount(draft,liarCount);
             VisualElement victoryLimit=null;
             void BuildVictoryLimit()
@@ -965,13 +965,13 @@ namespace DrawLiar
             }
             Button(bulk,"전체 선택",()=>{selected.UnionWith(names);RefreshTopics();},"secondary grow").name="create-topics-all";
             Button(bulk,"초기화",()=>{selected.Clear();RefreshTopics();},"secondary grow").name="create-topics-clear";
+            TopicEntryButtons(topics.contentContainer,"create");
             var grid=Box(topics.contentContainer,"create-topic-grid");int topicIndex=0;
             foreach(string name in names)
             {
                 string key=name;var button=Button(grid,"",()=>{if(!selected.Add(key))selected.Remove(key);RefreshTopics();},"topic-toggle");
                 button.name="create-topic-"+topicIndex++;button.tooltip=key;button.userData=key;topicButtons[key]=button;
             }
-            Button(topics.contentContainer,"나만의 주제 만들기",()=>Navigate(LobbyScreen.Topics),"secondary create-custom-topics").name="create-custom-topics";
             RefreshTopics();
             scroll.schedule.Execute(()=>{if(scroll==_createRoomScroll&&scroll.panel!=null)scroll.scrollOffset=_createRoomScrollOffset;}).StartingIn(20);
             Enter(panel,220,8);
@@ -1000,9 +1000,10 @@ namespace DrawLiar
         }
         private static void RefreshRoomLiarCount(RoomSettings settings,VisualElement field)
         {
-            bool mismatch=settings.LiarMode==LiarMode.Mismatch;
-            if(mismatch)settings.LiarCount=1;
-            field?.SetEnabled(!mismatch);
+            bool fixedCount=settings.LiarMode!=LiarMode.Classic;
+            if(fixedCount)settings.LiarCount=1;
+            field?.SetEnabled(!fixedCount);
+            if(field!=null)field.style.display=fixedCount?DisplayStyle.None:DisplayStyle.Flex;
 #if UNITY_WEBGL && !UNITY_EDITOR
             if(field is TextField text)text.SetValueWithoutNotify(settings.LiarCount.ToString(System.Globalization.CultureInfo.InvariantCulture));
 #else
@@ -1051,12 +1052,12 @@ namespace DrawLiar
                     var heading=Box(info,"mobile-room-top row");RawText(heading,room.Name,"player-name grow");Text(heading,room.IsInProgress?"진행 중":"대기 중","mobile-room-state");
                     var metadata=Box(info,"mobile-room-metadata row");Text(metadata,"{0} / {1}명","muted mobile-small mobile-room-meta",room.Players,room.MaxPlayers);
                     if(room.Spectators>0)Text(metadata,"관전 {0}명","muted mobile-small mobile-room-meta",room.Spectators);
-                    if(room.LiarMode==LiarMode.Mismatch)Text(metadata,"미스매치","muted mobile-small mobile-room-meta").name="room-liar-mode-"+room.Id;
+                    if(room.LiarMode!=LiarMode.Classic)Text(metadata,room.LiarMode==LiarMode.Optional?"불확정":"미스매치","muted mobile-small mobile-room-meta").name="room-liar-mode-"+room.Id;
                 }
                 else
                 {
                     RawText(info,room.Name,"player-name");Text(info,room.IsInProgress?"{0} / {1}명 · 관전 {2}명 · 진행 중":"{0} / {1}명 · 관전 {2}명 · 대기 중","muted mobile-small",room.Players,room.MaxPlayers,room.Spectators);
-                    if(room.LiarMode==LiarMode.Mismatch)Text(info,"미스매치","muted mobile-small").name="room-liar-mode-"+room.Id;
+                    if(room.LiarMode!=LiarMode.Classic)Text(info,room.LiarMode==LiarMode.Optional?"불확정":"미스매치","muted mobile-small").name="room-liar-mode-"+room.Id;
                 }
                 var actions=IsMobile?Box(entry,"mobile-room-entry-actions mobile-room-action row"):entry;
                 if(!room.IsInProgress||room.AllowMidRoundJoin)
@@ -1416,6 +1417,7 @@ namespace DrawLiar
         private void RoomShortcut(KeyDownEvent e)
         {
             if(_roomPasswordOverlay!=null)return;
+            if(_roomTopicWorkshopOverlay!=null){if(e.keyCode==KeyCode.Escape)CloseRoomTopicWorkshop();e.StopPropagation();return;}
             if(_roomCustomizeOverlay!=null&&overlay==null)
             {if(e.keyCode==KeyCode.Escape)CloseRoomCustomization();e.StopPropagation();return;}
             if(_profileOverlay!=null){if(e.keyCode==KeyCode.Escape)ClosePublicProfile();e.StopPropagation();return;}
@@ -1457,6 +1459,8 @@ namespace DrawLiar
             names=names.Where(name=>!string.IsNullOrWhiteSpace(name)).Distinct().Take(128).ToArray();
             var editor=Modal("방 옵션",false);editor.name="room-options-editor";editor.AddToClassList("room-options-editor");
             _roomOptionsEditor=editor;_roomOptionsDraft=settings;
+            foreach(var topic in GameDataStore.LoadCustomTopics().Where(topic=>!names.Contains(topic.Name)))
+                _roomOptionsCustomTopics[topic.Name]=new ServerTopicData{Name=topic.Name,Words=(topic.Words??Array.Empty<string>()).ToArray()};
             var tabs=Box(editor,"row room-options-tabs");
             var scroll=DrawSmoothScroll.Create(ScrollViewMode.Vertical);scroll.name="room-options-scroll";scroll.AddToClassList("room-options-scroll");editor.Add(scroll);
             var body=Box(scroll,"room-options-body");
@@ -1470,7 +1474,8 @@ namespace DrawLiar
                 try
                 {
                     ValidateRoomPassword(settings.IsPrivate,_roomOptionsPassword,state.Settings.IsPrivate);
-                    await network.ConfigureRoomAsync(_roomOptionsDraft,settings.IsPrivate?_roomOptionsPassword:"");
+                    await network.ConfigureRoomAsync(_roomOptionsDraft,settings.IsPrivate?_roomOptionsPassword:"",
+                        _roomOptionsCustomTopics.Values.Where(topic=>settings.Topics.Contains(topic.Name)).ToArray());
                     if(_roomOptionsEditor==editor){CloseModal();Toast("방 옵션을 변경했습니다.");}
                 }
                 finally
@@ -1503,9 +1508,8 @@ namespace DrawLiar
                 else if(index==1)
                 {
                     VisualElement liarCount=null;
-                    Choice(body,"라이어 방식",new[]{"일반","미스매치"},(int)settings.LiarMode,i=>{settings.LiarMode=(LiarMode)i;RefreshRoomLiarCount(settings,liarCount);}).name="room-options-liar-mode";
-                    Choice(body,"그리기 방식",new[]{"릴레이 그리기","한 명씩 그리기"},(int)settings.Mode,i=>settings.Mode=(DrawingMode)i);
-                    liarCount=Int(body,"라이어 수",settings.LiarCount,1,GameRules.MAX_PLAYERS-1,v=>settings.LiarCount=settings.LiarMode==LiarMode.Mismatch?1:v);liarCount.name="room-options-liars";
+                    RoomModeChoices(body,settings,"room-options",()=>RefreshRoomLiarCount(settings,liarCount));
+                    liarCount=Int(body,"라이어 수",settings.LiarCount,1,GameRules.MAX_PLAYERS-1,v=>settings.LiarCount=settings.LiarMode==LiarMode.Classic?v:1);liarCount.name="room-options-liars";
                     RefreshRoomLiarCount(settings,liarCount);
                     Choice(body,"승리 조건",new[]{"정해진 판수 후 최고점","목표 점수 먼저 달성"},(int)settings.Victory,i=>{settings.Victory=(VictoryMode)i;SelectTab(1);});
                     if(settings.Victory==VictoryMode.RoundCount)Int(body,"진행 판수",settings.RoundCount,1,30,v=>settings.RoundCount=v);
@@ -1515,24 +1519,27 @@ namespace DrawLiar
                 else if(index==2)TimeFields(body,settings);
                 else
                 {
-                    var selected=new HashSet<string>((settings.Topics??names).Intersect(names));var controls=Box(body,"row spread");
+                    var available=names.Concat(_roomOptionsCustomTopics.Keys).Distinct().Take(128).ToArray();
+                    var selected=new HashSet<string>((settings.Topics??available).Intersect(available));var controls=Box(body,"row spread");
                     var count=Text(controls,"","topic-count");var bulk=Box(controls,"row");
+                    TopicEntryButtons(body,"room-options");
                     var grid=Box(body,"topic-grid");var topics=new Dictionary<string,Button>();
                     void Refresh()
                     {
-                        settings.Topics=names.Where(selected.Contains).ToArray();save.SetEnabled(settings.Topics.Length>0);
-                        SetText(count,"{0} / {1}개 선택",selected.Count,names.Length);
+                        settings.Topics=available.Where(selected.Contains).ToArray();save.SetEnabled(settings.Topics.Length>0);
+                        SetText(count,"{0} / {1}개 선택",selected.Count,available.Length);
                         foreach(var entry in topics){bool chosen=selected.Contains(entry.Key);SetRawText(entry.Value,(chosen?"✓  ":"")+entry.Key);entry.Value.EnableInClassList("topic-selected",chosen);}
                     }
-                    Button(bulk,"전체 선택",()=>{selected.UnionWith(names);Refresh();},"secondary");
+                    Button(bulk,"전체 선택",()=>{selected.UnionWith(available);Refresh();},"secondary");
                     Button(bulk,"초기화",()=>{selected.Clear();Refresh();},"secondary");
-                    foreach(string name in names){string key=name;var button=topics[key]=Button(grid,"",()=>{if(!selected.Add(key))selected.Remove(key);Refresh();},"topic-toggle");button.tooltip=key;button.userData=key;}
+                    foreach(string name in available){string key=name;var button=topics[key]=Button(grid,"",()=>{if(!selected.Add(key))selected.Remove(key);Refresh();},"topic-toggle");button.tooltip=key;button.userData=key;}
                     Refresh();
                 }
                 scroll.scrollOffset=Vector2.zero;HideMobileScrollers();
             }
             var titles=new[]{"방 정보","게임 규칙","시간 설정","주제"};var ids=new[]{"info","rules","time","topics"};
             for(int i=0;i<titles.Length;i++){int index=i;var button=Button(tabs,titles[i],()=>SelectTab(index),"secondary grow");button.name="room-options-"+ids[i];buttons.Add(button);}
+            _roomOptionsRefreshTopics=()=>SelectTab(3);
             save.SetEnabled(settings.Topics?.Length>0);SelectTab(0);
         }
         private void RefreshSecret(RoomSnapshot state)
@@ -1556,7 +1563,7 @@ namespace DrawLiar
             bool phaseChanged=previousPhase!=state.Phase;
             if(phaseChanged||_ballotVersion!=state.BallotVersion)
             {selectedPlayerId=-1;_hasSelectedPlayer=false;voteSubmitted=_judgmentSubmitted=false;contextKey="";_ballotVersion=state.BallotVersion;}
-            if(_hasSelectedPlayer&&!state.Players.Any(p=>p.Id==selectedPlayerId&&p.IsConnected&&!p.IsSpectator))
+            if(_hasSelectedPlayer&&!IsNoLiarSelected(state)&&!state.Players.Any(p=>p.Id==selectedPlayerId&&p.IsConnected&&!p.IsSpectator))
             {selectedPlayerId=-1;_hasSelectedPlayer=false;voteSubmitted=false;}
             SetRawText(roomBadge,state.Phase==GamePhase.Lobby?"—":state.Settings.Victory==VictoryMode.RoundCount?$"{state.Round:00} / {state.Settings.RoundCount:00}":$"{state.Round:00}");
             SetText(roundCaption,state.Phase==GamePhase.Lobby?"대기실":"라운드");
@@ -1582,8 +1589,8 @@ namespace DrawLiar
                     SetText(_mobileRoundInfo,"{0} / {1}명",state.Players.Count(p=>!p.IsSpectator&&p.IsConnected),state.Settings.MaxPlayers);
                     if(state.Settings.LiarMode==LiarMode.Mismatch)
                         SetText(_mobileRoundHint,state.Settings.Victory==VictoryMode.RoundCount?"미스매치 · {0}라운드":"미스매치 · 목표 {0}점",state.Settings.Victory==VictoryMode.RoundCount?state.Settings.RoundCount:state.Settings.TargetScore);
-                    else if(state.Settings.Victory==VictoryMode.RoundCount)SetText(_mobileRoundHint,"라이어 {0}명 · {1}라운드",state.Settings.LiarCount,state.Settings.RoundCount);
-                    else SetText(_mobileRoundHint,"라이어 {0}명 · 목표 {1}점",state.Settings.LiarCount,state.Settings.TargetScore);
+                    else if(state.Settings.Victory==VictoryMode.RoundCount)SetText(_mobileRoundHint,"라이어 {0}명 · {1}라운드",state.Settings.LiarMode==LiarMode.Optional?(object)"0~1":state.Settings.LiarCount,state.Settings.RoundCount);
+                    else SetText(_mobileRoundHint,"라이어 {0}명 · 목표 {1}점",state.Settings.LiarMode==LiarMode.Optional?(object)"0~1":state.Settings.LiarCount,state.Settings.TargetScore);
                 }
                 else
                 {
@@ -1634,9 +1641,7 @@ namespace DrawLiar
         }
         private bool CanSelectVote(RoomSnapshot state,PlayerView player)
         {
-            return IsNominationPhase(state)&&!state.LocalIsSpectator&&!voteSubmitted
-                &&state.Players.Any(p=>p.Id==state.LocalPlayerId&&p.IsConnected&&!p.IsSpectator&&!p.HasVoted)
-                &&player.Id!=state.LocalPlayerId&&player.IsConnected&&!player.IsSpectator;
+            return CanNominate(state)&&player!=null&&player.Id!=state.LocalPlayerId&&player.IsConnected&&!player.IsSpectator;
         }
         private static bool IsNominationPhase(RoomSnapshot state)=>state!=null&&(state.Phase==GamePhase.Discussion||state.Phase==GamePhase.Voting);
         private bool CanJudge(RoomSnapshot state,PlayerView local)=>state!=null&&state.Phase==GamePhase.Rebuttal
@@ -1732,8 +1737,8 @@ namespace DrawLiar
                     if(!IsMobile)
                     {
                         Text(contextInfo,"{0} / {1}명","context-name",state.Players.Count(p=>!p.IsSpectator&&p.IsConnected),state.Settings.MaxPlayers);
-                        if(state.Settings.LiarMode==LiarMode.Mismatch)Text(contextInfo,"미스매치","muted");
-                        Text(contextInfo,"라이어 {0}명","muted",state.Settings.LiarCount);
+                        if(state.Settings.LiarMode!=LiarMode.Classic)Text(contextInfo,state.Settings.LiarMode==LiarMode.Optional?"불확정":"미스매치","muted");
+                        Text(contextInfo,"라이어 {0}명","muted",state.Settings.LiarMode==LiarMode.Optional?(object)"0~1":state.Settings.LiarCount);
                         if(state.Settings.Victory==VictoryMode.RoundCount)Text(contextInfo,"{0}라운드","muted",state.Settings.RoundCount);
                         else Text(contextInfo,"목표 {0}점","muted",state.Settings.TargetScore);
                     }
@@ -1744,8 +1749,9 @@ namespace DrawLiar
         private void SubmitVote()
         {
             var state=network.State;var target=_hasSelectedPlayer?state?.Players.FirstOrDefault(p=>p.Id==selectedPlayerId):null;
-            if(target==null||!CanSelectVote(state,target))return;
-            voteSubmitted=true;network.Vote(target.Id);RefreshState(network.State);
+            if(!IsNoLiarSelected(state)||!CanSelectNoLiar(state))
+            {if(target==null||!CanSelectVote(state,target))return;}
+            voteSubmitted=true;network.Vote(selectedPlayerId);RefreshState(network.State);
         }
         private void SubmitJudgment(bool approve)
         {
@@ -1766,9 +1772,9 @@ namespace DrawLiar
                     if(state.IsHost)Button(phaseActions,"방 옵션",RoomOptions,"secondary").name="room-options-open";
                     if(state.IsHost&&!state.CanStart)
                     {
-                        if(state.Settings.LiarMode==LiarMode.Mismatch&&state.Players.Count(player=>player.IsConnected&&!player.IsSpectator)>=GameRules.MIN_START_PLAYERS)
+                        if(state.Settings.LiarMode==LiarMode.Mismatch&&state.Players.Count(player=>player.IsConnected&&!player.IsSpectator)>=GameRules.MinimumPlayers(state.Settings.LiarMode))
                             Text(phaseActions,"미스매치는 서로 다른 단어가 2개 이상인 주제가 필요합니다.","rules");
-                        else Text(phaseActions,"참가자 {0}명 필요","rules",GameRules.MIN_START_PLAYERS);
+                        else Text(phaseActions,"참가자 {0}명 필요","rules",GameRules.MinimumPlayers(state.Settings.LiarMode));
                     }
                     if(!IsMobile){Button(phaseActions,RoomCopyLabel,CopyRoomInvite,"secondary");RoomFriendInviteButton(phaseActions,"secondary");}break;
                 case GamePhase.Drawing:if(network.CanDraw)Button(phaseActions,"그리기 완료",network.EndTurn,"primary",DrawSound.UiConfirm);break;
@@ -1791,7 +1797,7 @@ namespace DrawLiar
         private static bool HasHiddenMismatchRole(RoomSnapshot state)=>state.Settings.LiarMode==LiarMode.Mismatch
             &&state.Phase>=GamePhase.RoleReveal&&state.Phase<=GamePhase.Voting;
         private static string LocalRoleName(RoomSnapshot state)=>state.LocalIsSpectator?"관전":HasHiddenMismatchRole(state)?"제시어":state.LocalIsLiar?"라이어":"시민";
-        private static string PhaseName(RoomSnapshot state)=>state.Phase==GamePhase.RoleReveal&&HasHiddenMismatchRole(state)?"제시어 확인":PhaseName(state.Phase);
+        private static string PhaseName(RoomSnapshot state)=>state.Phase==GamePhase.Rebuttal&&IsNoLiarAccused(state)?"확인 투표":state.Phase==GamePhase.RoleReveal&&HasHiddenMismatchRole(state)?"제시어 확인":PhaseName(state.Phase);
 
         private void RoleReveal(RoomSnapshot state)
         {
@@ -1811,6 +1817,8 @@ namespace DrawLiar
             var modal=Modal(state.Phase==GamePhase.MatchResults?"최종 결과":"라운드 결과");
             MatchRewardSummary(modal,state);
             Text(modal,"정답 · {0}","subtitle",state.Word);
+            if(state.Settings.LiarMode==LiarMode.Optional&&state.RevealedLiarCount==0)
+                Text(modal,"이번 라운드에는 라이어가 없습니다.","subtitle").name="results-no-liar";
             if(state.Settings.LiarMode==LiarMode.Mismatch&&(state.Phase==GamePhase.RoundResults||state.Phase==GamePhase.MatchResults)&&!string.IsNullOrEmpty(state.MismatchWord))
                 Text(modal,"다른 제시어 · {0}","subtitle",state.MismatchWord).name="results-mismatch-word";
             var list=DrawSmoothScroll.Create();list.style.maxHeight=380;modal.Add(list);
@@ -1827,6 +1835,8 @@ namespace DrawLiar
         private void RevealLiars(RoomSnapshot state)
         {
             var modal=Modal("라이어 공개");
+            if(state.Settings.LiarMode==LiarMode.Optional&&state.RevealedLiarCount==0)
+                Text(modal,"이번 라운드에는 라이어가 없습니다.","subtitle").name="revealed-no-liar";
             var identities=Box(modal,"row reveal-liars");
             foreach(var player in state.Players.Where(p=>p.IsLiar))
             {
@@ -1910,9 +1920,10 @@ namespace DrawLiar
         }
         private void ProfileForm(VisualElement panel,VisualElement preview=null,Action onSaved=null,bool scrollInModal=false,Action onCancel=null)
         {
+            if(!AvatarParts.Slots.Contains(_customizePartSlot))_customizePartSlot=AvatarPartSlot.Head;
             string accountId=lobby.Profile?.AccountId;
             var selectedColor=avatarColor;
-            int ownedMask=lobby.Profile?.OwnedAccessories?.Aggregate(0,(mask,item)=>mask|item)??0;
+            long ownedMask=lobby.Profile?.OwnedAccessories?.Aggregate(0L,(mask,item)=>mask|item)??0L;
             var selectedAccessory=AvatarParts.Sanitize(accessory&ownedMask);
             preview??=avatarStage;
             var equipmentButtons=new Dictionary<AvatarAccessory,Button>();
@@ -1928,7 +1939,7 @@ namespace DrawLiar
                 preview.Clear();var a=new AvatarElement(selectedColor,selectedAccessory);a.AddToClassList("lobby-avatar");preview.Add(a);
                 foreach(var item in equipmentButtons)
                 {
-                    bool equipped=item.Key==AvatarAccessory.None?(selectedAccessory&AvatarParts.Mask(_customizePartSlot))==0:AvatarParts.IsEquipped(selectedAccessory,(int)item.Key);
+                    bool equipped=item.Key==AvatarAccessory.None?(selectedAccessory&AvatarParts.Mask(_customizePartSlot))==0:AvatarParts.IsEquipped(selectedAccessory,(long)item.Key);
                     item.Value.EnableInClassList("equipped",equipped);
                     SetText(item.Value.Q<Label>(className:"equipment-state"),equipped?"장착 중":item.Key==AvatarAccessory.None?"":"장착하기");
                 }
@@ -1949,16 +1960,16 @@ namespace DrawLiar
                 {
                     var button=Button(equipment,"",()=>
                     {
-                        selectedAccessory=item==AvatarAccessory.None?AvatarParts.Remove(selectedAccessory,_customizePartSlot):AvatarParts.Equip(selectedAccessory,(int)item);
+                        selectedAccessory=item==AvatarAccessory.None?AvatarParts.Remove(selectedAccessory,_customizePartSlot):AvatarParts.Equip(selectedAccessory,(long)item);
                         UpdateAvatar();RevealAvatarPreview();
                     },"equipment-option");
                     button.name=id+"-option";SetTooltip(button,name);
-                    var icon=new AvatarElement(selectedColor,(int)item);icon.AddToClassList("equipment-preview");button.Add(icon);
+                    var icon=new AvatarElement(selectedColor,(long)item);icon.AddToClassList("equipment-preview");button.Add(icon);
                     Text(button,name,"equipment-name");Text(button,"","equipment-state");equipmentButtons[item]=button;
                 }
                 string defaultName=_customizePartSlot==AvatarPartSlot.Expression||_customizePartSlot==AvatarPartSlot.Body?"기본":"없음";
                 AddEquipment(AvatarAccessory.None,defaultName,"none");
-                foreach(var item in AvatarParts.Items.Where(part=>part.Slot==_customizePartSlot&&(ownedMask&(int)part.Accessory)==(int)part.Accessory))AddEquipment(item.Accessory,item.Name,item.Id);
+                foreach(var item in AvatarParts.Items.Where(part=>part.Slot==_customizePartSlot&&(ownedMask&(long)part.Accessory)==(long)part.Accessory))AddEquipment(item.Accessory,item.Name,item.Id);
                 UpdateAvatar();
             }
             PartTabs(form,(int)_customizePartSlot,slot=>{_customizePartSlot=(AvatarPartSlot)slot;RenderEquipment();},false);
@@ -2186,6 +2197,7 @@ namespace DrawLiar
         }
         private void CloseModal()
         {
+            CloseRoomTopicWorkshop(false);
             ClearGuessingPopup();
             ClosePublicProfile(false);
             var returnFocus=_popupReturnFocus;_popupReturnFocus=null;
@@ -2194,6 +2206,7 @@ namespace DrawLiar
             _socialList=null;
             if(_lobbyChatPanel?.ClassListContains("lobby-chat-in-modal")==true)ResetLobbyChatView();
             _roomOptionsEditor=null;_roomOptionsDraft=null;_roomOptionsSaving=false;
+            _roomOptionsRefreshTopics=null;_roomOptionsCustomTopics.Clear();
             ClearRoomOptionsPassword();
             DrawAudio.Instance?.FlushSettings();
             if(overlay!=null){var previous=overlay;overlay=null;DrawUIMotion.HideModal(previous,previous.Q<VisualElement>(className:"modal"));}
@@ -2228,6 +2241,7 @@ namespace DrawLiar
             root.EnableInClassList("rtl",L.IsRightToLeft);
             root.Query<TextElement>().ForEach(element=>{if(LOCALIZED_TEXT.TryGetValue(element,out var value))element.text=value.Resolve();});
             root.Query<VisualElement>().ForEach(element=>{if(LOCALIZED_TOOLTIPS.TryGetValue(element,out var value))element.tooltip=value.Resolve();});
+            PositionModeTooltip();
             root.Query<TextField>().ForEach(field=>{if(LOCALIZED_PLACEHOLDERS.TryGetValue(field,out var value))field.textEdition.placeholder=value.Resolve();});
             root.Query<DropdownField>().ForEach(field=>
             {
@@ -2252,6 +2266,7 @@ namespace DrawLiar
         }
         private void OnDestroy()
         {
+            HideModeTooltip();
             ClearDrawingPreview();
             ResetGuessingInput(true);
             CloseRoomCustomization(false,true);

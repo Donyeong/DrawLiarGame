@@ -45,12 +45,12 @@ internal static partial class Integration
             new EnterGameRequest { AssignmentToken = retry.AssignmentToken }, null);
         Check(entered.Profile.IsGuest && entered.Profile.AccountId == first.AccountId, "게임서버에도 게스트 상태가 전달되어야 합니다.");
         var purchased = await PostAsync<ProfileData>(game, "/api/shop/purchase", new PurchaseRequest
-            { ProductId = "beret", OperationId = Guid.NewGuid().ToString("D") }, entered.SessionToken);
+            { ProductId = "crown", OperationId = Guid.NewGuid().ToString("D") }, entered.SessionToken);
         string displayName = "게스트_" + Guid.NewGuid().ToString("N")[..8];
         using (var patch = new HttpRequestMessage(HttpMethod.Patch, "/api/profile")
         {
             Content = JsonContent.Create(new UpdateProfileRequest
-                { DisplayName = displayName, AvatarColor = 2, Accessory = 1 }, options: Json)
+                { DisplayName = displayName, AvatarColor = 2, Accessory = 4 }, options: Json)
         })
         {
             patch.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", entered.SessionToken);
@@ -77,8 +77,8 @@ internal static partial class Integration
         await AssertRejectedAsync(game, "/api/rooms", new CreateRoomRequest(), entered.SessionToken);
         var restored = await PostAsync<LoginResponse>(main, "/api/auth/guest", request, null);
         Check(restored.AccountId == first.AccountId && restored.Profile.DisplayName == displayName
-            && restored.Profile.Coins == purchased.Coins && restored.Profile.Coins == first.Profile.Coins - 100
-            && restored.Profile.AvatarColor == 2 && restored.Profile.Accessory == 1 && restored.Profile.OwnedAccessories.Contains(1),
+            && restored.Profile.Coins == purchased.Coins && restored.Profile.Coins == first.Profile.Coins - 150
+            && restored.Profile.AvatarColor == 2 && restored.Profile.Accessory == 4 && restored.Profile.OwnedAccessories.Contains(4),
             "게스트 재접속은 이름·캐릭터·보유품·재화를 PostgreSQL에서 복원해야 합니다.");
         await PostNoContentAsync(main, "/api/session/logout", new { }, restored.SessionToken);
         Report("운영 게스트 생성·응답 유실 재시도·재접속 프로필/보유품/재화 복원·잘못된 자격 거부·회원가입 제거·하위 세션 폐기 검증");
@@ -128,8 +128,8 @@ internal static partial class Integration
                 { GuestId = request.GuestId, GuestSecret = NewGuestRequest().GuestSecret }), "InvalidGuestCredential");
             await ExpectAuthErrorAsync(() => database.GuestLoginAsync(new GuestLoginRequest
                 { GuestId = Guid.Empty.ToString("D"), GuestSecret = request.GuestSecret }), "InvalidGuestCredential");
-            var purchased = await database.PurchaseAsync(accountId, new PurchaseRequest { ProductId = "beret", OperationId = Guid.NewGuid().ToString("D") });
-            var customized = await database.UpdateProfileAsync(accountId, new UpdateProfileRequest { DisplayName = "연동화가", AvatarColor = 4, Accessory = 1 });
+            var purchased = await database.PurchaseAsync(accountId, new PurchaseRequest { ProductId = "crown", OperationId = Guid.NewGuid().ToString("D") });
+            var customized = await database.UpdateProfileAsync(accountId, new UpdateProfileRequest { DisplayName = "연동화가", AvatarColor = 4, Accessory = 4 });
             await database.RequestFriendAsync(accountId, legacyId);
             await database.RespondFriendAsync(legacyId, accountId, true);
             var challenge = await database.CreateChallengeAsync("fixture-client", "mobile", accountId);

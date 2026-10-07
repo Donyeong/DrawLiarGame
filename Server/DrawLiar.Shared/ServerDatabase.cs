@@ -66,8 +66,25 @@ public sealed partial class ServerDatabase : IDisposable
     {
         Guid id = Guid.NewGuid();
         await using var connection = await _source.OpenConnectionAsync();
-        await Execute(connection, null, "INSERT INTO \"Account\" (\"Id\",\"DisplayName\",\"AvatarColor\") VALUES ($1,$2,$3)", id, ServerRuntime.DisplayName(name), Random.Shared.Next(6));
+        await using var transaction = await connection.BeginTransactionAsync();
+        await Execute(connection, transaction, "INSERT INTO \"Account\" (\"Id\",\"DisplayName\",\"AvatarColor\") VALUES ($1,$2,$3)", id, ServerRuntime.DisplayName(name), Random.Shared.Next(6));
+        await GrantDefaultAccessories(connection, transaction, id);
+        await transaction.CommitAsync();
         return id;
+    }
+
+    private static async Task GrantDefaultAccessories(NpgsqlConnection connection, NpgsqlTransaction transaction, Guid accountId,
+        CancellationToken cancellationToken = default)
+    {
+        foreach (var accessory in AvatarParts.DefaultAccessories)
+        {
+            await using var grant = Command(connection, transaction, """
+                INSERT INTO "OwnedAccessory" ("AccountId","Accessory") SELECT $1,$2
+                WHERE NOT EXISTS (SELECT 1 FROM "OwnedAccessory" WHERE "AccountId"=$1 AND ("Accessory" & $2)=$2)
+                ON CONFLICT ("AccountId","Accessory") DO NOTHING
+                """, accountId, (long)accessory);
+            await grant.ExecuteNonQueryAsync(cancellationToken);
+        }
     }
 
     public async Task<Guid> LoginAsync(LoginRequest request)
@@ -168,13 +185,13 @@ public sealed partial class ServerDatabase : IDisposable
             profile = new ProfileData
             {
                 AccountId = id.ToString(), DisplayName = reader.GetString(0), AvatarColor = reader.GetInt32(1),
-                Accessory = reader.GetInt32(2), Coins = reader.GetInt32(3), IsGuest = reader.GetBoolean(4), HasGoogleAccount = reader.GetBoolean(5)
+                Accessory = AvatarParts.Sanitize(reader.GetInt64(2)), Coins = reader.GetInt32(3), IsGuest = reader.GetBoolean(4), HasGoogleAccount = reader.GetBoolean(5)
             };
         }
-        var accessories = new List<int> { 0 };
+        var accessories = new SortedSet<long> { 0 };
         await using var owned = Command(connection, transaction, "SELECT \"Accessory\" FROM \"OwnedAccessory\" WHERE \"AccountId\"=$1 ORDER BY \"Accessory\"", id);
         await using var ownedReader = await owned.ExecuteReaderAsync();
-        while (await ownedReader.ReadAsync()) accessories.Add(ownedReader.GetInt32(0));
+        while (await ownedReader.ReadAsync()) accessories.Add(ownedReader.GetInt64(0) & AvatarParts.ALL_MASK);
         profile.OwnedAccessories = accessories.ToArray();
         return profile;
     }
@@ -187,7 +204,7 @@ public sealed partial class ServerDatabase : IDisposable
         await using var transaction = await connection.BeginTransactionAsync();
         if (request.Accessory != 0)
         {
-            int ownedMask = Convert.ToInt32(await Scalar(connection, transaction, "SELECT COALESCE(bit_or(\"Accessory\"),0) FROM \"OwnedAccessory\" WHERE \"AccountId\"=$1", id));
+            long ownedMask = Convert.ToInt64(await Scalar(connection, transaction, "SELECT COALESCE(bit_or(\"Accessory\"),0) FROM \"OwnedAccessory\" WHERE \"AccountId\"=$1", id));
             if ((ownedMask & request.Accessory) != request.Accessory) throw new ApiException("AccessoryNotOwned", 403);
         }
         await Execute(connection, transaction, "UPDATE \"Account\" SET \"DisplayName\"=$2,\"AvatarColor\"=$3,\"Accessory\"=$4 WHERE \"Id\"=$1", id, name, request.AvatarColor, request.Accessory);
@@ -235,7 +252,10 @@ public sealed partial class ServerDatabase : IDisposable
         {
             id = linkAccountId ?? Guid.NewGuid();
             if (!linkAccountId.HasValue)
+            {
                 await Execute(connection, transaction, "INSERT INTO \"Account\" (\"Id\",\"DisplayName\",\"AvatarColor\") VALUES ($1,$2,$3)", id, displayName, Random.Shared.Next(6));
+                await GrantDefaultAccessories(connection, transaction, id);
+            }
             else
             {
                 if (await Scalar(connection, transaction, "SELECT \"Id\" FROM \"Account\" WHERE \"Id\"=$1 AND NOT \"IsBanned\" FOR UPDATE", id) == null)
