@@ -16,4 +16,5 @@
 - Google Play 자동 업로드는 최초 콘솔 빌드 등록 이후 DrawLiar의 내부 테스트 초안에만 수행한다. 출시용 업로드 키·게시 서비스 계정은 테스트 서명·Firebase 자격 증명과 분리하고, CI 캐시의 예약된 Play 버전 코드를 재사용하지 않는다. 기존 초안·심사 중인 릴리스를 자동 교체하거나 정식 출시하지 않는다.
 - Unity Mono는 `ClientWebSocket`의 인증서 콜백을 적용하지 않는다. WSS는 `DrawWebSocketClient`의 `SslStream` 검증과 관리형 WebSocket을 사용한다.
 - WebGL은 브라우저 WebSocket과 동일 원점 HTTPS 프록시를 사용하며 Google 웹 인증은 서버의 일회용 nonce를 검증한다. 프록시는 공개 API와 채팅·게임 경로만 전달하며 전달 IP는 설정한 프록시에서만 신뢰한다.
+- 아바타 착용값은 JavaScript의 안전한 정수 범위를 넘을 수 있다. WebGL 브리지는 관련 JSON을 파싱·재직렬화하지 않고 원문 UTF-8로 전달하며, 로컬 착용값은 십진 문자열로 보관한다.
 - 웹사이트 Git 작업과 배포 원본은 `C:\RacallabWebGit` 저장소를 사용한다. 정적 파일은 운영 `WEB_ROOT`가 우선하므로 기존 릴리스를 보존해 변경 파일만 반영하고, 경로 전환 뒤 `rascallab` 서비스를 재시작한다.

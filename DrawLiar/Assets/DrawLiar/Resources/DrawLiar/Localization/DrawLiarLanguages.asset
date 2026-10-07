@@ -9467,6 +9467,688 @@ MonoBehaviour:
       - "\u0648\u062C\u0647 \u0642\u0637\u0629"
       Flags: 000000000000000000000000
       Languages_Touch: []
+    - Term: UI/7LSI66Gx7LSI66GxIOyWvOq1tA
+      TermType: 0
+      Description: "\uCD08\uB871\uCD08\uB871 \uC5BC\uAD74"
+      Languages:
+      - "\uCD08\uB871\uCD08\uB871 \uC5BC\uAD74"
+      - Bright-Eyed Face
+      - "\u4EAE\u6676\u6676\u8138"
+      - "\u4EAE\u6676\u6676\u81C9"
+      - "\u304D\u3089\u304D\u3089\u9854"
+      - Cara de ojos brillantes
+      - Rosto de olhos brilhantes
+      - Visage aux yeux brillants
+      - Strahlendes Gesicht
+      - Wajah Berbinar
+      - "\u091A\u092E\u0915\u0924\u0940 \u0906\u0901\u0916\u094B\u0902 \u0935\u093E\u0932\u093E
+        \u091A\u0947\u0939\u0930\u093E"
+      - "\u0648\u062C\u0647 \u0628\u0639\u064A\u0648\u0646 \u0644\u0627\u0645\u0639\u0629"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/64KY66W47ZWcIOyWvOq1tA
+      TermType: 0
+      Description: "\uB098\uB978\uD55C \uC5BC\uAD74"
+      Languages:
+      - "\uB098\uB978\uD55C \uC5BC\uAD74"
+      - Mellow Face
+      - "\u6175\u61D2\u8138"
+      - "\u6175\u61F6\u81C9"
+      - "\u307E\u3063\u305F\u308A\u9854"
+      - Cara relajada
+      - Rosto relaxado
+      - "Visage d\xE9tendu"
+      - Entspanntes Gesicht
+      - Wajah Santai
+      - "\u0936\u093E\u0902\u0924 \u091A\u0947\u0939\u0930\u093E"
+      - "\u0648\u062C\u0647 \u0645\u0633\u062A\u0631\u062E\u064D"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/67aE7ZmNIOyCkOyjvSDqsIDrsJw
+      TermType: 0
+      Description: "\uBD84\uD64D \uC090\uC8FD \uAC00\uBC1C"
+      Languages:
+      - "\uBD84\uD64D \uC090\uC8FD \uAC00\uBC1C"
+      - Pink Spiky Wig
+      - "\u7C89\u8272\u523A\u523A\u5047\u53D1"
+      - "\u7C89\u7D05\u523A\u523A\u5047\u9AEE"
+      - "\u30D4\u30F3\u30AF\u306E\u30C4\u30F3\u30C4\u30F3\u304B\u3064\u3089"
+      - Peluca rosa de puntas
+      - Peruca rosa espetada
+      - Perruque rose en bataille
+      - "Rosa Strubbelper\xFCcke"
+      - Wig Pink Berduri
+      - "\u0917\u0941\u0932\u093E\u092C\u0940 \u0928\u0941\u0915\u0940\u0932\u0940
+        \u0935\u093F\u0917"
+      - "\u0628\u0627\u0631\u0648\u0643\u0629 \u0648\u0631\u062F\u064A\u0629 \u0645\u0634\u0639\u062B\u0629"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7J6l66-4IOunjOuRkOuouOumrA
+      TermType: 0
+      Description: "\uC7A5\uBBF8 \uB9CC\uB450\uBA38\uB9AC"
+      Languages:
+      - "\uC7A5\uBBF8 \uB9CC\uB450\uBA38\uB9AC"
+      - Rose Twin Buns
+      - "\u73AB\u7470\u53CC\u4E38\u5B50\u5934"
+      - "\u73AB\u7470\u96D9\u4E38\u5B50\u982D"
+      - "\u30ED\u30FC\u30BA\u306E\u304A\u56E3\u5B50\u30D8\u30A2"
+      - "Dos mo\xF1os de rosa"
+      - Coques duplos de rosa
+      - Chignons roses
+      - Rosen-Duttfrisur
+      - Sanggul Mawar Kembar
+      - "\u0917\u0941\u0932\u093E\u092C \u0935\u093E\u0932\u0947 \u0926\u094B \u091C\u0942\u0921\u093C\u0947"
+      - "\u062A\u0633\u0631\u064A\u062D\u0629 \u0643\u0639\u0643\u062A\u064A\u0646
+        \u0628\u0627\u0644\u0648\u0631\u062F"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7JWE6riwIOyDgeyWtCDtm4Trk5w
+      TermType: 0
+      Description: "\uC544\uAE30 \uC0C1\uC5B4 \uD6C4\uB4DC"
+      Languages:
+      - "\uC544\uAE30 \uC0C1\uC5B4 \uD6C4\uB4DC"
+      - Baby Shark Hood
+      - "\u5C0F\u9CA8\u9C7C\u515C\u5E3D"
+      - "\u5C0F\u9BCA\u9B5A\u515C\u5E3D"
+      - "\u5B50\u30B6\u30E1\u30D5\u30FC\u30C9"
+      - Capucha de tiburoncito
+      - "Capuz de tubar\xE3ozinho"
+      - "Capuche b\xE9b\xE9 requin"
+      - Babyhai-Kapuze
+      - Tudung Bayi Hiu
+      - "\u0928\u0928\u094D\u0939\u0947 \u0936\u093E\u0930\u094D\u0915 \u0915\u093E
+        \u0939\u0941\u0921"
+      - "\u063A\u0637\u0627\u0621 \u0631\u0623\u0633 \u0627\u0644\u0642\u0631\u0634
+        \u0627\u0644\u0635\u063A\u064A\u0631"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7JmV64iIIOqwnOq1rOumrCDrqqjsnpA
+      TermType: 0
+      Description: "\uC655\uB208 \uAC1C\uAD6C\uB9AC \uBAA8\uC790"
+      Languages:
+      - "\uC655\uB208 \uAC1C\uAD6C\uB9AC \uBAA8\uC790"
+      - Big-Eyed Frog Hat
+      - "\u5927\u773C\u9752\u86D9\u5E3D"
+      - "\u5927\u773C\u9752\u86D9\u5E3D"
+      - "\u304E\u3087\u308D\u76EE\u30AB\u30A8\u30EB\u5E3D"
+      - Gorro de rana de ojos grandes
+      - "Chap\xE9u de sapo de olhos grandes"
+      - "Chapeau grenouille \xE0 gros yeux"
+      - "Glubschaugen-Froschm\xFCtze"
+      - Topi Katak Mata Besar
+      - "\u092C\u0921\u093C\u0940 \u0906\u0901\u0916\u094B\u0902 \u0935\u093E\u0932\u0940
+        \u092E\u0947\u0902\u0922\u0915 \u091F\u094B\u092A\u0940"
+      - "\u0642\u0628\u0639\u0629 \u0636\u0641\u062F\u0639 \u0628\u0639\u064A\u0648\u0646
+        \u0643\u0628\u064A\u0631\u0629"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7ZS97IWAIOyZleq0gA
+      TermType: 0
+      Description: "\uD53D\uC140 \uC655\uAD00"
+      Languages:
+      - "\uD53D\uC140 \uC655\uAD00"
+      - Pixel Crown
+      - "\u50CF\u7D20\u738B\u51A0"
+      - "\u50CF\u7D20\u738B\u51A0"
+      - "\u30D4\u30AF\u30BB\u30EB\u738B\u51A0"
+      - "Corona de p\xEDxeles"
+      - Coroa de pixels
+      - "Couronne pixelis\xE9e"
+      - Pixelkrone
+      - Mahkota Piksel
+      - "\u092A\u093F\u0915\u094D\u0938\u0947\u0932 \u0924\u093E\u091C"
+      - "\u062A\u0627\u062C \u0628\u0643\u0633\u0644"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7JmV64iIIOyViOqyvQ
+      TermType: 0
+      Description: "\uC655\uB208 \uC548\uACBD"
+      Languages:
+      - "\uC655\uB208 \uC548\uACBD"
+      - Googly-Eye Glasses
+      - "\u5927\u773C\u773C\u955C"
+      - "\u5927\u773C\u773C\u93E1"
+      - "\u304E\u3087\u308D\u76EE\u30E1\u30AC\u30CD"
+      - Gafas de ojos saltones
+      - "\xD3culos de olhos arregalados"
+      - "Lunettes \xE0 gros yeux"
+      - Glubschaugenbrille
+      - Kacamata Mata Melotot
+      - "\u092C\u0921\u093C\u0940 \u0906\u0901\u0916\u094B\u0902 \u0935\u093E\u0932\u093E
+        \u091A\u0936\u094D\u092E\u093E"
+      - "\u0646\u0638\u0627\u0631\u0627\u062A \u0639\u064A\u0648\u0646 \u0643\u0628\u064A\u0631\u0629"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/67mZ6riAIOyViOqyvQ
+      TermType: 0
+      Description: "\uBE59\uAE00 \uC548\uACBD"
+      Languages:
+      - "\uBE59\uAE00 \uC548\uACBD"
+      - Spiral Glasses
+      - "\u87BA\u65CB\u773C\u955C"
+      - "\u87BA\u65CB\u773C\u93E1"
+      - "\u3050\u308B\u3050\u308B\u30E1\u30AC\u30CD"
+      - Gafas en espiral
+      - "\xD3culos em espiral"
+      - Lunettes en spirale
+      - Spiralbrille
+      - Kacamata Spiral
+      - "\u0918\u0941\u092E\u093E\u0935\u0926\u093E\u0930 \u091A\u0936\u094D\u092E\u093E"
+      - "\u0646\u0638\u0627\u0631\u0627\u062A \u062D\u0644\u0632\u0648\u0646\u064A\u0629"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7Iuc7YGs66a_IOuIiOqwgOumrOqwnA
+      TermType: 0
+      Description: "\uC2DC\uD06C\uB9BF \uB208\uAC00\uB9AC\uAC1C"
+      Languages:
+      - "\uC2DC\uD06C\uB9BF \uB208\uAC00\uB9AC\uAC1C"
+      - Secret Eye Mask
+      - "\u795E\u79D8\u773C\u7F69"
+      - "\u795E\u79D8\u773C\u7F69"
+      - "\u30B7\u30FC\u30AF\u30EC\u30C3\u30C8\u76EE\u96A0\u3057"
+      - Antifaz secreto
+      - "M\xE1scara secreta"
+      - Bandeau secret
+      - Geheime Augenmaske
+      - Penutup Mata Rahasia
+      - "\u0917\u0941\u092A\u094D\u0924 \u0906\u0901\u0916\u094B\u0902 \u0915\u093E
+        \u092E\u093E\u0938\u094D\u0915"
+      - "\u0642\u0646\u0627\u0639 \u0639\u064A\u0648\u0646 \u0633\u0631\u064A"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7KeE65WAIOyKpO2LsOy7pA
+      TermType: 0
+      Description: "\uC9C4\uB540 \uC2A4\uD2F0\uCEE4"
+      Languages:
+      - "\uC9C4\uB540 \uC2A4\uD2F0\uCEE4"
+      - Nervous Sweat Sticker
+      - "\u51B7\u6C57\u8D34\u7EB8"
+      - "\u51B7\u6C57\u8CBC\u7D19"
+      - "\u51B7\u3084\u6C57\u30B7\u30FC\u30EB"
+      - "Pegatina de sudor fr\xEDo"
+      - Adesivo de suor frio
+      - Autocollant sueur froide
+      - "Schwei\xDFtropfen-Aufkleber"
+      - Stiker Keringat Dingin
+      - "\u0918\u092C\u0930\u093E\u0939\u091F \u0915\u0947 \u092A\u0938\u0940\u0928\u0947
+        \u0915\u093E \u0938\u094D\u091F\u093F\u0915\u0930"
+      - "\u0645\u0644\u0635\u0642 \u0639\u0631\u0642 \u0627\u0644\u062A\u0648\u062A\u0631"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/6rO87J6lIOy9p-yImOyXvA
+      TermType: 0
+      Description: "\uACFC\uC7A5 \uCF67\uC218\uC5FC"
+      Languages:
+      - "\uACFC\uC7A5 \uCF67\uC218\uC5FC"
+      - Dramatic Moustache
+      - "\u5938\u5F20\u5C0F\u80E1\u5B50"
+      - "\u8A87\u5F35\u5C0F\u9B0D\u5B50"
+      - "\u5927\u3052\u3055\u306A\u53E3\u3072\u3052"
+      - Bigote exagerado
+      - Bigode exagerado
+      - Moustache extravagante
+      - "\xDCbertriebener Schnurrbart"
+      - Kumis Berlebihan
+      - "\u092C\u0921\u093C\u0940 \u092E\u0942\u0901\u091B\u0947\u0902"
+      - "\u0634\u0627\u0631\u0628 \u0645\u0628\u0627\u0644\u063A \u0641\u064A\u0647"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/67Cp7Jq4IOuqqeqxuOydtA
+      TermType: 0
+      Description: "\uBC29\uC6B8 \uBAA9\uAC78\uC774"
+      Languages:
+      - "\uBC29\uC6B8 \uBAA9\uAC78\uC774"
+      - Bell Necklace
+      - "\u94C3\u94DB\u9879\u94FE"
+      - "\u9234\u943A\u9805\u934A"
+      - "\u9234\u306E\u30CD\u30C3\u30AF\u30EC\u30B9"
+      - Collar de cascabel
+      - Colar de sino
+      - "Collier \xE0 clochette"
+      - "Gl\xF6ckchenkette"
+      - Kalung Lonceng
+      - "\u0918\u0902\u091F\u0940 \u0935\u093E\u0932\u093E \u0939\u093E\u0930"
+      - "\u0642\u0644\u0627\u062F\u0629 \u062C\u0631\u0633"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7JmV66as67O4
+      TermType: 0
+      Description: "\uC655\uB9AC\uBCF8"
+      Languages:
+      - "\uC655\uB9AC\uBCF8"
+      - Giant Bow
+      - "\u5927\u8774\u8776\u7ED3"
+      - "\u5927\u8774\u8776\u7D50"
+      - "\u30C7\u30AB\u30EA\u30DC\u30F3"
+      - Lazo gigante
+      - "La\xE7o gigante"
+      - "N\u0153ud g\xE9ant"
+      - Riesenschleife
+      - Pita Raksasa
+      - "\u0935\u093F\u0936\u093E\u0932 \u0930\u093F\u092C\u0928"
+      - "\u0641\u064A\u0648\u0646\u0643\u0629 \u0643\u0628\u064A\u0631\u0629"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/66m067CcIOuouO2UjOufrA
+      TermType: 0
+      Description: "\uBA74\uBC1C \uBA38\uD50C\uB7EC"
+      Languages:
+      - "\uBA74\uBC1C \uBA38\uD50C\uB7EC"
+      - Noodle Scarf
+      - "\u9762\u6761\u56F4\u5DFE"
+      - "\u9EB5\u689D\u570D\u5DFE"
+      - "\u9EBA\u306E\u30DE\u30D5\u30E9\u30FC"
+      - Bufanda de fideos
+      - "Cachecol de macarr\xE3o"
+      - "\xC9charpe de nouilles"
+      - Nudelschal
+      - Syal Mi
+      - "\u0928\u0942\u0921\u0932 \u0935\u093E\u0932\u093E \u092E\u092B\u0932\u0930"
+      - "\u0648\u0634\u0627\u062D \u0646\u0648\u062F\u0644\u0632"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7Ya17Ya1IOyytOyduA
+      TermType: 0
+      Description: "\uD1B5\uD1B5 \uCCB4\uC778"
+      Languages:
+      - "\uD1B5\uD1B5 \uCCB4\uC778"
+      - Chunky Chain
+      - "\u7C97\u94FE\u6761"
+      - "\u7C97\u93C8\u689D"
+      - "\u592A\u3081\u30C1\u30A7\u30FC\u30F3"
+      - Cadena gruesa
+      - Corrente grossa
+      - "Grosse cha\xEEne"
+      - Dicke Kette
+      - Rantai Tebal
+      - "\u092E\u094B\u091F\u0940 \u091A\u0947\u0928"
+      - "\u0633\u0644\u0633\u0644\u0629 \u0633\u0645\u064A\u0643\u0629"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/66-464uIIOy5tOuplOudvA
+      TermType: 0
+      Description: "\uBBF8\uB2C8 \uCE74\uBA54\uB77C"
+      Languages:
+      - "\uBBF8\uB2C8 \uCE74\uBA54\uB77C"
+      - Mini Camera
+      - "\u8FF7\u4F60\u76F8\u673A"
+      - "\u8FF7\u4F60\u76F8\u6A5F"
+      - "\u30DF\u30CB\u30AB\u30E1\u30E9"
+      - "Mini c\xE1mara"
+      - "Mini c\xE2mera"
+      - Mini appareil photo
+      - Minikamera
+      - Kamera Mini
+      - "\u092E\u093F\u0928\u0940 \u0915\u0948\u092E\u0930\u093E"
+      - "\u0643\u0627\u0645\u064A\u0631\u0627 \u0635\u063A\u064A\u0631\u0629"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7Iud67m1IOuwsOuCrQ
+      TermType: 0
+      Description: "\uC2DD\uBE75 \uBC30\uB0AD"
+      Languages:
+      - "\uC2DD\uBE75 \uBC30\uB0AD"
+      - Toast Backpack
+      - "\u5410\u53F8\u80CC\u5305"
+      - "\u5410\u53F8\u80CC\u5305"
+      - "\u98DF\u30D1\u30F3\u30EA\u30E5\u30C3\u30AF"
+      - Mochila de tostada
+      - Mochila de torrada
+      - "Sac \xE0 dos tartine"
+      - Toastbrot-Rucksack
+      - Ransel Roti Panggang
+      - "\u091F\u094B\u0938\u094D\u091F \u0935\u093E\u0932\u093E \u092C\u0948\u0917"
+      - "\u062D\u0642\u064A\u0628\u0629 \u0638\u0647\u0631 \u062A\u0648\u0633\u062A"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7IOB7Ja0IOq8rOumrA
+      TermType: 0
+      Description: "\uC0C1\uC5B4 \uAF2C\uB9AC"
+      Languages:
+      - "\uC0C1\uC5B4 \uAF2C\uB9AC"
+      - Shark Tail
+      - "\u9CA8\u9C7C\u5C3E\u5DF4"
+      - "\u9BCA\u9B5A\u5C3E\u5DF4"
+      - "\u30B5\u30E1\u306E\u3057\u3063\u307D"
+      - "Cola de tibur\xF3n"
+      - "Cauda de tubar\xE3o"
+      - Queue de requin
+      - Haischwanz
+      - Ekor Hiu
+      - "\u0936\u093E\u0930\u094D\u0915 \u0915\u0940 \u092A\u0942\u0901\u091B"
+      - "\u0630\u064A\u0644 \u0642\u0631\u0634"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/66eQ7ZKN7ISgIO2Mu-unkA
+      TermType: 0
+      Description: "\uB9D0\uD48D\uC120 \uD33B\uB9D0"
+      Languages:
+      - "\uB9D0\uD48D\uC120 \uD33B\uB9D0"
+      - Speech Bubble Sign
+      - "\u5BF9\u8BDD\u6C14\u6CE1\u724C"
+      - "\u5C0D\u8A71\u6CE1\u6CE1\u724C"
+      - "\u3075\u304D\u3060\u3057\u770B\u677F"
+      - Cartel de bocadillo
+      - "Placa de bal\xE3o de fala"
+      - Pancarte bulle de dialogue
+      - Sprechblasen-Schild
+      - Papan Balon Dialog
+      - "\u0938\u0902\u0935\u093E\u0926 \u092C\u0941\u0932\u092C\u0941\u0932\u0947
+        \u0915\u0940 \u0924\u0916\u094D\u0924\u0940"
+      - "\u0644\u0627\u0641\u062A\u0629 \u0641\u0642\u0627\u0639\u0629 \u0643\u0644\u0627\u0645"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7ZS97IWAIOuCoOqwnA
+      TermType: 0
+      Description: "\uD53D\uC140 \uB0A0\uAC1C"
+      Languages:
+      - "\uD53D\uC140 \uB0A0\uAC1C"
+      - Pixel Wings
+      - "\u50CF\u7D20\u7FC5\u8180"
+      - "\u50CF\u7D20\u7FC5\u8180"
+      - "\u30D4\u30AF\u30BB\u30EB\u306E\u7FBD"
+      - "Alas de p\xEDxeles"
+      - Asas de pixels
+      - "Ailes pixelis\xE9es"
+      - "Pixelfl\xFCgel"
+      - Sayap Piksel
+      - "\u092A\u093F\u0915\u094D\u0938\u0947\u0932 \u092A\u0902\u0916"
+      - "\u0623\u062C\u0646\u062D\u0629 \u0628\u0643\u0633\u0644"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7Y-t64ulIOuLtOyalA
+      TermType: 0
+      Description: "\uD3ED\uB2E5 \uB2F4\uC694"
+      Languages:
+      - "\uD3ED\uB2E5 \uB2F4\uC694"
+      - Cozy Blanket
+      - "\u8F6F\u7EF5\u6BEF"
+      - "\u8EDF\u7DBF\u6BEF"
+      - "\u3075\u308F\u3075\u308F\u6BDB\u5E03"
+      - Manta acogedora
+      - Cobertor fofinho
+      - Couverture douillette
+      - Kuscheldecke
+      - Selimut Nyaman
+      - "\u092E\u0941\u0932\u093E\u092F\u092E \u0915\u0902\u092C\u0932"
+      - "\u0628\u0637\u0627\u0646\u064A\u0629 \u062F\u0627\u0641\u0626\u0629"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7IOd7ISgIOyduO2YlQ
+      TermType: 0
+      Description: "\uC0DD\uC120 \uC778\uD615"
+      Languages:
+      - "\uC0DD\uC120 \uC778\uD615"
+      - Fish Plush
+      - "\u9C7C\u73A9\u5076"
+      - "\u9B5A\u73A9\u5076"
+      - "\u9B5A\u306E\u306C\u3044\u3050\u308B\u307F"
+      - Peluche de pez
+      - "Pel\xFAcia de peixe"
+      - Poisson en peluche
+      - "Fischpl\xFCschtier"
+      - Boneka Ikan
+      - "\u092E\u091B\u0932\u0940 \u0915\u093E \u0916\u093F\u0932\u094C\u0928\u093E"
+      - "\u062F\u0645\u064A\u0629 \u0633\u0645\u0643\u0629"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7IKR7IKRIOunney5mA
+      TermType: 0
+      Description: "\uC091\uC091 \uB9DD\uCE58"
+      Languages:
+      - "\uC091\uC091 \uB9DD\uCE58"
+      - Squeaky Hammer
+      - "\u5431\u5431\u9524"
+      - "\u5431\u5431\u9318"
+      - "\u30D4\u30B3\u30D4\u30B3\u30CF\u30F3\u30DE\u30FC"
+      - "Martillo chill\xF3n"
+      - Martelo que apita
+      - Marteau couineur
+      - Quietschhammer
+      - Palu Berdecit
+      - "\u091A\u0940\u0902-\u091A\u0940\u0902 \u0939\u0925\u094C\u0921\u093C\u093E"
+      - "\u0645\u0637\u0631\u0642\u0629 \u062A\u0635\u062F\u0631 \u0635\u0641\u064A\u0631\u064B\u0627"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/64qQ6riL7ZWcIOywu-yelA
+      TermType: 0
+      Description: "\uB290\uAE0B\uD55C \uCC3B\uC794"
+      Languages:
+      - "\uB290\uAE0B\uD55C \uCC3B\uC794"
+      - Cozy Teacup
+      - "\u60A0\u95F2\u8336\u676F"
+      - "\u60A0\u9592\u8336\u676F"
+      - "\u306E\u3093\u3073\u308A\u30C6\u30A3\u30FC\u30AB\u30C3\u30D7"
+      - "Taza de t\xE9 acogedora"
+      - "X\xEDcara de ch\xE1 aconchegante"
+      - "Tasse de th\xE9 douillette"
+      - "Gem\xFCtliche Teetasse"
+      - Cangkir Teh Santai
+      - "\u0906\u0930\u093E\u092E\u0926\u093E\u092F\u0915 \u091A\u093E\u092F \u0915\u093E
+        \u0915\u092A"
+      - "\u0641\u0646\u062C\u0627\u0646 \u0634\u0627\u064A \u0647\u0627\u062F\u0626"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7J6YIOydteydgCDrsJTrgpjrgpg
+      TermType: 0
+      Description: "\uC798 \uC775\uC740 \uBC14\uB098\uB098"
+      Languages:
+      - "\uC798 \uC775\uC740 \uBC14\uB098\uB098"
+      - Ripe Banana
+      - "\u719F\u9999\u8549"
+      - "\u719F\u9999\u8549"
+      - "\u5B8C\u719F\u30D0\u30CA\u30CA"
+      - "Pl\xE1tano maduro"
+      - Banana madura
+      - "Banane m\xFBre"
+      - Reife Banane
+      - Pisang Matang
+      - "\u092A\u0915\u093E \u0915\u0947\u0932\u093E"
+      - "\u0645\u0648\u0632\u0629 \u0646\u0627\u0636\u062C\u0629"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/66-464uIIO2CpOuztOuTnA
+      TermType: 0
+      Description: "\uBBF8\uB2C8 \uD0A4\uBCF4\uB4DC"
+      Languages:
+      - "\uBBF8\uB2C8 \uD0A4\uBCF4\uB4DC"
+      - Mini Keyboard
+      - "\u8FF7\u4F60\u952E\u76D8"
+      - "\u8FF7\u4F60\u9375\u76E4"
+      - "\u30DF\u30CB\u30AD\u30FC\u30DC\u30FC\u30C9"
+      - Mini teclado
+      - Mini teclado
+      - Mini clavier
+      - Minitastatur
+      - Papan Ketik Mini
+      - "\u092E\u093F\u0928\u0940 \u0915\u0940\u092C\u094B\u0930\u094D\u0921"
+      - "\u0644\u0648\u062D\u0629 \u0645\u0641\u0627\u062A\u064A\u062D \u0635\u063A\u064A\u0631\u0629"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/66mN7ZWcIOyWvOq1tA
+      TermType: 0
+      Description: "\uBA4D\uD55C \uC5BC\uAD74"
+      Languages:
+      - "\uBA4D\uD55C \uC5BC\uAD74"
+      - Blank Face
+      - "\u5446\u5446\u8138"
+      - "\u5446\u5446\u81C9"
+      - "\u307C\u3093\u3084\u308A\u9854"
+      - Cara ausente
+      - "Rosto distra\xEDdo"
+      - Visage distrait
+      - "Vertr\xE4umtes Gesicht"
+      - Wajah Bengong
+      - "\u0916\u094B\u092F\u093E \u0939\u0941\u0906 \u091A\u0947\u0939\u0930\u093E"
+      - "\u0648\u062C\u0647 \u0634\u0627\u0631\u062F"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/64ql6riAIOyWvOq1tA
+      TermType: 0
+      Description: "\uB2A5\uAE00 \uC5BC\uAD74"
+      Languages:
+      - "\uB2A5\uAE00 \uC5BC\uAD74"
+      - Smug Face
+      - "\u5F97\u610F\u8138"
+      - "\u5F97\u610F\u81C9"
+      - "\u30CB\u30E4\u30EA\u9854"
+      - Cara presumida
+      - Rosto convencido
+      - Visage suffisant
+      - "Selbstgef\xE4lliges Gesicht"
+      - Wajah Sok Puas
+      - "\u0906\u0924\u094D\u092E\u0938\u0902\u0924\u0941\u0937\u094D\u091F \u091A\u0947\u0939\u0930\u093E"
+      - "\u0648\u062C\u0647 \u0645\u062A\u0628\u0627\u0647\u064D"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7Yyo64uJIOyWvOq1tA
+      TermType: 0
+      Description: "\uD328\uB2C9 \uC5BC\uAD74"
+      Languages:
+      - "\uD328\uB2C9 \uC5BC\uAD74"
+      - Panic Face
+      - "\u614C\u5F20\u8138"
+      - "\u614C\u5F35\u81C9"
+      - "\u30D1\u30CB\u30C3\u30AF\u9854"
+      - "Cara de p\xE1nico"
+      - "Rosto em p\xE2nico"
+      - "Visage paniqu\xE9"
+      - Panikgesicht
+      - Wajah Panik
+      - "\u0918\u092C\u0930\u093E\u092F\u093E \u091A\u0947\u0939\u0930\u093E"
+      - "\u0648\u062C\u0647 \u0645\u0630\u0639\u0648\u0631"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7LCM6re465-s7KeEIOyWvOq1tA
+      TermType: 0
+      Description: "\uCC0C\uADF8\uB7EC\uC9C4 \uC5BC\uAD74"
+      Languages:
+      - "\uCC0C\uADF8\uB7EC\uC9C4 \uC5BC\uAD74"
+      - Squished Face
+      - "\u6324\u6241\u8138"
+      - "\u64E0\u6241\u81C9"
+      - "\u307A\u3057\u3083\u3093\u3053\u9854"
+      - Cara aplastada
+      - Rosto amassado
+      - "Visage \xE9cras\xE9"
+      - "Zerdr\xFCcktes Gesicht"
+      - Wajah Penyok
+      - "\u092A\u093F\u091A\u0915\u093E \u0939\u0941\u0906 \u091A\u0947\u0939\u0930\u093E"
+      - "\u0648\u062C\u0647 \u0645\u0641\u0644\u0637\u062D"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7JSpIOybg-uKlCDslrzqtbQ
+      TermType: 0
+      Description: "\uC529 \uC6C3\uB294 \uC5BC\uAD74"
+      Languages:
+      - "\uC529 \uC6C3\uB294 \uC5BC\uAD74"
+      - Grinning Face
+      - "\u54A7\u5634\u7B11\u8138"
+      - "\u54A7\u5634\u7B11\u81C9"
+      - "\u306B\u3093\u307E\u308A\u9854"
+      - Cara sonriente
+      - Rosto sorridente
+      - Visage souriant
+      - Grinsegesicht
+      - Wajah Nyengir
+      - "\u091A\u094C\u0921\u093C\u0940 \u092E\u0941\u0938\u094D\u0915\u093E\u0928
+        \u0935\u093E\u0932\u093E \u091A\u0947\u0939\u0930\u093E"
+      - "\u0648\u062C\u0647 \u0628\u0627\u0628\u062A\u0633\u0627\u0645\u0629 \u0639\u0631\u064A\u0636\u0629"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/6ri47K2JIOqzoOyWkeydtCDrqrjthrU
+      TermType: 0
+      Description: "\uAE38\uCB49 \uACE0\uC591\uC774 \uBAB8\uD1B5"
+      Languages:
+      - "\uAE38\uCB49 \uACE0\uC591\uC774 \uBAB8\uD1B5"
+      - Long Cat Body
+      - "\u7EC6\u957F\u732B\u54AA\u8EAB\u4F53"
+      - "\u7D30\u9577\u8C93\u54AA\u8EAB\u9AD4"
+      - "\u306E\u3073\u732B\u30DC\u30C7\u30A3"
+      - Cuerpo de gato alargado
+      - Corpo de gato comprido
+      - "Corps de chat allong\xE9"
+      - "Langer Katzenk\xF6rper"
+      - Badan Kucing Panjang
+      - "\u0932\u0902\u092C\u0940 \u092C\u093F\u0932\u094D\u0932\u0940 \u0915\u093E
+        \u0936\u0930\u0940\u0930"
+      - "\u062C\u0633\u0645 \u0642\u0637\u0629 \u0637\u0648\u064A\u0644"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7YOx6riAIO2RuOuUqSDrqrjthrU
+      TermType: 0
+      Description: "\uD0F1\uAE00 \uD478\uB529 \uBAB8\uD1B5"
+      Languages:
+      - "\uD0F1\uAE00 \uD478\uB529 \uBAB8\uD1B5"
+      - Jiggly Pudding Body
+      - "Q\u5F39\u5E03\u4E01\u8EAB\u4F53"
+      - "\u5F48\u5AE9\u5E03\u4E01\u8EAB\u9AD4"
+      - "\u3077\u308B\u3077\u308B\u30D7\u30EA\u30F3\u30DC\u30C7\u30A3"
+      - "Cuerpo de pud\xEDn tembloroso"
+      - Corpo de pudim macio
+      - Corps de flan tremblotant
+      - "Wackelpuddingk\xF6rper"
+      - Badan Puding Kenyal
+      - "\u0932\u091A\u0940\u0932\u0947 \u092A\u0941\u0921\u093F\u0902\u0917 \u0915\u093E
+        \u0936\u0930\u0940\u0930"
+      - "\u062C\u0633\u0645 \u0628\u0648\u062F\u064A\u0646\u063A \u0637\u0631\u064A"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/66eI7Iuc66mc66GcIOuquO2GtQ
+      TermType: 0
+      Description: "\uB9C8\uC2DC\uBA5C\uB85C \uBAB8\uD1B5"
+      Languages:
+      - "\uB9C8\uC2DC\uBA5C\uB85C \uBAB8\uD1B5"
+      - Marshmallow Body
+      - "\u68C9\u82B1\u7CD6\u8EAB\u4F53"
+      - "\u68C9\u82B1\u7CD6\u8EAB\u9AD4"
+      - "\u30DE\u30B7\u30E5\u30DE\u30ED\u30DC\u30C7\u30A3"
+      - Cuerpo de malvavisco
+      - Corpo de marshmallow
+      - Corps de guimauve
+      - "Marshmallowk\xF6rper"
+      - Badan Marshmallow
+      - "\u092E\u093E\u0930\u094D\u0936\u092E\u0948\u0932\u094B \u0915\u093E \u0936\u0930\u0940\u0930"
+      - "\u062C\u0633\u0645 \u0645\u0627\u0631\u0634\u0645\u064A\u0644\u0648"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/66eQ656RIOycoOuguSDrqrjthrU
+      TermType: 0
+      Description: "\uB9D0\uB791 \uC720\uB839 \uBAB8\uD1B5"
+      Languages:
+      - "\uB9D0\uB791 \uC720\uB839 \uBAB8\uD1B5"
+      - Squishy Ghost Body
+      - "\u8F6F\u8F6F\u5E7D\u7075\u8EAB\u4F53"
+      - "\u8EDF\u8EDF\u5E7D\u9748\u8EAB\u9AD4"
+      - "\u3084\u308F\u3089\u304B\u304A\u3070\u3051\u30DC\u30C7\u30A3"
+      - Cuerpo de fantasma blandito
+      - Corpo de fantasma fofinho
+      - "Corps de fant\xF4me moelleux"
+      - "Weicher Geisterk\xF6rper"
+      - Badan Hantu Lembut
+      - "\u092E\u0941\u0932\u093E\u092F\u092E \u092D\u0942\u0924 \u0915\u093E \u0936\u0930\u0940\u0930"
+      - "\u062C\u0633\u0645 \u0634\u0628\u062D \u0637\u0631\u064A"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7ZS97IWAIOu4lOuhnSDrqrjthrU
+      TermType: 0
+      Description: "\uD53D\uC140 \uBE14\uB85D \uBAB8\uD1B5"
+      Languages:
+      - "\uD53D\uC140 \uBE14\uB85D \uBAB8\uD1B5"
+      - Pixel Block Body
+      - "\u50CF\u7D20\u65B9\u5757\u8EAB\u4F53"
+      - "\u50CF\u7D20\u65B9\u584A\u8EAB\u9AD4"
+      - "\u30D4\u30AF\u30BB\u30EB\u30D6\u30ED\u30C3\u30AF\u30DC\u30C7\u30A3"
+      - "Cuerpo de bloque de p\xEDxeles"
+      - Corpo de bloco de pixels
+      - "Corps de bloc pixelis\xE9"
+      - "Pixelblockk\xF6rper"
+      - Badan Blok Piksel
+      - "\u092A\u093F\u0915\u094D\u0938\u0947\u0932 \u092C\u094D\u0932\u0949\u0915
+        \u0915\u093E \u0936\u0930\u0940\u0930"
+      - "\u062C\u0633\u0645 \u0643\u062A\u0644\u0629 \u0628\u0643\u0633\u0644"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
     CaseInsensitiveTerms: 0
     OnMissingTranslation: 0
     mTerm_AppName:

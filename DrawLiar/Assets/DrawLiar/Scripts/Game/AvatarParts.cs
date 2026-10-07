@@ -15,7 +15,43 @@ namespace DrawLiar
         BeanBody = 33554432, CatBody = 67108864, BearBody = 134217728,
         Blush = 268435456, Mischievous = 536870912, Tearful = 1073741824,
         HeartEyes = 2147483648L, StarEyes = 4294967296L, SpiralEyes = 8589934592L,
-        PixelFace = 17179869184L, SkullFace = 34359738368L, CatFace = 68719476736L
+        PixelFace = 17179869184L, SkullFace = 34359738368L, CatFace = 68719476736L,
+        SparkleFace = 137438953472L, MellowFace = 274877906944L,
+        PinkWig = 549755813888L,
+        RoseBuns = 1099511627776L,
+        SharkHood = 1649267441664L,
+        FrogCap = 2199023255552L,
+        PixelCrown = 2748779069440L,
+        GoggleEyes = 4398046511104L,
+        SwirlGlasses = 8796093022208L,
+        CensorBar = 13194139533312L,
+        SweatSticker = 17592186044416L,
+        MemeMoustache = 21990232555520L,
+        BellCollar = 35184372088832L,
+        GiantBow = 70368744177664L,
+        NoodleScarf = 105553116266496L,
+        ChunkyChain = 140737488355328L,
+        CameraStrap = 175921860444160L,
+        ToastBackpack = 281474976710656L,
+        SharkTail = 562949953421312L,
+        SpeechSign = 844424930131968L,
+        PixelWings = 1125899906842624L,
+        CozyBlanket = 1407374883553280L,
+        FishPlush = 2251799813685248L,
+        SqueakyHammer = 4503599627370496L,
+        TeaCup = 6755399441055744L,
+        Banana = 9007199254740992L,
+        TinyKeyboard = 11258999068426240L,
+        BlankFace = 18014398509481984L,
+        SmugFace = 36028797018963968L,
+        PanicFace = 54043195528445952L,
+        SquishFace = 72057594037927936L,
+        WideGrinFace = 90071992547409920L,
+        LongCatBody = 144115188075855872L,
+        PuddingBody = 288230376151711744L,
+        MarshmallowBody = 432345564227567616L,
+        GhostBody = 576460752303423488L,
+        BlockBody = 720575940379279360L
     }
 
     public enum AvatarPartSlot { Head, Face, Neck, Back, Hand, Expression = 5, Clothing = 6, Body = 7 }
@@ -37,7 +73,8 @@ namespace DrawLiar
     public static class AvatarParts
     {
         public const long RETIRED_CLOTHING_MASK = 4063232L;
-        public const long ALL_MASK = ((1L << 37) - 1) & ~RETIRED_CLOTHING_MASK;
+        public const long LEGACY_MASK = ((1L << 39) - 1) & ~RETIRED_CLOTHING_MASK;
+        public const long ALL_MASK = ((1L << 60) - 1) & ~RETIRED_CLOTHING_MASK;
         public static IReadOnlyList<AvatarAccessory> DefaultAccessories { get; } = Array.AsReadOnly(new[]
         {
             AvatarAccessory.Beret, AvatarAccessory.Wink, AvatarAccessory.RoundBody
@@ -80,7 +117,44 @@ namespace DrawLiar
             new AvatarPartDefinition("spiral-eyes", "빙글 눈", 120, AvatarAccessory.SpiralEyes, AvatarPartSlot.Expression),
             new AvatarPartDefinition("pixel-face", "픽셀 얼굴", 180, AvatarAccessory.PixelFace, AvatarPartSlot.Expression),
             new AvatarPartDefinition("skull-face", "해골 얼굴", 180, AvatarAccessory.SkullFace, AvatarPartSlot.Expression),
-            new AvatarPartDefinition("cat-face", "냥냥 얼굴", 160, AvatarAccessory.CatFace, AvatarPartSlot.Expression)
+            new AvatarPartDefinition("cat-face", "냥냥 얼굴", 160, AvatarAccessory.CatFace, AvatarPartSlot.Expression),
+            new AvatarPartDefinition("sparkle-face", "초롱초롱 얼굴", 160, AvatarAccessory.SparkleFace, AvatarPartSlot.Expression),
+            new AvatarPartDefinition("mellow-face", "나른한 얼굴", 160, AvatarAccessory.MellowFace, AvatarPartSlot.Expression),
+            new AvatarPartDefinition("pink-wig", "분홍 삐죽 가발", 220, AvatarAccessory.PinkWig, AvatarPartSlot.Head),
+            new AvatarPartDefinition("rose-buns", "장미 만두머리", 240, AvatarAccessory.RoseBuns, AvatarPartSlot.Head),
+            new AvatarPartDefinition("shark-hood", "아기 상어 후드", 220, AvatarAccessory.SharkHood, AvatarPartSlot.Head),
+            new AvatarPartDefinition("frog-cap", "왕눈 개구리 모자", 200, AvatarAccessory.FrogCap, AvatarPartSlot.Head),
+            new AvatarPartDefinition("pixel-crown", "픽셀 왕관", 200, AvatarAccessory.PixelCrown, AvatarPartSlot.Head),
+            new AvatarPartDefinition("goggle-eyes", "왕눈 안경", 140, AvatarAccessory.GoggleEyes, AvatarPartSlot.Face),
+            new AvatarPartDefinition("swirl-glasses", "빙글 안경", 160, AvatarAccessory.SwirlGlasses, AvatarPartSlot.Face),
+            new AvatarPartDefinition("censor-bar", "시크릿 눈가리개", 140, AvatarAccessory.CensorBar, AvatarPartSlot.Face),
+            new AvatarPartDefinition("sweat-sticker", "진땀 스티커", 120, AvatarAccessory.SweatSticker, AvatarPartSlot.Face),
+            new AvatarPartDefinition("meme-moustache", "과장 콧수염", 140, AvatarAccessory.MemeMoustache, AvatarPartSlot.Face),
+            new AvatarPartDefinition("bell-collar", "방울 목걸이", 140, AvatarAccessory.BellCollar, AvatarPartSlot.Neck),
+            new AvatarPartDefinition("giant-bow", "왕리본", 160, AvatarAccessory.GiantBow, AvatarPartSlot.Neck),
+            new AvatarPartDefinition("noodle-scarf", "면발 머플러", 160, AvatarAccessory.NoodleScarf, AvatarPartSlot.Neck),
+            new AvatarPartDefinition("chunky-chain", "통통 체인", 180, AvatarAccessory.ChunkyChain, AvatarPartSlot.Neck),
+            new AvatarPartDefinition("camera-strap", "미니 카메라", 180, AvatarAccessory.CameraStrap, AvatarPartSlot.Neck),
+            new AvatarPartDefinition("toast-backpack", "식빵 배낭", 180, AvatarAccessory.ToastBackpack, AvatarPartSlot.Back),
+            new AvatarPartDefinition("shark-tail", "상어 꼬리", 200, AvatarAccessory.SharkTail, AvatarPartSlot.Back),
+            new AvatarPartDefinition("speech-sign", "말풍선 팻말", 180, AvatarAccessory.SpeechSign, AvatarPartSlot.Back),
+            new AvatarPartDefinition("pixel-wings", "픽셀 날개", 200, AvatarAccessory.PixelWings, AvatarPartSlot.Back),
+            new AvatarPartDefinition("cozy-blanket", "폭닥 담요", 180, AvatarAccessory.CozyBlanket, AvatarPartSlot.Back),
+            new AvatarPartDefinition("fish-plush", "생선 인형", 160, AvatarAccessory.FishPlush, AvatarPartSlot.Hand),
+            new AvatarPartDefinition("squeaky-hammer", "삑삑 망치", 160, AvatarAccessory.SqueakyHammer, AvatarPartSlot.Hand),
+            new AvatarPartDefinition("tea-cup", "느긋한 찻잔", 160, AvatarAccessory.TeaCup, AvatarPartSlot.Hand),
+            new AvatarPartDefinition("banana", "잘 익은 바나나", 140, AvatarAccessory.Banana, AvatarPartSlot.Hand),
+            new AvatarPartDefinition("tiny-keyboard", "미니 키보드", 180, AvatarAccessory.TinyKeyboard, AvatarPartSlot.Hand),
+            new AvatarPartDefinition("blank-face", "멍한 얼굴", 120, AvatarAccessory.BlankFace, AvatarPartSlot.Expression),
+            new AvatarPartDefinition("smug-face", "능글 얼굴", 160, AvatarAccessory.SmugFace, AvatarPartSlot.Expression),
+            new AvatarPartDefinition("panic-face", "패닉 얼굴", 160, AvatarAccessory.PanicFace, AvatarPartSlot.Expression),
+            new AvatarPartDefinition("squish-face", "찌그러진 얼굴", 160, AvatarAccessory.SquishFace, AvatarPartSlot.Expression),
+            new AvatarPartDefinition("wide-grin-face", "씩 웃는 얼굴", 160, AvatarAccessory.WideGrinFace, AvatarPartSlot.Expression),
+            new AvatarPartDefinition("long-cat-body", "길쭉 고양이 몸통", 220, AvatarAccessory.LongCatBody, AvatarPartSlot.Body),
+            new AvatarPartDefinition("pudding-body", "탱글 푸딩 몸통", 220, AvatarAccessory.PuddingBody, AvatarPartSlot.Body),
+            new AvatarPartDefinition("marshmallow-body", "마시멜로 몸통", 220, AvatarAccessory.MarshmallowBody, AvatarPartSlot.Body),
+            new AvatarPartDefinition("ghost-body", "말랑 유령 몸통", 240, AvatarAccessory.GhostBody, AvatarPartSlot.Body),
+            new AvatarPartDefinition("block-body", "픽셀 블록 몸통", 220, AvatarAccessory.BlockBody, AvatarPartSlot.Body)
         });
 
         public static ShopProduct[] CreateShopProducts()
@@ -100,15 +174,15 @@ namespace DrawLiar
         {
             switch (slot)
             {
-                case AvatarPartSlot.Head: return 1 | 4 | 8 | 16;
-                case AvatarPartSlot.Face: return 32 | 64;
-                case AvatarPartSlot.Neck: return 128 | 512;
-                case AvatarPartSlot.Back: return 256;
-                case AvatarPartSlot.Hand: return 2 | 1024 | 2048;
+                case AvatarPartSlot.Head: return 1 | 4 | 8 | 16 | ExtensionMask(slot);
+                case AvatarPartSlot.Face: return 32 | 64 | ExtensionMask(slot);
+                case AvatarPartSlot.Neck: return 128 | 512 | ExtensionMask(slot);
+                case AvatarPartSlot.Back: return 256 | ExtensionMask(slot);
+                case AvatarPartSlot.Hand: return 2 | 1024 | 2048 | ExtensionMask(slot);
                 case AvatarPartSlot.Expression: return 4096L | 8192L | 16384L | 32768L | 65536L | 268435456L | 536870912L | 1073741824L
-                    | 2147483648L | 4294967296L | 8589934592L | 17179869184L | 34359738368L | 68719476736L;
+                    | 2147483648L | 4294967296L | 8589934592L | 17179869184L | 34359738368L | 68719476736L | 137438953472L | 274877906944L | ExtensionMask(slot);
                 case AvatarPartSlot.Clothing: return 0;
-                case AvatarPartSlot.Body: return 4194304 | 8388608 | 16777216 | 33554432 | 67108864 | 134217728;
+                case AvatarPartSlot.Body: return 4194304 | 8388608 | 16777216 | 33554432 | 67108864 | 134217728 | ExtensionMask(slot);
                 default: return 0;
             }
         }
@@ -133,10 +207,24 @@ namespace DrawLiar
             if ((equipment & ~ALL_MASK) != 0) return false;
             foreach (var slot in Slots)
             {
-                long part = equipment & Mask(slot);
-                if ((part & (part - 1)) != 0) return false;
+                long legacy = equipment & Mask(slot) & LEGACY_MASK;
+                long extension = equipment & ExtensionMask(slot);
+                if (extension != 0)
+                {
+                    if (legacy != 0 || (extension >> ExtensionShift(slot)) > 5) return false;
+                }
+                else if ((legacy & (legacy - 1)) != 0) return false;
             }
             return true;
+        }
+
+        public static long Get(long equipment, AvatarPartSlot slot)
+        {
+            if (equipment < 0) return 0;
+            long legacy = equipment & Mask(slot) & LEGACY_MASK;
+            if (legacy != 0) return legacy & -legacy;
+            long extension = equipment & ExtensionMask(slot);
+            return (extension >> ExtensionShift(slot)) <= 5 ? extension : 0;
         }
 
         public static long Sanitize(long equipment)
@@ -145,8 +233,7 @@ namespace DrawLiar
             long result = 0;
             foreach (var slot in Slots)
             {
-                long part = equipment & Mask(slot);
-                result |= part & -part;
+                result |= Get(equipment, slot);
             }
             return result;
         }
@@ -164,6 +251,70 @@ namespace DrawLiar
         }
 
         public static long Remove(long equipment, AvatarPartSlot slot) => Sanitize(equipment) & ~Mask(slot);
-        public static bool IsEquipped(long equipment, long parts) => parts != 0 && (equipment & parts) == parts;
+
+        public static bool IsEquipped(long equipment, long parts)
+        {
+            if (parts == 0 || !IsValid(parts)) return false;
+            foreach (var slot in Slots)
+            {
+                long part = parts & Mask(slot);
+                if (part != 0 && Get(equipment, slot) != part) return false;
+            }
+            return true;
+        }
+
+        public static bool IsOwned(IEnumerable<long> owned, long parts)
+        {
+            if (!IsValid(parts)) return false;
+            if (parts == 0) return true;
+            if (owned == null) return false;
+            long remaining = parts;
+            foreach (long item in owned)
+            {
+                if (item < 0) continue;
+                remaining &= ~(item & LEGACY_MASK);
+                foreach (var slot in Slots)
+                {
+                    long extension = parts & ExtensionMask(slot);
+                    if (extension != 0 && (item & Mask(slot)) == extension) remaining &= ~extension;
+                }
+                if (remaining == 0) return true;
+            }
+            return false;
+        }
+
+        public static long KeepOwned(long equipment, IEnumerable<long> owned)
+        {
+            if (owned == null) return 0;
+            var entries = new List<long>(owned);
+            long result = 0;
+            foreach (var slot in Slots)
+            {
+                long part = Get(equipment, slot);
+                if (IsOwned(entries, part)) result |= part;
+            }
+            return result;
+        }
+
+        private static long ExtensionMask(AvatarPartSlot slot)
+        {
+            int shift = ExtensionShift(slot);
+            return shift == 0 ? 0 : 7L << shift;
+        }
+
+        private static int ExtensionShift(AvatarPartSlot slot)
+        {
+            switch (slot)
+            {
+                case AvatarPartSlot.Head: return 39;
+                case AvatarPartSlot.Face: return 42;
+                case AvatarPartSlot.Neck: return 45;
+                case AvatarPartSlot.Back: return 48;
+                case AvatarPartSlot.Hand: return 51;
+                case AvatarPartSlot.Expression: return 54;
+                case AvatarPartSlot.Body: return 57;
+                default: return 0;
+            }
+        }
     }
 }

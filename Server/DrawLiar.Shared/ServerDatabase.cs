@@ -188,12 +188,17 @@ public sealed partial class ServerDatabase : IDisposable
                 Accessory = AvatarParts.Sanitize(reader.GetInt64(2)), Coins = reader.GetInt32(3), IsGuest = reader.GetBoolean(4), HasGoogleAccount = reader.GetBoolean(5)
             };
         }
+        profile.OwnedAccessories = await ReadOwnedAccessories(connection, transaction, id);
+        return profile;
+    }
+
+    private static async Task<long[]> ReadOwnedAccessories(NpgsqlConnection connection, NpgsqlTransaction? transaction, Guid id)
+    {
         var accessories = new SortedSet<long> { 0 };
         await using var owned = Command(connection, transaction, "SELECT \"Accessory\" FROM \"OwnedAccessory\" WHERE \"AccountId\"=$1 ORDER BY \"Accessory\"", id);
-        await using var ownedReader = await owned.ExecuteReaderAsync();
-        while (await ownedReader.ReadAsync()) accessories.Add(ownedReader.GetInt64(0) & AvatarParts.ALL_MASK);
-        profile.OwnedAccessories = accessories.ToArray();
-        return profile;
+        await using var reader = await owned.ExecuteReaderAsync();
+        while (await reader.ReadAsync()) accessories.Add(reader.GetInt64(0) & AvatarParts.ALL_MASK);
+        return accessories.ToArray();
     }
 
     public async Task<ProfileData> UpdateProfileAsync(Guid id, UpdateProfileRequest request)
@@ -204,8 +209,8 @@ public sealed partial class ServerDatabase : IDisposable
         await using var transaction = await connection.BeginTransactionAsync();
         if (request.Accessory != 0)
         {
-            long ownedMask = Convert.ToInt64(await Scalar(connection, transaction, "SELECT COALESCE(bit_or(\"Accessory\"),0) FROM \"OwnedAccessory\" WHERE \"AccountId\"=$1", id));
-            if ((ownedMask & request.Accessory) != request.Accessory) throw new ApiException("AccessoryNotOwned", 403);
+            long[] owned = await ReadOwnedAccessories(connection, transaction, id);
+            if (!AvatarParts.IsOwned(owned, request.Accessory)) throw new ApiException("AccessoryNotOwned", 403);
         }
         await Execute(connection, transaction, "UPDATE \"Account\" SET \"DisplayName\"=$2,\"AvatarColor\"=$3,\"Accessory\"=$4 WHERE \"Id\"=$1", id, name, request.AvatarColor, request.Accessory);
         var profile = await ReadProfile(connection, transaction, id);

@@ -6,6 +6,7 @@ using Npgsql;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text.Json;
 
 internal static partial class Integration
 {
@@ -26,14 +27,24 @@ internal static partial class Integration
             foreach(var body in AvatarParts.Items.Where(part=>part.Slot == AvatarPartSlot.Body))
             {
                 long active = legacy | (long)face.Accessory | (long)body.Accessory;
-                Check(AvatarParts.IsValid(active) && AvatarParts.Sanitize(active) == active,"몸통6종과 얼굴14종은 기존 다섯 부위와 함께 착용해야 합니다.");
+                Check(AvatarParts.IsValid(active) && AvatarParts.Sanitize(active) == active,"몸통11종과 얼굴21종은 기존 다섯 부위와 함께 착용해야 합니다.");
                 foreach(long clothing in RetiredClothingBits)
                     Check(!AvatarParts.IsValid(active | clothing) && AvatarParts.Sanitize(active | clothing) == active
                         && AvatarParts.Equip(active,clothing) == active,"옛 옷은 옷만 제거하고 재착용은 거부해야 합니다.");
                 Check(AvatarParts.Equip(active,(long)AvatarAccessory.BearBody) == (legacy | (long)face.Accessory | (long)AvatarAccessory.BearBody)
                     && AvatarParts.Remove(active,AvatarPartSlot.Body) == (legacy | (long)face.Accessory),"몸통 교체·해제는 나머지 부위를 보존해야 합니다.");
+                long sparkle = AvatarParts.Equip(active,(long)AvatarAccessory.SparkleFace);
+                Check(sparkle == (legacy | (long)body.Accessory | (long)AvatarAccessory.SparkleFace)
+                    && AvatarParts.Remove(sparkle,AvatarPartSlot.Expression) == (legacy | (long)body.Accessory),
+                    "초롱초롱 얼굴 교체·해제는 몸통과 다른 부위를 보존해야 합니다.");
+                long mellow = AvatarParts.Equip(sparkle,(long)AvatarAccessory.MellowFace);
+                Check(mellow == (legacy | (long)body.Accessory | (long)AvatarAccessory.MellowFace)
+                    && AvatarParts.Remove(mellow,AvatarPartSlot.Expression) == (legacy | (long)body.Accessory),
+                    "나른한 얼굴 교체·해제는 초롱초롱 얼굴만 교체하고 다른 부위를 보존해야 합니다.");
             }
-        foreach(long invalid in new[] { -1L,long.MinValue,1L<<37,5L,96L,640L,2050L,(long)(AvatarAccessory.Wink|AvatarAccessory.CatFace),
+        foreach(long invalid in new[] { -1L,long.MinValue,1L<<60,5L,96L,640L,2050L,(long)(AvatarAccessory.Wink|AvatarAccessory.CatFace),
+            (long)(AvatarAccessory.CatFace|AvatarAccessory.SparkleFace),
+            (long)(AvatarAccessory.SparkleFace|AvatarAccessory.MellowFace),
             (long)(AvatarAccessory.RoundBody|AvatarAccessory.CatBody) }) Check(!AvatarParts.IsValid(invalid),"미지 비트·부호 비트·같은 부위 중복 착용은 거부해야 합니다.");
         Check(AvatarParts.Sanitize(-1)==0 && AvatarParts.Sanitize(5)==1 && AvatarParts.IsValid((long)AvatarAccessory.Painter),
             "잘못된 저장은 정규화하고 기존 비트3의 화가 세트는 보존해야 합니다.");
@@ -41,23 +52,80 @@ internal static partial class Integration
             "기본 지급은 베레모·윙크·동그란 몸통 세 품목이어야 합니다.");
         var products = ServerDatabase.ShopProducts;
         long[] activeBits = Enum.GetValues<AvatarAccessory>().Select(part=>(long)part).Where(bit=>bit>0 && (bit&(bit-1))==0
-            && (bit&AvatarParts.RETIRED_CLOTHING_MASK)==0).Order().ToArray();
-        Check(AvatarParts.Items.Count==32 && products.Length==33 && products.Select(item=>item.Id).Distinct().Count()==33
-            && activeBits.SequenceEqual(AvatarParts.Items.Select(item=>(long)item.Accessory).Order())
-            && activeBits.Aggregate(0L,(mask,bit)=>mask|bit)==AvatarParts.ALL_MASK,"활성32파츠와 기존세트33상품을 중복 없이 제공해야 합니다.");
-        Check(AvatarParts.Items.Count(part=>part.Slot==AvatarPartSlot.Body)==6 && AvatarParts.Items.Count(part=>part.Slot==AvatarPartSlot.Expression)==14
-            && RetiredClothingIds.All(id=>products.All(product=>product.Id!=id)),"얼굴14종·몸통6종을 제공하고 옷 상품은 제거해야 합니다.");
+            && (bit&~AvatarParts.LEGACY_MASK)==0).Order().ToArray();
+        Check(AvatarParts.Items.Count==69 && products.Length==70 && products.Select(item=>item.Id).Distinct().Count()==70
+            && AvatarParts.Items.Select(item=>(long)item.Accessory).Distinct().Count()==69
+            && activeBits.SequenceEqual(AvatarParts.Items.Where(item=>((long)item.Accessory&~AvatarParts.LEGACY_MASK)==0)
+                .Select(item=>(long)item.Accessory).Order())
+            && activeBits.Aggregate(0L,(mask,bit)=>mask|bit)==AvatarParts.LEGACY_MASK,
+            "기존34파츠의 비트와 추가35파츠의 고유 코드·70상품 ID를 보존해야 합니다.");
+        Check(AvatarParts.Items.Count(part=>part.Slot==AvatarPartSlot.Body)==11 && AvatarParts.Items.Count(part=>part.Slot==AvatarPartSlot.Expression)==21
+            && RetiredClothingIds.All(id=>products.All(product=>product.Id!=id)),"얼굴21종·몸통11종을 제공하고 옷 상품은 제거해야 합니다.");
         foreach(var part in AvatarParts.Items) Check(products.Count(item=>item.Id==part.Id && item.Name==part.Name && item.Price==part.Price
             && item.Accessory==(long)part.Accessory)==1 && AvatarParts.IsValid((long)part.Accessory),"상점은 공유 파츠의 ID·이름·가격·비트를 보존해야 합니다.");
         Check(products.Single(product=>product.Id=="painter").Price==180 && products.Single(product=>product.Id=="painter").Accessory==3,
             "기존 화가 세트의 ID·가격·비트는 유지해야 합니다.");
-        long outfit = legacy | (long)(AvatarAccessory.CatFace|AvatarAccessory.BearBody);
+        var sparkleFace = AvatarParts.Items.Single(part=>part.Id=="sparkle-face");
+        Check(sparkleFace.Name=="초롱초롱 얼굴" && sparkleFace.Price==160 && sparkleFace.Slot==AvatarPartSlot.Expression
+            && (long)sparkleFace.Accessory==137438953472L,"초롱초롱 얼굴의 상품 ID·가격·슬롯과 저장 비트37을 유지해야 합니다.");
+        var mellowFace = AvatarParts.Items.Single(part=>part.Id=="mellow-face");
+        Check(mellowFace.Name=="나른한 얼굴" && mellowFace.Price==160 && mellowFace.Slot==AvatarPartSlot.Expression
+            && (long)mellowFace.Accessory==274877906944L,"나른한 얼굴의 상품 ID·가격·슬롯과 저장 비트38을 유지해야 합니다.");
+        var shifts=new Dictionary<AvatarPartSlot,int> { [AvatarPartSlot.Head]=39,[AvatarPartSlot.Face]=42,[AvatarPartSlot.Neck]=45,
+            [AvatarPartSlot.Back]=48,[AvatarPartSlot.Hand]=51,[AvatarPartSlot.Expression]=54,[AvatarPartSlot.Body]=57 };
+        long baseline=legacy|(long)(AvatarAccessory.MellowFace|AvatarAccessory.BearBody);
+        foreach(var slot in AvatarParts.Slots)
+        {
+            var choices=AvatarParts.Items.Where(part=>part.Slot==slot).ToArray();
+            var extensions=choices.Where(part=>((long)part.Accessory&AvatarParts.LEGACY_MASK)==0).OrderBy(part=>(long)part.Accessory).ToArray();
+            Check(extensions.Length==5 && extensions.Select((part,index)=>(long)part.Accessory==((index+1L)<<shifts[slot])).All(value=>value),
+                "각 부위의 확장 파츠는 지정된3비트 위치의 코드1부터5까지 유지해야 합니다.");
+            foreach(var from in choices) foreach(var to in choices)
+            {
+                long equipment=AvatarParts.Equip(AvatarParts.Equip(baseline,(long)from.Accessory),(long)to.Accessory);
+                Check(AvatarParts.IsValid(equipment) && AvatarParts.Sanitize(equipment)==equipment
+                    && AvatarParts.Get(equipment,slot)==(long)to.Accessory && AvatarParts.IsEquipped(equipment,(long)to.Accessory)
+                    && (from.Accessory==to.Accessory || !AvatarParts.IsEquipped(equipment,(long)from.Accessory))
+                    && AvatarParts.Remove(equipment,slot)==AvatarParts.Remove(baseline,slot),
+                    "기존/확장 파츠의 교체·해제·착용 판정은 같은 부위를 정확히 비교하고 나머지 부위를 보존해야 합니다.");
+            }
+            long oldPart=(long)choices.First(part=>((long)part.Accessory&AvatarParts.LEGACY_MASK)!=0).Accessory;
+            long first=(long)extensions[0].Accessory,second=(long)extensions[1].Accessory,third=(long)extensions[2].Accessory;
+            long mixed=oldPart|first;
+            Check(!AvatarParts.IsValid(mixed) && AvatarParts.Get(mixed,slot)==oldPart && AvatarParts.Sanitize(mixed)==oldPart,
+                "같은 부위의 기존 파츠와 확장 코드 혼합은 거부하고 저장값은 기존 파츠를 보존해야 합니다.");
+            foreach(int code in new[] { 6,7 })
+            {
+                long invalid=(long)code<<shifts[slot];
+                Check(!AvatarParts.IsValid(invalid) && AvatarParts.Get(invalid,slot)==0 && AvatarParts.Sanitize(invalid)==0
+                    && !AvatarParts.IsOwned(new[] { first,second,(long)extensions[3].Accessory },invalid),
+                    "확장 코드6과7은 착용·소유 판정에서 거부하고 저장값에서 제거해야 합니다.");
+            }
+            long[] owned={ first,second,oldPart };
+            Check(AvatarParts.IsOwned(owned,first) && AvatarParts.IsOwned(owned,second) && !AvatarParts.IsOwned(owned,third)
+                && !AvatarParts.IsEquipped(third,first) && !AvatarParts.IsEquipped(third,second)
+                && AvatarParts.KeepOwned(AvatarParts.Equip(baseline,third),owned)==0,
+                "코드1과2 소유를 합쳐 미구매 코드3을 지급하거나 부분 비트로 착용 판정하면 안 됩니다.");
+        }
+        Check(AvatarParts.Slots.Aggregate(0L,(mask,slot)=>mask|AvatarParts.Mask(slot))==AvatarParts.ALL_MASK
+            && AvatarParts.IsOwned(Array.Empty<long>(),0)
+            && AvatarParts.IsOwned(new[] { (long)AvatarAccessory.Beret,(long)AvatarAccessory.Brush },(long)AvatarAccessory.Painter)
+            && AvatarParts.IsOwned(new[] { (long)AvatarAccessory.Painter },(long)AvatarAccessory.Beret)
+            && AvatarParts.KeepOwned((long)AvatarAccessory.Painter,new[] { (long)AvatarAccessory.Brush })==(long)AvatarAccessory.Brush,
+            "빈 착용과 기존 화가 세트의 소유 조합·부분 해제는 호환되어야 합니다.");
+        long outfit=(long)(AvatarAccessory.Beret|AvatarAccessory.MemeMoustache|AvatarAccessory.CameraStrap|AvatarAccessory.CozyBlanket
+            |AvatarAccessory.TinyKeyboard|AvatarAccessory.WideGrinFace|AvatarAccessory.BlockBody);
+        var precise=new ProfileData { Accessory=outfit,OwnedAccessories=AvatarParts.Items.Select(part=>(long)part.Accessory).ToArray() };
+        var decoded=JsonSerializer.Deserialize<ProfileData>(JsonSerializer.Serialize(precise,Json),Json)!;
+        Check(outfit>(1L<<53) && (outfit&1)==1 && decoded.Accessory==outfit && decoded.OwnedAccessories.SequenceEqual(precise.OwnedAccessories)
+            && AvatarParts.KeepOwned(outfit,precise.OwnedAccessories)==outfit,
+            "JS 안전 정수 범위를 넘는 홀수 착용값과 확장 소유 목록을 JSON과 소유 필터에서 정확히 보존해야 합니다.");
         var session = new GameSession(new RoomSettings(),new GameData());
         Check(session.Join(1,"파츠검증",2,outfit|(long)AvatarAccessory.Overalls)
             && session.Snapshot(1,1,0).Players.Single().Accessory==outfit,"게임 입장은 옛 옷만 제거하고64비트 얼굴을 동기화해야 합니다.");
         session.UpdateProfile(1,"파츠검증",3,outfit|(long)AvatarAccessory.StarSweater);
         Check(session.Snapshot(1,1,0).Players.Single().Accessory==outfit,"게임 프로필 변경도 최상위 얼굴 비트를 보존해야 합니다.");
-        Report("활성7부위·84얼굴/몸통 조합·옷5폐기/예약비트·33상품·기본3종·64비트/미지비트·게임 상태 정규화 검증");
+        Report("활성7부위·231얼굴/몸통 조합·70상품·기존비트/기본3종·확장코드 교체/해제/소유 충돌 거부·64비트 JSON/게임 상태 정규화 검증");
     }
 
     private static async Task VerifyAvatarDatabaseAsync()
@@ -75,25 +143,46 @@ internal static partial class Integration
             using var database = new ServerDatabase(configuration); await database.InitializeAsync();
             await VerifyAvatarMigrationAsync(database,configuration,owner);
             Guid account=await database.DevelopmentAccountAsync("파츠 화가"),friend=await database.DevelopmentAccountAsync("친구 화가");
-            await using(var coins=new NpgsqlCommand("UPDATE \"Account\" SET \"Coins\"=5000 WHERE \"Id\"=$1",owner))
+            await using(var coins=new NpgsqlCommand("UPDATE \"Account\" SET \"Coins\"=50000 WHERE \"Id\"=$1",owner))
             { coins.Parameters.AddWithValue(account); await coins.ExecuteNonQueryAsync(); }
-            var purchase=new PurchaseRequest { ProductId="cat-face",OperationId=Guid.NewGuid().ToString() };
+            var purchase=new PurchaseRequest { ProductId="sparkle-face",OperationId=Guid.NewGuid().ToString() };
             var parallel=await Task.WhenAll(Enumerable.Range(0,8).Select(_=>database.PurchaseAsync(account,purchase)));
-            Check(parallel.All(profile=>profile.Coins==4840 && profile.OwnedAccessories.Contains((long)AvatarAccessory.CatFace)),
-                "최상위64비트 얼굴의 병렬 구매 재시도는 한 번만 차감해야 합니다.");
+            Check(parallel.All(profile=>profile.Coins==49840 && profile.OwnedAccessories.Contains((long)AvatarAccessory.SparkleFace)),
+                "초롱초롱 얼굴의 병렬 구매 재시도는 한 번만 차감해야 합니다.");
+            var mellowPurchase=new PurchaseRequest { ProductId="mellow-face",OperationId=Guid.NewGuid().ToString() };
+            var mellowParallel=await Task.WhenAll(Enumerable.Range(0,8).Select(_=>database.PurchaseAsync(account,mellowPurchase)));
+            Check(mellowParallel.All(profile=>profile.Coins==49680 && profile.OwnedAccessories.Contains((long)AvatarAccessory.MellowFace)
+                && profile.OwnedAccessories.Contains((long)AvatarAccessory.SparkleFace)),
+                "나른한 얼굴의 병렬 구매는 한 번만 차감하고 초롱초롱 얼굴 소유를 보존해야 합니다.");
             UpdateProfileRequest Outfit(long bits)=>new() { DisplayName="파츠 화가",AvatarColor=4,Accessory=bits };
             foreach(string id in RetiredClothingIds) await ExpectAvatarErrorAsync(()=>database.PurchaseAsync(account,
                 new PurchaseRequest { ProductId=id,OperationId=Guid.NewGuid().ToString() }),"ProductUnavailable",400);
             foreach(long bit in RetiredClothingBits) await ExpectAvatarErrorAsync(()=>database.UpdateProfileAsync(account,Outfit(bit)),"InvalidAvatar",400);
             await ExpectAvatarErrorAsync(()=>database.UpdateProfileAsync(account,Outfit((long)AvatarAccessory.SkullFace)),"AccessoryNotOwned",403);
-            await ExpectAvatarErrorAsync(()=>database.UpdateProfileAsync(account,Outfit(1L<<37)),"InvalidAvatar",400);
-            foreach(var part in AvatarParts.Items.Where(part=>part.Id!="cat-face" && !AvatarParts.DefaultAccessories.Contains(part.Accessory)))
+            await ExpectAvatarErrorAsync(()=>database.UpdateProfileAsync(account,Outfit(1L<<60)),"InvalidAvatar",400);
+            var purchased=new HashSet<string> { "sparkle-face","mellow-face" };
+            int spent=320;
+            foreach(var slot in AvatarParts.Slots)
+            {
+                var extensions=AvatarParts.Items.Where(part=>part.Slot==slot && ((long)part.Accessory&AvatarParts.LEGACY_MASK)==0)
+                    .OrderBy(part=>(long)part.Accessory).ToArray();
+                foreach(var part in extensions.Take(2))
+                { await database.PurchaseAsync(account,new PurchaseRequest { ProductId=part.Id,OperationId=Guid.NewGuid().ToString() }); purchased.Add(part.Id); spent+=part.Price; }
+                await ExpectAvatarErrorAsync(()=>database.UpdateProfileAsync(account,Outfit((long)extensions[2].Accessory)),"AccessoryNotOwned",403);
+                var third=new PurchaseRequest { ProductId=extensions[2].Id,OperationId=Guid.NewGuid().ToString() };
+                var results=await Task.WhenAll(Enumerable.Range(0,8).Select(_=>database.PurchaseAsync(account,third)));
+                purchased.Add(third.ProductId); spent+=extensions[2].Price;
+                Check(results.All(profile=>profile.Coins==50000-spent && profile.OwnedAccessories.Contains((long)extensions[2].Accessory)),
+                    "코드1과2 소유는 코드3 착용을 허용하지 않고 코드3의 병렬 구매는 정확히 한 번 차감해야 합니다.");
+            }
+            foreach(var part in AvatarParts.Items.Where(part=>!purchased.Contains(part.Id) && !AvatarParts.DefaultAccessories.Contains(part.Accessory)))
                 await database.PurchaseAsync(account,new PurchaseRequest { ProductId=part.Id,OperationId=Guid.NewGuid().ToString() });
-            long outfit=(long)(AvatarAccessory.Crown|AvatarAccessory.RoundGlasses|AvatarAccessory.Scarf|AvatarAccessory.Cape
-                |AvatarAccessory.Palette|AvatarAccessory.CatFace|AvatarAccessory.BearBody);
+            long outfit=(long)(AvatarAccessory.Beret|AvatarAccessory.MemeMoustache|AvatarAccessory.CameraStrap|AvatarAccessory.CozyBlanket
+                |AvatarAccessory.TinyKeyboard|AvatarAccessory.WideGrinFace|AvatarAccessory.BlockBody);
             var saved=await database.UpdateProfileAsync(account,Outfit(outfit));
-            Check(saved.Accessory==outfit && saved.Coins==5000-AvatarParts.Items.Where(part=>!AvatarParts.DefaultAccessories.Contains(part.Accessory)).Sum(part=>part.Price)
-                && saved.OwnedAccessories.Aggregate(0L,(mask,item)=>mask|item)==AvatarParts.ALL_MASK,"활성 파츠의 구매·소유·64비트 얼굴이 영속되어야 합니다.");
+            Check(saved.Accessory==outfit && saved.Coins==50000-AvatarParts.Items.Where(part=>!AvatarParts.DefaultAccessories.Contains(part.Accessory)).Sum(part=>part.Price)
+                && AvatarParts.Items.All(part=>AvatarParts.IsOwned(saved.OwnedAccessories,(long)part.Accessory)),
+                "모든 파츠의 개별 소유와 정밀64비트 착용은 구매·저장에서 보존되어야 합니다.");
             using(var reopened=new ServerDatabase(configuration))
                 Check((await reopened.ProfileAsync(account)).OwnedAccessories.SequenceEqual(saved.OwnedAccessories)
                     && (await reopened.ProfileAsync(account)).Accessory==outfit,"새 연결도 bigint 소유와 착용을 복원해야 합니다.");
@@ -190,9 +279,11 @@ internal static partial class Integration
         var user=await GuestAndEnterAsync(main); Check(user.Login.GameServerUrl=="http://127.0.0.1:25560","파츠 HTTP는 전용 게임서버만 사용합니다.");
         using var game=Client(user.Login.GameServerUrl); string token=user.Session.SessionToken;
         var shop=await GetAsync<ShopResponse>(game,"/api/shop",token);
-        Check(shop.Products.Length==33 && shop.Products.All(product=>!RetiredClothingIds.Contains(product.Id)),"HTTP는 옷을 제외한33상품만 전달해야 합니다.");
+        Check(shop.Products.Length==70 && shop.Products.All(product=>!RetiredClothingIds.Contains(product.Id)),"HTTP는 옷을 제외한70상품만 전달해야 합니다.");
         Check(user.Login.Profile.Coins==500 && user.Login.Profile.OwnedAccessories.Count(item=>item!=0)==3
             && user.Login.Profile.OwnedAccessories.All(item=>(item&AvatarParts.RETIRED_CLOTHING_MASK)==0),"HTTP 첫 접속은 옷 없이 기본3종만 소유해야 합니다.");
+        await using(var coins=new NpgsqlCommand("UPDATE \"Account\" SET \"Coins\"=50000 WHERE \"Id\"=$1",owner))
+        { coins.Parameters.AddWithValue(Guid.Parse(user.Login.AccountId)); await coins.ExecuteNonQueryAsync(); }
         foreach(string id in RetiredClothingIds)
         {
             using var response=await SendAsync(game,"/api/shop/purchase",new PurchaseRequest { ProductId=id,OperationId=Guid.NewGuid().ToString() },token);
@@ -200,22 +291,46 @@ internal static partial class Integration
                 "폐기한 옷의 HTTP 구매는 불가해야 합니다.");
         }
         foreach(long bit in RetiredClothingBits) await AvatarHttpProfileAsync(game,token,bit,"InvalidAvatar",HttpStatusCode.BadRequest);
-        var cat=new PurchaseRequest { ProductId="cat-face",OperationId=Guid.NewGuid().ToString() };
-        var purchases=await Task.WhenAll(Enumerable.Range(0,8).Select(_=>PostAsync<ProfileData>(game,"/api/shop/purchase",cat,token)));
-        Check(purchases.All(profile=>profile.Coins==340 && profile.OwnedAccessories.Contains((long)AvatarAccessory.CatFace)),
-            "bit36 얼굴의 HTTP 병렬 재시도는 정확히 한 번 차감해야 합니다.");
-        long outfit=(long)(AvatarAccessory.Beret|AvatarAccessory.RoundBody|AvatarAccessory.CatFace);
+        var sparkle=new PurchaseRequest { ProductId="sparkle-face",OperationId=Guid.NewGuid().ToString() };
+        var purchases=await Task.WhenAll(Enumerable.Range(0,8).Select(_=>PostAsync<ProfileData>(game,"/api/shop/purchase",sparkle,token)));
+        Check(purchases.All(profile=>profile.Coins==49840 && profile.OwnedAccessories.Contains((long)AvatarAccessory.SparkleFace)),
+            "bit37 얼굴의 HTTP 병렬 재시도는 정확히 한 번 차감해야 합니다.");
+        long outfit=(long)(AvatarAccessory.Beret|AvatarAccessory.RoundBody|AvatarAccessory.SparkleFace);
         await AvatarHttpProfileAsync(game,token,outfit); var saved=await GetAsync<ProfileData>(game,"/api/profile",token);
-        Check(saved.Accessory==outfit && saved.Coins==340,"bit36 얼굴은 HTTP 저장·재조회에 정확히 전달되어야 합니다.");
+        Check(saved.Accessory==outfit && saved.Coins==49840,"bit37 얼굴은 HTTP 저장·재조회에 정확히 전달되어야 합니다.");
+        var mellow=new PurchaseRequest { ProductId="mellow-face",OperationId=Guid.NewGuid().ToString() };
+        var mellowPurchases=await Task.WhenAll(Enumerable.Range(0,8).Select(_=>PostAsync<ProfileData>(game,"/api/shop/purchase",mellow,token)));
+        Check(mellowPurchases.All(profile=>profile.Coins==49680 && profile.OwnedAccessories.Contains((long)AvatarAccessory.MellowFace)
+            && profile.OwnedAccessories.Contains((long)AvatarAccessory.SparkleFace)),
+            "bit38 얼굴의 HTTP 병렬 구매는 한 번만 차감하고 bit37 얼굴 소유를 보존해야 합니다.");
+        outfit=AvatarParts.Equip(outfit,(long)AvatarAccessory.MellowFace);
+        await AvatarHttpProfileAsync(game,token,outfit); saved=await GetAsync<ProfileData>(game,"/api/profile",token);
+        Check(saved.Accessory==outfit && saved.Coins==49680,"bit38 얼굴은 다른 부위와 재화를 보존하며 HTTP에 전달되어야 합니다.");
+        foreach(string id in new[] { "pink-wig","rose-buns" })
+            await PostAsync<ProfileData>(game,"/api/shop/purchase",new PurchaseRequest { ProductId=id,OperationId=Guid.NewGuid().ToString() },token);
+        await AvatarHttpProfileAsync(game,token,(long)AvatarAccessory.SharkHood,"AccessoryNotOwned",HttpStatusCode.Forbidden);
+        var shark=new PurchaseRequest { ProductId="shark-hood",OperationId=Guid.NewGuid().ToString() };
+        var sharkPurchases=await Task.WhenAll(Enumerable.Range(0,8).Select(_=>PostAsync<ProfileData>(game,"/api/shop/purchase",shark,token)));
+        Check(sharkPurchases.All(profile=>profile.Coins==49000 && profile.OwnedAccessories.Contains((long)AvatarAccessory.SharkHood)),
+            "HTTP에서 코드1과2 소유로 코드3을 무료 착용하거나 구매를 생략하면 안 됩니다.");
+        await PostAsync<ProfileData>(game,"/api/shop/purchase",new PurchaseRequest { ProductId="block-body",OperationId=Guid.NewGuid().ToString() },token);
+        outfit=AvatarParts.Equip(outfit,(long)(AvatarAccessory.SharkHood|AvatarAccessory.BlockBody));
+        await AvatarHttpProfileAsync(game,token,outfit);
+        outfit=AvatarParts.Equip(outfit,(long)AvatarAccessory.Beret);
+        await AvatarHttpProfileAsync(game,token,outfit); saved=await GetAsync<ProfileData>(game,"/api/profile",token);
+        Check(saved.Accessory==outfit && saved.Coins==48780 && outfit>(1L<<53) && (outfit&1)==1,
+            "높은 확장 몸통과 기존 홀수 비트의 착용은 HTTP와 bigint 저장에서 정밀도를 보존해야 합니다.");
         foreach(long bit in RetiredClothingBits) await AvatarHttpProfileAsync(game,token,outfit|bit,"InvalidAvatar",HttpStatusCode.BadRequest);
-        await AvatarHttpProfileAsync(game,token,1L<<37,"InvalidAvatar",HttpStatusCode.BadRequest);
+        await AvatarHttpProfileAsync(game,token,1L<<60,"InvalidAvatar",HttpStatusCode.BadRequest);
+        await AvatarHttpProfileAsync(game,token,6L<<39,"InvalidAvatar",HttpStatusCode.BadRequest);
+        await AvatarHttpProfileAsync(game,token,(long)(AvatarAccessory.Beret|AvatarAccessory.PinkWig),"InvalidAvatar",HttpStatusCode.BadRequest);
         await AvatarHttpProfileAsync(game,token,(long)AvatarAccessory.SkullFace,"AccessoryNotOwned",HttpStatusCode.Forbidden);
         await using(var legacy=new NpgsqlCommand("INSERT INTO \"OwnedAccessory\" (\"AccountId\",\"Accessory\") VALUES ($1,131072)",owner))
         { legacy.Parameters.AddWithValue(Guid.Parse(user.Login.AccountId)); await legacy.ExecuteNonQueryAsync(); }
         var hidden=await GetAsync<ProfileData>(game,"/api/profile",token);
-        Check(hidden.Accessory==outfit && hidden.Coins==340 && hidden.OwnedAccessories.All(item=>(item&AvatarParts.RETIRED_CLOTHING_MASK)==0),
+        Check(hidden.Accessory==outfit && hidden.Coins==48780 && hidden.OwnedAccessories.All(item=>(item&AvatarParts.RETIRED_CLOTHING_MASK)==0),
             "DB에 보존된 옛 옷 소유를 HTTP에 다시 노출하거나64비트 외형을 바꾸면 안 됩니다.");
-        Report("HTTP33상품·기본3종·옷5구매/착용 거부·bit36얼굴 병렬 구매/저장·미지/미보유 비트 거부·옛 소유 비노출 검증");
+        Report("HTTP70상품·기본3종·옷5거부·bit37/38얼굴 회귀·확장코드 소유 충돌/병렬 구매·정밀 bigint 착용·미지/미보유 거부 검증");
     }
 
     private static async Task AvatarHttpProfileAsync(HttpClient game,string token,long accessory,string? error=null,HttpStatusCode status=HttpStatusCode.OK)

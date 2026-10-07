@@ -8210,6 +8210,635 @@
         "बिल्ली का चेहरा",
         "وجه قطة"
       ]
+    },
+    {
+      "Key": "초롱초롱 얼굴",
+      "Values": [
+        "초롱초롱 얼굴",
+        "Bright-Eyed Face",
+        "亮晶晶脸",
+        "亮晶晶臉",
+        "きらきら顔",
+        "Cara de ojos brillantes",
+        "Rosto de olhos brilhantes",
+        "Visage aux yeux brillants",
+        "Strahlendes Gesicht",
+        "Wajah Berbinar",
+        "चमकती आँखों वाला चेहरा",
+        "وجه بعيون لامعة"
+      ]
+    },
+    {
+      "Key": "나른한 얼굴",
+      "Values": [
+        "나른한 얼굴",
+        "Mellow Face",
+        "慵懒脸",
+        "慵懶臉",
+        "まったり顔",
+        "Cara relajada",
+        "Rosto relaxado",
+        "Visage détendu",
+        "Entspanntes Gesicht",
+        "Wajah Santai",
+        "शांत चेहरा",
+        "وجه مسترخٍ"
+      ]
+    },
+    {
+      "Key": "분홍 삐죽 가발",
+      "Values": [
+        "분홍 삐죽 가발",
+        "Pink Spiky Wig",
+        "粉色刺刺假发",
+        "粉紅刺刺假髮",
+        "ピンクのツンツンかつら",
+        "Peluca rosa de puntas",
+        "Peruca rosa espetada",
+        "Perruque rose en bataille",
+        "Rosa Strubbelperücke",
+        "Wig Pink Berduri",
+        "गुलाबी नुकीली विग",
+        "باروكة وردية مشعثة"
+      ]
+    },
+    {
+      "Key": "장미 만두머리",
+      "Values": [
+        "장미 만두머리",
+        "Rose Twin Buns",
+        "玫瑰双丸子头",
+        "玫瑰雙丸子頭",
+        "ローズのお団子ヘア",
+        "Dos moños de rosa",
+        "Coques duplos de rosa",
+        "Chignons roses",
+        "Rosen-Duttfrisur",
+        "Sanggul Mawar Kembar",
+        "गुलाब वाले दो जूड़े",
+        "تسريحة كعكتين بالورد"
+      ]
+    },
+    {
+      "Key": "아기 상어 후드",
+      "Values": [
+        "아기 상어 후드",
+        "Baby Shark Hood",
+        "小鲨鱼兜帽",
+        "小鯊魚兜帽",
+        "子ザメフード",
+        "Capucha de tiburoncito",
+        "Capuz de tubarãozinho",
+        "Capuche bébé requin",
+        "Babyhai-Kapuze",
+        "Tudung Bayi Hiu",
+        "नन्हे शार्क का हुड",
+        "غطاء رأس القرش الصغير"
+      ]
+    },
+    {
+      "Key": "왕눈 개구리 모자",
+      "Values": [
+        "왕눈 개구리 모자",
+        "Big-Eyed Frog Hat",
+        "大眼青蛙帽",
+        "大眼青蛙帽",
+        "ぎょろ目カエル帽",
+        "Gorro de rana de ojos grandes",
+        "Chapéu de sapo de olhos grandes",
+        "Chapeau grenouille à gros yeux",
+        "Glubschaugen-Froschmütze",
+        "Topi Katak Mata Besar",
+        "बड़ी आँखों वाली मेंढक टोपी",
+        "قبعة ضفدع بعيون كبيرة"
+      ]
+    },
+    {
+      "Key": "픽셀 왕관",
+      "Values": [
+        "픽셀 왕관",
+        "Pixel Crown",
+        "像素王冠",
+        "像素王冠",
+        "ピクセル王冠",
+        "Corona de píxeles",
+        "Coroa de pixels",
+        "Couronne pixelisée",
+        "Pixelkrone",
+        "Mahkota Piksel",
+        "पिक्सेल ताज",
+        "تاج بكسل"
+      ]
+    },
+    {
+      "Key": "왕눈 안경",
+      "Values": [
+        "왕눈 안경",
+        "Googly-Eye Glasses",
+        "大眼眼镜",
+        "大眼眼鏡",
+        "ぎょろ目メガネ",
+        "Gafas de ojos saltones",
+        "Óculos de olhos arregalados",
+        "Lunettes à gros yeux",
+        "Glubschaugenbrille",
+        "Kacamata Mata Melotot",
+        "बड़ी आँखों वाला चश्मा",
+        "نظارات عيون كبيرة"
+      ]
+    },
+    {
+      "Key": "빙글 안경",
+      "Values": [
+        "빙글 안경",
+        "Spiral Glasses",
+        "螺旋眼镜",
+        "螺旋眼鏡",
+        "ぐるぐるメガネ",
+        "Gafas en espiral",
+        "Óculos em espiral",
+        "Lunettes en spirale",
+        "Spiralbrille",
+        "Kacamata Spiral",
+        "घुमावदार चश्मा",
+        "نظارات حلزونية"
+      ]
+    },
+    {
+      "Key": "시크릿 눈가리개",
+      "Values": [
+        "시크릿 눈가리개",
+        "Secret Eye Mask",
+        "神秘眼罩",
+        "神秘眼罩",
+        "シークレット目隠し",
+        "Antifaz secreto",
+        "Máscara secreta",
+        "Bandeau secret",
+        "Geheime Augenmaske",
+        "Penutup Mata Rahasia",
+        "गुप्त आँखों का मास्क",
+        "قناع عيون سري"
+      ]
+    },
+    {
+      "Key": "진땀 스티커",
+      "Values": [
+        "진땀 스티커",
+        "Nervous Sweat Sticker",
+        "冷汗贴纸",
+        "冷汗貼紙",
+        "冷や汗シール",
+        "Pegatina de sudor frío",
+        "Adesivo de suor frio",
+        "Autocollant sueur froide",
+        "Schweißtropfen-Aufkleber",
+        "Stiker Keringat Dingin",
+        "घबराहट के पसीने का स्टिकर",
+        "ملصق عرق التوتر"
+      ]
+    },
+    {
+      "Key": "과장 콧수염",
+      "Values": [
+        "과장 콧수염",
+        "Dramatic Moustache",
+        "夸张小胡子",
+        "誇張小鬍子",
+        "大げさな口ひげ",
+        "Bigote exagerado",
+        "Bigode exagerado",
+        "Moustache extravagante",
+        "Übertriebener Schnurrbart",
+        "Kumis Berlebihan",
+        "बड़ी मूँछें",
+        "شارب مبالغ فيه"
+      ]
+    },
+    {
+      "Key": "방울 목걸이",
+      "Values": [
+        "방울 목걸이",
+        "Bell Necklace",
+        "铃铛项链",
+        "鈴鐺項鍊",
+        "鈴のネックレス",
+        "Collar de cascabel",
+        "Colar de sino",
+        "Collier à clochette",
+        "Glöckchenkette",
+        "Kalung Lonceng",
+        "घंटी वाला हार",
+        "قلادة جرس"
+      ]
+    },
+    {
+      "Key": "왕리본",
+      "Values": [
+        "왕리본",
+        "Giant Bow",
+        "大蝴蝶结",
+        "大蝴蝶結",
+        "デカリボン",
+        "Lazo gigante",
+        "Laço gigante",
+        "Nœud géant",
+        "Riesenschleife",
+        "Pita Raksasa",
+        "विशाल रिबन",
+        "فيونكة كبيرة"
+      ]
+    },
+    {
+      "Key": "면발 머플러",
+      "Values": [
+        "면발 머플러",
+        "Noodle Scarf",
+        "面条围巾",
+        "麵條圍巾",
+        "麺のマフラー",
+        "Bufanda de fideos",
+        "Cachecol de macarrão",
+        "Écharpe de nouilles",
+        "Nudelschal",
+        "Syal Mi",
+        "नूडल वाला मफलर",
+        "وشاح نودلز"
+      ]
+    },
+    {
+      "Key": "통통 체인",
+      "Values": [
+        "통통 체인",
+        "Chunky Chain",
+        "粗链条",
+        "粗鏈條",
+        "太めチェーン",
+        "Cadena gruesa",
+        "Corrente grossa",
+        "Grosse chaîne",
+        "Dicke Kette",
+        "Rantai Tebal",
+        "मोटी चेन",
+        "سلسلة سميكة"
+      ]
+    },
+    {
+      "Key": "미니 카메라",
+      "Values": [
+        "미니 카메라",
+        "Mini Camera",
+        "迷你相机",
+        "迷你相機",
+        "ミニカメラ",
+        "Mini cámara",
+        "Mini câmera",
+        "Mini appareil photo",
+        "Minikamera",
+        "Kamera Mini",
+        "मिनी कैमरा",
+        "كاميرا صغيرة"
+      ]
+    },
+    {
+      "Key": "식빵 배낭",
+      "Values": [
+        "식빵 배낭",
+        "Toast Backpack",
+        "吐司背包",
+        "吐司背包",
+        "食パンリュック",
+        "Mochila de tostada",
+        "Mochila de torrada",
+        "Sac à dos tartine",
+        "Toastbrot-Rucksack",
+        "Ransel Roti Panggang",
+        "टोस्ट वाला बैग",
+        "حقيبة ظهر توست"
+      ]
+    },
+    {
+      "Key": "상어 꼬리",
+      "Values": [
+        "상어 꼬리",
+        "Shark Tail",
+        "鲨鱼尾巴",
+        "鯊魚尾巴",
+        "サメのしっぽ",
+        "Cola de tiburón",
+        "Cauda de tubarão",
+        "Queue de requin",
+        "Haischwanz",
+        "Ekor Hiu",
+        "शार्क की पूँछ",
+        "ذيل قرش"
+      ]
+    },
+    {
+      "Key": "말풍선 팻말",
+      "Values": [
+        "말풍선 팻말",
+        "Speech Bubble Sign",
+        "对话气泡牌",
+        "對話泡泡牌",
+        "ふきだし看板",
+        "Cartel de bocadillo",
+        "Placa de balão de fala",
+        "Pancarte bulle de dialogue",
+        "Sprechblasen-Schild",
+        "Papan Balon Dialog",
+        "संवाद बुलबुले की तख्ती",
+        "لافتة فقاعة كلام"
+      ]
+    },
+    {
+      "Key": "픽셀 날개",
+      "Values": [
+        "픽셀 날개",
+        "Pixel Wings",
+        "像素翅膀",
+        "像素翅膀",
+        "ピクセルの羽",
+        "Alas de píxeles",
+        "Asas de pixels",
+        "Ailes pixelisées",
+        "Pixelflügel",
+        "Sayap Piksel",
+        "पिक्सेल पंख",
+        "أجنحة بكسل"
+      ]
+    },
+    {
+      "Key": "폭닥 담요",
+      "Values": [
+        "폭닥 담요",
+        "Cozy Blanket",
+        "软绵毯",
+        "軟綿毯",
+        "ふわふわ毛布",
+        "Manta acogedora",
+        "Cobertor fofinho",
+        "Couverture douillette",
+        "Kuscheldecke",
+        "Selimut Nyaman",
+        "मुलायम कंबल",
+        "بطانية دافئة"
+      ]
+    },
+    {
+      "Key": "생선 인형",
+      "Values": [
+        "생선 인형",
+        "Fish Plush",
+        "鱼玩偶",
+        "魚玩偶",
+        "魚のぬいぐるみ",
+        "Peluche de pez",
+        "Pelúcia de peixe",
+        "Poisson en peluche",
+        "Fischplüschtier",
+        "Boneka Ikan",
+        "मछली का खिलौना",
+        "دمية سمكة"
+      ]
+    },
+    {
+      "Key": "삑삑 망치",
+      "Values": [
+        "삑삑 망치",
+        "Squeaky Hammer",
+        "吱吱锤",
+        "吱吱錘",
+        "ピコピコハンマー",
+        "Martillo chillón",
+        "Martelo que apita",
+        "Marteau couineur",
+        "Quietschhammer",
+        "Palu Berdecit",
+        "चीं-चीं हथौड़ा",
+        "مطرقة تصدر صفيرًا"
+      ]
+    },
+    {
+      "Key": "느긋한 찻잔",
+      "Values": [
+        "느긋한 찻잔",
+        "Cozy Teacup",
+        "悠闲茶杯",
+        "悠閒茶杯",
+        "のんびりティーカップ",
+        "Taza de té acogedora",
+        "Xícara de chá aconchegante",
+        "Tasse de thé douillette",
+        "Gemütliche Teetasse",
+        "Cangkir Teh Santai",
+        "आरामदायक चाय का कप",
+        "فنجان شاي هادئ"
+      ]
+    },
+    {
+      "Key": "잘 익은 바나나",
+      "Values": [
+        "잘 익은 바나나",
+        "Ripe Banana",
+        "熟香蕉",
+        "熟香蕉",
+        "完熟バナナ",
+        "Plátano maduro",
+        "Banana madura",
+        "Banane mûre",
+        "Reife Banane",
+        "Pisang Matang",
+        "पका केला",
+        "موزة ناضجة"
+      ]
+    },
+    {
+      "Key": "미니 키보드",
+      "Values": [
+        "미니 키보드",
+        "Mini Keyboard",
+        "迷你键盘",
+        "迷你鍵盤",
+        "ミニキーボード",
+        "Mini teclado",
+        "Mini teclado",
+        "Mini clavier",
+        "Minitastatur",
+        "Papan Ketik Mini",
+        "मिनी कीबोर्ड",
+        "لوحة مفاتيح صغيرة"
+      ]
+    },
+    {
+      "Key": "멍한 얼굴",
+      "Values": [
+        "멍한 얼굴",
+        "Blank Face",
+        "呆呆脸",
+        "呆呆臉",
+        "ぼんやり顔",
+        "Cara ausente",
+        "Rosto distraído",
+        "Visage distrait",
+        "Verträumtes Gesicht",
+        "Wajah Bengong",
+        "खोया हुआ चेहरा",
+        "وجه شارد"
+      ]
+    },
+    {
+      "Key": "능글 얼굴",
+      "Values": [
+        "능글 얼굴",
+        "Smug Face",
+        "得意脸",
+        "得意臉",
+        "ニヤリ顔",
+        "Cara presumida",
+        "Rosto convencido",
+        "Visage suffisant",
+        "Selbstgefälliges Gesicht",
+        "Wajah Sok Puas",
+        "आत्मसंतुष्ट चेहरा",
+        "وجه متباهٍ"
+      ]
+    },
+    {
+      "Key": "패닉 얼굴",
+      "Values": [
+        "패닉 얼굴",
+        "Panic Face",
+        "慌张脸",
+        "慌張臉",
+        "パニック顔",
+        "Cara de pánico",
+        "Rosto em pânico",
+        "Visage paniqué",
+        "Panikgesicht",
+        "Wajah Panik",
+        "घबराया चेहरा",
+        "وجه مذعور"
+      ]
+    },
+    {
+      "Key": "찌그러진 얼굴",
+      "Values": [
+        "찌그러진 얼굴",
+        "Squished Face",
+        "挤扁脸",
+        "擠扁臉",
+        "ぺしゃんこ顔",
+        "Cara aplastada",
+        "Rosto amassado",
+        "Visage écrasé",
+        "Zerdrücktes Gesicht",
+        "Wajah Penyok",
+        "पिचका हुआ चेहरा",
+        "وجه مفلطح"
+      ]
+    },
+    {
+      "Key": "씩 웃는 얼굴",
+      "Values": [
+        "씩 웃는 얼굴",
+        "Grinning Face",
+        "咧嘴笑脸",
+        "咧嘴笑臉",
+        "にんまり顔",
+        "Cara sonriente",
+        "Rosto sorridente",
+        "Visage souriant",
+        "Grinsegesicht",
+        "Wajah Nyengir",
+        "चौड़ी मुस्कान वाला चेहरा",
+        "وجه بابتسامة عريضة"
+      ]
+    },
+    {
+      "Key": "길쭉 고양이 몸통",
+      "Values": [
+        "길쭉 고양이 몸통",
+        "Long Cat Body",
+        "细长猫咪身体",
+        "細長貓咪身體",
+        "のび猫ボディ",
+        "Cuerpo de gato alargado",
+        "Corpo de gato comprido",
+        "Corps de chat allongé",
+        "Langer Katzenkörper",
+        "Badan Kucing Panjang",
+        "लंबी बिल्ली का शरीर",
+        "جسم قطة طويل"
+      ]
+    },
+    {
+      "Key": "탱글 푸딩 몸통",
+      "Values": [
+        "탱글 푸딩 몸통",
+        "Jiggly Pudding Body",
+        "Q弹布丁身体",
+        "彈嫩布丁身體",
+        "ぷるぷるプリンボディ",
+        "Cuerpo de pudín tembloroso",
+        "Corpo de pudim macio",
+        "Corps de flan tremblotant",
+        "Wackelpuddingkörper",
+        "Badan Puding Kenyal",
+        "लचीले पुडिंग का शरीर",
+        "جسم بودينغ طري"
+      ]
+    },
+    {
+      "Key": "마시멜로 몸통",
+      "Values": [
+        "마시멜로 몸통",
+        "Marshmallow Body",
+        "棉花糖身体",
+        "棉花糖身體",
+        "マシュマロボディ",
+        "Cuerpo de malvavisco",
+        "Corpo de marshmallow",
+        "Corps de guimauve",
+        "Marshmallowkörper",
+        "Badan Marshmallow",
+        "मार्शमैलो का शरीर",
+        "جسم مارشميلو"
+      ]
+    },
+    {
+      "Key": "말랑 유령 몸통",
+      "Values": [
+        "말랑 유령 몸통",
+        "Squishy Ghost Body",
+        "软软幽灵身体",
+        "軟軟幽靈身體",
+        "やわらかおばけボディ",
+        "Cuerpo de fantasma blandito",
+        "Corpo de fantasma fofinho",
+        "Corps de fantôme moelleux",
+        "Weicher Geisterkörper",
+        "Badan Hantu Lembut",
+        "मुलायम भूत का शरीर",
+        "جسم شبح طري"
+      ]
+    },
+    {
+      "Key": "픽셀 블록 몸통",
+      "Values": [
+        "픽셀 블록 몸통",
+        "Pixel Block Body",
+        "像素方块身体",
+        "像素方塊身體",
+        "ピクセルブロックボディ",
+        "Cuerpo de bloque de píxeles",
+        "Corpo de bloco de pixels",
+        "Corps de bloc pixelisé",
+        "Pixelblockkörper",
+        "Badan Blok Piksel",
+        "पिक्सेल ब्लॉक का शरीर",
+        "جسم كتلة بكسل"
+      ]
     }
   ]
 }

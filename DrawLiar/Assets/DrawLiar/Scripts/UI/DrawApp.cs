@@ -767,16 +767,16 @@ namespace DrawLiar
         {
             if(shopList?.panel==null)return;
             shopList.Clear();
-            long ownedMask=lobby.Profile?.OwnedAccessories?.Aggregate(0L,(mask,item)=>mask|item)??0L;
+            var ownedAccessories=lobby.Profile?.OwnedAccessories??Array.Empty<long>();
             var serverProducts=(lobby.Shop.Products??Array.Empty<ShopProduct>()).Where(item=>item!=null).ToArray();
             int displayed=0;
             var products=AvatarParts.CreateShopProducts().Select(product=>serverProducts.FirstOrDefault(item=>item.Id==product.Id&&item.Accessory==product.Accessory)??product)
-                .Where(item=>_shopPartFilter<0||(item.Accessory&AvatarParts.Mask((AvatarPartSlot)_shopPartFilter))!=0)
-                .OrderBy(item=>(ownedMask&item.Accessory)==item.Accessory);
+                .Where(item=>_shopPartFilter<0||AvatarParts.Get(item.Accessory,(AvatarPartSlot)_shopPartFilter)!=0)
+                .OrderBy(item=>AvatarParts.IsOwned(ownedAccessories,item.Accessory));
             foreach(var product in products)
             {
                 displayed++;
-                bool owned=(ownedMask&product.Accessory)==product.Accessory;
+                bool owned=AvatarParts.IsOwned(ownedAccessories,product.Accessory);
                 var row=Box(shopList,"shop-entry");row.userData=product;
                 row.EnableInClassList("shop-owned",owned);
                 var summary=Box(row,"shop-product");
@@ -792,7 +792,7 @@ namespace DrawLiar
                     if(!owned){await lobby.PurchaseAsync(product.Id);return;}
                     var profile=lobby.Profile;
                     await lobby.SaveProfileAsync(profile.DisplayName,profile.AvatarColor,AvatarParts.Equip(profile.Accessory,product.Accessory));
-                    foreach(var slot in AvatarParts.Slots)if((product.Accessory&AvatarParts.Mask(slot))!=0)_shopPreviewParts.Remove(slot);
+                    foreach(var slot in AvatarParts.Slots)if(AvatarParts.Get(product.Accessory,slot)!=0)_shopPreviewParts.Remove(slot);
                     UpdateShopPreview();
                 }),"primary grow mobile-last",DrawSound.UiConfirm);apply.name="shop-buy-"+product.Id;
                 bool available=serverProducts.Any(item=>item.Id==product.Id&&item.Accessory==product.Accessory);
@@ -808,7 +808,7 @@ namespace DrawLiar
         {
             foreach(var slot in AvatarParts.Slots)
             {
-                long part=product.Accessory&AvatarParts.Mask(slot);
+                long part=AvatarParts.Get(product.Accessory,slot);
                 if(part!=0)_shopPreviewParts[slot]=part;
             }
             UpdateShopPreview();RevealAvatarPreview();
@@ -835,7 +835,7 @@ namespace DrawLiar
             shopList?.Query<VisualElement>(className:"shop-entry").ForEach(row=>
             {
                 var product=(ShopProduct)row.userData;
-                bool selected=AvatarParts.IsEquipped(preview,product.Accessory)&&AvatarParts.Slots.Any(slot=>(product.Accessory&AvatarParts.Mask(slot))!=0&&_shopPreviewParts.ContainsKey(slot));
+                bool selected=AvatarParts.IsEquipped(preview,product.Accessory)&&AvatarParts.Slots.Any(slot=>AvatarParts.Get(product.Accessory,slot)!=0&&_shopPreviewParts.ContainsKey(slot));
                 row.EnableInClassList("shop-selected",selected);
                 var tryOn=row.Q<Button>(className:"shop-try-on");
                 SetText(tryOn,selected&&!IsMobile?"미리보기 중":"입혀보기");SetTooltip(tryOn,selected?"미리보기 중":"입혀보기");
@@ -1923,8 +1923,8 @@ namespace DrawLiar
             if(!AvatarParts.Slots.Contains(_customizePartSlot))_customizePartSlot=AvatarPartSlot.Head;
             string accountId=lobby.Profile?.AccountId;
             var selectedColor=avatarColor;
-            long ownedMask=lobby.Profile?.OwnedAccessories?.Aggregate(0L,(mask,item)=>mask|item)??0L;
-            var selectedAccessory=AvatarParts.Sanitize(accessory&ownedMask);
+            var ownedAccessories=lobby.Profile?.OwnedAccessories??Array.Empty<long>();
+            var selectedAccessory=AvatarParts.KeepOwned(accessory,ownedAccessories);
             preview??=avatarStage;
             var equipmentButtons=new Dictionary<AvatarAccessory,Button>();
             var form=panel;
@@ -1939,11 +1939,11 @@ namespace DrawLiar
                 preview.Clear();var a=new AvatarElement(selectedColor,selectedAccessory);a.AddToClassList("lobby-avatar");preview.Add(a);
                 foreach(var item in equipmentButtons)
                 {
-                    bool equipped=item.Key==AvatarAccessory.None?(selectedAccessory&AvatarParts.Mask(_customizePartSlot))==0:AvatarParts.IsEquipped(selectedAccessory,(long)item.Key);
+                    bool equipped=item.Key==AvatarAccessory.None?AvatarParts.Get(selectedAccessory,_customizePartSlot)==0:AvatarParts.IsEquipped(selectedAccessory,(long)item.Key);
                     item.Value.EnableInClassList("equipped",equipped);
                     SetText(item.Value.Q<Label>(className:"equipment-state"),equipped?"장착 중":item.Key==AvatarAccessory.None?"":"장착하기");
                 }
-                bool canSave=(selectedAccessory&~ownedMask)==0;
+                bool canSave=AvatarParts.IsOwned(ownedAccessories,selectedAccessory);
                 if(save!=null){save.userData=canSave;save.SetEnabled(canSave&&!lobby.IsBusy);}
             }
             UpdateAvatar();var nameField=Field(form,"닉네임",nickname);nameField.maxLength=16;nameField.name="customize-nickname";
@@ -1969,18 +1969,18 @@ namespace DrawLiar
                 }
                 string defaultName=_customizePartSlot==AvatarPartSlot.Expression||_customizePartSlot==AvatarPartSlot.Body?"기본":"없음";
                 AddEquipment(AvatarAccessory.None,defaultName,"none");
-                foreach(var item in AvatarParts.Items.Where(part=>part.Slot==_customizePartSlot&&(ownedMask&(long)part.Accessory)==(long)part.Accessory))AddEquipment(item.Accessory,item.Name,item.Id);
+                foreach(var item in AvatarParts.Items.Where(part=>part.Slot==_customizePartSlot&&AvatarParts.IsOwned(ownedAccessories,(long)part.Accessory)))AddEquipment(item.Accessory,item.Name,item.Id);
                 UpdateAvatar();
             }
             PartTabs(form,(int)_customizePartSlot,slot=>{_customizePartSlot=(AvatarPartSlot)slot;RenderEquipment();},false);
             equipment=Box(form,"row equipment-options");RenderEquipment();
-            var reset=Button(form,"원래 모습",()=>{selectedAccessory=AvatarParts.Sanitize(accessory&ownedMask);SelectColor(avatarColor);RevealAvatarPreview();},"secondary",DrawSound.UiCancel);reset.name="customize-reset";
+            var reset=Button(form,"원래 모습",()=>{selectedAccessory=AvatarParts.KeepOwned(accessory,ownedAccessories);SelectColor(avatarColor);RevealAvatarPreview();},"secondary",DrawSound.UiCancel);reset.name="customize-reset";
             var footer=scrollInModal?Box(panel,"row room-customize-actions"):panel;
             if(scrollInModal)Button(footer,"취소",onCancel??CloseModal,"secondary grow",DrawSound.UiCancel).name="room-customize-cancel";
             save=Button(footer,"저장",()=>Run(async()=>
             {
                 if(accountId!=lobby.Profile?.AccountId||panel.panel==null)return;
-                if((selectedAccessory&~ownedMask)!=0){Toast("미구매 아이템은 구매하거나 벗긴 뒤 저장해 주세요.");return;}
+                if(!AvatarParts.IsOwned(ownedAccessories,selectedAccessory)){Toast("미구매 아이템은 구매하거나 벗긴 뒤 저장해 주세요.");return;}
                 if(scrollInModal)panel.SetEnabled(false);
                 try
                 {
