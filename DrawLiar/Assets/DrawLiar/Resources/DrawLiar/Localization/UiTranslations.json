@@ -9196,6 +9196,346 @@
         "झूठे की भूमिका {0} ने निभाई थी।",
         "كان دور الكاذب من نصيب {0}."
       ]
+    },
+    {
+      "Key": "주제 관리",
+      "Values": [
+        "주제 관리",
+        "Manage topics",
+        "管理主题",
+        "管理主題",
+        "テーマ管理",
+        "Gestionar temas",
+        "Gerenciar temas",
+        "Gérer les thèmes",
+        "Themen verwalten",
+        "Kelola tema",
+        "विषय प्रबंधन",
+        "إدارة المواضيع"
+      ]
+    },
+    {
+      "Key": "미리보기",
+      "Values": [
+        "미리보기",
+        "Preview",
+        "预览",
+        "預覽",
+        "プレビュー",
+        "Vista previa",
+        "Prévia",
+        "Aperçu",
+        "Vorschau",
+        "Pratinjau",
+        "पूर्वावलोकन",
+        "معاينة"
+      ]
+    },
+    {
+      "Key": "제시어 미리보기",
+      "Values": [
+        "제시어 미리보기",
+        "Word preview",
+        "词语预览",
+        "詞語預覽",
+        "お題の単語プレビュー",
+        "Vista previa de palabras",
+        "Prévia das palavras",
+        "Aperçu des mots",
+        "Wörtervorschau",
+        "Pratinjau kata",
+        "शब्दों का पूर्वावलोकन",
+        "معاينة الكلمات"
+      ]
+    },
+    {
+      "Key": "제시어를 불러오지 못했습니다.",
+      "Values": [
+        "제시어를 불러오지 못했습니다.",
+        "Could not load the words.",
+        "无法加载词语。",
+        "無法載入詞語。",
+        "単語を読み込めませんでした。",
+        "No se pudieron cargar las palabras.",
+        "Não foi possível carregar as palavras.",
+        "Impossible de charger les mots.",
+        "Die Wörter konnten nicht geladen werden.",
+        "Tidak dapat memuat kata.",
+        "शब्द लोड नहीं हो सके।",
+        "تعذر تحميل الكلمات."
+      ]
+    },
+    {
+      "Key": "받은 표 {0}개",
+      "Values": [
+        "받은 표 {0}개",
+        "Votes received: {0}",
+        "收到 {0} 票",
+        "收到 {0} 票",
+        "得票数：{0}",
+        "Votos recibidos: {0}",
+        "Votos recebidos: {0}",
+        "Votes reçus : {0}",
+        "Erhaltene Stimmen: {0}",
+        "Suara diterima: {0}",
+        "प्राप्त वोट: {0}",
+        "الأصوات المستلمة: {0}"
+      ]
+    },
+    {
+      "Key": "지목하기 · 받은 표 {0}개",
+      "Values": [
+        "지목하기 · 받은 표 {0}개",
+        "Nominate · Votes received: {0}",
+        "指认 · 收到 {0} 票",
+        "指認 · 收到 {0} 票",
+        "指名する · 得票数：{0}",
+        "Nominar · Votos recibidos: {0}",
+        "Indicar · Votos recebidos: {0}",
+        "Désigner · Votes reçus : {0}",
+        "Nominieren · Erhaltene Stimmen: {0}",
+        "Tunjuk · Suara diterima: {0}",
+        "नामित करें · प्राप्त वोट: {0}",
+        "ترشيح · الأصوات المستلمة: {0}"
+      ]
+    },
+    {
+      "Key": "라이어는 제시어를 모릅니다. 그림을 보고 라이어를 찾으세요.",
+      "Values": [
+        "라이어는 제시어를 모릅니다. 그림을 보고 라이어를 찾으세요.",
+        "Liars do not know the word. Find them through their drawings.",
+        "说谎者不知道提示词。通过绘画找出说谎者。",
+        "說謊者不知道提示詞。透過繪畫找出說謊者。",
+        "ライアーはお題の単語を知りません。絵を見て見つけましょう。",
+        "Los mentirosos no conocen la palabra. Encuéntralos por sus dibujos.",
+        "Os mentirosos não sabem a palavra. Encontre-os pelos desenhos.",
+        "Les menteurs ne connaissent pas le mot. Repérez-les grâce aux dessins.",
+        "Lügner kennen das Wort nicht. Finde sie anhand der Zeichnungen.",
+        "Pembohong tidak tahu kata yang diberikan. Temukan mereka lewat gambar.",
+        "झूठों को दिया गया शब्द नहीं पता। चित्र देखकर उन्हें पहचानें।",
+        "الكاذبون لا يعرفون الكلمة. اكتشفهم من رسوماتهم."
+      ]
+    },
+    {
+      "Key": "한 명에게만 다른 제시어가 주어집니다. 누구도 자신의 역할을 알 수 없습니다.",
+      "Values": [
+        "한 명에게만 다른 제시어가 주어집니다. 누구도 자신의 역할을 알 수 없습니다.",
+        "One player receives a different word. Nobody knows their own role.",
+        "只有一人得到不同的提示词。所有人都不知道自己的身份。",
+        "只有一人得到不同的提示詞。所有人都不知道自己的身分。",
+        "1人だけ違う単語が与えられます。誰も自分の役割を知りません。",
+        "Un jugador recibe otra palabra. Nadie conoce su propio rol.",
+        "Um jogador recebe outra palavra. Ninguém sabe seu próprio papel.",
+        "Un joueur reçoit un mot différent. Personne ne connaît son rôle.",
+        "Ein Spieler erhält ein anderes Wort. Niemand kennt seine eigene Rolle.",
+        "Satu pemain mendapat kata berbeda. Tidak ada yang tahu perannya sendiri.",
+        "एक खिलाड़ी को अलग शब्द मिलता है। किसी को अपनी भूमिका नहीं पता।",
+        "يحصل لاعب واحد على كلمة مختلفة. لا أحد يعرف دوره."
+      ]
+    },
+    {
+      "Key": "라운드마다 라이어가 0명 또는 1명입니다. ‘라이어 없음’에도 투표할 수 있습니다.",
+      "Values": [
+        "라운드마다 라이어가 0명 또는 1명입니다. ‘라이어 없음’에도 투표할 수 있습니다.",
+        "Each round has zero or one liar. You can also vote “No Liar”.",
+        "每轮有零名或一名说谎者。也可以投票选择“没有说谎者”。",
+        "每輪有零名或一名說謊者。也可以投票選擇「沒有說謊者」。",
+        "各ラウンドのライアーは0人か1人です。「ライアーなし」にも投票できます。",
+        "Cada ronda tiene cero o un mentiroso. También puedes votar «Sin mentiroso».",
+        "Cada rodada tem zero ou um mentiroso. Você também pode votar “Sem mentiroso”.",
+        "Chaque manche a zéro ou un menteur. Vous pouvez voter « Aucun menteur ».",
+        "Jede Runde hat keinen oder einen Lügner. Du kannst auch „Kein Lügner“ wählen.",
+        "Setiap ronde memiliki nol atau satu pembohong. Kamu juga bisa memilih “Tidak Ada Pembohong”.",
+        "हर राउंड में शून्य या एक झूठा होता है। “कोई झूठा नहीं” पर भी वोट कर सकते हैं।",
+        "كل جولة تضم صفرًا أو كاذبًا واحدًا. يمكنك أيضًا التصويت «لا يوجد كاذب»."
+      ]
+    },
+    {
+      "Key": "같은 캔버스에 차례로 이어 그립니다.",
+      "Values": [
+        "같은 캔버스에 차례로 이어 그립니다.",
+        "Take turns drawing on the same canvas.",
+        "轮流在同一画布上接着画。",
+        "輪流在同一畫布上接著畫。",
+        "同じキャンバスに順番で描き足します。",
+        "Dibujen por turnos en el mismo lienzo.",
+        "Desenhem por turnos na mesma tela.",
+        "Dessinez à tour de rôle sur la même toile.",
+        "Zeichnet abwechselnd auf derselben Leinwand.",
+        "Bergiliran menggambar di kanvas yang sama.",
+        "एक ही कैनवास पर बारी-बारी से चित्र बनाएं।",
+        "تناوبوا على الرسم على اللوحة نفسها."
+      ]
+    },
+    {
+      "Key": "각자 캔버스에 차례로 그립니다. 토론 때 참가자의 그림을 비교하세요.",
+      "Values": [
+        "각자 캔버스에 차례로 그립니다. 토론 때 참가자의 그림을 비교하세요.",
+        "Take turns on individual canvases. Compare drawings during discussion.",
+        "轮流在各自的画布上画。讨论时比较大家的画。",
+        "輪流在各自的畫布上畫。討論時比較大家的畫。",
+        "各自のキャンバスに順番で描きます。討論でみんなの絵を比べましょう。",
+        "Dibujen por turnos en lienzos individuales. Comparen los dibujos durante el debate.",
+        "Desenhem por turnos em telas individuais. Comparem os desenhos na discussão.",
+        "Dessinez à tour de rôle sur vos propres toiles. Comparez les dessins pendant la discussion.",
+        "Zeichnet abwechselnd auf eigenen Leinwänden. Vergleicht die Bilder in der Diskussion.",
+        "Bergiliran menggambar di kanvas masing-masing. Bandingkan gambar saat diskusi.",
+        "बारी-बारी से अपने कैनवास पर चित्र बनाएं। चर्चा में चित्रों की तुलना करें।",
+        "تناوبوا على الرسم على لوحاتكم الخاصة. قارنوا الرسومات أثناء النقاش."
+      ]
+    },
+    {
+      "Key": "제시어에 맞춰 그림을 그리고, 단어를 모르는 라이어를 찾아 투표하세요.",
+      "Values": [
+        "제시어에 맞춰 그림을 그리고, 단어를 모르는 라이어를 찾아 투표하세요.",
+        "Draw clues for your word, then find and vote for the liar who does not know it.",
+        "按提示词画图，再找出不知道词语的说谎者并投票。",
+        "依照提示詞畫圖，再找出不知道詞語的說謊者並投票。",
+        "単語に合う絵を描き、単語を知らないライアーを見つけて投票しましょう。",
+        "Dibuja pistas de tu palabra, encuentra al mentiroso que no la conoce y vota por él.",
+        "Desenhe pistas da sua palavra, encontre o mentiroso que não a conhece e vote nele.",
+        "Dessinez des indices sur votre mot, puis trouvez le menteur qui ne le connaît pas et votez pour lui.",
+        "Zeichne Hinweise zu deinem Wort. Finde den Lügner, der es nicht kennt, und stimme für ihn.",
+        "Gambar petunjuk untuk katamu, lalu temukan dan pilih pembohong yang tidak mengetahuinya.",
+        "अपने शब्द के अनुसार चित्र बनाएं, फिर शब्द न जानने वाले झूठे को पहचानकर वोट दें।",
+        "ارسم تلميحات لكلمتك، ثم اكتشف الكاذب الذي لا يعرفها وصوّت له."
+      ]
+    },
+    {
+      "Key": "시민인 척 들키지 않게 그림을 그리고, 시민들의 그림을 보고 제시어를 맞혀 보세요.",
+      "Values": [
+        "시민인 척 들키지 않게 그림을 그리고, 시민들의 그림을 보고 제시어를 맞혀 보세요.",
+        "Draw like a citizen without getting caught. Use the citizens' drawings to guess the word.",
+        "像平民一样画图，不要暴露身份。观察平民的画，猜出提示词。",
+        "像平民一樣畫圖，不要暴露身分。觀察平民的畫，猜出提示詞。",
+        "市民のふりをして見破られないように絵を描き、市民の絵から単語を推測しましょう。",
+        "Dibuja como un ciudadano sin que te descubran. Usa sus dibujos para adivinar la palabra.",
+        "Desenhe como um cidadão sem ser descoberto. Use os desenhos dos cidadãos para adivinhar a palavra.",
+        "Dessinez comme un citoyen sans vous faire repérer. Devinez le mot grâce aux dessins des citoyens.",
+        "Zeichne wie ein Bürger, ohne aufzufallen. Errate das Wort anhand der Bilder der Bürger.",
+        "Gambar seperti warga tanpa ketahuan. Tebak kata dari gambar para warga.",
+        "पकड़े जाने से बचते हुए नागरिक की तरह चित्र बनाएं। नागरिकों के चित्र देखकर शब्द का अनुमान लगाएं。",
+        "ارسم كمواطن دون أن تُكشف. استخدم رسومات المواطنين لتخمين الكلمة."
+      ]
+    },
+    {
+      "Key": "제시어에 맞춰 그리고, 라이어를 찾아 투표하세요. 없다고 생각하면 ‘라이어 없음’을 선택하세요.",
+      "Values": [
+        "제시어에 맞춰 그리고, 라이어를 찾아 투표하세요. 없다고 생각하면 ‘라이어 없음’을 선택하세요.",
+        "Draw for your word and vote for the liar. If you think there is no liar, choose “No Liar”.",
+        "按提示词画图，找出说谎者并投票。认为没有说谎者时，选择“没有说谎者”。",
+        "依照提示詞畫圖，找出說謊者並投票。認為沒有說謊者時，選擇「沒有說謊者」。",
+        "単語に合う絵を描き、ライアーを見つけて投票しましょう。いないと思ったら「ライアーなし」を選びましょう。",
+        "Dibuja tu palabra y vota por el mentiroso. Si crees que no hay ninguno, elige «Sin mentiroso».",
+        "Desenhe sua palavra e vote no mentiroso. Se achar que não há nenhum, escolha “Sem mentiroso”.",
+        "Dessinez votre mot et votez pour le menteur. Si vous pensez qu'il n'y en a pas, choisissez « Aucun menteur ».",
+        "Zeichne dein Wort und stimme für den Lügner. Glaubst du, dass es keinen gibt, wähle „Kein Lügner“.",
+        "Gambar sesuai katamu dan pilih pembohong. Jika menurutmu tidak ada, pilih “Tidak Ada Pembohong”.",
+        "अपने शब्द के अनुसार चित्र बनाएं और झूठे को वोट दें। कोई झूठा न लगे तो “कोई झूठा नहीं” चुनें。",
+        "ارسم كلمتك وصوّت للكاذب. إن ظننت أنه لا يوجد كاذب، اختر «لا يوجد كاذب»."
+      ]
+    },
+    {
+      "Key": "내 제시어에 맞춰 그리고, 다른 단어를 받은 사람을 찾아보세요. 나일 수도 있어요.",
+      "Values": [
+        "내 제시어에 맞춰 그리고, 다른 단어를 받은 사람을 찾아보세요. 나일 수도 있어요.",
+        "Draw for your word and find the player with a different word. That player could be you.",
+        "根据自己的提示词画图，找出拿到不同词语的人。那个人也可能是你。",
+        "依照自己的提示詞畫圖，找出拿到不同詞語的人。那個人也可能是你。",
+        "自分の単語に合う絵を描き、違う単語をもらった人を探しましょう。自分かもしれません。",
+        "Dibuja tu palabra y busca al jugador con una palabra distinta. Podrías ser tú.",
+        "Desenhe sua palavra e encontre quem recebeu uma palavra diferente. Pode ser você.",
+        "Dessinez votre mot et cherchez le joueur qui en a un autre. Ce pourrait être vous.",
+        "Zeichne dein Wort und finde den Spieler mit einem anderen Wort. Das könntest du selbst sein.",
+        "Gambar sesuai katamu dan cari pemain yang mendapat kata berbeda. Bisa jadi kamu sendiri.",
+        "अपने शब्द के अनुसार चित्र बनाएं और अलग शब्द वाले खिलाड़ी को खोजें। वह आप भी हो सकते हैं。",
+        "ارسم وفق كلمتك وابحث عن اللاعب الذي لديه كلمة مختلفة. قد تكون أنت ذلك اللاعب."
+      ]
+    },
+    {
+      "Key": "그림과 토론을 지켜보며 누가 라이어인지 추측해 보세요.",
+      "Values": [
+        "그림과 토론을 지켜보며 누가 라이어인지 추측해 보세요.",
+        "Watch the drawings and discussion, and try to work out who the liar is.",
+        "观察绘画和讨论，猜猜谁是说谎者。",
+        "觀察繪畫和討論，猜猜誰是說謊者。",
+        "絵と討論を見ながら、誰がライアーか推測してみましょう。",
+        "Observa los dibujos y el debate e intenta descubrir quién es el mentiroso.",
+        "Observe os desenhos e a discussão e tente descobrir quem é o mentiroso.",
+        "Observez les dessins et la discussion, et tentez de deviner qui est le menteur.",
+        "Beobachte die Bilder und die Diskussion und überlege, wer der Lügner ist.",
+        "Amati gambar dan diskusi, lalu coba tebak siapa pembohongnya.",
+        "चित्रों और चर्चा को देखकर अनुमान लगाएं कि झूठा कौन है。",
+        "تابع الرسومات والنقاش وحاول استنتاج من هو الكاذب."
+      ]
+    },
+    {
+      "Key": "시간이 끝나기 전까지 투표를 바꿀 수 있어요.",
+      "Values": [
+        "시간이 끝나기 전까지 투표를 바꿀 수 있어요.",
+        "You can change your vote until time runs out.",
+        "时间结束前可以更改投票。",
+        "時間結束前可以更改投票。",
+        "時間が終わるまでは投票先を変更できます。",
+        "Puedes cambiar tu voto hasta que se acabe el tiempo.",
+        "Você pode mudar seu voto até o tempo acabar.",
+        "Vous pouvez changer votre vote jusqu’à la fin du temps imparti.",
+        "Du kannst deine Stimme ändern, bis die Zeit abläuft.",
+        "Kamu bisa mengubah suara sebelum waktu habis.",
+        "समय खत्म होने तक आप अपना वोट बदल सकते हैं।",
+        "يمكنك تغيير تصويتك قبل انتهاء الوقت."
+      ]
+    },
+    {
+      "Key": "투표 바꾸기",
+      "Values": [
+        "투표 바꾸기",
+        "Change Vote",
+        "更改投票",
+        "更改投票",
+        "投票を変更",
+        "Cambiar voto",
+        "Mudar voto",
+        "Changer le vote",
+        "Stimme ändern",
+        "Ubah suara",
+        "वोट बदलें",
+        "تغيير التصويت"
+      ]
+    },
+    {
+      "Key": "현재 투표 · {0}",
+      "Values": [
+        "현재 투표 · {0}",
+        "Current vote · {0}",
+        "当前投票 · {0}",
+        "目前投票 · {0}",
+        "現在の投票先 · {0}",
+        "Voto actual · {0}",
+        "Voto atual · {0}",
+        "Vote actuel · {0}",
+        "Aktuelle Stimme · {0}",
+        "Suara saat ini · {0}",
+        "मौजूदा वोट · {0}",
+        "التصويت الحالي · {0}"
+      ]
+    },
+    {
+      "Key": "투표가 반영되지 않았어요. 다시 시도하세요.",
+      "Values": [
+        "투표가 반영되지 않았어요. 다시 시도하세요.",
+        "Your vote was not recorded. Please try again.",
+        "投票未生效，请重试。",
+        "投票未生效，請重試。",
+        "投票が反映されませんでした。もう一度お試しください。",
+        "Tu voto no se ha registrado. Inténtalo de nuevo.",
+        "Seu voto não foi registrado. Tente novamente.",
+        "Votre vote n’a pas été enregistré. Veuillez réessayer.",
+        "Deine Stimme wurde nicht erfasst. Bitte versuche es erneut.",
+        "Suaramu belum tercatat. Silakan coba lagi.",
+        "आपका वोट दर्ज नहीं हुआ। कृपया फिर से कोशिश करें।",
+        "لم يُسجل تصويتك. يرجى المحاولة مرة أخرى."
+      ]
     }
   ]
 }

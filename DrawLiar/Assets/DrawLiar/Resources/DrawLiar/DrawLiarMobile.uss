@@ -433,11 +433,18 @@
 .mobile.in-game .mobile-playing .room-hud .mobile-back { min-width: 56px; height: 44px; min-height: 44px; padding: 4px 8px; margin: 0; font-size: 14px; }
 .mobile.in-game .mobile-playing .mobile-secret { flex-direction: row; align-items: center; height: 44px; min-height: 44px; margin: 0 0 6px; padding: 0 8px; }
 .mobile.in-game .mobile-playing .topic { flex-grow: 1; flex-basis: auto; flex-shrink: 1; min-width: 0; font-size: 12px; margin: 0 8px 0 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mobile.in-game .mobile-playing .room-secret-context { flex-grow: 1; flex-basis: 0; min-width: 0; max-width: none; margin-right: 6px; }
+.mobile.in-game .mobile-playing .room-mode-badges { height: 16px; margin-bottom: 0; }
+.mobile.in-game .mobile-playing .room-mode-badge { height: 16px; margin-right: 3px; padding: 0 3px; font-size: 10px; }
+.mobile.in-game .mobile-playing .room-secret-context .topic { height: 16px; margin: 0; flex-grow: 0; font-size: 11px; }
 .mobile.in-game .mobile-playing .mobile-role-line { flex-grow: 0; flex-basis: auto; flex-shrink: 0; min-width: 0; max-width: 70%; }
 .mobile.in-game .mobile-playing .role { flex-shrink: 0; font-size: 12px; margin: 0 6px 0 0; white-space: nowrap; }
 .mobile.in-game .mobile-playing .word { flex-basis: auto; flex-shrink: 1; font-size: 14px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .mobile.in-game .mobile-playing .secret-toggle { width: 60px; min-width: 60px; flex-shrink: 0; height: 44px; min-height: 44px; margin: 0 0 0 4px; padding: 2px 4px; font-size: 11px; white-space: normal; }
 .mobile .room-role-details .subtitle, .mobile .room-role-details .section-title { max-width: 100%; min-width: 0; white-space: normal; }
+.mobile .room-role-details .role-information-identity .avatar-preview { width: 88px; height: 88px; margin-right: 12px; }
+.mobile .room-role-details .room-role-instructions { font-size: 15px; padding: 10px 12px; }
+.mobile-landscape .room-role-details .role-information-identity .avatar-preview { width: 64px; height: 64px; }
 .mobile.in-game .mobile-playing .mobile-workspace { flex-direction: column; }
 .mobile.in-game .mobile-playing .mobile-roster { width: 100%; flex-shrink: 0; margin-bottom: 6px; }
 .mobile.in-game .mobile-playing .mobile-roster > .mobile-small { display: none; }
@@ -449,6 +456,8 @@
 .mobile.in-game .player.preview-player { border-width: 2px; border-color: #537F70; background-color: #EDF5EF; }
 .mobile.in-game .mobile-playing .player-host-badge { top: 4px; left: 4px; width: 32px; max-width: 32px; height: 16px; margin: 0; padding: 1px 2px; font-size: 10px; -unity-text-align: middle-center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .mobile.in-game .mobile-playing .player-drawing-order { top: 24px; left: 4px; right: auto; }
+.mobile.in-game .mobile-playing .player-vote-stack { top: 30px; left: 4px; right: 4px; height: 12px; }
+.mobile.in-game .mobile-playing .player-vote-stack .vote-token { width: 11px; height: 12px; margin: 0; border-radius: 2px; }
 .mobile.in-game .author-preview-guide { font-size: 12px; margin-bottom: 4px; }
 .app.mobile .topic-workshop .workshop-tabs .button { font-size: 16px; }
 .app.mobile .topic-workshop .workshop-editor-actions .button { padding: 8px; font-size: 14px; }
@@ -458,6 +467,13 @@
 .app.mobile .workshop-local-scroll { max-height: 240px; }
 .app.mobile .workshop-browse-scroll { max-height: 400px; }
 .app.mobile .workshop-own-count { max-width: 55%; flex-shrink: 1; }
+.app.mobile .topic-workshop .workshop-entry-actions .button { padding: 8px; font-size: 14px; }
+.app.mobile .workshop-preview-name { font-size: 22px; }
+.app.mobile .workshop-preview-word { padding: 8px 12px; font-size: 16px; }
+.app.mobile-landscape .workshop-preview-overlay { align-items: center; justify-content: center; }
+.app.mobile-landscape .modal.workshop-preview-popup { width: 640px; max-width: 94%; height: 90%; padding: 12px 16px; border-radius: 16px; }
+.app.mobile-landscape .workshop-preview-popup .utility-popup-header { min-height: 40px; height: 40px; margin-bottom: 8px; }
+.app.mobile-landscape .workshop-preview-popup .utility-popup-close { min-height: 44px; height: 44px; margin-top: 8px; }
 .mobile.in-game .mobile-playing .player > .player-identity { flex-direction: column; align-items: center; justify-content: flex-end; }
 .mobile.in-game .mobile-playing .player .avatar { margin: 0; }
 .mobile.in-game .mobile-playing .player .grow { width: 100%; flex-grow: 0; flex-shrink: 0; height: 28px; }

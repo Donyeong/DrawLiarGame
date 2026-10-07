@@ -47,6 +47,8 @@ app.MapPost("/api/topic-workshop", async (HttpContext context, TopicWorkshopPubl
     await database.PublishWorkshopTopicAsync((await Authenticate(context)).AccountId, request, context.RequestAborted));
 app.MapGet("/api/topic-workshop/{topicId}", async (HttpContext context, string topicId) =>
     await database.DownloadWorkshopTopicAsync((await Authenticate(context)).AccountId, topicId, context.RequestAborted));
+app.MapGet("/api/topic-workshop/{topicId}/preview", async (HttpContext context, string topicId) =>
+    await database.PreviewWorkshopTopicAsync((await Authenticate(context)).AccountId, topicId, context.RequestAborted));
 app.MapDelete("/api/topic-workshop/{topicId}", async (HttpContext context, string topicId) =>
 {
     await database.DeleteWorkshopTopicAsync((await Authenticate(context)).AccountId, topicId, context.RequestAborted);

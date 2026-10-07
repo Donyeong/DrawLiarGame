@@ -130,7 +130,6 @@ namespace DrawLiar
                 else if (Phase == GamePhase.Discussion)
                 {
                     foreach (var voter in players.Values.Where(voter => voter.Vote == id)) voter.Vote = null;
-                    if (ActivePlayers().All(HasValidVote)) ResolveNomination(now);
                 }
                 else if (Phase == GamePhase.Rebuttal)
                 {
@@ -253,10 +252,9 @@ namespace DrawLiar
             if (Phase != GamePhase.Discussion || !IsActive(id) || !IsNominationTarget(target) || id == target) return false;
             if (now >= deadline) { Tick(now); return false; }
             var player = players[id];
-            if (player.Vote.HasValue) return false;
+            if (player.Vote == target) return true;
             player.Vote = target;
-            if (ActivePlayers().All(HasValidVote)) ResolveNomination(now);
-            else Changed?.Invoke();
+            Changed?.Invoke();
             return true;
         }
 
@@ -318,6 +316,7 @@ namespace DrawLiar
         {
             players.TryGetValue(id, out var local);
             bool reveal = Phase >= GamePhase.LiarReveal;
+            bool showVoteCount = reveal || Phase == GamePhase.Discussion || Phase == GamePhase.Voting;
             bool result = Phase >= GamePhase.RoundResults;
             bool mismatch = Settings.LiarMode == LiarMode.Mismatch;
             bool spectator = local == null || local.Spectator;
@@ -334,6 +333,7 @@ namespace DrawLiar
                 LocalPlayerId = id, HostPlayerId = hostId, IsHost = id == hostId, CanStart = CanStart, CanvasVersion = CanvasVersion,
                 DrawingEpoch = DrawingEpoch, DrawingOrder = Round > 0 ? turns.ToArray() : Array.Empty<int>(),
                 HasAccused = _hasAccused, AccusedPlayerId = _accusedPlayerId, BallotVersion = BallotVersion,
+                LocalVoteTargetId = spectator ? -1 : local.Vote ?? -1,
                 ApprovalCount = judgmentVoters.Count(player => player.Judgment == true),
                 RejectionCount = judgmentVoters.Count(player => player.Judgment == false),
                 JudgmentVoterCount = judgmentVoters.Length, JudgmentVotesCast = judgmentVoters.Count(player => player.Judgment.HasValue),
@@ -348,7 +348,7 @@ namespace DrawLiar
                     IsSpectator = player.Spectator, IsConnected = player.Connected, IsLiar = reveal && player.Liar,
                     IsCaught = reveal && player.Caught, AvatarColor = player.Color, Accessory = player.Accessory,
                     HasVoted = player.Vote.HasValue, HasJudged = player.Judgment.HasValue, HasGuessed = reveal && player.Guessed,
-                    VoteCount = reveal ? ActivePlayers().Count(voter => voter.Vote == player.Id) : 0,
+                    VoteCount = showVoteCount ? ActivePlayers().Count(voter => voter.Vote == player.Id) : 0,
                     Guess = result && player.Liar ? player.Guess : "",
                     GuessOutcome = result && player.Liar ? !player.Guessed ? GuessOutcome.Unanswered
                         : HasCorrectGuess(player) ? GuessOutcome.Correct : GuessOutcome.Incorrect : GuessOutcome.Hidden

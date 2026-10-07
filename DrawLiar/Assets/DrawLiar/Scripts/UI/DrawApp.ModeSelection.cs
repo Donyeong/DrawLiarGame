@@ -12,10 +12,71 @@ namespace DrawLiar
         private const string OPTIONAL_MODE_TOOLTIP = "라운드마다 라이어가 0명 또는 1명입니다. ‘라이어 없음’에도 투표할 수 있습니다.\n최소 {0}명";
         private const string RELAY_MODE_TOOLTIP = "같은 캔버스에 차례로 이어 그립니다.\n최소 {0}명";
         private const string INDIVIDUAL_MODE_TOOLTIP = "각자 캔버스에 차례로 그립니다. 토론 때 참가자의 그림을 비교하세요.\n최소 {0}명";
+        private const string CLASSIC_MODE_DESCRIPTION = "라이어는 제시어를 모릅니다. 그림을 보고 라이어를 찾으세요.";
+        private const string MISMATCH_MODE_DESCRIPTION = "한 명에게만 다른 제시어가 주어집니다. 누구도 자신의 역할을 알 수 없습니다.";
+        private const string OPTIONAL_MODE_DESCRIPTION = "라운드마다 라이어가 0명 또는 1명입니다. ‘라이어 없음’에도 투표할 수 있습니다.";
+        private const string RELAY_MODE_DESCRIPTION = "같은 캔버스에 차례로 이어 그립니다.";
+        private const string INDIVIDUAL_MODE_DESCRIPTION = "각자 캔버스에 차례로 그립니다. 토론 때 참가자의 그림을 비교하세요.";
 
+        private Label _roomLiarMode, _roomDrawingMode;
         private VisualElement _modeTooltipTarget;
         private Label _modeTooltip;
         private IVisualElementScheduledItem _modeTooltipDelay;
+
+        private void CreateRoomSecretContext(VisualElement parent, string topicTitle)
+        {
+            var context = Box(parent, "room-secret-context");
+            var modes = Box(context, "room-mode-badges");
+            _roomLiarMode = Text(modes, "", "room-mode-badge");
+            _roomLiarMode.name = "room-liar-mode";
+            _roomDrawingMode = Text(modes, "", "room-mode-badge");
+            _roomDrawingMode.name = "room-drawing-mode";
+            BindRoomModeTooltip(_roomLiarMode);
+            BindRoomModeTooltip(_roomDrawingMode);
+            topic = Text(context, topicTitle, "topic");
+        }
+
+        private void BindRoomModeTooltip(Label badge)
+        {
+            badge.pickingMode = PickingMode.Position;
+            BindModeTooltip(badge);
+            badge.RegisterCallback<GeometryChangedEvent>(_ =>
+            {
+                if (_modeTooltipTarget == badge) PositionModeTooltip();
+            });
+            badge.RegisterCallback<ClickEvent>(evt =>
+            {
+                if (!IsMobile || evt.button != 0) return;
+                HideModeTooltip();
+                _modeTooltipTarget = badge;
+                ShowModeTooltip(badge);
+                evt.StopPropagation();
+            });
+        }
+
+        private void RefreshRoomModeLabels(RoomSnapshot state)
+        {
+            if (_roomLiarMode == null || _roomDrawingMode == null) return;
+            var liarMode = state.Settings.LiarMode;
+            RefreshRoomModeBadge(_roomLiarMode,
+                liarMode == LiarMode.Mismatch ? "미스매치" : liarMode == LiarMode.Optional ? "불확정" : "일반",
+                liarMode == LiarMode.Mismatch ? MISMATCH_MODE_DESCRIPTION : liarMode == LiarMode.Optional ? OPTIONAL_MODE_DESCRIPTION : CLASSIC_MODE_DESCRIPTION);
+            bool individual = state.Settings.Mode == DrawingMode.Individual;
+            RefreshRoomModeBadge(_roomDrawingMode, individual ? "한 명씩 그리기" : "릴레이 그리기",
+                individual ? INDIVIDUAL_MODE_DESCRIPTION : RELAY_MODE_DESCRIPTION);
+        }
+
+        private void RefreshRoomModeBadge(Label badge, string title, string description)
+        {
+            string previous = badge.tooltip;
+            SetText(badge, title);
+            SetTooltip(badge, description);
+            if (previous != badge.tooltip && _modeTooltipTarget == badge && _modeTooltip != null && IsVisible(_modeTooltip))
+            {
+                SetText(_modeTooltip, description);
+                PositionModeTooltip();
+            }
+        }
 
         private void RoomModeChoices(VisualElement parent, RoomSettings settings, string prefix, Action changed = null)
         {
@@ -91,9 +152,9 @@ namespace DrawLiar
                 _modeTooltipTarget = target;
                 _modeTooltipDelay = target.schedule.Execute(() => ShowModeTooltip(target)).StartingIn(350);
             });
-            target.RegisterCallback<PointerLeaveEvent>(_ =>
+            target.RegisterCallback<PointerLeaveEvent>(evt =>
             {
-                if (_modeTooltipTarget == target) HideModeTooltip();
+                if (evt.pointerType == UnityEngine.UIElements.PointerType.mouse && _modeTooltipTarget == target) HideModeTooltip();
             });
             target.RegisterCallback<PointerDownEvent>(_ => HideModeTooltip());
             target.RegisterCallback<DetachFromPanelEvent>(_ =>
@@ -104,6 +165,11 @@ namespace DrawLiar
 
         private void ShowModeTooltip(VisualElement target)
         {
+            if (IsRoomModeTooltipBlocked(target))
+            {
+                HideModeTooltip();
+                return;
+            }
             if (!isActiveAndEnabled || _modeTooltipTarget != target || target.panel != root?.panel
                 || !IsVisible(target) || !LOCALIZED_TOOLTIPS.TryGetValue(target, out var binding)) return;
             if (_modeTooltip == null)
@@ -118,6 +184,10 @@ namespace DrawLiar
             _modeTooltip.style.display = DisplayStyle.Flex;
             PositionModeTooltip();
         }
+
+        private bool IsRoomModeTooltipBlocked(VisualElement target) => target != null
+            && (target == _roomLiarMode || target == _roomDrawingMode)
+            && (overlay != null || _profileOverlay != null || _roomPasswordOverlay != null || _roomCustomizeOverlay != null);
 
         private void PositionModeTooltip()
         {
@@ -152,8 +222,8 @@ namespace DrawLiar
         private bool CanSelectNoLiar(RoomSnapshot state) => state != null && state.Settings.LiarMode == LiarMode.Optional
             && CanNominate(state);
 
-        private bool CanNominate(RoomSnapshot state) => IsNominationPhase(state) && !state.LocalIsSpectator && !voteSubmitted
-            && Array.Exists(state.Players, player => player.Id == state.LocalPlayerId && player.IsConnected && !player.IsSpectator && !player.HasVoted);
+        private bool CanNominate(RoomSnapshot state) => IsNominationPhase(state) && state.RemainingSeconds > 0 && !state.LocalIsSpectator && !voteSubmitted
+            && Array.Exists(state.Players, player => player.Id == state.LocalPlayerId && player.IsConnected && !player.IsSpectator);
 
         private void SelectNoLiar()
         {

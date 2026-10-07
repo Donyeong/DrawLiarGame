@@ -74,20 +74,26 @@ namespace DrawLiar
         {
             var target = _hasSelectedPlayer ? state.Players.FirstOrDefault(player => player.Id == selectedPlayerId) : null;
             bool noLiarSelected = IsNoLiarSelected(state);
-            string key = $"nomination/{state.Phase}/{state.BallotVersion}/{state.Settings.LiarMode}/{state.LocalPlayerId}/{state.LocalIsSpectator}/{local?.IsConnected}/{local?.IsSpectator}/{local?.HasVoted}/{selectedPlayerId}/{_hasSelectedPlayer}/{target?.Name}/{voteSubmitted}";
+            var votedTarget = local?.HasVoted == true ? state.Players.FirstOrDefault(player => player.Id == state.LocalVoteTargetId) : null;
+            bool votedNoLiar = local?.HasVoted == true && state.Settings.LiarMode == LiarMode.Optional && state.LocalVoteTargetId == GameRules.NO_LIAR_TARGET;
+            string key = $"nomination/{state.Phase}/{state.BallotVersion}/{state.Settings.LiarMode}/{state.LocalPlayerId}/{state.LocalIsSpectator}/{local?.IsConnected}/{local?.IsSpectator}/{local?.HasVoted}/{state.LocalVoteTargetId}/{state.RemainingSeconds > 0}/{selectedPlayerId}/{_hasSelectedPlayer}/{target?.Name}/{votedTarget?.Name}/{voteSubmitted}/{DrawLocalization.CurrentLanguageCode}";
             if (key != _judgmentPanelKey)
             {
                 _judgmentPanelKey = key;
                 _judgmentPanel.Clear();
                 _judgmentCounts = _judgmentProgress = null;
                 bool spectator = state.LocalIsSpectator || local?.IsSpectator == true;
-                string prompt = spectator ? "관전 중" : local?.HasVoted == true ? "지목 완료" : voteSubmitted ? "제출 중"
+                string prompt = spectator ? "관전 중" : state.RemainingSeconds <= 0 ? "투표 완료" : voteSubmitted ? "제출 중"
+                    : local?.HasVoted == true ? "시간이 끝나기 전까지 투표를 바꿀 수 있어요."
                     : state.Settings.LiarMode == LiarMode.Optional ? "의심스러운 사람 또는 ‘라이어 없음’을 선택하세요" : "의심스러운 사람을 지목하세요";
                 Text(_judgmentPanel, prompt, "nomination-prompt").name = "nomination-guidance";
-                if (!spectator && local?.IsConnected == true && !local.HasVoted)
+                if (!spectator && local?.IsConnected == true)
                 {
-                    if (target != null) RawText(_judgmentPanel, target.Name, "nomination-target").name = "nomination-target";
-                    else if (noLiarSelected) Text(_judgmentPanel, "라이어 없음", "nomination-target").name = "nomination-target";
+                    if (votedTarget != null || votedNoLiar)
+                        Text(_judgmentPanel, "현재 투표 · {0}", "nomination-current", votedNoLiar ? DrawLocalization.Text("라이어 없음") : votedTarget.Name).name = "nomination-current";
+                    bool selectionConfirmed = local.HasVoted && _hasSelectedPlayer && selectedPlayerId == state.LocalVoteTargetId;
+                    if (!selectionConfirmed && target != null) RawText(_judgmentPanel, target.Name, "nomination-target").name = "nomination-target";
+                    else if (!selectionConfirmed && noLiarSelected) Text(_judgmentPanel, "라이어 없음", "nomination-target").name = "nomination-target";
                     VisualElement actions = _judgmentPanel;
                     if (state.Settings.LiarMode == LiarMode.Optional)
                     {
@@ -97,9 +103,9 @@ namespace DrawLiar
                         none.EnableInClassList("create-mode-selected", noLiarSelected);
                         none.SetEnabled(CanSelectNoLiar(state));
                     }
-                    var submit = Button(actions, voteSubmitted ? "제출 중" : "지목하기", SubmitVote, "primary nomination-submit", DrawSound.UiConfirm);
+                    var submit = Button(actions, voteSubmitted ? "제출 중" : local.HasVoted ? "투표 바꾸기" : "지목하기", SubmitVote, "primary nomination-submit", DrawSound.UiConfirm);
                     submit.name = "nomination-submit";
-                    submit.SetEnabled(noLiarSelected ? CanSelectNoLiar(state) : target != null && CanSelectVote(state, target));
+                    submit.SetEnabled(CanSubmitVote(state));
                 }
                 voteProgress = Text(_judgmentPanel, "", "nomination-progress");
                 voteProgress.name = "nomination-progress";

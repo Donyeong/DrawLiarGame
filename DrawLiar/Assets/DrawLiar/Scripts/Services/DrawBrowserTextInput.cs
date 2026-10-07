@@ -65,6 +65,26 @@ namespace DrawLiar
             RefreshFields();
         }
 
+        public void Focus(TextField field)
+        {
+            if (_disposed || field == null || field.isReadOnly || field.panel != _root.panel
+                || !_root.Contains(field) || !IsVisible(field)) return;
+            RefreshFields();
+            if (!_ids.TryGetValue(field, out int id)) return;
+            field.Focus();
+            if (_disposed || field.isReadOnly || field.panel != _root.panel || !_root.Contains(field)
+                || !IsVisible(field) || !_ids.TryGetValue(field, out id)) return;
+            if (_active != field) Open(field, id);
+            else if (DrawBrowserInterop.DrawBrowserInputOpen(id) != 1) Close(false);
+        }
+
+        public void Blur(TextField field, bool focusCanvas)
+        {
+            if (_disposed || field == null || _active != field) return;
+            ReadValue(true);
+            if (_active == field) Close(focusCanvas);
+        }
+
         private static TextField ParentField(VisualElement element)
         {
             while (element != null)

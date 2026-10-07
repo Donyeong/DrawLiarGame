@@ -10,6 +10,112 @@ namespace DrawLiar
         private const int MOBILE_ROOM_CHAT_LIMIT = 6;
         private const float ROOM_CHAT_BOTTOM_TOLERANCE = 24f;
         private RoomChatScrollUpdate _roomChatScrollUpdate;
+        private bool _pcChatExpanded;
+        private int _chatFocusVersion;
+        private IVisualElementScheduledItem _pcChatTailUpdate;
+
+        private void CreatePcRoomChat(VisualElement parent)
+        {
+            var chat = _pcRoomChat = Box(parent, "pc-room-chat pc-chat-collapsed");
+            chat.name = "pc-room-chat";
+            var header = Box(chat, "row pc-chat-header");
+            Text(header, "채팅", "pc-chat-title grow");
+            chatOpen = Button(header, "Enter  채팅", OpenChat, "chat-open grow");
+            chatOpen.name = "pc-chat-open";
+            IconButton(header, "닫기", DrawUIIcon.Kind.Close, CloseChat, "pc-chat-close").name = "pc-chat-close";
+            chatHistory = DrawSmoothScroll.Create(ScrollViewMode.Vertical);
+            Classes(chatHistory, "chat-history pc-chat-scroll");
+            chatHistory.name = "pc-chat-history";
+            chatHistory.horizontalScrollerVisibility = ScrollerVisibility.Hidden;
+            chatHistory.verticalScrollerVisibility = ScrollerVisibility.Hidden;
+            chat.Add(chatHistory);
+            chatbar = Box(chat, "chatbar");
+            chatbar.style.display = DisplayStyle.None;
+            chatInput = new TextField { maxLength = 160, name = "room-chat-input" };
+            Placeholder(chatInput, "채팅 입력");
+            chatInput.AddToClassList("chat-input");
+            chatInput.textEdition.autoCorrection = false;
+            chatbar.Add(chatInput);
+            chatInput.RegisterCallback<KeyDownEvent>(evt =>
+            {
+                if (evt.keyCode == KeyCode.Return || evt.keyCode == KeyCode.KeypadEnter)
+                {
+                    if (!string.IsNullOrWhiteSpace(chatInput.value)) DrawAudio.Instance?.Play(DrawSound.UiConfirm);
+                    SendChat();
+                    evt.StopPropagation();
+                }
+                else if (evt.keyCode == KeyCode.Escape) { CloseChat(); evt.StopPropagation(); }
+            });
+            Button(chatbar, "보내기", SendChat, "secondary", DrawSound.UiConfirm).name = "room-chat-send";
+            chat.RegisterCallback<PointerDownEvent>(evt =>
+            {
+                if (_pcChatExpanded) return;
+                for (var target = evt.target as VisualElement; target != null && target != chat; target = target.parent)
+                    if (target.ClassListContains("profile-trigger")) return;
+                OpenChat();
+            });
+            chat.RegisterCallback<FocusOutEvent>(_ => chat.schedule.Execute(() =>
+            {
+                var focused = root?.focusController?.focusedElement as VisualElement;
+                if (_pcRoomChat == chat && _pcChatExpanded && (focused == null || !chat.Contains(focused))) CollapsePcRoomChat(false);
+            }).StartingIn(1));
+            chatHistory.RegisterCallback<GeometryChangedEvent>(_ =>
+            {
+                if (_pcRoomChat == chat && !_pcChatExpanded) ScrollPcRoomChatToLatest();
+            });
+            chatHistory.contentContainer.RegisterCallback<GeometryChangedEvent>(_ =>
+            {
+                if (_pcRoomChat == chat && !_pcChatExpanded) ScrollPcRoomChatToLatest();
+            });
+        }
+
+        private void SetPcRoomChatExpanded(bool expanded)
+        {
+            if (_pcRoomChat == null) return;
+            bool changed = _pcChatExpanded != expanded;
+            if (changed && _roomChatScrollUpdate != null) CancelRoomChatScrollUpdate(_roomChatScrollUpdate);
+            _pcChatExpanded = expanded;
+            _pcRoomChat.EnableInClassList("pc-chat-collapsed", !expanded);
+            _pcRoomChat.EnableInClassList("pc-chat-expanded", expanded);
+            chatbar.style.display = expanded ? DisplayStyle.Flex : DisplayStyle.None;
+            chatOpen.style.display = expanded ? DisplayStyle.None : DisplayStyle.Flex;
+            chatHistory.verticalScrollerVisibility = expanded ? ScrollerVisibility.Auto : ScrollerVisibility.Hidden;
+            if (changed || !expanded) ScrollPcRoomChatToLatest();
+        }
+
+        private void CollapsePcRoomChat(bool focusCanvas)
+        {
+            _chatFocusVersion++;
+            _chatTransitionVersion++;
+#if UNITY_WEBGL && !UNITY_EDITOR
+            _browserTextInput?.Blur(chatInput, focusCanvas);
+#endif
+            if (FocusedTextField() == chatInput) root.focusController?.focusedElement?.Blur();
+            SetPcRoomChatExpanded(false);
+        }
+
+        private void RoomChatOutsidePointer(PointerDownEvent evt)
+        {
+            if (!inRoom || IsMobile || !_pcChatExpanded || _pcRoomChat == null) return;
+            if (evt.target is VisualElement target && _pcRoomChat.Contains(target)) return;
+            CollapsePcRoomChat(false);
+        }
+
+        private void ScrollPcRoomChatToLatest()
+        {
+            var history = chatHistory;
+            if (history == null || _pcRoomChat == null) return;
+            _pcChatTailUpdate?.Pause();
+            var chat = _pcRoomChat;
+            int version = _chatTransitionVersion;
+            void AlignTail()
+            {
+                if (_pcRoomChat != chat || history != chatHistory || version != _chatTransitionVersion) return;
+                history.scrollOffset = new Vector2(0, Mathf.Max(history.verticalScroller.lowValue, history.verticalScroller.highValue));
+            }
+            AlignTail();
+            _pcChatTailUpdate = history.schedule.Execute(AlignTail).StartingIn(20);
+        }
 
         private sealed class RoomChatScrollUpdate
         {
@@ -48,8 +154,9 @@ namespace DrawLiar
                 }
                 _roomChatScrollUpdate = update;
             }
-            update.FollowLatest |= mobile || atBottom || ownMessage;
-            update.OwnMessage |= mobile || ownMessage;
+            bool compact = !mobile && !_pcChatExpanded;
+            update.FollowLatest |= mobile || compact || atBottom || ownMessage;
+            update.OwnMessage |= mobile || compact || ownMessage;
             var entry = Box(history, "chat-entry");
             var name = RawText(entry, line.Name, "chat-name");
             var player = network?.State?.Players.FirstOrDefault(value => value.Id == line.PlayerId);
@@ -67,6 +174,7 @@ namespace DrawLiar
             {
                 CancelRoomChatScrollUpdate(pending);
                 if (!isActiveAndEnabled || history != chatHistory || pending.Entry?.panel == null) return;
+                if (!mobile && !_pcChatExpanded) { ScrollPcRoomChatToLatest(); return; }
                 bool readingEarlier = history.scrollOffset.y < pending.Offset.y - ROOM_CHAT_BOTTOM_TOLERANCE;
                 if (pending.FollowLatest && (pending.OwnMessage || !readingEarlier))
                 {

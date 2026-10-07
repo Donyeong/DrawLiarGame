@@ -88,6 +88,25 @@ public sealed partial class ServerDatabase
         };
     }
 
+    public async Task<TopicWorkshopDetailResponse> PreviewWorkshopTopicAsync(Guid accountId, string topicId,
+        CancellationToken cancellationToken = default)
+    {
+        Guid id = WorkshopTopicId(topicId);
+        await using var connection = await _source.OpenConnectionAsync(cancellationToken);
+        await using var command = Command(connection, null, """
+            SELECT t."Id",t."CreatorAccountId",a."DisplayName",t."Name",t."LanguageCode",jsonb_array_length(t."Words"),t."DownloadCount",t."CreatedAt",t."Words"::text
+            FROM "TopicWorkshop" t JOIN "Account" a ON a."Id"=t."CreatorAccountId"
+            WHERE t."Id"=$1 AND NOT a."IsBanned"
+            """, id);
+        await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+        if (!await reader.ReadAsync(cancellationToken)) throw new ApiException("TopicWorkshopUnavailable", 404);
+        return new TopicWorkshopDetailResponse
+        {
+            Topic = ReadWorkshopEntry(reader, accountId),
+            Words = JsonSerializer.Deserialize<string[]>(reader.GetString(8), ServerRuntime.Json)!
+        };
+    }
+
     public async Task<TopicWorkshopDetailResponse> DownloadWorkshopTopicAsync(Guid accountId, string topicId,
         CancellationToken cancellationToken = default)
     {

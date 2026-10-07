@@ -1,4 +1,6 @@
 using System;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -69,6 +71,26 @@ namespace DrawLiar
             await RefreshAfterWorkshopMutationAsync(session, accountId, revision);
             SetStatus("주제를 게시했습니다.");
         });
+
+        public async Task<TopicWorkshopDetailResponse> PreviewTopicWorkshopAsync(string id, CancellationToken cancellationToken = default)
+        {
+            RequireLogin();
+            if (!Guid.TryParse(id, out _))
+                throw new InvalidOperationException(DrawLocalization.Text("주제 이름과 제시어를 확인하세요."));
+            string session = _gameSession, accountId = Profile.AccountId;
+            int revision = _topicWorkshopRevision;
+            var result = await SendAsync<TopicWorkshopDetailResponse>(_gameServerUrl,
+                "/api/topic-workshop/" + Uri.EscapeDataString(id) + "/preview", "GET", bearer: session, cancellationToken: cancellationToken);
+            EnsureTopicWorkshopIdentity(session, accountId, revision);
+            var entry = result.Topic;
+            if (entry == null || !string.Equals(entry.Id, id, StringComparison.OrdinalIgnoreCase)
+                || string.IsNullOrWhiteSpace(entry.Name) || entry.Name != GameRules.CleanText(entry.Name, 40)
+                || !TopicWorkshopPolicy.LanguageCodes.Contains(entry.LanguageCode) || result.Words == null
+                || result.Words.Length == 0 || result.Words.Length > 200 || entry.WordCount != result.Words.Length
+                || result.Words.Any(word => string.IsNullOrWhiteSpace(word) || word != GameRules.CleanText(word, 40)))
+                throw new InvalidOperationException(DrawLocalization.Text("주제 이름과 제시어를 확인하세요."));
+            return result;
+        }
 
         public async Task<TopicData> DownloadTopicWorkshopAsync(string id)
         {

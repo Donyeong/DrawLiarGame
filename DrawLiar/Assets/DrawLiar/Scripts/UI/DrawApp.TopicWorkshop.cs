@@ -38,6 +38,7 @@ namespace DrawLiar
 
         private void BeginTopicWorkshopPage()
         {
+            CloseWorkshopPreview(false);
             _workshopVersion++;
             _workshopActive = true;
             _workshopAccountId = lobby.Profile?.AccountId;
@@ -63,12 +64,14 @@ namespace DrawLiar
 
         private void SuspendTopicWorkshopPage()
         {
+            CloseWorkshopPreview(false);
             _workshopVersion++; _workshopBusy = _workshopLoading = false;
             _workshopRefreshPending = _workshopActive;
         }
 
         private void ClearTopicWorkshopView()
         {
+            CloseWorkshopPreview(false);
             _workshopView = _workshopEditor = _workshopBrowser = _workshopLocalList = _workshopList = null;
             _workshopName = _workshopWords = null;
             _workshopPublishLanguageField = _workshopBrowseLanguageField = null;
@@ -173,6 +176,7 @@ namespace DrawLiar
         private void SelectTopicWorkshopTab(bool browse)
         {
             if (!_workshopActive || _workshopView == null) return;
+            CloseWorkshopPreview(false);
             bool entering = browse && !_workshopBrowse;
             _workshopBrowse = browse;
             if (_workshopTitle != null) SetText(_workshopTitle, browse ? "창작마당" : "나만의 주제");
@@ -322,6 +326,9 @@ namespace DrawLiar
                 RawText(metadata, L.AvailableLanguages.FirstOrDefault(language => language.Code == entry.LanguageCode)?.DisplayName ?? entry.LanguageCode, "workshop-entry-language");
                 Text(row, "제시어 {0}개 · 다운로드 {1}회", "rules workshop-topic-count", entry.WordCount, entry.DownloadCount);
                 var actions = Box(row, "row workshop-entry-actions");
+                Button preview = null;
+                preview = Button(actions, "미리보기", () => OpenWorkshopPreview(entry, preview), "secondary grow workshop-action workshop-preview");
+                preview.name = "workshop-preview-" + entry.Id;
                 Button(actions, "다운로드", () => RunTopicWorkshopAction(async (version, account, view) =>
                 {
                     var downloaded = await lobby.DownloadTopicWorkshopAsync(entry.Id);
@@ -332,7 +339,7 @@ namespace DrawLiar
                 {
                     await lobby.DeleteTopicWorkshopAsync(entry.Id);
                     if (IsCurrentTopicWorkshop(version, account, view)) Toast("게시물을 삭제했습니다.");
-                }), "secondary grow workshop-action").name = "workshop-delete-" + entry.Id;
+                }), "secondary grow workshop-action workshop-delete").name = "workshop-delete-" + entry.Id;
             }
         }
 
@@ -362,6 +369,7 @@ namespace DrawLiar
         private void QueueTopicWorkshopRefresh()
         {
             if (!_workshopActive || !isActiveAndEnabled) return;
+            CloseWorkshopPreview(false);
             _workshopRefreshPending = true; _workshopReady = false; _workshopLoadError = ""; RenderTopicWorkshopList();
             RefreshTopicWorkshopControls();
         }
@@ -416,6 +424,7 @@ namespace DrawLiar
         private void OnTopicWorkshopLanguageChanged()
         {
             if (!_workshopActive || _workshopView == null) return;
+            CloseWorkshopPreview(false);
             if (!_workshopPublishLanguageChosen) _workshopPublishLanguage = L.CurrentLanguageCode;
             bool refresh = !_workshopBrowseLanguageChosen && _workshopBrowseLanguage != L.CurrentLanguageCode;
             if (refresh) { _workshopBrowseLanguage = L.CurrentLanguageCode; _workshopOffset = 0; }

@@ -135,6 +135,7 @@ namespace DrawLiar
         public bool HasAccused;
         public int AccusedPlayerId = -1;
         public int BallotVersion;
+        public int LocalVoteTargetId = -1;
         public int ApprovalCount;
         public int RejectionCount;
         public int JudgmentVoterCount;

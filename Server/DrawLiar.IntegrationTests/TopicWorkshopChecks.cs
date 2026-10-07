@@ -67,6 +67,36 @@ internal static partial class Integration
             Check(first.GetProperty("Topic").GetProperty("Name").GetString() == exactName && WorkshopWords(first).SequenceEqual(exactWords)
                 && first.GetProperty("Topic").GetProperty("WordCount").GetInt32() == wordCount,
                 "정확한 한도값의 업로드는 이름과 모든 단어를 그대로 저장해야 합니다.");
+            string previewPath = WORKSHOP_PATH + "/" + firstId + "/preview";
+            string storedBeforePreview = await WorkshopStoredTopicsAsync(owner);
+            await WorkshopErrorAsync(game, HttpMethod.Get, previewPath, null, null, HttpStatusCode.Unauthorized, "Unauthorized");
+            await WorkshopErrorAsync(game, HttpMethod.Get, previewPath, null, author.Login.SessionToken, HttpStatusCode.Unauthorized, "Unauthorized");
+            var ownPreview = await GetAsync<JsonElement>(game, previewPath, author.Session.SessionToken);
+            Check(WorkshopWords(ownPreview).SequenceEqual(exactWords)
+                && ownPreview.GetProperty("Topic").GetRawText() == first.GetProperty("Topic").GetRawText(),
+                "본인 미리보기는 제시어·전체 메타데이터·소유 표시를 게시 응답 그대로 반환해야 합니다.");
+            var previews = await Task.WhenAll(Enumerable.Range(0, 4)
+                .Select(_ => GetAsync<JsonElement>(game, previewPath, downloader.Session.SessionToken)));
+            Check(previews.All(preview => WorkshopWords(preview).SequenceEqual(exactWords)
+                && preview.GetProperty("Topic").GetProperty("CreatorAccountId").GetString() == author.Login.AccountId
+                && !preview.GetProperty("Topic").GetProperty("IsMine").GetBoolean()
+                && preview.GetProperty("Topic").GetProperty("DownloadCount").GetInt32() == 0),
+                "다른 사용자의 반복 미리보기는 제시어와 작성자 정보를 반환하며 다운로드 수를 늘리면 안 됩니다.");
+            foreach (string invalidId in new[] { "invalid", Guid.Empty.ToString(), Guid.NewGuid().ToString() })
+                await WorkshopErrorAsync(game, HttpMethod.Get, WORKSHOP_PATH + "/" + invalidId + "/preview", null,
+                    downloader.Session.SessionToken, HttpStatusCode.NotFound, "TopicWorkshopUnavailable");
+            var readOnlySettings = new NpgsqlConnectionStringBuilder(scoped.ConnectionString)
+            { Options = "-c default_transaction_read_only=on" };
+            using (var readOnly = new ServerDatabase(new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
+            { ["ConnectionStrings:DrawLiarDatabase"] = readOnlySettings.ConnectionString }).Build()))
+            {
+                var preview = await readOnly.PreviewWorkshopTopicAsync(Guid.Parse(author.Login.AccountId), firstId);
+                Check(preview.Topic.IsMine && preview.Topic.DownloadCount == 0 && preview.Words.SequenceEqual(exactWords),
+                    "미리보기는 PostgreSQL 읽기 전용 연결에서도 쓰기 없이 동일하게 성공해야 합니다.");
+            }
+            Check(await WorkshopStoredTopicsAsync(owner) == storedBeforePreview,
+                "미리보기 성공·인증 실패·404는 모든 게시물 값과 PostgreSQL 행 버전을 변경하면 안 됩니다.");
+            Report("미리보기 인증·본인/타인 메타데이터·반복/읽기 전용 SELECT·404·게시물/다운로드 수 불변 검증");
             await WorkshopErrorAsync(game, HttpMethod.Post, WORKSHOP_PATH, new { Name = exactName, LanguageCode = "ko-KR", Words = new[] { "다른단어" } },
                 author.Session.SessionToken, HttpStatusCode.Conflict, "TopicWorkshopNameConflict");
             using (var data = JsonDocument.Parse(typeof(ServerDatabase).Assembly.GetManifestResourceStream("DrawLiar.BuiltInGameData.json")!))
@@ -88,6 +118,12 @@ internal static partial class Integration
             Check(WorkshopItems(listing).All(item => item.GetProperty("LanguageCode").GetString() == "ko-KR")
                 && WorkshopItems(listing).Single(item => item.GetProperty("Id").GetString() == firstId).GetProperty("DownloadCount").GetInt32() == 2,
                 "언어 필터와 목록의 다운로드 집계는 실제 저장된 값을 반영해야 합니다.");
+            string storedAfterDownloads = await WorkshopStoredTopicsAsync(owner);
+            var previewAfterDownloads = await GetAsync<JsonElement>(game, previewPath, downloader.Session.SessionToken);
+            Check(WorkshopWords(previewAfterDownloads).SequenceEqual(exactWords)
+                && previewAfterDownloads.GetProperty("Topic").GetProperty("DownloadCount").GetInt32() == 2
+                && await WorkshopStoredTopicsAsync(owner) == storedAfterDownloads,
+                "미리보기는 실제 다운로드 이후의 집계를 반환하되 기존 다운로드 동작과 게시물을 변경하면 안 됩니다.");
             var english = await WorkshopListAsync(game, author, "?language=en&mine=true");
             Check(english.GetProperty("Total").GetInt32() == 1 && english.GetProperty("OwnCount").GetInt32() == 2
                 && WorkshopItems(english).All(item => item.GetProperty("IsMine").GetBoolean()),
@@ -121,6 +157,8 @@ internal static partial class Integration
             Check((await WorkshopListAsync(game, concurrentAuthor, "?mine=true")).GetProperty("OwnCount").GetInt32() == quota - 1,
                 "본인 삭제는 업로드 슬롯을 즉시 반환해야 합니다.");
             await WorkshopErrorAsync(game, HttpMethod.Get, WORKSHOP_PATH + "/" + createdIds[0], null,
+                downloader.Session.SessionToken, HttpStatusCode.NotFound, "TopicWorkshopUnavailable");
+            await WorkshopErrorAsync(game, HttpMethod.Get, WORKSHOP_PATH + "/" + createdIds[0] + "/preview", null,
                 downloader.Session.SessionToken, HttpStatusCode.NotFound, "TopicWorkshopUnavailable");
             await PostAsync<JsonElement>(game, WORKSHOP_PATH, new { Name = "슬롯복원", LanguageCode = "ko-KR", Words = new[] { "사과" } }, concurrentAuthor.Session.SessionToken);
             Check((await WorkshopListAsync(game, concurrentAuthor, "?mine=true")).GetProperty("OwnCount").GetInt32() == quota,
@@ -157,6 +195,13 @@ internal static partial class Integration
                     "다운로드한 콘텐츠는 실제 방 생성·입장권 교환의 커스텀 주제에 빠짐없이 전달되어야 합니다.");
             }
             await WorkshopSetBannedAsync(owner, author.Login.AccountId, true);
+            string storedBeforeBannedPreview = await WorkshopStoredTopicsAsync(owner);
+            await WorkshopErrorAsync(game, HttpMethod.Get, previewPath, null,
+                downloader.Session.SessionToken, HttpStatusCode.NotFound, "TopicWorkshopUnavailable");
+            await WorkshopErrorAsync(game, HttpMethod.Get, previewPath, null,
+                author.Session.SessionToken, HttpStatusCode.Unauthorized, "Unauthorized");
+            Check(await WorkshopStoredTopicsAsync(owner) == storedBeforeBannedPreview,
+                "제재 작성자의 게시물 미리보기 거부는 게시물과 다운로드 수를 변경하면 안 됩니다.");
             await WorkshopErrorAsync(game, HttpMethod.Get, WORKSHOP_PATH + "/" + firstId, null,
                 downloader.Session.SessionToken, HttpStatusCode.NotFound, "TopicWorkshopUnavailable");
             Check(WorkshopItems(await WorkshopListAsync(game, downloader)).All(item => item.GetProperty("CreatorAccountId").GetString() != author.Login.AccountId),
@@ -180,6 +225,14 @@ internal static partial class Integration
     private static string WorkshopId(JsonElement detail) => detail.GetProperty("Topic").GetProperty("Id").GetString()!;
     private static string[] WorkshopWords(JsonElement detail) => detail.GetProperty("Words").EnumerateArray().Select(value => value.GetString()!).ToArray();
     private static JsonElement[] WorkshopItems(JsonElement list) => list.GetProperty("Items").EnumerateArray().ToArray();
+    private static async Task<string> WorkshopStoredTopicsAsync(NpgsqlConnection connection)
+    {
+        await using var command = new NpgsqlCommand("""
+            SELECT COALESCE(jsonb_agg(jsonb_build_object('Row',to_jsonb(t),'Version',t.xmin::text) ORDER BY t."Id"),'[]'::jsonb)::text
+            FROM "TopicWorkshop" t
+            """, connection);
+        return (string)(await command.ExecuteScalarAsync())!;
+    }
     private static async Task WorkshopErrorAsync(HttpClient game, HttpMethod method, string path, object? body, string? token, HttpStatusCode expected, string? code = null)
     {
         using var request = new HttpRequestMessage(method, path);

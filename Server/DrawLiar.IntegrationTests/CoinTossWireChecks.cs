@@ -40,6 +40,9 @@ internal static partial class Integration
             Send(0, "vote", 2, version);
             Send(1, "vote", 1, version);
             Send(2, "vote", 1, version);
+            var voting = await State(state => state.Phase == GamePhase.Discussion
+                && state.Players.Count(player => player.IsConnected && !player.IsSpectator && player.HasVoted) == 3);
+            room.Tick(now += voting.RemainingSeconds + .01);
             return await State(state => state.Phase == GamePhase.Rebuttal && state.BallotVersion > version);
         }
         try

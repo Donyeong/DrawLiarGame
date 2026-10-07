@@ -56,8 +56,10 @@ internal static partial class Integration
             "토론 중 난입은 이미 그린 순서·투표·시간을 초기화하면 안 됩니다.");
         int finalOld = oldVoters[4];
         Check(game.Vote(finalOld, finalOld == liar ? oldVoters.First(other => other != liar) : liar, now)
-            && game.Phase == GamePhase.Discussion && game.Vote(6, liar, now) && game.Phase == GamePhase.Rebuttal,
-            "새 참가자를 포함해 모두 지목하면 즉시 반론으로 진행해야 합니다.");
+            && game.Phase == GamePhase.Discussion && game.Vote(6, liar, now) && game.Phase == GamePhase.Discussion,
+            "새 참가자를 포함해 모두 지목해도 기존 마감까지 토론을 유지해야 합니다.");
+        AdvanceProfilePhase(game, ref now);
+        Check(game.Phase == GamePhase.Rebuttal, "지목 마감 뒤 난입 참가자의 표까지 합쳐 반론으로 진행해야 합니다.");
         initial = game.Snapshot(1, 1, now);
         int firstJudge = oldVoters.First(id => id != liar);
         Check(game.Judge(firstJudge, liar, true, now) && game.Join(7, "반론 중 난입", 0, 0), "반론 중에도 새 시민이 찬반에 참여해야 합니다.");

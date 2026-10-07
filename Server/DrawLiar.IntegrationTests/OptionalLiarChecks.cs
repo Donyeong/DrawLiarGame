@@ -109,14 +109,17 @@ internal static partial class Integration
         return now;
     }
 
-    private static void OptionalNominateNone(GameSession game, double now)
+    private static double OptionalNominateNone(GameSession game, double now)
     {
         foreach (int id in game.Snapshot(1, 1, now).Players.Where(player => player.IsConnected && !player.IsSpectator).Select(player => player.Id))
             Check(game.Vote(id, GameRules.NO_LIAR_TARGET, now), "참가자는 라이어 없음에 지목 투표할 수 있어야 합니다.");
+        Check(game.Phase == GamePhase.Discussion, "없음 지목도 전원 제출 후 마감까지 변경할 수 있어야 합니다.");
+        AdvanceProfilePhase(game, ref now);
         var snapshot = game.Snapshot(1, 1, now);
         Check(snapshot.Phase == GamePhase.Rebuttal && snapshot.HasAccused && snapshot.AccusedPlayerId == GameRules.NO_LIAR_TARGET
             && snapshot.JudgmentVoterCount == snapshot.Players.Count(player => player.IsConnected && !player.IsSpectator)
             && snapshot.RevealedLiarCount == -1, "없음 지목은 실제 역할을 숨긴 채 전원 찬반으로 넘어가야 합니다.");
+        return now;
     }
 
     private static void VerifyOptionalAbsenceTie(DrawingMode mode)
@@ -124,17 +127,22 @@ internal static partial class Integration
         var game = OptionalGameWithLiar(false, 4, mode); double now = OptionalDiscussion(game);
         CompletedMatchData? completed = null; int completionCount = 0; game.MatchCompleted += value => { completed = value; completionCount++; };
         Check(!game.Vote(99, -1, now) && !game.Vote(1, -2, now) && !game.Vote(1, 1, now), "관전자·잘못된 음수 대상·자기 지목은 거부해야 합니다.");
-        Check(game.Vote(1, -1, now) && !game.Vote(1, -1, now), "없음 지목도 중복 제출할 수 없어야 합니다.");
+        Check(game.Vote(1, -1, now) && game.Vote(1, -1, now)
+            && game.Snapshot(1, 1, now).LocalVoteTargetId == -1
+            && game.Snapshot(1, 1, now).Players.Single(player => player.Id == 1).HasVoted,
+            "같은 없음 지목의 재전송은 표를 중복 집계하지 않고 본인 제출 상태를 유지해야 합니다.");
         Check(game.Vote(2, -1, now), "두 번째 없음 지목을 제출해야 합니다.");
         Check(game.Vote(3, -1, now) && game.Phase == GamePhase.Discussion && game.Vote(4, -1, now),
-            "네 참가자의 없음 지목을 모두 제출해야 찬반으로 넘어가야 합니다.");
+            "네 참가자의 없음 지목을 모두 제출할 수 있어야 합니다.");
+        Check(game.Phase == GamePhase.Discussion, "전원 없음 지목 후에도 토론 마감까지 기다려야 합니다.");
+        AdvanceProfilePhase(game, ref now);
         Check(!game.Judge(99, -1, true, now) && !game.Judge(1, 2, true, now), "관전자·다른 대상 찬반은 거부해야 합니다.");
         Check(game.Judge(1, -1, true, now) && !game.Judge(1, -1, false, now), "찬반도 한 번만 제출해야 합니다.");
         Check(game.Judge(2, -1, false, now) && game.Judge(3, -1, true, now) && game.Phase == GamePhase.Rebuttal,
             "네 번째 참가자의 찬반을 기다려야 합니다.");
         Check(game.Judge(4, -1, false, now) && game.Phase == GamePhase.Discussion && !game.Snapshot(99, 1, now).IsJudgmentCoinToss,
             "첫 2대2 찬반 동률이면 없음 지목도 부결해야 합니다.");
-        OptionalNominateNone(game, now);
+        now = OptionalNominateNone(game, now);
         for (int id = 1; id <= 4; id++) Check(game.Judge(id, -1, id is 1 or 3, now), "두 번째 없음 지목의 동률을 제출해야 합니다.");
         var toss = game.Snapshot(99, 1, now);
         Check(toss.IsJudgmentCoinToss && toss.AccusedPlayerId == -1 && toss.RemainingSeconds == 3 && toss.RevealedLiarCount == -1
@@ -143,7 +151,7 @@ internal static partial class Integration
         if (!toss.JudgmentCoinApproved)
         {
             Check(game.Phase == GamePhase.Discussion, "반대 동전은 없음 지목도 재토론으로 돌려야 합니다.");
-            OptionalNominateNone(game, now);
+            now = OptionalNominateNone(game, now);
             Check(game.Judge(1, -1, true, now) && game.Judge(3, -1, true, now), "기존 올바른 참가자만 재찬성해야 합니다.");
             game.Tick(now += game.Settings.RebuttalSeconds + .01);
         }
@@ -168,7 +176,7 @@ internal static partial class Integration
         var game = OptionalGameWithLiar(true, mode: mode); double now = OptionalDiscussion(game);
         int liar = Enumerable.Range(1, 3).Single(id => game.Snapshot(id, 1, now).LocalIsLiar);
         var citizens = Enumerable.Range(1, 3).Where(id => id != liar).ToArray(); int citizen = citizens[0];
-        OptionalNominateNone(game, now); int ballot = game.BallotVersion;
+        now = OptionalNominateNone(game, now); int ballot = game.BallotVersion;
         foreach (int id in Enumerable.Range(1, 3)) Check(game.Judge(id, -1, false, now), "실제 라이어가 있으면 없음 지목에 반대할 수 있어야 합니다.");
         Check(game.Phase == GamePhase.Discussion && game.BallotVersion > ballot && !game.Snapshot(1, 1, now).HasAccused
             && game.Snapshot(1, 1, now).RevealedLiarCount == -1, "부결은 비밀을 유지하고 새 토론·투표로 복귀해야 합니다.");
@@ -181,6 +189,7 @@ internal static partial class Integration
         Check(game.Judge(citizens[1], liar, false, now) && game.Phase == GamePhase.Discussion,
             "사람 지목도 첫 1대1 찬반 동률이면 부결해야 합니다.");
         foreach (int id in Enumerable.Range(1, 3)) Check(game.Vote(id, id == liar ? citizen : liar, now), "같은 라운드에서 라이어를 다시 지목해야 합니다.");
+        AdvanceProfilePhase(game, ref now);
         foreach (int id in citizens) Check(game.Judge(id, liar, true, now), "동률 이후 찬성 우세는 지연 없이 가결해야 합니다.");
         Check(game.Phase == GamePhase.LiarReveal && !game.Snapshot(citizen, 1, now).IsJudgmentCoinToss,
             "찬성 우세는 앞 동률 횟수와 무관하게 가결해야 합니다.");
@@ -199,7 +208,7 @@ internal static partial class Integration
         var game = OptionalGameWithLiar(true, 3, mode); double now = OptionalDiscussion(game);
         int liar = Enumerable.Range(1, 3).Single(id => game.Snapshot(id, 1, now).LocalIsLiar);
         int dissenter = Enumerable.Range(1, 3).First(id => id != liar);
-        OptionalNominateNone(game, now);
+        now = OptionalNominateNone(game, now);
         foreach (int id in Enumerable.Range(1, 3)) Check(game.Judge(id, -1, id != dissenter, now), "없음 지목에 찬반을 제출해야 합니다.");
         Check(game.Phase == GamePhase.LiarReveal && game.Snapshot(99, 1, now).RevealedLiarCount == 1
             && game.Snapshot(99, 1, now).Players.All(player => !player.IsCaught), "잘못 가결된 없음 지목은 실제 라이어를 잡은 것으로 처리하면 안 됩니다.");
@@ -215,7 +224,7 @@ internal static partial class Integration
     {
         var game = OptionalGameWithLiar(true, 4); double now = OptionalDiscussion(game);
         int liar = Enumerable.Range(1, 4).Single(id => game.Snapshot(id, 1, now).LocalIsLiar); game.Disconnect(liar, now);
-        OptionalNominateNone(game, now);
+        now = OptionalNominateNone(game, now);
         var citizens = Enumerable.Range(1, 4).Where(id => id != liar).ToArray();
         Check(game.Judge(citizens[0], -1, false, now), "단절된 라이어가 있는 라운드에서도 없음 반대가 가능해야 합니다.");
         foreach (int id in citizens.Skip(1)) Check(game.Judge(id, -1, true, now), "나머지 시민은 찬성할 수 있어야 합니다.");
@@ -228,7 +237,7 @@ internal static partial class Integration
     private static void VerifyOptionalMidRoundJoin()
     {
         var game = OptionalGameWithLiar(false); double now = OptionalDiscussion(game);
-        OptionalNominateNone(game, now);
+        now = OptionalNominateNone(game, now);
         Check(game.Join(4, "도중 참가자", 0, 0), "없음 찬반 중에도 일반 난입이 가능해야 합니다.");
         var joined = game.Snapshot(4, 1, now);
         Check(!joined.LocalIsSpectator && joined.Word == "비밀사과" && joined.RevealedLiarCount == -1
@@ -281,6 +290,13 @@ internal static partial class Integration
             room.Receive(peers[3], new GameplayEnvelope { Type = "request", Kind = "vote", Target = -1, BallotVersion = nominationVersion }, now += .1);
             room.Receive(peers[0], new GameplayEnvelope { Type = "request", Kind = "vote", Target = -1, BallotVersion = nominationVersion - 1 }, now += .1);
             for (int index = 0; index < 3; index++) room.Receive(peers[index], new GameplayEnvelope { Type = "request", Kind = "vote", Target = -1, BallotVersion = nominationVersion }, now += .1);
+            await WaitAsync(() => sockets.All(socket => socket.LastState is { Phase: GamePhase.Discussion } state
+                && state.Players.Count(player => player.HasVoted && !player.IsSpectator) == 3), 3);
+            Check(sockets.Take(3).All(socket => socket.LastState!.LocalVoteTargetId == -1
+                && socket.LastState!.Players.Single(player => player.Id == socket.LastState!.LocalPlayerId).HasVoted)
+                && sockets[3].LastState!.LocalVoteTargetId == -1 && sockets[3].LastState!.LocalIsSpectator,
+                "없음 target -1은 본인 HasVoted와 함께 전달하고 관전자에게 개인 표를 공개하면 안 됩니다.");
+            room.Tick(now += sockets[0].LastState!.RemainingSeconds + .01);
             await WaitAsync(() => sockets.All(socket => socket.LastState?.Phase == GamePhase.Rebuttal), 3);
             Check(sockets.All(socket => socket.LastState is { HasAccused: true, AccusedPlayerId: -1, JudgmentVoterCount: 3, RevealedLiarCount: -1 }),
                 "실제 DS JSON은 -1 없음 표적과 전원 찬반 수를 전달해야 합니다.");

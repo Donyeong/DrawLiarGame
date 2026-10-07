@@ -145,8 +145,10 @@ internal static partial class Integration
         Check(session.Phase == GamePhase.Discussion, "모든 그림 차례 뒤 토론해야 합니다.");
         foreach (int id in active)
             Check(session.Vote(id, id == liar ? active.First(other => other != liar) : liar, now += 0.1), "정상 투표를 수락해야 합니다.");
+        Check(session.Phase == GamePhase.Discussion, "전원이 지목해도 토론 마감 전에는 반론으로 진행하면 안 됩니다.");
+        AdvanceProfilePhase(session, ref now);
         Check(session.Phase == GamePhase.Rebuttal && session.Snapshot(1, 1, now).AccusedPlayerId == liar,
-            "전원 지목 뒤 한 명의 반론으로 진행해야 합니다.");
+            "마감 시 최다표 한 명의 반론으로 진행해야 합니다.");
         Check(session.Snapshot(1, 1, now).Players.All(player => !player.IsLiar && player.RoundPoints == 0),
             "반론 중 역할이나 올바른 찬반 보상을 노출하면 안 됩니다.");
         foreach (int id in active.Where(id => id != liar))

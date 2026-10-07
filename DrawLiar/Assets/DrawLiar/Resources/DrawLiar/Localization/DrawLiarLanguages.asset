@@ -10575,6 +10575,506 @@ MonoBehaviour:
         \u0645\u0646 \u0646\u0635\u064A\u0628 {0}."
       Flags: 000000000000000000000000
       Languages_Touch: []
+    - Term: UI/7KO87KCcIOq0gOumrA
+      TermType: 0
+      Description: "\uC8FC\uC81C \uAD00\uB9AC"
+      Languages:
+      - "\uC8FC\uC81C \uAD00\uB9AC"
+      - Manage topics
+      - "\u7BA1\u7406\u4E3B\u9898"
+      - "\u7BA1\u7406\u4E3B\u984C"
+      - "\u30C6\u30FC\u30DE\u7BA1\u7406"
+      - Gestionar temas
+      - Gerenciar temas
+      - "G\xE9rer les th\xE8mes"
+      - Themen verwalten
+      - Kelola tema
+      - "\u0935\u093F\u0937\u092F \u092A\u094D\u0930\u092C\u0902\u0927\u0928"
+      - "\u0625\u062F\u0627\u0631\u0629 \u0627\u0644\u0645\u0648\u0627\u0636\u064A\u0639"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/66-466as67O06riw
+      TermType: 0
+      Description: "\uBBF8\uB9AC\uBCF4\uAE30"
+      Languages:
+      - "\uBBF8\uB9AC\uBCF4\uAE30"
+      - Preview
+      - "\u9884\u89C8"
+      - "\u9810\u89BD"
+      - "\u30D7\u30EC\u30D3\u30E5\u30FC"
+      - Vista previa
+      - "Pr\xE9via"
+      - "Aper\xE7u"
+      - Vorschau
+      - Pratinjau
+      - "\u092A\u0942\u0930\u094D\u0935\u093E\u0935\u0932\u094B\u0915\u0928"
+      - "\u0645\u0639\u0627\u064A\u0646\u0629"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7KCc7Iuc7Ja0IOuvuOumrOuztOq4sA
+      TermType: 0
+      Description: "\uC81C\uC2DC\uC5B4 \uBBF8\uB9AC\uBCF4\uAE30"
+      Languages:
+      - "\uC81C\uC2DC\uC5B4 \uBBF8\uB9AC\uBCF4\uAE30"
+      - Word preview
+      - "\u8BCD\u8BED\u9884\u89C8"
+      - "\u8A5E\u8A9E\u9810\u89BD"
+      - "\u304A\u984C\u306E\u5358\u8A9E\u30D7\u30EC\u30D3\u30E5\u30FC"
+      - Vista previa de palabras
+      - "Pr\xE9via das palavras"
+      - "Aper\xE7u des mots"
+      - "W\xF6rtervorschau"
+      - Pratinjau kata
+      - "\u0936\u092C\u094D\u0926\u094B\u0902 \u0915\u093E \u092A\u0942\u0930\u094D\u0935\u093E\u0935\u0932\u094B\u0915\u0928"
+      - "\u0645\u0639\u0627\u064A\u0646\u0629 \u0627\u0644\u0643\u0644\u0645\u0627\u062A"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7KCc7Iuc7Ja066W8IOu2iOufrOyYpOyngCDrqrvtlojsirXri4jri6Qu
+      TermType: 0
+      Description: "\uC81C\uC2DC\uC5B4\uB97C \uBD88\uB7EC\uC624\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4."
+      Languages:
+      - "\uC81C\uC2DC\uC5B4\uB97C \uBD88\uB7EC\uC624\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4."
+      - Could not load the words.
+      - "\u65E0\u6CD5\u52A0\u8F7D\u8BCD\u8BED\u3002"
+      - "\u7121\u6CD5\u8F09\u5165\u8A5E\u8A9E\u3002"
+      - "\u5358\u8A9E\u3092\u8AAD\u307F\u8FBC\u3081\u307E\u305B\u3093\u3067\u3057\u305F\u3002"
+      - No se pudieron cargar las palabras.
+      - "N\xE3o foi poss\xEDvel carregar as palavras."
+      - Impossible de charger les mots.
+      - "Die W\xF6rter konnten nicht geladen werden."
+      - Tidak dapat memuat kata.
+      - "\u0936\u092C\u094D\u0926 \u0932\u094B\u0921 \u0928\u0939\u0940\u0902 \u0939\u094B
+        \u0938\u0915\u0947\u0964"
+      - "\u062A\u0639\u0630\u0631 \u062A\u062D\u0645\u064A\u0644 \u0627\u0644\u0643\u0644\u0645\u0627\u062A."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/67Cb7J2AIO2RnCB7MH3qsJw
+      TermType: 0
+      Description: "\uBC1B\uC740 \uD45C {0}\uAC1C"
+      Languages:
+      - "\uBC1B\uC740 \uD45C {0}\uAC1C"
+      - 'Votes received: {0}'
+      - "\u6536\u5230 {0} \u7968"
+      - "\u6536\u5230 {0} \u7968"
+      - "\u5F97\u7968\u6570\uFF1A{0}"
+      - 'Votos recibidos: {0}'
+      - 'Votos recebidos: {0}'
+      - "Votes re\xE7us : {0}"
+      - 'Erhaltene Stimmen: {0}'
+      - 'Suara diterima: {0}'
+      - "\u092A\u094D\u0930\u093E\u092A\u094D\u0924 \u0935\u094B\u091F: {0}"
+      - "\u0627\u0644\u0623\u0635\u0648\u0627\u062A \u0627\u0644\u0645\u0633\u062A\u0644\u0645\u0629:
+        {0}"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7KeA66qp7ZWY6riwIMK3IOuwm-ydgCDtkZwgezB96rCc
+      TermType: 0
+      Description: "\uC9C0\uBAA9\uD558\uAE30 \xB7 \uBC1B\uC740 \uD45C {0}\uAC1C"
+      Languages:
+      - "\uC9C0\uBAA9\uD558\uAE30 \xB7 \uBC1B\uC740 \uD45C {0}\uAC1C"
+      - "Nominate \xB7 Votes received: {0}"
+      - "\u6307\u8BA4 \xB7 \u6536\u5230 {0} \u7968"
+      - "\u6307\u8A8D \xB7 \u6536\u5230 {0} \u7968"
+      - "\u6307\u540D\u3059\u308B \xB7 \u5F97\u7968\u6570\uFF1A{0}"
+      - "Nominar \xB7 Votos recibidos: {0}"
+      - "Indicar \xB7 Votos recebidos: {0}"
+      - "D\xE9signer \xB7 Votes re\xE7us : {0}"
+      - "Nominieren \xB7 Erhaltene Stimmen: {0}"
+      - "Tunjuk \xB7 Suara diterima: {0}"
+      - "\u0928\u093E\u092E\u093F\u0924 \u0915\u0930\u0947\u0902 \xB7 \u092A\u094D\u0930\u093E\u092A\u094D\u0924
+        \u0935\u094B\u091F: {0}"
+      - "\u062A\u0631\u0634\u064A\u062D \xB7 \u0627\u0644\u0623\u0635\u0648\u0627\u062A
+        \u0627\u0644\u0645\u0633\u062A\u0644\u0645\u0629: {0}"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/65287J207Ja064qUIOygnOyLnOyWtOulvCDrqqjrpoXri4jri6QuIOq3uOumvOydhCDrs7Tqs6Ag65287J207Ja066W8IOywvuycvOyEuOyalC4
+      TermType: 0
+      Description: "\uB77C\uC774\uC5B4\uB294 \uC81C\uC2DC\uC5B4\uB97C \uBAA8\uB985\uB2C8\uB2E4.
+        \uADF8\uB9BC\uC744 \uBCF4\uACE0 \uB77C\uC774\uC5B4\uB97C \uCC3E\uC73C\uC138\uC694."
+      Languages:
+      - "\uB77C\uC774\uC5B4\uB294 \uC81C\uC2DC\uC5B4\uB97C \uBAA8\uB985\uB2C8\uB2E4.
+        \uADF8\uB9BC\uC744 \uBCF4\uACE0 \uB77C\uC774\uC5B4\uB97C \uCC3E\uC73C\uC138\uC694."
+      - Liars do not know the word. Find them through their drawings.
+      - "\u8BF4\u8C0E\u8005\u4E0D\u77E5\u9053\u63D0\u793A\u8BCD\u3002\u901A\u8FC7\u7ED8\u753B\u627E\u51FA\u8BF4\u8C0E\u8005\u3002"
+      - "\u8AAA\u8B0A\u8005\u4E0D\u77E5\u9053\u63D0\u793A\u8A5E\u3002\u900F\u904E\u7E6A\u756B\u627E\u51FA\u8AAA\u8B0A\u8005\u3002"
+      - "\u30E9\u30A4\u30A2\u30FC\u306F\u304A\u984C\u306E\u5358\u8A9E\u3092\u77E5\u308A\u307E\u305B\u3093\u3002\u7D75\u3092\u898B\u3066\u898B\u3064\u3051\u307E\u3057\u3087\u3046\u3002"
+      - "Los mentirosos no conocen la palabra. Encu\xE9ntralos por sus dibujos."
+      - "Os mentirosos n\xE3o sabem a palavra. Encontre-os pelos desenhos."
+      - "Les menteurs ne connaissent pas le mot. Rep\xE9rez-les gr\xE2ce aux dessins."
+      - "L\xFCgner kennen das Wort nicht. Finde sie anhand der Zeichnungen."
+      - Pembohong tidak tahu kata yang diberikan. Temukan mereka lewat gambar.
+      - "\u091D\u0942\u0920\u094B\u0902 \u0915\u094B \u0926\u093F\u092F\u093E \u0917\u092F\u093E
+        \u0936\u092C\u094D\u0926 \u0928\u0939\u0940\u0902 \u092A\u0924\u093E\u0964
+        \u091A\u093F\u0924\u094D\u0930 \u0926\u0947\u0916\u0915\u0930 \u0909\u0928\u094D\u0939\u0947\u0902
+        \u092A\u0939\u091A\u093E\u0928\u0947\u0902\u0964"
+      - "\u0627\u0644\u0643\u0627\u0630\u0628\u0648\u0646 \u0644\u0627 \u064A\u0639\u0631\u0641\u0648\u0646
+        \u0627\u0644\u0643\u0644\u0645\u0629. \u0627\u0643\u062A\u0634\u0641\u0647\u0645
+        \u0645\u0646 \u0631\u0633\u0648\u0645\u0627\u062A\u0647\u0645."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7ZWcIOuqheyXkOqyjOunjCDri6Trpbgg7KCc7Iuc7Ja06rCAIOyjvOyWtOynkeuLiOuLpC4g64iE6rWs64-EIOyekOyLoOydmCDsl63tlaDsnYQg7JWMIOyImCDsl4bsirXri4jri6Qu
+      TermType: 0
+      Description: "\uD55C \uBA85\uC5D0\uAC8C\uB9CC \uB2E4\uB978 \uC81C\uC2DC\uC5B4\uAC00
+        \uC8FC\uC5B4\uC9D1\uB2C8\uB2E4. \uB204\uAD6C\uB3C4 \uC790\uC2E0\uC758 \uC5ED\uD560\uC744
+        \uC54C \uC218 \uC5C6\uC2B5\uB2C8\uB2E4."
+      Languages:
+      - "\uD55C \uBA85\uC5D0\uAC8C\uB9CC \uB2E4\uB978 \uC81C\uC2DC\uC5B4\uAC00 \uC8FC\uC5B4\uC9D1\uB2C8\uB2E4.
+        \uB204\uAD6C\uB3C4 \uC790\uC2E0\uC758 \uC5ED\uD560\uC744 \uC54C \uC218 \uC5C6\uC2B5\uB2C8\uB2E4."
+      - One player receives a different word. Nobody knows their own role.
+      - "\u53EA\u6709\u4E00\u4EBA\u5F97\u5230\u4E0D\u540C\u7684\u63D0\u793A\u8BCD\u3002\u6240\u6709\u4EBA\u90FD\u4E0D\u77E5\u9053\u81EA\u5DF1\u7684\u8EAB\u4EFD\u3002"
+      - "\u53EA\u6709\u4E00\u4EBA\u5F97\u5230\u4E0D\u540C\u7684\u63D0\u793A\u8A5E\u3002\u6240\u6709\u4EBA\u90FD\u4E0D\u77E5\u9053\u81EA\u5DF1\u7684\u8EAB\u5206\u3002"
+      - "1\u4EBA\u3060\u3051\u9055\u3046\u5358\u8A9E\u304C\u4E0E\u3048\u3089\u308C\u307E\u3059\u3002\u8AB0\u3082\u81EA\u5206\u306E\u5F79\u5272\u3092\u77E5\u308A\u307E\u305B\u3093\u3002"
+      - Un jugador recibe otra palabra. Nadie conoce su propio rol.
+      - "Um jogador recebe outra palavra. Ningu\xE9m sabe seu pr\xF3prio papel."
+      - "Un joueur re\xE7oit un mot diff\xE9rent. Personne ne conna\xEEt son r\xF4le."
+      - "Ein Spieler erh\xE4lt ein anderes Wort. Niemand kennt seine eigene Rolle."
+      - Satu pemain mendapat kata berbeda. Tidak ada yang tahu perannya sendiri.
+      - "\u090F\u0915 \u0916\u093F\u0932\u093E\u0921\u093C\u0940 \u0915\u094B \u0905\u0932\u0917
+        \u0936\u092C\u094D\u0926 \u092E\u093F\u0932\u0924\u093E \u0939\u0948\u0964
+        \u0915\u093F\u0938\u0940 \u0915\u094B \u0905\u092A\u0928\u0940 \u092D\u0942\u092E\u093F\u0915\u093E
+        \u0928\u0939\u0940\u0902 \u092A\u0924\u093E\u0964"
+      - "\u064A\u062D\u0635\u0644 \u0644\u0627\u0639\u0628 \u0648\u0627\u062D\u062F
+        \u0639\u0644\u0649 \u0643\u0644\u0645\u0629 \u0645\u062E\u062A\u0644\u0641\u0629.
+        \u0644\u0627 \u0623\u062D\u062F \u064A\u0639\u0631\u0641 \u062F\u0648\u0631\u0647."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/65287Jq065Oc66eI64ukIOudvOydtOyWtOqwgCAw66qFIOuYkOuKlCAx66qF7J6F64uI64ukLiDigJjrnbzsnbTslrQg7JeG7J2M4oCZ7JeQ64-EIO2IrO2RnO2VoCDsiJgg7J6I7Iq164uI64ukLg
+      TermType: 0
+      Description: "\uB77C\uC6B4\uB4DC\uB9C8\uB2E4 \uB77C\uC774\uC5B4\uAC00 0\uBA85
+        \uB610\uB294 1\uBA85\uC785\uB2C8\uB2E4. \u2018\uB77C\uC774\uC5B4 \uC5C6\uC74C\u2019\uC5D0\uB3C4
+        \uD22C\uD45C\uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4."
+      Languages:
+      - "\uB77C\uC6B4\uB4DC\uB9C8\uB2E4 \uB77C\uC774\uC5B4\uAC00 0\uBA85 \uB610\uB294
+        1\uBA85\uC785\uB2C8\uB2E4. \u2018\uB77C\uC774\uC5B4 \uC5C6\uC74C\u2019\uC5D0\uB3C4
+        \uD22C\uD45C\uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4."
+      - "Each round has zero or one liar. You can also vote \u201CNo Liar\u201D."
+      - "\u6BCF\u8F6E\u6709\u96F6\u540D\u6216\u4E00\u540D\u8BF4\u8C0E\u8005\u3002\u4E5F\u53EF\u4EE5\u6295\u7968\u9009\u62E9\u201C\u6CA1\u6709\u8BF4\u8C0E\u8005\u201D\u3002"
+      - "\u6BCF\u8F2A\u6709\u96F6\u540D\u6216\u4E00\u540D\u8AAA\u8B0A\u8005\u3002\u4E5F\u53EF\u4EE5\u6295\u7968\u9078\u64C7\u300C\u6C92\u6709\u8AAA\u8B0A\u8005\u300D\u3002"
+      - "\u5404\u30E9\u30A6\u30F3\u30C9\u306E\u30E9\u30A4\u30A2\u30FC\u306F0\u4EBA\u304B1\u4EBA\u3067\u3059\u3002\u300C\u30E9\u30A4\u30A2\u30FC\u306A\u3057\u300D\u306B\u3082\u6295\u7968\u3067\u304D\u307E\u3059\u3002"
+      - "Cada ronda tiene cero o un mentiroso. Tambi\xE9n puedes votar \xABSin mentiroso\xBB."
+      - "Cada rodada tem zero ou um mentiroso. Voc\xEA tamb\xE9m pode votar \u201CSem
+        mentiroso\u201D."
+      - "Chaque manche a z\xE9ro ou un menteur. Vous pouvez voter \xAB Aucun menteur
+        \xBB."
+      - "Jede Runde hat keinen oder einen L\xFCgner. Du kannst auch \u201EKein L\xFCgner\u201C
+        w\xE4hlen."
+      - "Setiap ronde memiliki nol atau satu pembohong. Kamu juga bisa memilih \u201CTidak
+        Ada Pembohong\u201D."
+      - "\u0939\u0930 \u0930\u093E\u0909\u0902\u0921 \u092E\u0947\u0902 \u0936\u0942\u0928\u094D\u092F
+        \u092F\u093E \u090F\u0915 \u091D\u0942\u0920\u093E \u0939\u094B\u0924\u093E
+        \u0939\u0948\u0964 \u201C\u0915\u094B\u0908 \u091D\u0942\u0920\u093E \u0928\u0939\u0940\u0902\u201D
+        \u092A\u0930 \u092D\u0940 \u0935\u094B\u091F \u0915\u0930 \u0938\u0915\u0924\u0947
+        \u0939\u0948\u0902\u0964"
+      - "\u0643\u0644 \u062C\u0648\u0644\u0629 \u062A\u0636\u0645 \u0635\u0641\u0631\u064B\u0627
+        \u0623\u0648 \u0643\u0627\u0630\u0628\u064B\u0627 \u0648\u0627\u062D\u062F\u064B\u0627.
+        \u064A\u0645\u0643\u0646\u0643 \u0623\u064A\u0636\u064B\u0627 \u0627\u0644\u062A\u0635\u0648\u064A\u062A
+        \xAB\u0644\u0627 \u064A\u0648\u062C\u062F \u0643\u0627\u0630\u0628\xBB."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/6rCZ7J2AIOy6lOuyhOyKpOyXkCDssKjroYDroZwg7J207Ja0IOq3uOumveuLiOuLpC4
+      TermType: 0
+      Description: "\uAC19\uC740 \uCE94\uBC84\uC2A4\uC5D0 \uCC28\uB840\uB85C \uC774\uC5B4
+        \uADF8\uB9BD\uB2C8\uB2E4."
+      Languages:
+      - "\uAC19\uC740 \uCE94\uBC84\uC2A4\uC5D0 \uCC28\uB840\uB85C \uC774\uC5B4 \uADF8\uB9BD\uB2C8\uB2E4."
+      - Take turns drawing on the same canvas.
+      - "\u8F6E\u6D41\u5728\u540C\u4E00\u753B\u5E03\u4E0A\u63A5\u7740\u753B\u3002"
+      - "\u8F2A\u6D41\u5728\u540C\u4E00\u756B\u5E03\u4E0A\u63A5\u8457\u756B\u3002"
+      - "\u540C\u3058\u30AD\u30E3\u30F3\u30D0\u30B9\u306B\u9806\u756A\u3067\u63CF\u304D\u8DB3\u3057\u307E\u3059\u3002"
+      - Dibujen por turnos en el mismo lienzo.
+      - Desenhem por turnos na mesma tela.
+      - "Dessinez \xE0 tour de r\xF4le sur la m\xEAme toile."
+      - Zeichnet abwechselnd auf derselben Leinwand.
+      - Bergiliran menggambar di kanvas yang sama.
+      - "\u090F\u0915 \u0939\u0940 \u0915\u0948\u0928\u0935\u093E\u0938 \u092A\u0930
+        \u092C\u093E\u0930\u0940-\u092C\u093E\u0930\u0940 \u0938\u0947 \u091A\u093F\u0924\u094D\u0930
+        \u092C\u0928\u093E\u090F\u0902\u0964"
+      - "\u062A\u0646\u0627\u0648\u0628\u0648\u0627 \u0639\u0644\u0649 \u0627\u0644\u0631\u0633\u0645
+        \u0639\u0644\u0649 \u0627\u0644\u0644\u0648\u062D\u0629 \u0646\u0641\u0633\u0647\u0627."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/6rCB7J6QIOy6lOuyhOyKpOyXkCDssKjroYDroZwg6re466a964uI64ukLiDthqDroaAg65WMIOywuOqwgOyekOydmCDqt7jrprzsnYQg67mE6rWQ7ZWY7IS47JqULg
+      TermType: 0
+      Description: "\uAC01\uC790 \uCE94\uBC84\uC2A4\uC5D0 \uCC28\uB840\uB85C \uADF8\uB9BD\uB2C8\uB2E4.
+        \uD1A0\uB860 \uB54C \uCC38\uAC00\uC790\uC758 \uADF8\uB9BC\uC744 \uBE44\uAD50\uD558\uC138\uC694."
+      Languages:
+      - "\uAC01\uC790 \uCE94\uBC84\uC2A4\uC5D0 \uCC28\uB840\uB85C \uADF8\uB9BD\uB2C8\uB2E4.
+        \uD1A0\uB860 \uB54C \uCC38\uAC00\uC790\uC758 \uADF8\uB9BC\uC744 \uBE44\uAD50\uD558\uC138\uC694."
+      - Take turns on individual canvases. Compare drawings during discussion.
+      - "\u8F6E\u6D41\u5728\u5404\u81EA\u7684\u753B\u5E03\u4E0A\u753B\u3002\u8BA8\u8BBA\u65F6\u6BD4\u8F83\u5927\u5BB6\u7684\u753B\u3002"
+      - "\u8F2A\u6D41\u5728\u5404\u81EA\u7684\u756B\u5E03\u4E0A\u756B\u3002\u8A0E\u8AD6\u6642\u6BD4\u8F03\u5927\u5BB6\u7684\u756B\u3002"
+      - "\u5404\u81EA\u306E\u30AD\u30E3\u30F3\u30D0\u30B9\u306B\u9806\u756A\u3067\u63CF\u304D\u307E\u3059\u3002\u8A0E\u8AD6\u3067\u307F\u3093\u306A\u306E\u7D75\u3092\u6BD4\u3079\u307E\u3057\u3087\u3046\u3002"
+      - Dibujen por turnos en lienzos individuales. Comparen los dibujos durante
+        el debate.
+      - "Desenhem por turnos em telas individuais. Comparem os desenhos na discuss\xE3o."
+      - "Dessinez \xE0 tour de r\xF4le sur vos propres toiles. Comparez les dessins
+        pendant la discussion."
+      - "Zeichnet abwechselnd auf eigenen Leinw\xE4nden. Vergleicht die Bilder in
+        der Diskussion."
+      - Bergiliran menggambar di kanvas masing-masing. Bandingkan gambar saat diskusi.
+      - "\u092C\u093E\u0930\u0940-\u092C\u093E\u0930\u0940 \u0938\u0947 \u0905\u092A\u0928\u0947
+        \u0915\u0948\u0928\u0935\u093E\u0938 \u092A\u0930 \u091A\u093F\u0924\u094D\u0930
+        \u092C\u0928\u093E\u090F\u0902\u0964 \u091A\u0930\u094D\u091A\u093E \u092E\u0947\u0902
+        \u091A\u093F\u0924\u094D\u0930\u094B\u0902 \u0915\u0940 \u0924\u0941\u0932\u0928\u093E
+        \u0915\u0930\u0947\u0902\u0964"
+      - "\u062A\u0646\u0627\u0648\u0628\u0648\u0627 \u0639\u0644\u0649 \u0627\u0644\u0631\u0633\u0645
+        \u0639\u0644\u0649 \u0644\u0648\u062D\u0627\u062A\u0643\u0645 \u0627\u0644\u062E\u0627\u0635\u0629.
+        \u0642\u0627\u0631\u0646\u0648\u0627 \u0627\u0644\u0631\u0633\u0648\u0645\u0627\u062A
+        \u0623\u062B\u0646\u0627\u0621 \u0627\u0644\u0646\u0642\u0627\u0634."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7KCc7Iuc7Ja07JeQIOunnuy2sCDqt7jrprzsnYQg6re466as6rOgLCDri6jslrTrpbwg66qo66W064qUIOudvOydtOyWtOulvCDssL7slYQg7Yis7ZGc7ZWY7IS47JqULg
+      TermType: 0
+      Description: "\uC81C\uC2DC\uC5B4\uC5D0 \uB9DE\uCDB0 \uADF8\uB9BC\uC744 \uADF8\uB9AC\uACE0,
+        \uB2E8\uC5B4\uB97C \uBAA8\uB974\uB294 \uB77C\uC774\uC5B4\uB97C \uCC3E\uC544
+        \uD22C\uD45C\uD558\uC138\uC694."
+      Languages:
+      - "\uC81C\uC2DC\uC5B4\uC5D0 \uB9DE\uCDB0 \uADF8\uB9BC\uC744 \uADF8\uB9AC\uACE0,
+        \uB2E8\uC5B4\uB97C \uBAA8\uB974\uB294 \uB77C\uC774\uC5B4\uB97C \uCC3E\uC544
+        \uD22C\uD45C\uD558\uC138\uC694."
+      - Draw clues for your word, then find and vote for the liar who does not know
+        it.
+      - "\u6309\u63D0\u793A\u8BCD\u753B\u56FE\uFF0C\u518D\u627E\u51FA\u4E0D\u77E5\u9053\u8BCD\u8BED\u7684\u8BF4\u8C0E\u8005\u5E76\u6295\u7968\u3002"
+      - "\u4F9D\u7167\u63D0\u793A\u8A5E\u756B\u5716\uFF0C\u518D\u627E\u51FA\u4E0D\u77E5\u9053\u8A5E\u8A9E\u7684\u8AAA\u8B0A\u8005\u4E26\u6295\u7968\u3002"
+      - "\u5358\u8A9E\u306B\u5408\u3046\u7D75\u3092\u63CF\u304D\u3001\u5358\u8A9E\u3092\u77E5\u3089\u306A\u3044\u30E9\u30A4\u30A2\u30FC\u3092\u898B\u3064\u3051\u3066\u6295\u7968\u3057\u307E\u3057\u3087\u3046\u3002"
+      - "Dibuja pistas de tu palabra, encuentra al mentiroso que no la conoce y vota
+        por \xE9l."
+      - "Desenhe pistas da sua palavra, encontre o mentiroso que n\xE3o a conhece
+        e vote nele."
+      - "Dessinez des indices sur votre mot, puis trouvez le menteur qui ne le conna\xEEt
+        pas et votez pour lui."
+      - "Zeichne Hinweise zu deinem Wort. Finde den L\xFCgner, der es nicht kennt,
+        und stimme f\xFCr ihn."
+      - Gambar petunjuk untuk katamu, lalu temukan dan pilih pembohong yang tidak
+        mengetahuinya.
+      - "\u0905\u092A\u0928\u0947 \u0936\u092C\u094D\u0926 \u0915\u0947 \u0905\u0928\u0941\u0938\u093E\u0930
+        \u091A\u093F\u0924\u094D\u0930 \u092C\u0928\u093E\u090F\u0902, \u092B\u093F\u0930
+        \u0936\u092C\u094D\u0926 \u0928 \u091C\u093E\u0928\u0928\u0947 \u0935\u093E\u0932\u0947
+        \u091D\u0942\u0920\u0947 \u0915\u094B \u092A\u0939\u091A\u093E\u0928\u0915\u0930
+        \u0935\u094B\u091F \u0926\u0947\u0902\u0964"
+      - "\u0627\u0631\u0633\u0645 \u062A\u0644\u0645\u064A\u062D\u0627\u062A \u0644\u0643\u0644\u0645\u062A\u0643\u060C
+        \u062B\u0645 \u0627\u0643\u062A\u0634\u0641 \u0627\u0644\u0643\u0627\u0630\u0628
+        \u0627\u0644\u0630\u064A \u0644\u0627 \u064A\u0639\u0631\u0641\u0647\u0627
+        \u0648\u0635\u0648\u0651\u062A \u0644\u0647."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7Iuc66-87J24IOyymSDrk6TtgqTsp4Ag7JWK6rKMIOq3uOumvOydhCDqt7jrpqzqs6AsIOyLnOuvvOuTpOydmCDqt7jrprzsnYQg67O06rOgIOygnOyLnOyWtOulvCDrp57tmIAg67O07IS47JqULg
+      TermType: 0
+      Description: "\uC2DC\uBBFC\uC778 \uCC99 \uB4E4\uD0A4\uC9C0 \uC54A\uAC8C \uADF8\uB9BC\uC744
+        \uADF8\uB9AC\uACE0, \uC2DC\uBBFC\uB4E4\uC758 \uADF8\uB9BC\uC744 \uBCF4\uACE0
+        \uC81C\uC2DC\uC5B4\uB97C \uB9DE\uD600 \uBCF4\uC138\uC694."
+      Languages:
+      - "\uC2DC\uBBFC\uC778 \uCC99 \uB4E4\uD0A4\uC9C0 \uC54A\uAC8C \uADF8\uB9BC\uC744
+        \uADF8\uB9AC\uACE0, \uC2DC\uBBFC\uB4E4\uC758 \uADF8\uB9BC\uC744 \uBCF4\uACE0
+        \uC81C\uC2DC\uC5B4\uB97C \uB9DE\uD600 \uBCF4\uC138\uC694."
+      - Draw like a citizen without getting caught. Use the citizens' drawings to
+        guess the word.
+      - "\u50CF\u5E73\u6C11\u4E00\u6837\u753B\u56FE\uFF0C\u4E0D\u8981\u66B4\u9732\u8EAB\u4EFD\u3002\u89C2\u5BDF\u5E73\u6C11\u7684\u753B\uFF0C\u731C\u51FA\u63D0\u793A\u8BCD\u3002"
+      - "\u50CF\u5E73\u6C11\u4E00\u6A23\u756B\u5716\uFF0C\u4E0D\u8981\u66B4\u9732\u8EAB\u5206\u3002\u89C0\u5BDF\u5E73\u6C11\u7684\u756B\uFF0C\u731C\u51FA\u63D0\u793A\u8A5E\u3002"
+      - "\u5E02\u6C11\u306E\u3075\u308A\u3092\u3057\u3066\u898B\u7834\u3089\u308C\u306A\u3044\u3088\u3046\u306B\u7D75\u3092\u63CF\u304D\u3001\u5E02\u6C11\u306E\u7D75\u304B\u3089\u5358\u8A9E\u3092\u63A8\u6E2C\u3057\u307E\u3057\u3087\u3046\u3002"
+      - Dibuja como un ciudadano sin que te descubran. Usa sus dibujos para adivinar
+        la palabra.
+      - "Desenhe como um cidad\xE3o sem ser descoberto. Use os desenhos dos cidad\xE3os
+        para adivinhar a palavra."
+      - "Dessinez comme un citoyen sans vous faire rep\xE9rer. Devinez le mot gr\xE2ce
+        aux dessins des citoyens."
+      - "Zeichne wie ein B\xFCrger, ohne aufzufallen. Errate das Wort anhand der
+        Bilder der B\xFCrger."
+      - Gambar seperti warga tanpa ketahuan. Tebak kata dari gambar para warga.
+      - "\u092A\u0915\u0921\u093C\u0947 \u091C\u093E\u0928\u0947 \u0938\u0947 \u092C\u091A\u0924\u0947
+        \u0939\u0941\u090F \u0928\u093E\u0917\u0930\u093F\u0915 \u0915\u0940 \u0924\u0930\u0939
+        \u091A\u093F\u0924\u094D\u0930 \u092C\u0928\u093E\u090F\u0902\u0964 \u0928\u093E\u0917\u0930\u093F\u0915\u094B\u0902
+        \u0915\u0947 \u091A\u093F\u0924\u094D\u0930 \u0926\u0947\u0916\u0915\u0930
+        \u0936\u092C\u094D\u0926 \u0915\u093E \u0905\u0928\u0941\u092E\u093E\u0928
+        \u0932\u0917\u093E\u090F\u0902\u3002"
+      - "\u0627\u0631\u0633\u0645 \u0643\u0645\u0648\u0627\u0637\u0646 \u062F\u0648\u0646
+        \u0623\u0646 \u062A\u064F\u0643\u0634\u0641. \u0627\u0633\u062A\u062E\u062F\u0645
+        \u0631\u0633\u0648\u0645\u0627\u062A \u0627\u0644\u0645\u0648\u0627\u0637\u0646\u064A\u0646
+        \u0644\u062A\u062E\u0645\u064A\u0646 \u0627\u0644\u0643\u0644\u0645\u0629."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7KCc7Iuc7Ja07JeQIOunnuy2sCDqt7jrpqzqs6AsIOudvOydtOyWtOulvCDssL7slYQg7Yis7ZGc7ZWY7IS47JqULiDsl4bri6Tqs6Ag7IOd6rCB7ZWY66m0IOKAmOudvOydtOyWtCDsl4bsnYzigJnsnYQg7ISg7YOd7ZWY7IS47JqULg
+      TermType: 0
+      Description: "\uC81C\uC2DC\uC5B4\uC5D0 \uB9DE\uCDB0 \uADF8\uB9AC\uACE0, \uB77C\uC774\uC5B4\uB97C
+        \uCC3E\uC544 \uD22C\uD45C\uD558\uC138\uC694. \uC5C6\uB2E4\uACE0 \uC0DD\uAC01\uD558\uBA74
+        \u2018\uB77C\uC774\uC5B4 \uC5C6\uC74C\u2019\uC744 \uC120\uD0DD\uD558\uC138\uC694."
+      Languages:
+      - "\uC81C\uC2DC\uC5B4\uC5D0 \uB9DE\uCDB0 \uADF8\uB9AC\uACE0, \uB77C\uC774\uC5B4\uB97C
+        \uCC3E\uC544 \uD22C\uD45C\uD558\uC138\uC694. \uC5C6\uB2E4\uACE0 \uC0DD\uAC01\uD558\uBA74
+        \u2018\uB77C\uC774\uC5B4 \uC5C6\uC74C\u2019\uC744 \uC120\uD0DD\uD558\uC138\uC694."
+      - "Draw for your word and vote for the liar. If you think there is no liar,
+        choose \u201CNo Liar\u201D."
+      - "\u6309\u63D0\u793A\u8BCD\u753B\u56FE\uFF0C\u627E\u51FA\u8BF4\u8C0E\u8005\u5E76\u6295\u7968\u3002\u8BA4\u4E3A\u6CA1\u6709\u8BF4\u8C0E\u8005\u65F6\uFF0C\u9009\u62E9\u201C\u6CA1\u6709\u8BF4\u8C0E\u8005\u201D\u3002"
+      - "\u4F9D\u7167\u63D0\u793A\u8A5E\u756B\u5716\uFF0C\u627E\u51FA\u8AAA\u8B0A\u8005\u4E26\u6295\u7968\u3002\u8A8D\u70BA\u6C92\u6709\u8AAA\u8B0A\u8005\u6642\uFF0C\u9078\u64C7\u300C\u6C92\u6709\u8AAA\u8B0A\u8005\u300D\u3002"
+      - "\u5358\u8A9E\u306B\u5408\u3046\u7D75\u3092\u63CF\u304D\u3001\u30E9\u30A4\u30A2\u30FC\u3092\u898B\u3064\u3051\u3066\u6295\u7968\u3057\u307E\u3057\u3087\u3046\u3002\u3044\u306A\u3044\u3068\u601D\u3063\u305F\u3089\u300C\u30E9\u30A4\u30A2\u30FC\u306A\u3057\u300D\u3092\u9078\u3073\u307E\u3057\u3087\u3046\u3002"
+      - "Dibuja tu palabra y vota por el mentiroso. Si crees que no hay ninguno,
+        elige \xABSin mentiroso\xBB."
+      - "Desenhe sua palavra e vote no mentiroso. Se achar que n\xE3o h\xE1 nenhum,
+        escolha \u201CSem mentiroso\u201D."
+      - "Dessinez votre mot et votez pour le menteur. Si vous pensez qu'il n'y en
+        a pas, choisissez \xAB Aucun menteur \xBB."
+      - "Zeichne dein Wort und stimme f\xFCr den L\xFCgner. Glaubst du, dass es keinen
+        gibt, w\xE4hle \u201EKein L\xFCgner\u201C."
+      - "Gambar sesuai katamu dan pilih pembohong. Jika menurutmu tidak ada, pilih
+        \u201CTidak Ada Pembohong\u201D."
+      - "\u0905\u092A\u0928\u0947 \u0936\u092C\u094D\u0926 \u0915\u0947 \u0905\u0928\u0941\u0938\u093E\u0930
+        \u091A\u093F\u0924\u094D\u0930 \u092C\u0928\u093E\u090F\u0902 \u0914\u0930
+        \u091D\u0942\u0920\u0947 \u0915\u094B \u0935\u094B\u091F \u0926\u0947\u0902\u0964
+        \u0915\u094B\u0908 \u091D\u0942\u0920\u093E \u0928 \u0932\u0917\u0947 \u0924\u094B
+        \u201C\u0915\u094B\u0908 \u091D\u0942\u0920\u093E \u0928\u0939\u0940\u0902\u201D
+        \u091A\u0941\u0928\u0947\u0902\u3002"
+      - "\u0627\u0631\u0633\u0645 \u0643\u0644\u0645\u062A\u0643 \u0648\u0635\u0648\u0651\u062A
+        \u0644\u0644\u0643\u0627\u0630\u0628. \u0625\u0646 \u0638\u0646\u0646\u062A
+        \u0623\u0646\u0647 \u0644\u0627 \u064A\u0648\u062C\u062F \u0643\u0627\u0630\u0628\u060C
+        \u0627\u062E\u062A\u0631 \xAB\u0644\u0627 \u064A\u0648\u062C\u062F \u0643\u0627\u0630\u0628\xBB."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/64K0IOygnOyLnOyWtOyXkCDrp57strAg6re466as6rOgLCDri6Trpbgg64uo7Ja066W8IOuwm-ydgCDsgqzrnozsnYQg7LC-7JWE67O07IS47JqULiDrgpjsnbwg7IiY64-EIOyeiOyWtOyalC4
+      TermType: 0
+      Description: "\uB0B4 \uC81C\uC2DC\uC5B4\uC5D0 \uB9DE\uCDB0 \uADF8\uB9AC\uACE0,
+        \uB2E4\uB978 \uB2E8\uC5B4\uB97C \uBC1B\uC740 \uC0AC\uB78C\uC744 \uCC3E\uC544\uBCF4\uC138\uC694.
+        \uB098\uC77C \uC218\uB3C4 \uC788\uC5B4\uC694."
+      Languages:
+      - "\uB0B4 \uC81C\uC2DC\uC5B4\uC5D0 \uB9DE\uCDB0 \uADF8\uB9AC\uACE0, \uB2E4\uB978
+        \uB2E8\uC5B4\uB97C \uBC1B\uC740 \uC0AC\uB78C\uC744 \uCC3E\uC544\uBCF4\uC138\uC694.
+        \uB098\uC77C \uC218\uB3C4 \uC788\uC5B4\uC694."
+      - Draw for your word and find the player with a different word. That player
+        could be you.
+      - "\u6839\u636E\u81EA\u5DF1\u7684\u63D0\u793A\u8BCD\u753B\u56FE\uFF0C\u627E\u51FA\u62FF\u5230\u4E0D\u540C\u8BCD\u8BED\u7684\u4EBA\u3002\u90A3\u4E2A\u4EBA\u4E5F\u53EF\u80FD\u662F\u4F60\u3002"
+      - "\u4F9D\u7167\u81EA\u5DF1\u7684\u63D0\u793A\u8A5E\u756B\u5716\uFF0C\u627E\u51FA\u62FF\u5230\u4E0D\u540C\u8A5E\u8A9E\u7684\u4EBA\u3002\u90A3\u500B\u4EBA\u4E5F\u53EF\u80FD\u662F\u4F60\u3002"
+      - "\u81EA\u5206\u306E\u5358\u8A9E\u306B\u5408\u3046\u7D75\u3092\u63CF\u304D\u3001\u9055\u3046\u5358\u8A9E\u3092\u3082\u3089\u3063\u305F\u4EBA\u3092\u63A2\u3057\u307E\u3057\u3087\u3046\u3002\u81EA\u5206\u304B\u3082\u3057\u308C\u307E\u305B\u3093\u3002"
+      - "Dibuja tu palabra y busca al jugador con una palabra distinta. Podr\xEDas
+        ser t\xFA."
+      - "Desenhe sua palavra e encontre quem recebeu uma palavra diferente. Pode
+        ser voc\xEA."
+      - "Dessinez votre mot et cherchez le joueur qui en a un autre. Ce pourrait
+        \xEAtre vous."
+      - "Zeichne dein Wort und finde den Spieler mit einem anderen Wort. Das k\xF6nntest
+        du selbst sein."
+      - Gambar sesuai katamu dan cari pemain yang mendapat kata berbeda. Bisa jadi
+        kamu sendiri.
+      - "\u0905\u092A\u0928\u0947 \u0936\u092C\u094D\u0926 \u0915\u0947 \u0905\u0928\u0941\u0938\u093E\u0930
+        \u091A\u093F\u0924\u094D\u0930 \u092C\u0928\u093E\u090F\u0902 \u0914\u0930
+        \u0905\u0932\u0917 \u0936\u092C\u094D\u0926 \u0935\u093E\u0932\u0947 \u0916\u093F\u0932\u093E\u0921\u093C\u0940
+        \u0915\u094B \u0916\u094B\u091C\u0947\u0902\u0964 \u0935\u0939 \u0906\u092A
+        \u092D\u0940 \u0939\u094B \u0938\u0915\u0924\u0947 \u0939\u0948\u0902\u3002"
+      - "\u0627\u0631\u0633\u0645 \u0648\u0641\u0642 \u0643\u0644\u0645\u062A\u0643
+        \u0648\u0627\u0628\u062D\u062B \u0639\u0646 \u0627\u0644\u0644\u0627\u0639\u0628
+        \u0627\u0644\u0630\u064A \u0644\u062F\u064A\u0647 \u0643\u0644\u0645\u0629
+        \u0645\u062E\u062A\u0644\u0641\u0629. \u0642\u062F \u062A\u0643\u0648\u0646
+        \u0623\u0646\u062A \u0630\u0644\u0643 \u0627\u0644\u0644\u0627\u0639\u0628."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/6re466a86rO8IO2GoOuhoOydhCDsp4DsvJzrs7TrqbAg64iE6rCAIOudvOydtOyWtOyduOyngCDstpTsuKHtlbQg67O07IS47JqULg
+      TermType: 0
+      Description: "\uADF8\uB9BC\uACFC \uD1A0\uB860\uC744 \uC9C0\uCF1C\uBCF4\uBA70
+        \uB204\uAC00 \uB77C\uC774\uC5B4\uC778\uC9C0 \uCD94\uCE21\uD574 \uBCF4\uC138\uC694."
+      Languages:
+      - "\uADF8\uB9BC\uACFC \uD1A0\uB860\uC744 \uC9C0\uCF1C\uBCF4\uBA70 \uB204\uAC00
+        \uB77C\uC774\uC5B4\uC778\uC9C0 \uCD94\uCE21\uD574 \uBCF4\uC138\uC694."
+      - Watch the drawings and discussion, and try to work out who the liar is.
+      - "\u89C2\u5BDF\u7ED8\u753B\u548C\u8BA8\u8BBA\uFF0C\u731C\u731C\u8C01\u662F\u8BF4\u8C0E\u8005\u3002"
+      - "\u89C0\u5BDF\u7E6A\u756B\u548C\u8A0E\u8AD6\uFF0C\u731C\u731C\u8AB0\u662F\u8AAA\u8B0A\u8005\u3002"
+      - "\u7D75\u3068\u8A0E\u8AD6\u3092\u898B\u306A\u304C\u3089\u3001\u8AB0\u304C\u30E9\u30A4\u30A2\u30FC\u304B\u63A8\u6E2C\u3057\u3066\u307F\u307E\u3057\u3087\u3046\u3002"
+      - "Observa los dibujos y el debate e intenta descubrir qui\xE9n es el mentiroso."
+      - "Observe os desenhos e a discuss\xE3o e tente descobrir quem \xE9 o mentiroso."
+      - Observez les dessins et la discussion, et tentez de deviner qui est le menteur.
+      - "Beobachte die Bilder und die Diskussion und \xFCberlege, wer der L\xFCgner
+        ist."
+      - Amati gambar dan diskusi, lalu coba tebak siapa pembohongnya.
+      - "\u091A\u093F\u0924\u094D\u0930\u094B\u0902 \u0914\u0930 \u091A\u0930\u094D\u091A\u093E
+        \u0915\u094B \u0926\u0947\u0916\u0915\u0930 \u0905\u0928\u0941\u092E\u093E\u0928
+        \u0932\u0917\u093E\u090F\u0902 \u0915\u093F \u091D\u0942\u0920\u093E \u0915\u094C\u0928
+        \u0939\u0948\u3002"
+      - "\u062A\u0627\u0628\u0639 \u0627\u0644\u0631\u0633\u0648\u0645\u0627\u062A
+        \u0648\u0627\u0644\u0646\u0642\u0627\u0634 \u0648\u062D\u0627\u0648\u0644
+        \u0627\u0633\u062A\u0646\u062A\u0627\u062C \u0645\u0646 \u0647\u0648 \u0627\u0644\u0643\u0627\u0630\u0628."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7Iuc6rCE7J20IOuBneuCmOq4sCDsoITquYzsp4Ag7Yis7ZGc66W8IOuwlOq_gCDsiJgg7J6I7Ja07JqULg
+      TermType: 0
+      Description: "\uC2DC\uAC04\uC774 \uB05D\uB098\uAE30 \uC804\uAE4C\uC9C0 \uD22C\uD45C\uB97C
+        \uBC14\uAFC0 \uC218 \uC788\uC5B4\uC694."
+      Languages:
+      - "\uC2DC\uAC04\uC774 \uB05D\uB098\uAE30 \uC804\uAE4C\uC9C0 \uD22C\uD45C\uB97C
+        \uBC14\uAFC0 \uC218 \uC788\uC5B4\uC694."
+      - You can change your vote until time runs out.
+      - "\u65F6\u95F4\u7ED3\u675F\u524D\u53EF\u4EE5\u66F4\u6539\u6295\u7968\u3002"
+      - "\u6642\u9593\u7D50\u675F\u524D\u53EF\u4EE5\u66F4\u6539\u6295\u7968\u3002"
+      - "\u6642\u9593\u304C\u7D42\u308F\u308B\u307E\u3067\u306F\u6295\u7968\u5148\u3092\u5909\u66F4\u3067\u304D\u307E\u3059\u3002"
+      - Puedes cambiar tu voto hasta que se acabe el tiempo.
+      - "Voc\xEA pode mudar seu voto at\xE9 o tempo acabar."
+      - "Vous pouvez changer votre vote jusqu\u2019\xE0 la fin du temps imparti."
+      - "Du kannst deine Stimme \xE4ndern, bis die Zeit abl\xE4uft."
+      - Kamu bisa mengubah suara sebelum waktu habis.
+      - "\u0938\u092E\u092F \u0916\u0924\u094D\u092E \u0939\u094B\u0928\u0947 \u0924\u0915
+        \u0906\u092A \u0905\u092A\u0928\u093E \u0935\u094B\u091F \u092C\u0926\u0932
+        \u0938\u0915\u0924\u0947 \u0939\u0948\u0902\u0964"
+      - "\u064A\u0645\u0643\u0646\u0643 \u062A\u063A\u064A\u064A\u0631 \u062A\u0635\u0648\u064A\u062A\u0643
+        \u0642\u0628\u0644 \u0627\u0646\u062A\u0647\u0627\u0621 \u0627\u0644\u0648\u0642\u062A."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7Yis7ZGcIOuwlOq-uOq4sA
+      TermType: 0
+      Description: "\uD22C\uD45C \uBC14\uAFB8\uAE30"
+      Languages:
+      - "\uD22C\uD45C \uBC14\uAFB8\uAE30"
+      - Change Vote
+      - "\u66F4\u6539\u6295\u7968"
+      - "\u66F4\u6539\u6295\u7968"
+      - "\u6295\u7968\u3092\u5909\u66F4"
+      - Cambiar voto
+      - Mudar voto
+      - Changer le vote
+      - "Stimme \xE4ndern"
+      - Ubah suara
+      - "\u0935\u094B\u091F \u092C\u0926\u0932\u0947\u0902"
+      - "\u062A\u063A\u064A\u064A\u0631 \u0627\u0644\u062A\u0635\u0648\u064A\u062A"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7ZiE7J6sIO2IrO2RnCDCtyB7MH0
+      TermType: 0
+      Description: "\uD604\uC7AC \uD22C\uD45C \xB7 {0}"
+      Languages:
+      - "\uD604\uC7AC \uD22C\uD45C \xB7 {0}"
+      - "Current vote \xB7 {0}"
+      - "\u5F53\u524D\u6295\u7968 \xB7 {0}"
+      - "\u76EE\u524D\u6295\u7968 \xB7 {0}"
+      - "\u73FE\u5728\u306E\u6295\u7968\u5148 \xB7 {0}"
+      - "Voto actual \xB7 {0}"
+      - "Voto atual \xB7 {0}"
+      - "Vote actuel \xB7 {0}"
+      - "Aktuelle Stimme \xB7 {0}"
+      - "Suara saat ini \xB7 {0}"
+      - "\u092E\u094C\u091C\u0942\u0926\u093E \u0935\u094B\u091F \xB7 {0}"
+      - "\u0627\u0644\u062A\u0635\u0648\u064A\u062A \u0627\u0644\u062D\u0627\u0644\u064A
+        \xB7 {0}"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7Yis7ZGc6rCAIOuwmOyYgeuQmOyngCDslYrslZjslrTsmpQuIOuLpOyLnCDsi5zrj4TtlZjshLjsmpQu
+      TermType: 0
+      Description: "\uD22C\uD45C\uAC00 \uBC18\uC601\uB418\uC9C0 \uC54A\uC558\uC5B4\uC694.
+        \uB2E4\uC2DC \uC2DC\uB3C4\uD558\uC138\uC694."
+      Languages:
+      - "\uD22C\uD45C\uAC00 \uBC18\uC601\uB418\uC9C0 \uC54A\uC558\uC5B4\uC694. \uB2E4\uC2DC
+        \uC2DC\uB3C4\uD558\uC138\uC694."
+      - Your vote was not recorded. Please try again.
+      - "\u6295\u7968\u672A\u751F\u6548\uFF0C\u8BF7\u91CD\u8BD5\u3002"
+      - "\u6295\u7968\u672A\u751F\u6548\uFF0C\u8ACB\u91CD\u8A66\u3002"
+      - "\u6295\u7968\u304C\u53CD\u6620\u3055\u308C\u307E\u305B\u3093\u3067\u3057\u305F\u3002\u3082\u3046\u4E00\u5EA6\u304A\u8A66\u3057\u304F\u3060\u3055\u3044\u3002"
+      - "Tu voto no se ha registrado. Int\xE9ntalo de nuevo."
+      - "Seu voto n\xE3o foi registrado. Tente novamente."
+      - "Votre vote n\u2019a pas \xE9t\xE9 enregistr\xE9. Veuillez r\xE9essayer."
+      - Deine Stimme wurde nicht erfasst. Bitte versuche es erneut.
+      - Suaramu belum tercatat. Silakan coba lagi.
+      - "\u0906\u092A\u0915\u093E \u0935\u094B\u091F \u0926\u0930\u094D\u091C \u0928\u0939\u0940\u0902
+        \u0939\u0941\u0906\u0964 \u0915\u0943\u092A\u092F\u093E \u092B\u093F\u0930
+        \u0938\u0947 \u0915\u094B\u0936\u093F\u0936 \u0915\u0930\u0947\u0902\u0964"
+      - "\u0644\u0645 \u064A\u064F\u0633\u062C\u0644 \u062A\u0635\u0648\u064A\u062A\u0643.
+        \u064A\u0631\u062C\u0649 \u0627\u0644\u0645\u062D\u0627\u0648\u0644\u0629
+        \u0645\u0631\u0629 \u0623\u062E\u0631\u0649."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
     CaseInsensitiveTerms: 0
     OnMissingTranslation: 0
     mTerm_AppName:

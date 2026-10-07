@@ -94,8 +94,9 @@ internal static partial class Integration
         var reloaded = MismatchGame(data: MismatchData("한단어"));
         Check(!reloaded.CanStart && reloaded.Start(0, MismatchData()), "시작 시 갱신된 단어 데이터가 유효하면 이전 단어 부족 상태에서 시작할 수 있어야 합니다.");
         var configured = MismatchGame(classicSettings, MismatchData("한단어"));
-        Check(configured.CanStart && configured.Configure(MismatchSettings()) && !configured.CanStart
-            && !configured.Start(0), "기본 모드에서 미스매치로 변경하면 한 단어 주제로 시작할 수 없어야 합니다.");
+        Check(configured.CanStart && !configured.Configure(MismatchSettings())
+            && configured.Settings.LiarMode == LiarMode.Classic && configured.CanStart,
+            "서로 다른 단어가 부족한 미스매치 변경은 거부하고 기존 모드와 시작 가능 상태를 보존해야 합니다.");
         Check(configured.Configure(classicSettings) && configured.CanStart && configured.Start(0),
             "미스매치에서 기본 모드로 복원하면 동일 한 단어 주제로 다시 시작할 수 있어야 합니다.");
     }
@@ -128,6 +129,8 @@ internal static partial class Integration
         void Nominate()
         {
             foreach (int id in words.Keys) Check(game.Vote(id, id == minority ? words.Keys.First(other => other != minority) : minority, now), "자신을 제외한 참가자를 지목할 수 있어야 합니다.");
+            Check(game.Phase == GamePhase.Discussion, "전원이 지목해도 토론 마감까지 표를 변경할 수 있어야 합니다.");
+            AdvanceProfilePhase(game, ref now);
             Check(game.Phase == GamePhase.Rebuttal && game.Snapshot(1, 1, now).AccusedPlayerId == minority, "모든 지목 뒤 소수 단어 참가자가 반론해야 합니다.");
             VerifyMismatchSecret(game, words, common, alternate, now);
         }

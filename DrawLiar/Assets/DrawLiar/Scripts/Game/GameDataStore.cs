@@ -61,7 +61,29 @@ namespace DrawLiar
         {
             var parsed = JsonUtility.FromJson<CustomTopics>(content);
             if (parsed?.Topics == null) throw new ArgumentException("커스텀 주제 파일 형식이 올바르지 않습니다. 기존 파일은 보존됩니다.");
-            return Sanitize(parsed.Topics);
+            return SeparateBuiltInNames(Sanitize(parsed.Topics));
+        }
+
+        private static TopicData[] SeparateBuiltInNames(TopicData[] topics)
+        {
+            var asset = Resources.Load<TextAsset>("DrawLiar/GameData");
+            var builtin = asset != null ? JsonUtility.FromJson<GameData>(asset.text)?.Topics : null;
+            var reserved = new System.Collections.Generic.HashSet<string>((builtin ?? Array.Empty<TopicData>()).Select(topic => GameRules.NormalizeGuess(topic.Name)), StringComparer.Ordinal);
+            var taken = new System.Collections.Generic.HashSet<string>(reserved.Concat(topics.Select(topic => GameRules.NormalizeGuess(topic.Name))), StringComparer.Ordinal);
+            foreach (var topic in topics.Where(topic => reserved.Contains(GameRules.NormalizeGuess(topic.Name))))
+            {
+                string original = topic.Name;
+                int suffix = 2;
+                string available;
+                do
+                {
+                    string number = (suffix++).ToString(System.Globalization.CultureInfo.InvariantCulture);
+                    available = GameRules.CleanText(original, 40 - number.Length) + number;
+                } while (taken.Contains(GameRules.NormalizeGuess(available)));
+                topic.Name = available;
+                taken.Add(GameRules.NormalizeGuess(available));
+            }
+            return topics;
         }
 
         public static void SaveCustomTopics(TopicData[] topics, string path = null)
@@ -108,10 +130,10 @@ namespace DrawLiar
             {
                 var asset = Resources.Load<TextAsset>("DrawLiar/GameData");
                 var builtin = asset != null ? JsonUtility.FromJson<GameData>(asset.text).Topics : Array.Empty<TopicData>();
-                var taken = new System.Collections.Generic.HashSet<string>(existing.Select(topic => topic.Name)
-                    .Concat(builtin.Select(topic => topic.Name)), StringComparer.Ordinal);
+                var taken = new System.Collections.Generic.HashSet<string>(existing.Select(topic => GameRules.NormalizeGuess(topic.Name))
+                    .Concat(builtin.Select(topic => GameRules.NormalizeGuess(topic.Name))), StringComparer.Ordinal);
                 int suffix = 2;
-                while (taken.Contains(name))
+                while (taken.Contains(GameRules.NormalizeGuess(name)))
                 {
                     string number = (suffix++).ToString(System.Globalization.CultureInfo.InvariantCulture);
                     int length = policy.Limits.NameMaxLength - number.Length;
