@@ -29,7 +29,7 @@
 .mobile .mobile-topbar .mobile-workspace-title { font-size: 22px; -unity-font-style: bold; margin: 0 8px; padding: 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .mobile .mobile-topbar .mobile-lobby-title { margin-left: 0; }
 .mobile .mobile-bottom-nav { min-height: 68px; height: 68px; flex-shrink: 0; flex-direction: row; align-items: stretch; justify-content: space-between; padding: 8px 12px; background-color: #FFFFFF; border-top-width: 1px; border-top-color: #E3DDD4; }
-.mobile .mobile-bottom-nav .mobile-nav-item { flex-grow: 1; flex-basis: 0; min-width: 0; min-height: 48px; height: 48px; padding: 6px 4px; margin: 0 3px; border-width: 0; border-radius: 8px; color: #736957; background-color: transparent; font-size: 14px; -unity-font-style: normal; -unity-text-align: middle-center; }
+.mobile .mobile-bottom-nav .mobile-nav-item { flex-grow: 1; flex-basis: 0; min-width: 0; min-height: 48px; height: 48px; padding: 6px 4px; margin: 0 3px; border-width: 0; border-radius: 8px; color: #736957; background-color: #FFFFFF; font-size: 14px; -unity-font-style: normal; -unity-text-align: middle-center; transition-property: scale; }
 .mobile .mobile-bottom-nav .mobile-nav-selected { background-color: #F9E6BE; color: #34304B; border-width: 0 0 3px; border-color: #34304B; -unity-font-style: bold; }
 .mobile .mobile-lobby { flex-grow: 1; flex-basis: 0; min-height: 0; padding: 4px 20px 12px; }
 .mobile .mobile-lobby-profile { height: auto; min-height: 144px; flex-shrink: 0; margin-bottom: 16px; background-color: #FFFFFF; border-width: 2px; border-color: #34304B; border-radius: 12px; padding: 12px 16px; }

@@ -727,7 +727,7 @@ namespace DrawLiar
             Button(previewActions,"꾸미기",()=>Navigate(LobbyScreen.Customize),"secondary shop-customize").name="shop-customize";
             var catalog=Box(workspace,"shop-panel shop-catalog grow");catalog.name="shop-catalog";
             var filters=Box(catalog,"row shop-filters");
-            PartTabs(filters,_shopPartFilter,slot=>{_shopPartFilter=slot;RefreshShop();},true);
+            PartTabs(filters,_shopPartFilter,SelectShopPart,true);
             IconButton(filters,"새로고침",DrawUIIcon.Kind.Refresh,()=>Run(lobby.RefreshShopAsync),"shop-refresh");
             var scroll=DrawSmoothScroll.Create();scroll.name="shop-scroll";scroll.AddToClassList("shop-scroll");catalog.Add(scroll);
             shopList=Box(scroll,"shop-grid");shopList.name="shop-list";
@@ -736,6 +736,18 @@ namespace DrawLiar
             RefreshShop();
             if(IsMobile)MobileNavigation();
             DrawUIMotion.Stagger(page,28,220,8);
+        }
+
+        private void SelectShopPart(int slot)
+        {
+            _shopPartFilter=slot;
+            var scroll=shopList?.GetFirstAncestorOfType<ScrollView>();
+            if(scroll!=null)
+            {
+                DrawSmoothScroll.Bind(scroll);
+                scroll.scrollOffset=Vector2.zero;
+            }
+            RefreshShop();
         }
 
         private void SizeShopGrid(VisualElement grid,float width)
@@ -765,7 +777,7 @@ namespace DrawLiar
 
         private void RefreshShop()
         {
-            if(shopList?.panel==null)return;
+            if(shopList==null)return;
             shopList.Clear();
             var ownedAccessories=lobby.Profile?.OwnedAccessories??Array.Empty<long>();
             var serverProducts=(lobby.Shop.Products??Array.Empty<ShopProduct>()).Where(item=>item!=null).ToArray();
