@@ -223,8 +223,9 @@
 .mobile.in-game .judgment-counts { font-size: 17px; -unity-font-style: bold; color: #645797; }
 .mobile.in-game .accused-avatar { width: 144px; height: 144px; }
 .mobile.in-game .accused-name { font-size: 18px; }
-.mobile.in-game .speech-mobile { max-height: 64px; padding: 6px 8px; }
-.mobile.in-game .speech-mobile .player-speech-text { max-height: 46px; font-size: 12px; }
+.mobile.in-game .speech-mobile { padding: 6px 8px; }
+.mobile.in-game .speech-mobile .player-speech-text { font-size: 12px; }
+.mobile.in-game .speech-mobile .player-speech-following { margin-top: 3px; }
 .mobile.in-game .active-player .player-status, .mobile.in-game .selected-player .player-status { color: #78679E; }
 .mobile.in-game .phase-actions .button { margin-top: 0; margin-bottom: 8px; }
 .mobile.in-game .phase-actions .rules { margin: 0 0 8px; }
@@ -242,6 +243,20 @@
 .mobile.in-game .modal { padding: 0; background-color: #FFFFFF; color: #34304B; border-color: #E3DDD4; border-radius: 20px 20px 0 0; }
 .mobile.in-game .modal .title { color: #34304B; font-size: 24px; }
 .mobile.in-game .modal .subtitle, .mobile.in-game .modal .field > .unity-base-field__label { color: #817A87; }
+.app.mobile .modal.round-result-popup { width: 100%; max-width: 100%; padding: 20px; }
+.app.mobile .round-result-popup .title { margin-bottom: 12px; }
+.app.mobile .round-reveal-card { padding: 12px; }
+.app.mobile .round-reveal-statement { font-size: 21px; }
+.app.mobile .round-answer-card .round-reveal-statement { font-size: 24px; }
+.app.mobile .round-result-score-identity { margin-right: 8px; }
+.app.mobile .round-result-player-name, .app.mobile .round-result-content .player-score { font-size: 14px; }
+.app.mobile .round-result-content .player-score { color: #736957; }
+.app.mobile-landscape .modal.round-result-popup { width: 640px; max-width: 92%; align-self: center; padding: 16px; }
+.app.mobile-landscape .round-result-popup .title { font-size: 22px; margin-bottom: 8px; }
+.app.mobile-landscape .round-reveal-card { padding: 10px; margin-bottom: 10px; }
+.app.mobile-landscape .round-reveal-statement { font-size: 19px; }
+.app.mobile-landscape .round-answer-card .round-reveal-statement { font-size: 22px; }
+.app.mobile-landscape .round-result-popup .round-result-dismiss { margin-top: 8px; }
 .mobile.in-game .score-row { border-bottom-color: #E3DDD4; }
 .mobile.in-game .toast { bottom: 20px; background-color: #34304B; color: #FFFFFF; border-width: 0; border-radius: 12px; }
 .mobile-landscape .mobile-topbar { height: 52px; min-height: 52px; padding-top: 2px; padding-bottom: 2px; }
@@ -319,7 +334,8 @@
 .app.mobile .shop-header .shop-settings { width: 48px; min-width: 48px; margin-left: 8px; }
 .app.mobile .shop-workspace { flex-direction: column; align-items: stretch; }
 .app.mobile .shop-panel { padding: 12px; }
-.app.mobile .shop-preview-panel { width: 100%; height: 140px; min-height: 140px; flex-direction: row; align-items: center; margin: 0 0 12px; }
+.app.mobile .shop-preview-panel { width: 100%; height: auto; min-height: 0; flex-direction: column; align-items: stretch; margin: 0 0 12px; }
+.app.mobile .shop-preview-hero { flex-direction: row; align-items: center; min-height: 112px; }
 .app.mobile .shop-preview-stage { width: 104px; height: 104px; flex-shrink: 0; margin: 0 12px 0 0; background-color: transparent; }
 .app.mobile .shop-preview-stage .lobby-avatar { width: 104px; height: 104px; }
 .app.mobile .shop-preview-controls { flex-grow: 1; flex-basis: 0; min-width: 0; }
@@ -328,6 +344,16 @@
 .app.mobile .shop-preview-actions { flex-direction: row; align-items: stretch; }
 .app.mobile .shop-preview-actions .button { flex-grow: 1; flex-basis: auto; min-width: 0; margin: 0; padding: 3px 8px; font-size: 14px; white-space: nowrap; }
 .app.mobile .shop-preview-actions .shop-preview-reset { margin: 0 12px 0 0; }
+.app.mobile .shop-cart { flex-grow: 0; flex-basis: auto; margin-top: 10px; padding-top: 10px; }
+.app.mobile .shop-cart-heading { font-size: 14px; }
+.app.mobile .shop-cart-scroll { flex-grow: 0; flex-basis: auto; height: 112px; min-height: 54px; }
+.app.mobile .shop-cart-item { padding: 6px; }
+.app.mobile .shop-page .shop-cart-remove { width: 40px; min-width: 40px; height: 40px; min-height: 40px; padding: 8px; }
+.app.mobile .shop-cart-footer { margin-top: 8px; }
+.app.mobile .shop-cart-total { font-size: 13px; }
+.app.mobile .shop-cart-buy { font-size: 16px; }
+.app.mobile .modal.shop-purchase-popup { width: 100%; max-width: 100%; }
+.app.mobile .shop-purchase-question { font-size: 17px; }
 .app.mobile .shop-filters { margin-bottom: 12px; }
 .app.mobile .shop-filters .part-tab { width: auto; min-width: 64px; padding: 3px 8px; font-size: 14px; }
 .app.mobile .shop-grid .shop-entry { height: 230px; min-height: 230px; padding: 12px; margin-bottom: 12px; }
@@ -338,15 +364,23 @@
 .app.mobile-landscape .shop-page { padding: 12px 16px; }
 .app.mobile-landscape .shop-workspace { flex-direction: row; }
 .app.mobile-landscape .shop-preview-panel { width: 208px; height: auto; min-height: 0; flex-direction: column; align-items: stretch; margin: 0 12px 0 0; }
-.app.mobile-landscape .shop-preview-stage { width: 70px; height: 70px; align-self: center; margin: 0 0 8px; }
-.app.mobile-landscape .shop-preview-stage .lobby-avatar { width: 70px; height: 70px; }
-.app.mobile-landscape .shop-preview-controls { flex-grow: 0; flex-basis: auto; }
-.app.mobile-landscape .shop-preview-actions { flex-direction: column; }
-.app.mobile-landscape .shop-preview-actions .button { flex-grow: 0; width: 100%; }
-.app.mobile-landscape .shop-preview-actions .shop-preview-reset { margin: 0 0 8px; }
-.app.mobile-landscape .shop-profile-name, .app.mobile-landscape .shop-preview-controls .shop-preview-status { -unity-text-align: middle-center; }
-.app.mobile-landscape .shop-profile-name { height: 20px; margin-bottom: 6px; font-size: 16px; }
-.app.mobile-landscape .shop-preview-controls .shop-preview-status { min-height: 18px; margin-bottom: 6px; font-size: 13px; }
+.app.mobile-landscape .shop-preview-hero { flex-direction: row; min-height: 52px; }
+.app.mobile-landscape .shop-preview-stage { width: 48px; height: 48px; align-self: center; margin: 0 8px 0 0; }
+.app.mobile-landscape .shop-preview-stage .lobby-avatar { width: 48px; height: 48px; }
+.app.mobile-landscape .shop-preview-controls { flex-grow: 1; flex-basis: 0; }
+.app.mobile-landscape .shop-preview-actions { flex-direction: row; }
+.app.mobile-landscape .shop-preview-actions .button { flex-grow: 1; flex-basis: 0; width: auto; height: 36px; min-height: 36px; padding: 2px; font-size: 11px; white-space: normal; }
+.app.mobile-landscape .shop-preview-actions .shop-preview-reset { margin: 0 6px 0 0; }
+.app.mobile-landscape .shop-profile-name, .app.mobile-landscape .shop-preview-controls .shop-preview-status { -unity-text-align: middle-left; }
+.app.mobile-landscape .shop-profile-name { height: 14px; margin-bottom: 2px; font-size: 11px; }
+.app.mobile-landscape .shop-preview-controls .shop-preview-status { display: none; }
+.app.mobile-landscape .shop-cart { flex-grow: 1; flex-basis: 0; min-height: 0; margin-top: 4px; padding-top: 4px; }
+.app.mobile-landscape .shop-cart-heading { font-size: 12px; margin-bottom: 2px; white-space: normal; }
+.app.mobile-landscape .shop-cart-scroll { flex-grow: 1; flex-basis: 0; height: auto; min-height: 32px; }
+.app.mobile-landscape .shop-cart-footer { margin-top: 4px; }
+.app.mobile-landscape .shop-cart-total { font-size: 12px; margin-bottom: 2px; }
+.app.mobile-landscape .shop-cart-status { font-size: 11px; margin-bottom: 4px; }
+.app.mobile-landscape .shop-page .shop-cart-buy { height: 40px; min-height: 40px; padding: 4px 8px; font-size: 14px; }
 .app.mobile .modal.utility-popup { width: 100%; max-width: 100%; height: 88%; max-height: 704px; min-height: 0; padding: 16px; border-width: 2px; border-color: #34304B; border-radius: 20px 20px 0 0; background-color: #FFFFFF; }
 .app.mobile .modal.public-profile-popup { max-height: 90%; }
 .mobile .public-profile-avatar { width: 88px; height: 88px; margin-right: 12px; }
@@ -463,4 +497,14 @@
 .mobile-landscape.in-game .mobile-playing .mobile-play-side { width: auto; flex-grow: 2; flex-basis: 0; min-width: 0; min-height: 0; }
 .mobile-landscape.in-game .mobile-playing .mobile-roster { margin-bottom: 6px; }
 .mobile-landscape.in-game .mobile-playing .mobile-bottom-actions { margin-top: auto; }
+.app.mobile .judgment-coin-card { width: 380px; max-width: 90%; padding: 18px; border-width: 2px; border-radius: 18px; }
+.app.mobile .judgment-coin-heading { font-size: 24px; }
+.app.mobile .judgment-coin-note { font-size: 14px; }
+.app.mobile .judgment-coin-result { font-size: 20px; min-height: 28px; }
+.app.mobile .judgment-coin-visual { width: 190px; height: 170px; }
+.app.mobile-landscape .judgment-coin-card { width: 440px; padding: 10px 16px; }
+.app.mobile-landscape .judgment-coin-heading { font-size: 20px; }
+.app.mobile-landscape .judgment-coin-note { font-size: 12px; margin-bottom: 2px; }
+.app.mobile-landscape .judgment-coin-result { font-size: 18px; min-height: 24px; margin-top: 2px; }
+.app.mobile-landscape .judgment-coin-visual { width: 130px; height: 110px; }
 .mobile-landscape.in-game .mobile-playing .canvas-frame { width: 100%; margin-right: 0; }

@@ -33,6 +33,7 @@ namespace DrawLiar
         [DllImport("__Internal")] internal static extern void DrawBrowserInputSetValue(int id, string value);
         [DllImport("__Internal")] internal static extern void DrawBrowserInputClose(int id, int focusCanvas);
         [DllImport("__Internal")] internal static extern void DrawBrowserInputShutdown();
+        [DllImport("__Internal")] internal static extern void DrawBrowserAudioInit();
 
         public static string ServerUrl(string name, bool websocket)
         {

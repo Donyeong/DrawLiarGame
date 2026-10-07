@@ -39,7 +39,7 @@ namespace DrawLiar
             _judgmentPanel.EnableInClassList("nomination-panel", nomination);
             if (!visible) { _judgmentPanelKey = ""; _judgmentCounts = _judgmentProgress = null; voteProgress = null; return; }
             if (nomination) { RefreshNominationPanel(state, local); return; }
-            string key = $"judgment/{state.BallotVersion}/{state.AccusedPlayerId}/{state.Settings.LiarMode}/{state.LocalPlayerId}/{state.LocalIsSpectator}/{local?.IsConnected}/{local?.HasJudged}/{_judgmentSubmitted}/{state.LocalJudgmentApprove}";
+            string key = $"judgment/{state.BallotVersion}/{state.AccusedPlayerId}/{state.Settings.LiarMode}/{state.LocalPlayerId}/{state.LocalIsSpectator}/{local?.IsConnected}/{local?.HasJudged}/{_judgmentSubmitted}/{state.LocalJudgmentApprove}/{state.IsJudgmentCoinToss}";
             if (key != _judgmentPanelKey)
             {
                 _judgmentPanelKey = key;
@@ -50,7 +50,8 @@ namespace DrawLiar
                 _judgmentCounts.name = "judgment-counts";
                 _judgmentProgress = Text(_judgmentPanel, "", "judgment-progress");
                 _judgmentProgress.name = "judgment-progress";
-                if (state.LocalIsSpectator) Text(_judgmentPanel, "관전 중", "judgment-state");
+                if (state.IsJudgmentCoinToss) Text(_judgmentPanel, "동전 던지기", "judgment-state");
+                else if (state.LocalIsSpectator) Text(_judgmentPanel, "관전 중", "judgment-state");
                 else if (local?.Id == state.AccusedPlayerId) Text(_judgmentPanel, "반론 중", "judgment-state");
                 else if (local?.IsConnected == true && !local.IsSpectator)
                 {

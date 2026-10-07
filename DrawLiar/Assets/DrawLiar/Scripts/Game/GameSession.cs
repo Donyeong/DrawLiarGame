@@ -35,6 +35,9 @@ namespace DrawLiar
         private int[] _roundParticipants = Array.Empty<int>();
         private bool _hasAccused;
         private int _accusedPlayerId = -1;
+        private int _judgmentTieCount;
+        private bool _isJudgmentCoinToss, _judgmentCoinApproved;
+        private int[] _judgmentCoinCorrectVoters = Array.Empty<int>();
         private string topic = "", word = "", summary = GameRules.TieRule;
         private string _mismatchWord = "";
 
@@ -133,7 +136,7 @@ namespace DrawLiar
                 {
                     if (_hasAccused && _accusedPlayerId == id)
                         BeginDiscussion(now, "지목된 친구의 연결이 끊겨 토론과 지목 투표를 다시 시작해요.");
-                    else if (JudgmentVoters().All(voter => voter.Judgment.HasValue)) ResolveJudgment(now);
+                    else if (!_isJudgmentCoinToss && JudgmentVoters().All(voter => voter.Judgment.HasValue)) ResolveJudgment(now);
                 }
                 else if (Phase == GamePhase.Guessing && ActivePlayers().Where(liar => liar.Liar).All(liar => liar.Guessed)) ScoreRound(now);
             }
@@ -219,6 +222,7 @@ namespace DrawLiar
             matchDecided = false;
             _matchId = "";
             _completionEmitted = false;
+            _judgmentTieCount = 0;
             ResetBallots();
             foreach (var id in players.Values.Where(player => !player.Connected).Select(player => player.Id).ToArray()) players.Remove(id);
             AssignSeats();
@@ -261,6 +265,7 @@ namespace DrawLiar
             if (Phase != GamePhase.Rebuttal || !_hasAccused || target != _accusedPlayerId
                 || id == target || !IsActive(id) || !IsNominationTarget(target)) return false;
             if (now >= deadline) { Tick(now); return false; }
+            if (_isJudgmentCoinToss) return false;
             var player = players[id];
             if (player.Judgment.HasValue) return false;
             player.Judgment = approve;
@@ -333,6 +338,8 @@ namespace DrawLiar
                 RejectionCount = judgmentVoters.Count(player => player.Judgment == false),
                 JudgmentVoterCount = judgmentVoters.Length, JudgmentVotesCast = judgmentVoters.Count(player => player.Judgment.HasValue),
                 LocalJudgmentApprove = local?.Judgment == true,
+                IsJudgmentCoinToss = _isJudgmentCoinToss,
+                JudgmentCoinApproved = _isJudgmentCoinToss && _judgmentCoinApproved,
                 RemainingSeconds = Phase == GamePhase.Lobby || Phase == GamePhase.MatchResults ? 0 : (float)Math.Max(0, deadline - now),
                 Settings = Settings.Copy(), AvailableTopics = KnownTopicNames(), Winners = winners.ToArray(), Summary = summary,
                 Players = players.Values.Where(player => player.Connected || player.SeatReserved || result && player.RoundsPlayed > 0).OrderBy(player => player.Id).Select(player => new PlayerView
@@ -387,6 +394,7 @@ namespace DrawLiar
         private void BeginRound(double now)
         {
             Round++;
+            _judgmentTieCount = 0;
             ResetBallots();
             summary = GameRules.TieRule;
             var available = AvailableTopics().ToArray();
@@ -444,6 +452,7 @@ namespace DrawLiar
 
         private void ResetBallots()
         {
+            ResetJudgmentCoinToss();
             BallotVersion++;
             _hasAccused = false;
             _accusedPlayerId = -1;
@@ -488,16 +497,52 @@ namespace DrawLiar
                 BeginDiscussion(now, "지목된 친구의 연결이 끊겨 토론과 지목 투표를 다시 시작해요.");
                 return;
             }
+            if (_isJudgmentCoinToss)
+            {
+                if (now < deadline) return;
+                foreach (int id in _judgmentCoinCorrectVoters)
+                    if (players.TryGetValue(id, out var voter)) voter.CorrectJudgment = true;
+                ApplyJudgment(_judgmentCoinApproved, now);
+                return;
+            }
             bool noLiarAccused = IsNoLiarTarget(_accusedPlayerId);
             bool accusationCorrect = noLiarAccused ? !players.Values.Any(player => player.Liar) : players[_accusedPlayerId].Liar;
             var voters = JudgmentVoters().ToArray();
-            foreach (var voter in voters.Where(voter => voter.Judgment.HasValue && voter.Judgment.Value == accusationCorrect))
-                voter.CorrectJudgment = true;
-            if (voters.Count(voter => voter.Judgment == true) < voters.Count(voter => voter.Judgment == false))
+            int approvals = voters.Count(voter => voter.Judgment == true), rejections = voters.Count(voter => voter.Judgment == false);
+            if (approvals == rejections && ++_judgmentTieCount >= 2)
+            {
+                _isJudgmentCoinToss = true;
+                _judgmentCoinApproved = random.Next(2) == 1;
+                _judgmentCoinCorrectVoters = voters.Where(voter => voter.Judgment == accusationCorrect).Select(voter => voter.Id).ToArray();
+                summary = "이번 라운드 두 번째 동률부터 동전으로 결정해요.";
+                SetPhase(GamePhase.Rebuttal, GameRules.JUDGMENT_COIN_TOSS_SECONDS, now);
+                return;
+            }
+            foreach (var voter in voters.Where(voter => voter.Judgment == accusationCorrect)) voter.CorrectJudgment = true;
+            if (approvals == rejections)
+            {
+                BeginDiscussion(now, "첫 동률은 반대 우선으로 부결해요.");
+                return;
+            }
+            ApplyJudgment(approvals > rejections, now);
+        }
+
+        private void ResetJudgmentCoinToss()
+        {
+            _isJudgmentCoinToss = false;
+            _judgmentCoinApproved = false;
+            _judgmentCoinCorrectVoters = Array.Empty<int>();
+        }
+
+        private void ApplyJudgment(bool approved, double now)
+        {
+            ResetJudgmentCoinToss();
+            if (!approved)
             {
                 BeginDiscussion(now, "지목이 부결되었어요. 토론과 지목 투표를 다시 진행해 주세요.");
                 return;
             }
+            bool noLiarAccused = IsNoLiarTarget(_accusedPlayerId);
             if (!noLiarAccused) players[_accusedPlayerId].Caught = true;
             summary = noLiarAccused ? "라이어가 없다는 의견이 가결되었어요. 실제 역할을 공개해요."
                 : "지목이 가결되었어요. 라이어 모두에게 정답 기회가 있어요.";
@@ -545,6 +590,7 @@ namespace DrawLiar
 
         private void FinishMatch()
         {
+            ResetJudgmentCoinToss();
             if (!matchDecided) DecideWinners();
             Phase = GamePhase.MatchResults;
             if (!summary.StartsWith("참가자")) summary = winners.Length > 1 ? "동점 공동 우승! 함께 축하해요." : "최고 점수의 주인공이 정해졌어요!";
@@ -581,7 +627,7 @@ namespace DrawLiar
             matchDecided = true;
         }
 
-        private void SetPhase(GamePhase phase, int seconds, double now)
+        private void SetPhase(GamePhase phase, float seconds, double now)
         {
             Phase = phase;
             deadline = now + seconds;

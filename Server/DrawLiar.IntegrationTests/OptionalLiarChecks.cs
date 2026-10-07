@@ -49,7 +49,7 @@ internal static partial class Integration
         VerifyOptionalDisconnectedTruth();
         VerifyOptionalMidRoundJoin();
         await VerifyOptionalDedicatedAsync();
-        Report("선택 라이어 2인 시작 거부·3인 시작·0/1명 비밀 상태·없음 지목·전원 찬반·동률 가결·재토론·점수·빈 추측 생략 검증");
+        Report("선택 라이어 2인 시작 거부·3인 시작·0/1명 비밀 상태·없음 지목·첫 동률 부결·동전 판정·재토론·점수·빈 추측 생략 검증");
     }
 
     private static void VerifyOptionalSettingsAndPrivacy()
@@ -132,7 +132,23 @@ internal static partial class Integration
         Check(game.Judge(1, -1, true, now) && !game.Judge(1, -1, false, now), "찬반도 한 번만 제출해야 합니다.");
         Check(game.Judge(2, -1, false, now) && game.Judge(3, -1, true, now) && game.Phase == GamePhase.Rebuttal,
             "네 번째 참가자의 찬반을 기다려야 합니다.");
-        Check(game.Judge(4, -1, false, now) && game.Phase == GamePhase.LiarReveal, "2대2 찬반 동률이면 없음 지목을 가결해야 합니다.");
+        Check(game.Judge(4, -1, false, now) && game.Phase == GamePhase.Discussion && !game.Snapshot(99, 1, now).IsJudgmentCoinToss,
+            "첫 2대2 찬반 동률이면 없음 지목도 부결해야 합니다.");
+        OptionalNominateNone(game, now);
+        for (int id = 1; id <= 4; id++) Check(game.Judge(id, -1, id is 1 or 3, now), "두 번째 없음 지목의 동률을 제출해야 합니다.");
+        var toss = game.Snapshot(99, 1, now);
+        Check(toss.IsJudgmentCoinToss && toss.AccusedPlayerId == -1 && toss.RemainingSeconds == 3 && toss.RevealedLiarCount == -1
+            && !game.Judge(1, -1, false, now + 1), "없음 지목도 두 번째 동률부터 역할을 숨기고 3초 동전을 기다려야 합니다.");
+        game.Tick(now += GameRules.JUDGMENT_COIN_TOSS_SECONDS);
+        if (!toss.JudgmentCoinApproved)
+        {
+            Check(game.Phase == GamePhase.Discussion, "반대 동전은 없음 지목도 재토론으로 돌려야 합니다.");
+            OptionalNominateNone(game, now);
+            Check(game.Judge(1, -1, true, now) && game.Judge(3, -1, true, now), "기존 올바른 참가자만 재찬성해야 합니다.");
+            game.Tick(now += game.Settings.RebuttalSeconds + .01);
+        }
+        Check(game.Phase == GamePhase.LiarReveal && !game.Snapshot(99, 1, now).IsJudgmentCoinToss,
+            "동전 가결 또는 이후 찬성 우세는 없음 지목의 역할 공개로 진행해야 합니다.");
         Check(game.Snapshot(99, 1, now).RevealedLiarCount == 0, "공개 단계에는 관전자에게도 실제 0명을 알려야 합니다.");
         game.Tick(now += game.Settings.RevealSeconds + .01);
         Check(game.Phase == GamePhase.RoundResults && completed?.Players.Length == 4
@@ -162,8 +178,12 @@ internal static partial class Integration
             && game.Snapshot(citizen, 1, now).JudgmentVoterCount == 2, "사람 지목은 지목된 사람을 제외한 찬반 규칙을 유지해야 합니다.");
         Check(!game.Judge(liar, liar, true, now) && game.Judge(citizens[0], liar, true, now) && game.Phase == GamePhase.Rebuttal,
             "지목된 사람은 찬반할 수 없고 나머지 시민의 찬반이 끝나기를 기다려야 합니다.");
-        Check(game.Judge(citizens[1], liar, false, now) && game.Phase == GamePhase.LiarReveal,
-            "사람 지목도 1대1 찬반 동률이면 가결해야 합니다.");
+        Check(game.Judge(citizens[1], liar, false, now) && game.Phase == GamePhase.Discussion,
+            "사람 지목도 첫 1대1 찬반 동률이면 부결해야 합니다.");
+        foreach (int id in Enumerable.Range(1, 3)) Check(game.Vote(id, id == liar ? citizen : liar, now), "같은 라운드에서 라이어를 다시 지목해야 합니다.");
+        foreach (int id in citizens) Check(game.Judge(id, liar, true, now), "동률 이후 찬성 우세는 지연 없이 가결해야 합니다.");
+        Check(game.Phase == GamePhase.LiarReveal && !game.Snapshot(citizen, 1, now).IsJudgmentCoinToss,
+            "찬성 우세는 앞 동률 횟수와 무관하게 가결해야 합니다.");
         Check(game.Snapshot(99, 1, now).RevealedLiarCount == 1, "역할 공개 시 한 명을 알려야 합니다.");
         game.Tick(now += game.Settings.RevealSeconds + .01);
         Check(game.Phase == GamePhase.Guessing && !game.Guess(citizen, "비밀사과", now) && game.Guess(liar, "오답", now),

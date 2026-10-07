@@ -12,6 +12,7 @@ namespace DrawLiar
         private float _reportedRemaining;
         private GamePhase _phase;
         private int _round, _artist, _ballot;
+        private bool _coinToss;
 
         public float Duration { get; private set; }
         public int Period { get; private set; }
@@ -25,13 +26,14 @@ namespace DrawLiar
                 ? snapshot.BallotVersion : -1;
             float duration = PhaseDuration(snapshot);
             bool changed = _snapshot == null || _phase != snapshot.Phase || _round != snapshot.Round || _artist != artist
-                || _ballot != ballot || Duration != duration;
+                || _ballot != ballot || _coinToss != snapshot.IsJudgmentCoinToss || Duration != duration;
             if (ReferenceEquals(_snapshot, snapshot) && !changed) return;
             _snapshot = snapshot;
             _phase = snapshot.Phase;
             _round = snapshot.Round;
             _artist = artist;
             _ballot = ballot;
+            _coinToss = snapshot.IsJudgmentCoinToss;
             Duration = duration;
             IsVisible = snapshot.Phase != GamePhase.Lobby && snapshot.Phase != GamePhase.MatchResults;
             float remaining = snapshot.RemainingSeconds;
@@ -52,6 +54,7 @@ namespace DrawLiar
 
         private static float PhaseDuration(RoomSnapshot snapshot)
         {
+            if (snapshot.Phase == GamePhase.Rebuttal && snapshot.IsJudgmentCoinToss) return GameRules.JUDGMENT_COIN_TOSS_SECONDS;
             var settings = snapshot.Settings;
             if (settings == null) return 0;
             int seconds;

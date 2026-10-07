@@ -140,6 +140,8 @@ namespace DrawLiar
         public int JudgmentVoterCount;
         public int JudgmentVotesCast;
         public bool LocalJudgmentApprove;
+        public bool IsJudgmentCoinToss;
+        public bool JudgmentCoinApproved;
         public float RemainingSeconds;
         public RoomSettings Settings = new RoomSettings();
         public string[] AvailableTopics = Array.Empty<string>();

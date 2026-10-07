@@ -6,6 +6,7 @@ namespace DrawLiar.DedicatedServer;
 
 internal sealed class GameConnection : IAsyncDisposable
 {
+    private const double CHAT_INTERVAL_SECONDS = .5;
     private readonly WebSocket _socket;
     private readonly CancellationTokenSource _lifetime;
     private readonly Channel<byte[]> _outgoing = Channel.CreateBounded<byte[]>(new BoundedChannelOptions(256)
@@ -61,7 +62,7 @@ internal sealed class GameConnection : IAsyncDisposable
 
     public bool AcceptChat(double now)
     {
-        if (now - _lastChat < 2) return false;
+        if (now - _lastChat < CHAT_INTERVAL_SECONDS) return false;
         _lastChat = now;
         return true;
     }

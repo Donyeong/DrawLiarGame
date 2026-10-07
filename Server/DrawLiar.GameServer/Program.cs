@@ -39,6 +39,8 @@ app.MapPost("/api/friends/respond", async (HttpContext context, FriendRespondReq
 app.MapDelete("/api/friends/{accountId}", async (HttpContext context, string accountId) => { await database.RemoveFriendAsync((await Authenticate(context)).AccountId, ServerRuntime.AccountId(accountId)); return Results.NoContent(); });
 app.MapGet("/api/shop", (Func<HttpContext, Task<ShopResponse>>)(async context => { await Authenticate(context); return new ShopResponse { Products = ServerDatabase.ShopProducts }; }));
 app.MapPost("/api/shop/purchase", async (HttpContext context, PurchaseRequest request) => await database.PurchaseAsync((await Authenticate(context)).AccountId, request));
+app.MapPost("/api/shop/purchase-batch", async (HttpContext context, PurchaseBatchRequest request) =>
+    await database.PurchaseBatchAsync((await Authenticate(context)).AccountId, request, context.RequestAborted));
 app.MapGet("/api/topic-workshop", async (HttpContext context, string? language, bool? mine, int? offset, int? limit) =>
     await database.ListWorkshopTopicsAsync((await Authenticate(context)).AccountId, language, mine ?? false, offset ?? 0, limit ?? 20, context.RequestAborted));
 app.MapPost("/api/topic-workshop", async (HttpContext context, TopicWorkshopPublishRequest request) =>

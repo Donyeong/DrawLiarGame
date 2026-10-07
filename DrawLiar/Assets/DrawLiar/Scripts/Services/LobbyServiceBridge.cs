@@ -428,6 +428,14 @@ namespace DrawLiar
             SetStatus("아이템을 구매했습니다.");
         });
 
+        public Task PurchaseBatchAsync(string[] productIds) => RunAsync(async () =>
+        {
+            RequireLogin();
+            SetProfile(await SendGameAsync<ProfileData>("/api/shop/purchase-batch", "POST",
+                new PurchaseBatchRequest { ProductIds = productIds, OperationId = Guid.NewGuid().ToString("N") }));
+            SetStatus("아이템을 구매했습니다.");
+        });
+
         public Task HostAsync(RoomSettings settings, string password = "") => RunAsync(async () =>
         {
             RequireAvailable();
@@ -647,6 +655,9 @@ namespace DrawLiar
                 case "InvalidRoomPasswordFormat": return "비밀번호는 4~32자로 입력하세요.";
                 case "RoomConfigurationChanged": return "방 설정이 변경되었습니다. 다시 시도하세요.";
                 case "InsufficientCoins": return "코인이 부족합니다.";
+                case "InvalidPurchaseBatch":
+                case "OperationConflict": return "구매할 아이템을 다시 확인해 주세요.";
+                case "ProductUnavailable": return "현재 구매할 수 없는 아이템이 있어요.";
                 case "GoogleUnavailable": return "서버의 Google 로그인 설정을 확인해야 합니다.";
                 case "InvalidGoogleCredential": return "Google 인증에 실패했습니다. 다시 로그인해 주세요.";
                 case "GoogleAlreadyLinked": return "이미 연동한 Google 계정입니다.";

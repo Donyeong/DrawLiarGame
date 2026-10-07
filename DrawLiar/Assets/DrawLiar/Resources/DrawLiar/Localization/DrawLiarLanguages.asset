@@ -9166,35 +9166,42 @@ MonoBehaviour:
         \u0627\u0644\u0622\u0646."
       Flags: 000000000000000000000000
       Languages_Touch: []
-    - Term: UI/7LWc64ukIOuTne2RnCDrj5nrpaDsnYAg66y07J6R7JyE66GcIOqysOyglSDCtyDssKzrsJgg64-Z7IiY64qUIOqwgOqysA
+    - Term: UI/7LWc64ukIOuTne2RnCDrj5nrpaDsnYAg66y07J6R7JyE66GcIOqysOyglSDCtyDssqsg7LCs67CYIOuPmeyImOuKlCDrtoDqsrAsIOydtO2bhCDrj5nsoIQ
       TermType: 0
       Description: "\uCD5C\uB2E4 \uB4DD\uD45C \uB3D9\uB960\uC740 \uBB34\uC791\uC704\uB85C
-        \uACB0\uC815 \xB7 \uCC2C\uBC18 \uB3D9\uC218\uB294 \uAC00\uACB0"
+        \uACB0\uC815 \xB7 \uCCAB \uCC2C\uBC18 \uB3D9\uC218\uB294 \uBD80\uACB0, \uC774\uD6C4
+        \uB3D9\uC804"
       Languages:
       - "\uCD5C\uB2E4 \uB4DD\uD45C \uB3D9\uB960\uC740 \uBB34\uC791\uC704\uB85C \uACB0\uC815
-        \xB7 \uCC2C\uBC18 \uB3D9\uC218\uB294 \uAC00\uACB0"
-      - "Nomination ties are decided randomly \xB7 Confirmation ties pass"
-      - "\u6700\u9AD8\u7968\u5E73\u7968\u65F6\u968F\u673A\u51B3\u5B9A \xB7 \u786E\u8BA4\u7968\u5E73\u7968\u65F6\u901A\u8FC7"
-      - "\u6700\u9AD8\u7968\u5E73\u7968\u6642\u96A8\u6A5F\u6C7A\u5B9A \xB7 \u78BA\u8A8D\u7968\u5E73\u7968\u6642\u901A\u904E"
-      - "\u6700\u591A\u7968\u304C\u540C\u6570\u306A\u3089\u30E9\u30F3\u30C0\u30E0\u3067\u6C7A\u5B9A
-        \xB7 \u8CDB\u5426\u540C\u6570\u306F\u53EF\u6C7A"
-      - "Los empates de nominaci\xF3n se deciden al azar \xB7 Los empates de confirmaci\xF3n
-        se aprueban"
-      - "Empates na indica\xE7\xE3o s\xE3o decididos ao acaso \xB7 Empates na confirma\xE7\xE3o
-        aprovam"
-      - "Les \xE9galit\xE9s de nomination sont tranch\xE9es au hasard \xB7 Les \xE9galit\xE9s
-        de confirmation sont approuv\xE9es"
-      - "Bei Nominierungsgleichstand entscheidet der Zufall \xB7 Bei Best\xE4tigungsgleichstand
-        wird angenommen"
-      - "Nominasi seri diputuskan secara acak \xB7 Konfirmasi seri disetujui"
-      - "\u0928\u093E\u092E\u093E\u0902\u0915\u0928 \u092E\u0947\u0902 \u092C\u0930\u093E\u092C\u0930\u0940
+        \xB7 \uCCAB \uCC2C\uBC18 \uB3D9\uC218\uB294 \uBD80\uACB0, \uC774\uD6C4 \uB3D9\uC804"
+      - "Nomination ties are random \xB7 The first approval tie fails; later ties
+        use a coin"
+      - "\u6700\u9AD8\u7968\u5E73\u7968\u65F6\u968F\u673A\u51B3\u5B9A \xB7 \u9996\u6B21\u8D5E\u6210\u53CD\u5BF9\u5E73\u7968\u65F6\u5426\u51B3\uFF0C\u4E4B\u540E\u63B7\u786C\u5E01"
+      - "\u6700\u9AD8\u7968\u5E73\u7968\u6642\u96A8\u6A5F\u6C7A\u5B9A \xB7 \u9996\u6B21\u8D0A\u6210\u53CD\u5C0D\u5E73\u7968\u6642\u5426\u6C7A\uFF0C\u4E4B\u5F8C\u64F2\u786C\u5E63"
+      - "\u6700\u591A\u7968\u306E\u540C\u6570\u306F\u30E9\u30F3\u30C0\u30E0\u3067\u6C7A\u5B9A
+        \xB7 \u6700\u521D\u306E\u8CDB\u5426\u540C\u6570\u306F\u5426\u6C7A\u3001\u4EE5\u964D\u306F\u30B3\u30A4\u30F3"
+      - "Los empates de nominaci\xF3n son aleatorios \xB7 El primer empate de aprobaci\xF3n
+        se rechaza; los siguientes se deciden con una moneda"
+      - "Empates na indica\xE7\xE3o s\xE3o aleat\xF3rios \xB7 O primeiro empate de
+        aprova\xE7\xE3o \xE9 rejeitado; os seguintes usam uma moeda"
+      - "Les \xE9galit\xE9s de nomination sont al\xE9atoires \xB7 La premi\xE8re
+        \xE9galit\xE9 d\u2019approbation est rejet\xE9e, les suivantes se jouent
+        \xE0 pile ou face"
+      - "Nominierungsgleichstand entscheidet der Zufall \xB7 Das erste Patt wird
+        abgelehnt, sp\xE4tere per M\xFCnzwurf entschieden"
+      - "Nominasi seri diputuskan acak \xB7 Persetujuan seri pertama ditolak; berikutnya
+        ditentukan koin"
+      - "\u0928\u093E\u092E\u093E\u0902\u0915\u0928 \u0915\u0940 \u092C\u0930\u093E\u092C\u0930\u0940
         \u0915\u093E \u092B\u0948\u0938\u0932\u093E \u092F\u093E\u0926\u0943\u091A\u094D\u091B\u093F\u0915
-        \u0939\u094B\u0917\u093E \xB7 \u092A\u0941\u0937\u094D\u091F\u093F \u092E\u0947\u0902
-        \u092C\u0930\u093E\u092C\u0930\u0940 \u092A\u0930 \u0938\u094D\u0935\u0940\u0915\u093E\u0930"
+        \u0939\u0948 \xB7 \u092E\u0902\u091C\u0942\u0930\u0940 \u0915\u0940 \u092A\u0939\u0932\u0940
+        \u092C\u0930\u093E\u092C\u0930\u0940 \u092A\u0930 \u0905\u0938\u094D\u0935\u0940\u0915\u093E\u0930,
+        \u092C\u093E\u0926 \u092E\u0947\u0902 \u0938\u093F\u0915\u094D\u0915\u093E
+        \u0909\u091B\u093E\u0932\u093E \u091C\u093E\u0924\u093E \u0939\u0948"
       - "\u064A\u064F\u062D\u0633\u0645 \u062A\u0639\u0627\u062F\u0644 \u0627\u0644\u062A\u0631\u0634\u064A\u062D
-        \u0639\u0634\u0648\u0627\u0626\u064A\u064B\u0627 \xB7 \u0627\u0644\u062A\u0639\u0627\u062F\u0644
-        \u0641\u064A \u0627\u0644\u062A\u0623\u0643\u064A\u062F \u064A\u0639\u0646\u064A
-        \u0627\u0644\u0645\u0648\u0627\u0641\u0642\u0629"
+        \u0639\u0634\u0648\u0627\u0626\u064A\u064B\u0627 \xB7 \u064A\u064F\u0631\u0641\u0636
+        \u0623\u0648\u0644 \u062A\u0639\u0627\u062F\u0644 \u0644\u0644\u0645\u0648\u0627\u0641\u0642\u0629\u060C
+        \u0648\u062A\u064F\u062D\u0633\u0645 \u0627\u0644\u062A\u0639\u0627\u062F\u0644\u0627\u062A
+        \u0627\u0644\u062A\u0627\u0644\u064A\u0629 \u0628\u0631\u0645\u064A \u0639\u0645\u0644\u0629"
       Flags: 000000000000000000000000
       Languages_Touch: []
     - Term: UI/64-Z6re4656AIOuquO2GtQ
@@ -10147,6 +10154,425 @@ MonoBehaviour:
       - "\u092A\u093F\u0915\u094D\u0938\u0947\u0932 \u092C\u094D\u0932\u0949\u0915
         \u0915\u093E \u0936\u0930\u0940\u0930"
       - "\u062C\u0633\u0645 \u0643\u062A\u0644\u0629 \u0628\u0643\u0633\u0644"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/64-Z66Wg7J207JeQ7JqUIQ
+      TermType: 0
+      Description: "\uB3D9\uB960\uC774\uC5D0\uC694!"
+      Languages:
+      - "\uB3D9\uB960\uC774\uC5D0\uC694!"
+      - It's a tie!
+      - "\u5E73\u7968\u4E86\uFF01"
+      - "\u5E73\u7968\u4E86\uFF01"
+      - "\u540C\u6570\u3067\u3059\uFF01"
+      - "\xA1Hay empate!"
+      - Deu empate!
+      - "\xC9galit\xE9 !"
+      - Gleichstand!
+      - Seri!
+      - "\u092C\u0930\u093E\u092C\u0930\u0940 \u0939\u094B \u0917\u0908!"
+      - "\u062A\u0639\u0627\u062F\u0644!"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7LKrIOuPmeuloOydgCDrsJjrjIAg7Jqw7ISg7Jy866GcIOu2gOqysO2VtOyalC4
+      TermType: 0
+      Description: "\uCCAB \uB3D9\uB960\uC740 \uBC18\uB300 \uC6B0\uC120\uC73C\uB85C
+        \uBD80\uACB0\uD574\uC694."
+      Languages:
+      - "\uCCAB \uB3D9\uB960\uC740 \uBC18\uB300 \uC6B0\uC120\uC73C\uB85C \uBD80\uACB0\uD574\uC694."
+      - The first tie is rejected in favor of the opposing votes.
+      - "\u9996\u6B21\u5E73\u7968\u65F6\u53CD\u5BF9\u7968\u4F18\u5148\uFF0C\u56E0\u6B64\u5426\u51B3\u3002"
+      - "\u9996\u6B21\u5E73\u7968\u6642\u53CD\u5C0D\u7968\u512A\u5148\uFF0C\u56E0\u6B64\u5426\u6C7A\u3002"
+      - "\u6700\u521D\u306E\u540C\u6570\u306F\u53CD\u5BFE\u3092\u512A\u5148\u3057\u3066\u5426\u6C7A\u3057\u307E\u3059\u3002"
+      - El primer empate se rechaza dando prioridad a los votos en contra.
+      - "O primeiro empate \xE9 rejeitado, dando prioridade aos votos contra."
+      - "La premi\xE8re \xE9galit\xE9 est rejet\xE9e en donnant priorit\xE9 aux votes
+        contre."
+      - 'Beim ersten Gleichstand haben Gegenstimmen Vorrang: abgelehnt.'
+      - Seri pertama ditolak dengan mendahulukan suara yang menentang.
+      - "\u092A\u0939\u0932\u0940 \u092C\u0930\u093E\u092C\u0930\u0940 \u092A\u0930
+        \u0935\u093F\u0930\u094B\u0927\u0940 \u092E\u0924\u094B\u0902 \u0915\u094B
+        \u092A\u094D\u0930\u093E\u0925\u092E\u093F\u0915\u0924\u093E \u0926\u0947\u0915\u0930
+        \u092A\u094D\u0930\u0938\u094D\u0924\u093E\u0935 \u0905\u0938\u094D\u0935\u0940\u0915\u093E\u0930
+        \u0939\u094B\u0924\u093E \u0939\u0948\u0964"
+      - "\u064A\u064F\u0631\u0641\u0636 \u0623\u0648\u0644 \u062A\u0639\u0627\u062F\u0644
+        \u0645\u0639 \u0625\u0639\u0637\u0627\u0621 \u0627\u0644\u0623\u0648\u0644\u0648\u064A\u0629
+        \u0644\u0644\u0623\u0635\u0648\u0627\u062A \u0627\u0644\u0645\u0639\u0627\u0631\u0636\u0629."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7J2067KIIOudvOyatOuTnCDrkZAg67KI7Ke4IOuPmeuloOu2gO2EsCDrj5nsoITsnLzroZwg6rKw7KCV7ZW07JqULg
+      TermType: 0
+      Description: "\uC774\uBC88 \uB77C\uC6B4\uB4DC \uB450 \uBC88\uC9F8 \uB3D9\uB960\uBD80\uD130
+        \uB3D9\uC804\uC73C\uB85C \uACB0\uC815\uD574\uC694."
+      Languages:
+      - "\uC774\uBC88 \uB77C\uC6B4\uB4DC \uB450 \uBC88\uC9F8 \uB3D9\uB960\uBD80\uD130
+        \uB3D9\uC804\uC73C\uB85C \uACB0\uC815\uD574\uC694."
+      - From the second tie this round, a coin decides the result.
+      - "\u672C\u8F6E\u4ECE\u7B2C\u4E8C\u6B21\u5E73\u7968\u8D77\uFF0C\u4EE5\u63B7\u786C\u5E01\u51B3\u5B9A\u7ED3\u679C\u3002"
+      - "\u672C\u56DE\u5408\u5F9E\u7B2C\u4E8C\u6B21\u5E73\u7968\u8D77\uFF0C\u4EE5\u64F2\u786C\u5E63\u6C7A\u5B9A\u7D50\u679C\u3002"
+      - "\u3053\u306E\u30E9\u30A6\u30F3\u30C9\u306E2\u56DE\u76EE\u4EE5\u964D\u306E\u540C\u6570\u306F\u30B3\u30A4\u30F3\u3067\u6C7A\u3081\u307E\u3059\u3002"
+      - Desde el segundo empate de esta ronda, una moneda decide el resultado.
+      - A partir do segundo empate nesta rodada, uma moeda decide o resultado.
+      - "\xC0 partir de la deuxi\xE8me \xE9galit\xE9 de cette manche, le r\xE9sultat
+        se joue \xE0 pile ou face."
+      - "Ab dem zweiten Gleichstand dieser Runde entscheidet ein M\xFCnzwurf."
+      - Mulai seri kedua pada ronde ini, koin menentukan hasilnya.
+      - "\u0907\u0938 \u0930\u093E\u0909\u0902\u0921 \u0915\u0940 \u0926\u0942\u0938\u0930\u0940
+        \u092C\u0930\u093E\u092C\u0930\u0940 \u0938\u0947 \u0928\u0924\u0940\u091C\u093E
+        \u0938\u093F\u0915\u094D\u0915\u093E \u0909\u091B\u093E\u0932\u0915\u0930
+        \u0924\u092F \u0939\u094B\u0917\u093E\u0964"
+      - "\u0628\u062F\u0621\u064B\u0627 \u0645\u0646 \u0627\u0644\u062A\u0639\u0627\u062F\u0644
+        \u0627\u0644\u062B\u0627\u0646\u064A \u0641\u064A \u0647\u0630\u0647 \u0627\u0644\u062C\u0648\u0644\u0629\u060C
+        \u062A\u064F\u062D\u0633\u0645 \u0627\u0644\u0646\u062A\u064A\u062C\u0629
+        \u0628\u0631\u0645\u064A \u0639\u0645\u0644\u0629."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/64-Z7KCE7J2EIOuNmOyngOqzoCDsnojslrTsmpTigKY
+      TermType: 0
+      Description: "\uB3D9\uC804\uC744 \uB358\uC9C0\uACE0 \uC788\uC5B4\uC694\u2026"
+      Languages:
+      - "\uB3D9\uC804\uC744 \uB358\uC9C0\uACE0 \uC788\uC5B4\uC694\u2026"
+      - "Flipping the coin\u2026"
+      - "\u6B63\u5728\u63B7\u786C\u5E01\u2026"
+      - "\u6B63\u5728\u64F2\u786C\u5E63\u2026"
+      - "\u30B3\u30A4\u30F3\u3092\u6295\u3052\u3066\u3044\u307E\u3059\u2026"
+      - "Lanzando la moneda\u2026"
+      - "Lan\xE7ando a moeda\u2026"
+      - "La pi\xE8ce est lanc\xE9e\u2026"
+      - "Die M\xFCnze wird geworfen\u2026"
+      - "Melempar koin\u2026"
+      - "\u0938\u093F\u0915\u094D\u0915\u093E \u0909\u091B\u093E\u0932\u093E \u091C\u093E
+        \u0930\u0939\u093E \u0939\u0948\u2026"
+      - "\u062C\u0627\u0631\u064D \u0631\u0645\u064A \u0627\u0644\u0639\u0645\u0644\u0629\u2026"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/64-Z7KCEIOqysOqzvCDCtyDssKzshLE
+      TermType: 0
+      Description: "\uB3D9\uC804 \uACB0\uACFC \xB7 \uCC2C\uC131"
+      Languages:
+      - "\uB3D9\uC804 \uACB0\uACFC \xB7 \uCC2C\uC131"
+      - "Coin result \xB7 Approve"
+      - "\u786C\u5E01\u7ED3\u679C \xB7 \u8D5E\u6210"
+      - "\u786C\u5E63\u7D50\u679C \xB7 \u8D0A\u6210"
+      - "\u30B3\u30A4\u30F3\u306E\u7D50\u679C \xB7 \u8CDB\u6210"
+      - "Resultado de la moneda \xB7 A favor"
+      - "Resultado da moeda \xB7 A favor"
+      - "R\xE9sultat de la pi\xE8ce \xB7 Pour"
+      - "M\xFCnzergebnis \xB7 Daf\xFCr"
+      - "Hasil koin \xB7 Setuju"
+      - "\u0938\u093F\u0915\u094D\u0915\u0947 \u0915\u093E \u0928\u0924\u0940\u091C\u093E
+        \xB7 \u092A\u0915\u094D\u0937 \u092E\u0947\u0902"
+      - "\u0646\u062A\u064A\u062C\u0629 \u0627\u0644\u0639\u0645\u0644\u0629 \xB7
+        \u0645\u0648\u0627\u0641\u0642\u0629"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/64-Z7KCEIOqysOqzvCDCtyDrsJjrjIA
+      TermType: 0
+      Description: "\uB3D9\uC804 \uACB0\uACFC \xB7 \uBC18\uB300"
+      Languages:
+      - "\uB3D9\uC804 \uACB0\uACFC \xB7 \uBC18\uB300"
+      - "Coin result \xB7 Reject"
+      - "\u786C\u5E01\u7ED3\u679C \xB7 \u53CD\u5BF9"
+      - "\u786C\u5E63\u7D50\u679C \xB7 \u53CD\u5C0D"
+      - "\u30B3\u30A4\u30F3\u306E\u7D50\u679C \xB7 \u53CD\u5BFE"
+      - "Resultado de la moneda \xB7 En contra"
+      - "Resultado da moeda \xB7 Contra"
+      - "R\xE9sultat de la pi\xE8ce \xB7 Contre"
+      - "M\xFCnzergebnis \xB7 Dagegen"
+      - "Hasil koin \xB7 Tidak setuju"
+      - "\u0938\u093F\u0915\u094D\u0915\u0947 \u0915\u093E \u0928\u0924\u0940\u091C\u093E
+        \xB7 \u0935\u093F\u0930\u094B\u0927 \u092E\u0947\u0902"
+      - "\u0646\u062A\u064A\u062C\u0629 \u0627\u0644\u0639\u0645\u0644\u0629 \xB7
+        \u0645\u0639\u0627\u0631\u0636\u0629"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/64-Z7KCEIOuNmOyngOq4sA
+      TermType: 0
+      Description: "\uB3D9\uC804 \uB358\uC9C0\uAE30"
+      Languages:
+      - "\uB3D9\uC804 \uB358\uC9C0\uAE30"
+      - Coin toss
+      - "\u63B7\u786C\u5E01"
+      - "\u64F2\u786C\u5E63"
+      - "\u30B3\u30A4\u30F3\u30C8\u30B9"
+      - Lanzamiento de moneda
+      - "Lan\xE7amento de moeda"
+      - Pile ou face
+      - "M\xFCnzwurf"
+      - Lempar koin
+      - "\u0938\u093F\u0915\u094D\u0915\u093E \u0909\u091B\u093E\u0932\u0928\u093E"
+      - "\u0631\u0645\u064A \u0627\u0644\u0639\u0645\u0644\u0629"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7J6F7ZiA67O4IOyVhOydtO2FnA
+      TermType: 0
+      Description: "\uC785\uD600\uBCF8 \uC544\uC774\uD15C"
+      Languages:
+      - "\uC785\uD600\uBCF8 \uC544\uC774\uD15C"
+      - Tried-on items
+      - "\u8BD5\u7A7F\u7684\u7269\u54C1"
+      - "\u8A66\u7A7F\u7684\u7269\u54C1"
+      - "\u8A66\u7740\u4E2D\u306E\u30A2\u30A4\u30C6\u30E0"
+      - Objetos probados
+      - Itens experimentados
+      - "Objets essay\xE9s"
+      - "Anprobierte Gegenst\xE4nde"
+      - Item yang dicoba
+      - "\u0906\u091C\u093C\u092E\u093E\u090F \u0917\u090F \u0906\u0907\u091F\u092E"
+      - "\u0627\u0644\u0639\u0646\u0627\u0635\u0631 \u0627\u0644\u0645\u062C\u0631\u0651\u0628\u0629"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7JWE7KeBIOyehe2YgOuzuCDslYTsnbTthZzsnbQg7JeG7Ja07JqULg
+      TermType: 0
+      Description: "\uC544\uC9C1 \uC785\uD600\uBCF8 \uC544\uC774\uD15C\uC774 \uC5C6\uC5B4\uC694."
+      Languages:
+      - "\uC544\uC9C1 \uC785\uD600\uBCF8 \uC544\uC774\uD15C\uC774 \uC5C6\uC5B4\uC694."
+      - You haven't tried on any items yet.
+      - "\u8FD8\u6CA1\u6709\u8BD5\u7A7F\u7684\u7269\u54C1\u3002"
+      - "\u9084\u6C92\u6709\u8A66\u7A7F\u7684\u7269\u54C1\u3002"
+      - "\u307E\u3060\u30A2\u30A4\u30C6\u30E0\u3092\u8A66\u7740\u3057\u3066\u3044\u307E\u305B\u3093\u3002"
+      - "A\xFAn no has probado ning\xFAn objeto."
+      - "Voc\xEA ainda n\xE3o experimentou nenhum item."
+      - "Vous n'avez encore essay\xE9 aucun objet."
+      - "Du hast noch keine Gegenst\xE4nde anprobiert."
+      - Belum ada item yang dicoba.
+      - "\u0905\u092D\u0940 \u0915\u094B\u0908 \u0906\u0907\u091F\u092E \u0928\u0939\u0940\u0902
+        \u0906\u091C\u093C\u092E\u093E\u092F\u093E \u0939\u0948\u0964"
+      - "\u0644\u0645 \u062A\u062C\u0631\u0651\u0628 \u0623\u064A \u0639\u0646\u0627\u0635\u0631
+        \u0628\u0639\u062F."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7IOIIOyVhOydtO2FnCB7MH3qsJwgwrcg7LSdIHsxfSDsvZTsnbg
+      TermType: 0
+      Description: "\uC0C8 \uC544\uC774\uD15C {0}\uAC1C \xB7 \uCD1D {1} \uCF54\uC778"
+      Languages:
+      - "\uC0C8 \uC544\uC774\uD15C {0}\uAC1C \xB7 \uCD1D {1} \uCF54\uC778"
+      - "{0} new items \xB7 {1} coins total"
+      - "\u65B0\u7269\u54C1 {0} \u4EF6 \xB7 \u5171 {1} \u91D1\u5E01"
+      - "\u65B0\u7269\u54C1 {0} \u4EF6 \xB7 \u5171 {1} \u91D1\u5E63"
+      - "\u65B0\u30A2\u30A4\u30C6\u30E0 {0}\u500B \xB7 \u5408\u8A08 {1} \u30B3\u30A4\u30F3"
+      - "{0} objetos nuevos \xB7 Total: {1} monedas"
+      - "{0} itens novos \xB7 Total: {1} moedas"
+      - "{0} nouveaux objets \xB7 Total : {1} pi\xE8ces"
+      - "{0} neue Gegenst\xE4nde \xB7 Insgesamt {1} M\xFCnzen"
+      - "{0} item baru \xB7 Total {1} koin"
+      - "{0} \u0928\u090F \u0906\u0907\u091F\u092E \xB7 \u0915\u0941\u0932 {1} \u0938\u093F\u0915\u094D\u0915\u0947"
+      - "{0} \u0639\u0646\u0627\u0635\u0631 \u062C\u062F\u064A\u062F\u0629 \xB7 \u0627\u0644\u0645\u062C\u0645\u0648\u0639
+        {1} \u0639\u0645\u0644\u0627\u062A"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7J286rSEIOq1rOunpA
+      TermType: 0
+      Description: "\uC77C\uAD04 \uAD6C\uB9E4"
+      Languages:
+      - "\uC77C\uAD04 \uAD6C\uB9E4"
+      - Buy all
+      - "\u5168\u90E8\u8D2D\u4E70"
+      - "\u5168\u90E8\u8CFC\u8CB7"
+      - "\u307E\u3068\u3081\u3066\u8CFC\u5165"
+      - Comprar todo
+      - Comprar tudo
+      - Tout acheter
+      - Alle kaufen
+      - Beli semua
+      - "\u0938\u092D\u0940 \u0916\u0930\u0940\u0926\u0947\u0902"
+      - "\u0634\u0631\u0627\u0621 \u0627\u0644\u0643\u0644"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/6rWs66ek7ZWcIOyVhOydtO2FnOydhCDsp4DquIgg7J6l7LCp7ZWg6rmM7JqUPw
+      TermType: 0
+      Description: "\uAD6C\uB9E4\uD55C \uC544\uC774\uD15C\uC744 \uC9C0\uAE08 \uC7A5\uCC29\uD560\uAE4C\uC694?"
+      Languages:
+      - "\uAD6C\uB9E4\uD55C \uC544\uC774\uD15C\uC744 \uC9C0\uAE08 \uC7A5\uCC29\uD560\uAE4C\uC694?"
+      - Equip the purchased items now?
+      - "\u73B0\u5728\u88C5\u5907\u5DF2\u8D2D\u4E70\u7684\u7269\u54C1\u5417\uFF1F"
+      - "\u73FE\u5728\u88DD\u5099\u5DF2\u8CFC\u8CB7\u7684\u7269\u54C1\u55CE\uFF1F"
+      - "\u8CFC\u5165\u3057\u305F\u30A2\u30A4\u30C6\u30E0\u3092\u4ECA\u3059\u3050\u88C5\u7740\u3057\u307E\u3059\u304B\uFF1F"
+      - "\xBFEquipar ahora los objetos comprados?"
+      - Equipar os itens comprados agora?
+      - "\xC9quiper les objets achet\xE9s maintenant ?"
+      - "Gekaufte Gegenst\xE4nde jetzt anlegen?"
+      - Pakai item yang dibeli sekarang?
+      - "\u0916\u0930\u0940\u0926\u0947 \u0917\u090F \u0906\u0907\u091F\u092E \u0905\u092D\u0940
+        \u0932\u0917\u093E\u090F\u0901?"
+      - "\u0647\u0644 \u062A\u0631\u064A\u062F \u062A\u062C\u0647\u064A\u0632 \u0627\u0644\u0639\u0646\u0627\u0635\u0631
+        \u0627\u0644\u0645\u0634\u062A\u0631\u0627\u0629 \u0627\u0644\u0622\u0646\u061F"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/64KY7KSR7JeQ
+      TermType: 0
+      Description: "\uB098\uC911\uC5D0"
+      Languages:
+      - "\uB098\uC911\uC5D0"
+      - Later
+      - "\u7A0D\u540E"
+      - "\u7A0D\u5F8C"
+      - "\u3042\u3068\u3067"
+      - "M\xE1s tarde"
+      - Depois
+      - Plus tard
+      - "Sp\xE4ter"
+      - Nanti
+      - "\u092C\u093E\u0926 \u092E\u0947\u0902"
+      - "\u0644\u0627\u062D\u0642\u064B\u0627"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7KCc6rGw
+      TermType: 0
+      Description: "\uC81C\uAC70"
+      Languages:
+      - "\uC81C\uAC70"
+      - Remove
+      - "\u79FB\u9664"
+      - "\u79FB\u9664"
+      - "\u5916\u3059"
+      - Quitar
+      - Remover
+      - Retirer
+      - Entfernen
+      - Lepas
+      - "\u0939\u091F\u093E\u090F\u0901"
+      - "\u0625\u0632\u0627\u0644\u0629"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/6rWs66ekIOyZhOujjA
+      TermType: 0
+      Description: "\uAD6C\uB9E4 \uC644\uB8CC"
+      Languages:
+      - "\uAD6C\uB9E4 \uC644\uB8CC"
+      - Purchase complete
+      - "\u8D2D\u4E70\u5B8C\u6210"
+      - "\u8CFC\u8CB7\u5B8C\u6210"
+      - "\u8CFC\u5165\u5B8C\u4E86"
+      - Compra completada
+      - "Compra conclu\xEDda"
+      - "Achat termin\xE9"
+      - Kauf abgeschlossen
+      - Pembelian selesai
+      - "\u0916\u0930\u0940\u0926 \u092A\u0942\u0930\u0940 \u0939\u0941\u0908"
+      - "\u0627\u0643\u062A\u0645\u0644 \u0627\u0644\u0634\u0631\u0627\u0621"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7ZiE7J6sIOq1rOunpO2VoCDsiJgg7JeG64qUIOyVhOydtO2FnOydtCDsnojslrTsmpQu
+      TermType: 0
+      Description: "\uD604\uC7AC \uAD6C\uB9E4\uD560 \uC218 \uC5C6\uB294 \uC544\uC774\uD15C\uC774
+        \uC788\uC5B4\uC694."
+      Languages:
+      - "\uD604\uC7AC \uAD6C\uB9E4\uD560 \uC218 \uC5C6\uB294 \uC544\uC774\uD15C\uC774
+        \uC788\uC5B4\uC694."
+      - Some items are unavailable to buy right now.
+      - "\u6709\u4E9B\u7269\u54C1\u6682\u65F6\u65E0\u6CD5\u8D2D\u4E70\u3002"
+      - "\u6709\u4E9B\u7269\u54C1\u66AB\u6642\u7121\u6CD5\u8CFC\u8CB7\u3002"
+      - "\u4ECA\u306F\u8CFC\u5165\u3067\u304D\u306A\u3044\u30A2\u30A4\u30C6\u30E0\u304C\u3042\u308A\u307E\u3059\u3002"
+      - Algunos objetos no se pueden comprar ahora.
+      - "Alguns itens n\xE3o podem ser comprados agora."
+      - "Certains objets ne peuvent pas \xEAtre achet\xE9s pour le moment."
+      - "Einige Gegenst\xE4nde k\xF6nnen gerade nicht gekauft werden."
+      - Beberapa item belum bisa dibeli saat ini.
+      - "\u0915\u0941\u091B \u0906\u0907\u091F\u092E \u0905\u092D\u0940 \u0928\u0939\u0940\u0902
+        \u0916\u0930\u0940\u0926\u0947 \u091C\u093E \u0938\u0915\u0924\u0947\u0964"
+      - "\u0644\u0627 \u064A\u0645\u0643\u0646 \u0634\u0631\u0627\u0621 \u0628\u0639\u0636
+        \u0627\u0644\u0639\u0646\u0627\u0635\u0631 \u062D\u0627\u0644\u064A\u064B\u0627."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/6rWs66ek7ZWgIOyVhOydtO2FnOydhCDri6Tsi5wg7ZmV7J247ZW0IOyjvOyEuOyalC4
+      TermType: 0
+      Description: "\uAD6C\uB9E4\uD560 \uC544\uC774\uD15C\uC744 \uB2E4\uC2DC \uD655\uC778\uD574
+        \uC8FC\uC138\uC694."
+      Languages:
+      - "\uAD6C\uB9E4\uD560 \uC544\uC774\uD15C\uC744 \uB2E4\uC2DC \uD655\uC778\uD574
+        \uC8FC\uC138\uC694."
+      - Please check the items you want to buy again.
+      - "\u8BF7\u91CD\u65B0\u786E\u8BA4\u8981\u8D2D\u4E70\u7684\u7269\u54C1\u3002"
+      - "\u8ACB\u91CD\u65B0\u78BA\u8A8D\u8981\u8CFC\u8CB7\u7684\u7269\u54C1\u3002"
+      - "\u8CFC\u5165\u3059\u308B\u30A2\u30A4\u30C6\u30E0\u3092\u3082\u3046\u4E00\u5EA6\u78BA\u8A8D\u3057\u3066\u304F\u3060\u3055\u3044\u3002"
+      - Revisa de nuevo los objetos que quieres comprar.
+      - Confira novamente os itens que deseja comprar.
+      - "V\xE9rifiez \xE0 nouveau les objets que vous souhaitez acheter."
+      - "Pr\xFCfe die Gegenst\xE4nde, die du kaufen m\xF6chtest, noch einmal."
+      - Periksa lagi item yang ingin dibeli.
+      - "\u091C\u093F\u0928 \u0906\u0907\u091F\u092E \u0915\u094B \u0916\u0930\u0940\u0926\u0928\u093E
+        \u0939\u0948, \u0909\u0928\u094D\u0939\u0947\u0902 \u092B\u093F\u0930 \u0938\u0947
+        \u091C\u093E\u0901\u091A\u0947\u0902\u0964"
+      - "\u064A\u0631\u062C\u0649 \u0645\u0631\u0627\u062C\u0639\u0629 \u0627\u0644\u0639\u0646\u0627\u0635\u0631
+        \u0627\u0644\u062A\u064A \u062A\u0631\u064A\u062F \u0634\u0631\u0627\u0621\u0647\u0627
+        \u0645\u0631\u0629 \u0623\u062E\u0631\u0649."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7KCV64u17J2AIHswfeyYgOyKteuLiOuLpC4
+      TermType: 0
+      Description: "\uC815\uB2F5\uC740 {0}\uC600\uC2B5\uB2C8\uB2E4."
+      Languages:
+      - "\uC815\uB2F5\uC740 {0}\uC600\uC2B5\uB2C8\uB2E4."
+      - The answer was {0}.
+      - "\u6B63\u786E\u7B54\u6848\u662F {0}\u3002"
+      - "\u6B63\u78BA\u7B54\u6848\u662F {0}\u3002"
+      - "\u6B63\u89E3\u306F{0}\u3067\u3057\u305F\u3002"
+      - La respuesta era {0}.
+      - A resposta era {0}.
+      - "La r\xE9ponse \xE9tait {0}."
+      - Die Antwort war {0}.
+      - Jawabannya tadi adalah {0}.
+      - "\u0938\u0939\u0940 \u091C\u0935\u093E\u092C {0} \u0925\u093E\u0964"
+      - "\u0643\u0627\u0646\u062A \u0627\u0644\u0625\u062C\u0627\u0628\u0629 {0}."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7KCV64u17J2AIHswfeydtOyXiOyKteuLiOuLpC4
+      TermType: 0
+      Description: "\uC815\uB2F5\uC740 {0}\uC774\uC5C8\uC2B5\uB2C8\uB2E4."
+      Languages:
+      - "\uC815\uB2F5\uC740 {0}\uC774\uC5C8\uC2B5\uB2C8\uB2E4."
+      - The answer was {0}.
+      - "\u6B63\u786E\u7B54\u6848\u662F {0}\u3002"
+      - "\u6B63\u78BA\u7B54\u6848\u662F {0}\u3002"
+      - "\u6B63\u89E3\u306F{0}\u3067\u3057\u305F\u3002"
+      - La respuesta era {0}.
+      - A resposta era {0}.
+      - "La r\xE9ponse \xE9tait {0}."
+      - Die Antwort war {0}.
+      - Jawabannya tadi adalah {0}.
+      - "\u0938\u0939\u0940 \u091C\u0935\u093E\u092C {0} \u0925\u093E\u0964"
+      - "\u0643\u0627\u0646\u062A \u0627\u0644\u0625\u062C\u0627\u0628\u0629 {0}."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/65287J207Ja064qUIHswfeyYgOyKteuLiOuLpC4
+      TermType: 0
+      Description: "\uB77C\uC774\uC5B4\uB294 {0}\uC600\uC2B5\uB2C8\uB2E4."
+      Languages:
+      - "\uB77C\uC774\uC5B4\uB294 {0}\uC600\uC2B5\uB2C8\uB2E4."
+      - The liar role was played by {0}.
+      - "\u8BF4\u8C0E\u8005\u89D2\u8272\u7531 {0} \u626E\u6F14\u3002"
+      - "\u8AAA\u8B0A\u8005\u89D2\u8272\u7531 {0} \u626E\u6F14\u3002"
+      - "\u30E9\u30A4\u30A2\u30FC\u5F79\u306F{0}\u304C\u62C5\u5F53\u3057\u307E\u3057\u305F\u3002"
+      - El papel de mentiroso fue interpretado por {0}.
+      - O papel de mentiroso foi desempenhado por {0}.
+      - "Le r\xF4le de menteur \xE9tait jou\xE9 par {0}."
+      - "Die L\xFCgnerrolle wurde von {0} gespielt."
+      - Peran pembohong dimainkan oleh {0}.
+      - "\u091D\u0942\u0920\u0947 \u0915\u0940 \u092D\u0942\u092E\u093F\u0915\u093E
+        {0} \u0928\u0947 \u0928\u093F\u092D\u093E\u0908 \u0925\u0940\u0964"
+      - "\u0643\u0627\u0646 \u062F\u0648\u0631 \u0627\u0644\u0643\u0627\u0630\u0628
+        \u0645\u0646 \u0646\u0635\u064A\u0628 {0}."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/65287J207Ja064qUIHswfeydtOyXiOyKteuLiOuLpC4
+      TermType: 0
+      Description: "\uB77C\uC774\uC5B4\uB294 {0}\uC774\uC5C8\uC2B5\uB2C8\uB2E4."
+      Languages:
+      - "\uB77C\uC774\uC5B4\uB294 {0}\uC774\uC5C8\uC2B5\uB2C8\uB2E4."
+      - The liar role was played by {0}.
+      - "\u8BF4\u8C0E\u8005\u89D2\u8272\u7531 {0} \u626E\u6F14\u3002"
+      - "\u8AAA\u8B0A\u8005\u89D2\u8272\u7531 {0} \u626E\u6F14\u3002"
+      - "\u30E9\u30A4\u30A2\u30FC\u5F79\u306F{0}\u304C\u62C5\u5F53\u3057\u307E\u3057\u305F\u3002"
+      - El papel de mentiroso fue interpretado por {0}.
+      - O papel de mentiroso foi desempenhado por {0}.
+      - "Le r\xF4le de menteur \xE9tait jou\xE9 par {0}."
+      - "Die L\xFCgnerrolle wurde von {0} gespielt."
+      - Peran pembohong dimainkan oleh {0}.
+      - "\u091D\u0942\u0920\u0947 \u0915\u0940 \u092D\u0942\u092E\u093F\u0915\u093E
+        {0} \u0928\u0947 \u0928\u093F\u092D\u093E\u0908 \u0925\u0940\u0964"
+      - "\u0643\u0627\u0646 \u062F\u0648\u0631 \u0627\u0644\u0643\u0627\u0630\u0628
+        \u0645\u0646 \u0646\u0635\u064A\u0628 {0}."
       Flags: 000000000000000000000000
       Languages_Touch: []
     CaseInsensitiveTerms: 0

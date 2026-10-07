@@ -7940,20 +7940,20 @@
       ]
     },
     {
-      "Key": "최다 득표 동률은 무작위로 결정 · 찬반 동수는 가결",
+      "Key": "최다 득표 동률은 무작위로 결정 · 첫 찬반 동수는 부결, 이후 동전",
       "Values": [
-        "최다 득표 동률은 무작위로 결정 · 찬반 동수는 가결",
-        "Nomination ties are decided randomly · Confirmation ties pass",
-        "最高票平票时随机决定 · 确认票平票时通过",
-        "最高票平票時隨機決定 · 確認票平票時通過",
-        "最多票が同数ならランダムで決定 · 賛否同数は可決",
-        "Los empates de nominación se deciden al azar · Los empates de confirmación se aprueban",
-        "Empates na indicação são decididos ao acaso · Empates na confirmação aprovam",
-        "Les égalités de nomination sont tranchées au hasard · Les égalités de confirmation sont approuvées",
-        "Bei Nominierungsgleichstand entscheidet der Zufall · Bei Bestätigungsgleichstand wird angenommen",
-        "Nominasi seri diputuskan secara acak · Konfirmasi seri disetujui",
-        "नामांकन में बराबरी का फैसला यादृच्छिक होगा · पुष्टि में बराबरी पर स्वीकार",
-        "يُحسم تعادل الترشيح عشوائيًا · التعادل في التأكيد يعني الموافقة"
+        "최다 득표 동률은 무작위로 결정 · 첫 찬반 동수는 부결, 이후 동전",
+        "Nomination ties are random · The first approval tie fails; later ties use a coin",
+        "最高票平票时随机决定 · 首次赞成反对平票时否决，之后掷硬币",
+        "最高票平票時隨機決定 · 首次贊成反對平票時否決，之後擲硬幣",
+        "最多票の同数はランダムで決定 · 最初の賛否同数は否決、以降はコイン",
+        "Los empates de nominación son aleatorios · El primer empate de aprobación se rechaza; los siguientes se deciden con una moneda",
+        "Empates na indicação são aleatórios · O primeiro empate de aprovação é rejeitado; os seguintes usam uma moeda",
+        "Les égalités de nomination sont aléatoires · La première égalité d’approbation est rejetée, les suivantes se jouent à pile ou face",
+        "Nominierungsgleichstand entscheidet der Zufall · Das erste Patt wird abgelehnt, spätere per Münzwurf entschieden",
+        "Nominasi seri diputuskan acak · Persetujuan seri pertama ditolak; berikutnya ditentukan koin",
+        "नामांकन की बराबरी का फैसला यादृच्छिक है · मंजूरी की पहली बराबरी पर अस्वीकार, बाद में सिक्का उछाला जाता है",
+        "يُحسم تعادل الترشيح عشوائيًا · يُرفض أول تعادل للموافقة، وتُحسم التعادلات التالية برمي عملة"
       ]
     },
     {
@@ -8838,6 +8838,363 @@
         "Badan Blok Piksel",
         "पिक्सेल ब्लॉक का शरीर",
         "جسم كتلة بكسل"
+      ]
+    },
+    {
+      "Key": "동률이에요!",
+      "Values": [
+        "동률이에요!",
+        "It's a tie!",
+        "平票了！",
+        "平票了！",
+        "同数です！",
+        "¡Hay empate!",
+        "Deu empate!",
+        "Égalité !",
+        "Gleichstand!",
+        "Seri!",
+        "बराबरी हो गई!",
+        "تعادل!"
+      ]
+    },
+    {
+      "Key": "첫 동률은 반대 우선으로 부결해요.",
+      "Values": [
+        "첫 동률은 반대 우선으로 부결해요.",
+        "The first tie is rejected in favor of the opposing votes.",
+        "首次平票时反对票优先，因此否决。",
+        "首次平票時反對票優先，因此否決。",
+        "最初の同数は反対を優先して否決します。",
+        "El primer empate se rechaza dando prioridad a los votos en contra.",
+        "O primeiro empate é rejeitado, dando prioridade aos votos contra.",
+        "La première égalité est rejetée en donnant priorité aux votes contre.",
+        "Beim ersten Gleichstand haben Gegenstimmen Vorrang: abgelehnt.",
+        "Seri pertama ditolak dengan mendahulukan suara yang menentang.",
+        "पहली बराबरी पर विरोधी मतों को प्राथमिकता देकर प्रस्ताव अस्वीकार होता है।",
+        "يُرفض أول تعادل مع إعطاء الأولوية للأصوات المعارضة."
+      ]
+    },
+    {
+      "Key": "이번 라운드 두 번째 동률부터 동전으로 결정해요.",
+      "Values": [
+        "이번 라운드 두 번째 동률부터 동전으로 결정해요.",
+        "From the second tie this round, a coin decides the result.",
+        "本轮从第二次平票起，以掷硬币决定结果。",
+        "本回合從第二次平票起，以擲硬幣決定結果。",
+        "このラウンドの2回目以降の同数はコインで決めます。",
+        "Desde el segundo empate de esta ronda, una moneda decide el resultado.",
+        "A partir do segundo empate nesta rodada, uma moeda decide o resultado.",
+        "À partir de la deuxième égalité de cette manche, le résultat se joue à pile ou face.",
+        "Ab dem zweiten Gleichstand dieser Runde entscheidet ein Münzwurf.",
+        "Mulai seri kedua pada ronde ini, koin menentukan hasilnya.",
+        "इस राउंड की दूसरी बराबरी से नतीजा सिक्का उछालकर तय होगा।",
+        "بدءًا من التعادل الثاني في هذه الجولة، تُحسم النتيجة برمي عملة."
+      ]
+    },
+    {
+      "Key": "동전을 던지고 있어요…",
+      "Values": [
+        "동전을 던지고 있어요…",
+        "Flipping the coin…",
+        "正在掷硬币…",
+        "正在擲硬幣…",
+        "コインを投げています…",
+        "Lanzando la moneda…",
+        "Lançando a moeda…",
+        "La pièce est lancée…",
+        "Die Münze wird geworfen…",
+        "Melempar koin…",
+        "सिक्का उछाला जा रहा है…",
+        "جارٍ رمي العملة…"
+      ]
+    },
+    {
+      "Key": "동전 결과 · 찬성",
+      "Values": [
+        "동전 결과 · 찬성",
+        "Coin result · Approve",
+        "硬币结果 · 赞成",
+        "硬幣結果 · 贊成",
+        "コインの結果 · 賛成",
+        "Resultado de la moneda · A favor",
+        "Resultado da moeda · A favor",
+        "Résultat de la pièce · Pour",
+        "Münzergebnis · Dafür",
+        "Hasil koin · Setuju",
+        "सिक्के का नतीजा · पक्ष में",
+        "نتيجة العملة · موافقة"
+      ]
+    },
+    {
+      "Key": "동전 결과 · 반대",
+      "Values": [
+        "동전 결과 · 반대",
+        "Coin result · Reject",
+        "硬币结果 · 反对",
+        "硬幣結果 · 反對",
+        "コインの結果 · 反対",
+        "Resultado de la moneda · En contra",
+        "Resultado da moeda · Contra",
+        "Résultat de la pièce · Contre",
+        "Münzergebnis · Dagegen",
+        "Hasil koin · Tidak setuju",
+        "सिक्के का नतीजा · विरोध में",
+        "نتيجة العملة · معارضة"
+      ]
+    },
+    {
+      "Key": "동전 던지기",
+      "Values": [
+        "동전 던지기",
+        "Coin toss",
+        "掷硬币",
+        "擲硬幣",
+        "コイントス",
+        "Lanzamiento de moneda",
+        "Lançamento de moeda",
+        "Pile ou face",
+        "Münzwurf",
+        "Lempar koin",
+        "सिक्का उछालना",
+        "رمي العملة"
+      ]
+    },
+    {
+      "Key": "입혀본 아이템",
+      "Values": [
+        "입혀본 아이템",
+        "Tried-on items",
+        "试穿的物品",
+        "試穿的物品",
+        "試着中のアイテム",
+        "Objetos probados",
+        "Itens experimentados",
+        "Objets essayés",
+        "Anprobierte Gegenstände",
+        "Item yang dicoba",
+        "आज़माए गए आइटम",
+        "العناصر المجرّبة"
+      ]
+    },
+    {
+      "Key": "아직 입혀본 아이템이 없어요.",
+      "Values": [
+        "아직 입혀본 아이템이 없어요.",
+        "You haven't tried on any items yet.",
+        "还没有试穿的物品。",
+        "還沒有試穿的物品。",
+        "まだアイテムを試着していません。",
+        "Aún no has probado ningún objeto.",
+        "Você ainda não experimentou nenhum item.",
+        "Vous n'avez encore essayé aucun objet.",
+        "Du hast noch keine Gegenstände anprobiert.",
+        "Belum ada item yang dicoba.",
+        "अभी कोई आइटम नहीं आज़माया है।",
+        "لم تجرّب أي عناصر بعد."
+      ]
+    },
+    {
+      "Key": "새 아이템 {0}개 · 총 {1} 코인",
+      "Values": [
+        "새 아이템 {0}개 · 총 {1} 코인",
+        "{0} new items · {1} coins total",
+        "新物品 {0} 件 · 共 {1} 金币",
+        "新物品 {0} 件 · 共 {1} 金幣",
+        "新アイテム {0}個 · 合計 {1} コイン",
+        "{0} objetos nuevos · Total: {1} monedas",
+        "{0} itens novos · Total: {1} moedas",
+        "{0} nouveaux objets · Total : {1} pièces",
+        "{0} neue Gegenstände · Insgesamt {1} Münzen",
+        "{0} item baru · Total {1} koin",
+        "{0} नए आइटम · कुल {1} सिक्के",
+        "{0} عناصر جديدة · المجموع {1} عملات"
+      ]
+    },
+    {
+      "Key": "일괄 구매",
+      "Values": [
+        "일괄 구매",
+        "Buy all",
+        "全部购买",
+        "全部購買",
+        "まとめて購入",
+        "Comprar todo",
+        "Comprar tudo",
+        "Tout acheter",
+        "Alle kaufen",
+        "Beli semua",
+        "सभी खरीदें",
+        "شراء الكل"
+      ]
+    },
+    {
+      "Key": "구매한 아이템을 지금 장착할까요?",
+      "Values": [
+        "구매한 아이템을 지금 장착할까요?",
+        "Equip the purchased items now?",
+        "现在装备已购买的物品吗？",
+        "現在裝備已購買的物品嗎？",
+        "購入したアイテムを今すぐ装着しますか？",
+        "¿Equipar ahora los objetos comprados?",
+        "Equipar os itens comprados agora?",
+        "Équiper les objets achetés maintenant ?",
+        "Gekaufte Gegenstände jetzt anlegen?",
+        "Pakai item yang dibeli sekarang?",
+        "खरीदे गए आइटम अभी लगाएँ?",
+        "هل تريد تجهيز العناصر المشتراة الآن؟"
+      ]
+    },
+    {
+      "Key": "나중에",
+      "Values": [
+        "나중에",
+        "Later",
+        "稍后",
+        "稍後",
+        "あとで",
+        "Más tarde",
+        "Depois",
+        "Plus tard",
+        "Später",
+        "Nanti",
+        "बाद में",
+        "لاحقًا"
+      ]
+    },
+    {
+      "Key": "제거",
+      "Values": [
+        "제거",
+        "Remove",
+        "移除",
+        "移除",
+        "外す",
+        "Quitar",
+        "Remover",
+        "Retirer",
+        "Entfernen",
+        "Lepas",
+        "हटाएँ",
+        "إزالة"
+      ]
+    },
+    {
+      "Key": "구매 완료",
+      "Values": [
+        "구매 완료",
+        "Purchase complete",
+        "购买完成",
+        "購買完成",
+        "購入完了",
+        "Compra completada",
+        "Compra concluída",
+        "Achat terminé",
+        "Kauf abgeschlossen",
+        "Pembelian selesai",
+        "खरीद पूरी हुई",
+        "اكتمل الشراء"
+      ]
+    },
+    {
+      "Key": "현재 구매할 수 없는 아이템이 있어요.",
+      "Values": [
+        "현재 구매할 수 없는 아이템이 있어요.",
+        "Some items are unavailable to buy right now.",
+        "有些物品暂时无法购买。",
+        "有些物品暫時無法購買。",
+        "今は購入できないアイテムがあります。",
+        "Algunos objetos no se pueden comprar ahora.",
+        "Alguns itens não podem ser comprados agora.",
+        "Certains objets ne peuvent pas être achetés pour le moment.",
+        "Einige Gegenstände können gerade nicht gekauft werden.",
+        "Beberapa item belum bisa dibeli saat ini.",
+        "कुछ आइटम अभी नहीं खरीदे जा सकते।",
+        "لا يمكن شراء بعض العناصر حاليًا."
+      ]
+    },
+    {
+      "Key": "구매할 아이템을 다시 확인해 주세요.",
+      "Values": [
+        "구매할 아이템을 다시 확인해 주세요.",
+        "Please check the items you want to buy again.",
+        "请重新确认要购买的物品。",
+        "請重新確認要購買的物品。",
+        "購入するアイテムをもう一度確認してください。",
+        "Revisa de nuevo los objetos que quieres comprar.",
+        "Confira novamente os itens que deseja comprar.",
+        "Vérifiez à nouveau les objets que vous souhaitez acheter.",
+        "Prüfe die Gegenstände, die du kaufen möchtest, noch einmal.",
+        "Periksa lagi item yang ingin dibeli.",
+        "जिन आइटम को खरीदना है, उन्हें फिर से जाँचें।",
+        "يرجى مراجعة العناصر التي تريد شراءها مرة أخرى."
+      ]
+    },
+    {
+      "Key": "정답은 {0}였습니다.",
+      "Values": [
+        "정답은 {0}였습니다.",
+        "The answer was {0}.",
+        "正确答案是 {0}。",
+        "正確答案是 {0}。",
+        "正解は{0}でした。",
+        "La respuesta era {0}.",
+        "A resposta era {0}.",
+        "La réponse était {0}.",
+        "Die Antwort war {0}.",
+        "Jawabannya tadi adalah {0}.",
+        "सही जवाब {0} था।",
+        "كانت الإجابة {0}."
+      ]
+    },
+    {
+      "Key": "정답은 {0}이었습니다.",
+      "Values": [
+        "정답은 {0}이었습니다.",
+        "The answer was {0}.",
+        "正确答案是 {0}。",
+        "正確答案是 {0}。",
+        "正解は{0}でした。",
+        "La respuesta era {0}.",
+        "A resposta era {0}.",
+        "La réponse était {0}.",
+        "Die Antwort war {0}.",
+        "Jawabannya tadi adalah {0}.",
+        "सही जवाब {0} था।",
+        "كانت الإجابة {0}."
+      ]
+    },
+    {
+      "Key": "라이어는 {0}였습니다.",
+      "Values": [
+        "라이어는 {0}였습니다.",
+        "The liar role was played by {0}.",
+        "说谎者角色由 {0} 扮演。",
+        "說謊者角色由 {0} 扮演。",
+        "ライアー役は{0}が担当しました。",
+        "El papel de mentiroso fue interpretado por {0}.",
+        "O papel de mentiroso foi desempenhado por {0}.",
+        "Le rôle de menteur était joué par {0}.",
+        "Die Lügnerrolle wurde von {0} gespielt.",
+        "Peran pembohong dimainkan oleh {0}.",
+        "झूठे की भूमिका {0} ने निभाई थी।",
+        "كان دور الكاذب من نصيب {0}."
+      ]
+    },
+    {
+      "Key": "라이어는 {0}이었습니다.",
+      "Values": [
+        "라이어는 {0}이었습니다.",
+        "The liar role was played by {0}.",
+        "说谎者角色由 {0} 扮演。",
+        "說謊者角色由 {0} 扮演。",
+        "ライアー役は{0}が担当しました。",
+        "El papel de mentiroso fue interpretado por {0}.",
+        "O papel de mentiroso foi desempenhado por {0}.",
+        "Le rôle de menteur était joué par {0}.",
+        "Die Lügnerrolle wurde von {0} gespielt.",
+        "Peran pembohong dimainkan oleh {0}.",
+        "झूठे की भूमिका {0} ने निभाई थी।",
+        "كان دور الكاذب من نصيب {0}."
       ]
     }
   ]

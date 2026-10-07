@@ -30,6 +30,7 @@ namespace DrawLiar.Editor
             VerifyExplicitSpectatorsAndSeatPriority();
             VerifyFixedCapacityAndStartThreshold();
             VerifyConsensusVoting();
+            VerifyJudgmentCoinToss();
             VerifyGuessResults();
 #if UNITY_EDITOR
             UnityEngine.Debug.Log("DrawLiar game self-check PASS: 게임 모드, 승리 조건, 지목·찬반 합의, 점수, 비밀 상태, 재접속, 관전자, 타이머 검증");
@@ -253,6 +254,7 @@ namespace DrawLiar.Editor
                 Advance(GamePhase.Discussion, 9);
                 Check(!game.Vote(0, 1, now), "반론 중 지목을 새로 제출할 수 없습니다.");
                 Check(game.Snapshot(0, 0, now).Players.All(player => !player.IsLiar), "Rebuttal keeps identities private.");
+                Check(game.Judge(0, 1, true, now), "시간 제한 검증을 위해 찬성 우세의 일부 찬반을 제출해야 합니다.");
                 Advance(GamePhase.Rebuttal, 6);
                 Advance(GamePhase.LiarReveal, 3);
                 Advance(GamePhase.Guessing, 11);
@@ -500,9 +502,9 @@ namespace DrawLiar.Editor
                 Check(game.Judge(player.Id, state.AccusedPlayerId, true, now), "후보 외의 참가자가 찬성할 수 있어야 합니다.");
         }
 
-        private static GameSession DiscussionGame(int seed, int count = 4, int rebuttal = 6)
+        private static GameSession DiscussionGame(int seed, int count = 4, int rebuttal = 6, int rounds = 1)
         {
-            var game = new GameSession(new RoomSettings { RoundCount = 1, RebuttalSeconds = rebuttal, VoteSeconds = 8 }, Data(), seed);
+            var game = new GameSession(new RoomSettings { RoundCount = rounds, RebuttalSeconds = rebuttal, VoteSeconds = 8 }, Data(), seed);
             for (int id = 0; id < count; id++) game.Join(id, "P" + id, 0, 0);
             Check(game.Start(0), "합의 검증 경기를 시작해야 합니다.");
             game.Tick(100);
@@ -587,8 +589,8 @@ namespace DrawLiar.Editor
                 "반론 시간이 0이어도 기존 투표 시간을 찬반 제한으로 사용해야 합니다.");
             int[] eligible = rebuttal.Players.Where(player => player.Id != rebuttal.AccusedPlayerId).Select(player => player.Id).ToArray();
             Check(fallback.Judge(eligible[0], rebuttal.AccusedPlayerId, false, 200), "첫 찬반을 제출해야 합니다.");
-            Check(fallback.Judge(eligible[1], rebuttal.AccusedPlayerId, true, 200) && fallback.Phase == GamePhase.LiarReveal,
-                "찬성·반대 동률이면 가결해야 합니다.");
+            Check(fallback.Judge(eligible[1], rebuttal.AccusedPlayerId, true, 200) && fallback.Phase == GamePhase.Discussion,
+                "첫 찬성·반대 동률이면 부결하고 새 토론을 열어야 합니다.");
 
             var noVote = DiscussionGame(43);
             noVote.Tick(200);
@@ -638,6 +640,151 @@ namespace DrawLiar.Editor
                 && lateJudgment.Snapshot(2, 0, 106).BallotVersion > expiredEpoch
                 && lateJudgment.Snapshot(2, 0, 106).Players.All(player => !player.HasJudged && player.Score == 0 && player.RoundPoints == 0),
                 "정확한 찬반 기한의 늦은 찬성은 앞 판정을 뒤집거나 새 토론에 제출되면 안 됩니다.");
+        }
+
+        private static void SplitJudgment(GameSession game, int accused, double now, bool reverse = false)
+        {
+            int[] voters = game.Snapshot(0, 0, now).Players.Where(player => player.IsConnected && !player.IsSpectator && player.Id != accused)
+                .Select(player => player.Id).ToArray();
+            Check(voters.Length == 2 && game.Judge(voters[0], accused, reverse, now) && game.Judge(voters[1], accused, !reverse, now),
+                "두 유효 참가자의 찬반을 동률로 제출해야 합니다.");
+        }
+
+        private static GameSession SecondTieGame(int seed, int rounds = 1)
+        {
+            var game = DiscussionGame(seed, 3, rounds: rounds);
+            NominateAll(game, 0);
+            int ballot = game.BallotVersion, canvas = game.CanvasVersion;
+            SplitJudgment(game, 0, 100);
+            var first = game.Snapshot(0, 0, 100);
+            Check(game.Phase == GamePhase.Discussion && !first.IsJudgmentCoinToss && !first.JudgmentCoinApproved
+                && !first.HasAccused && game.BallotVersion > ballot && game.CanvasVersion == canvas && game.Round == 1,
+                "첫 동률은 동전 없이 같은 라운드·그림의 새 토론을 열어야 합니다.");
+            NominateAll(game, 0);
+            SplitJudgment(game, 0, 100, true);
+            return game;
+        }
+
+        private static void VerifyJudgmentCoinToss()
+        {
+            Check((int)GamePhase.Rebuttal == 4 && (int)GamePhase.LiarReveal == 6 && (int)GamePhase.MatchResults == 9,
+                "동전 상태를 추가해도 기존 단계 번호와 역할 공개 순서를 유지해야 합니다.");
+            var outcomes = new System.Collections.Generic.HashSet<bool>();
+            int rejectedSeed = -1;
+            for (int seed = 0; seed < 32; seed++)
+            {
+                var game = SecondTieGame(seed);
+                Check(game.Join(99, "관전자", 0, 0, spectatorOnly: true), "동전 검증 관전자를 추가해야 합니다.");
+                var toss = game.Snapshot(0, 0, 100);
+                Check(toss.Phase == GamePhase.Rebuttal && toss.IsJudgmentCoinToss && toss.RemainingSeconds == 3
+                    && toss.ApprovalCount == 1 && toss.RejectionCount == 1 && toss.HasAccused,
+                    "두 번째 동률은 서버 결과를 저장하고 반론 안에서 정확히 3초간 기다려야 합니다.");
+                bool approved = toss.JudgmentCoinApproved;
+                outcomes.Add(approved);
+                if (!approved) rejectedSeed = seed;
+                Check(SecondTieGame(seed).Snapshot(0, 0, 100).JudgmentCoinApproved == approved,
+                    "같은 서버 시드는 같은 동전 결과를 재현해야 합니다.");
+                foreach (int viewer in new[] { 0, 1, 2, 99 })
+                {
+                    var state = game.Snapshot(viewer, 0, 100);
+                    Check(state.IsJudgmentCoinToss && state.JudgmentCoinApproved == approved && state.RevealedLiarCount == -1
+                        && state.Players.All(player => !player.IsLiar && !player.IsCaught && player.RoundPoints == 0 && player.Score == 0)
+                        && (viewer != 99 || state.Word == ""), "동전 중 참가자와 관전자는 같은 결과를 받고 역할·중간 점수를 볼 수 없어야 합니다.");
+                }
+                Check(!game.Judge(1, 0, false, 101) && !game.Judge(99, 0, true, 101) && !game.Vote(2, 1, 101),
+                    "동전 연출 중 늦은 찬반·관전자 표·새 지목은 모두 거부해야 합니다.");
+                game.Tick(102.999);
+                Check(game.Snapshot(0, 0, 102.999).IsJudgmentCoinToss && game.Snapshot(0, 0, 102.999).JudgmentCoinApproved == approved,
+                    "동전 결과는 마감 직전까지 적용하거나 재추첨하면 안 됩니다.");
+                Check(!game.Judge(1, 0, true, 103), "동전 마감의 늦은 표는 타이머 결과만 처리하고 거부해야 합니다.");
+                var applied = game.Snapshot(0, 0, 103);
+                Check(game.Phase == (approved ? GamePhase.LiarReveal : GamePhase.Discussion) && !applied.IsJudgmentCoinToss
+                    && !applied.JudgmentCoinApproved && (approved ? applied.Players.Single(player => player.Id == 0).IsCaught : !applied.HasAccused),
+                    "저장된 동전 결과는 마감에 가결 또는 부결로 한 번만 적용해야 합니다.");
+                int changes = 0; game.Changed += () => changes++;
+                game.Tick(103);
+                Check(changes == 0, "같은 마감 Tick을 반복해도 동전 결과를 다시 적용하면 안 됩니다.");
+                if (!approved) { NominateAll(game, 0, 103); ApproveAll(game, 103); }
+                CompletedMatchData completed = null; game.MatchCompleted += value => completed = value;
+                game.Tick(200); game.Tick(300);
+                Check(completed != null && completed.Players.Where(player => player.PlayerId != 0).All(player => player.CorrectVotes == 1)
+                    && completed.Players.Single(player => player.PlayerId == 0).CorrectVotes == 0,
+                    "첫 동률과 동전의 올바른 표는 누적하되 보상 횟수는 라운드당 한 번이어야 합니다.");
+            }
+            Check(outcomes.Count == 2 && rejectedSeed >= 0, "여러 서버 시드에서 가결과 부결 동전 결과가 모두 나와야 합니다.");
+
+            var third = SecondTieGame(rejectedSeed);
+            third.Tick(103);
+            NominateAll(third, 0, 103); SplitJudgment(third, 0, 103);
+            Check(third.Snapshot(0, 0, 103).IsJudgmentCoinToss && third.Snapshot(0, 0, 103).RemainingSeconds == 3,
+                "같은 라운드의 세 번째 동률도 동전으로 결정해야 합니다.");
+
+            var empty = DiscussionGame(90, 3);
+            NominateAll(empty, 0); empty.Tick(106);
+            Check(empty.Phase == GamePhase.Discussion && !empty.Snapshot(0, 0, 106).IsJudgmentCoinToss,
+                "시간 만료의 첫 0대0도 첫 동률 부결로 처리해야 합니다.");
+            NominateAll(empty, 0, 106); empty.Tick(112);
+            Check(empty.Snapshot(0, 0, 112).IsJudgmentCoinToss && empty.Snapshot(0, 0, 112).RemainingSeconds == 3,
+                "시간 만료의 두 번째 0대0도 3초 동전으로 처리해야 합니다.");
+
+            var reconnect = SecondTieGame(91);
+            var frozen = reconnect.Snapshot(1, 0, 100);
+            reconnect.Disconnect(1, 101);
+            Check(reconnect.Snapshot(2, 0, 101).IsJudgmentCoinToss && reconnect.Join(1, "복귀", 0, 0),
+                "투표자 이탈·재접속은 동전을 취소하지 않아야 합니다.");
+            Check(reconnect.Join(3, "난입", 0, 0) && !reconnect.Judge(3, 0, true, 101), "동전 중 난입자는 표를 추가할 수 없어야 합니다.");
+            var resumed = reconnect.Snapshot(1, 0, 101);
+            Check(resumed.JudgmentCoinApproved == frozen.JudgmentCoinApproved && resumed.RemainingSeconds == 2
+                && resumed.BallotVersion == frozen.BallotVersion && resumed.Players.Single(player => player.Id == 1).HasJudged,
+                "재접속은 제출 상태·동전 결과·기한을 그대로 복원해야 합니다.");
+            reconnect.Tick(103);
+            Check(reconnect.Phase == (frozen.JudgmentCoinApproved ? GamePhase.LiarReveal : GamePhase.Discussion),
+                "인원 변화는 이미 저장된 동전 결과를 바꾸면 안 됩니다.");
+
+            var canceled = SecondTieGame(92);
+            bool liarAccused = canceled.Snapshot(0, 0, 100).LocalIsLiar;
+            canceled.Disconnect(0, 101);
+            Check(canceled.Phase == GamePhase.Discussion && !canceled.Snapshot(1, 1, 101).IsJudgmentCoinToss
+                && canceled.Join(0, "복귀", 0, 0), "후보 이탈은 동전을 취소하고 재접속해도 부활시키지 않아야 합니다.");
+            CompletedMatchData canceledReport = null; canceled.MatchCompleted += value => canceledReport = value;
+            canceled.Tick(200); canceled.Tick(300); canceled.Tick(400);
+            int firstCorrect = liarAccused ? 2 : 1, canceledCorrect = liarAccused ? 1 : 2;
+            Check(canceledReport != null && canceledReport.Players.Single(player => player.PlayerId == firstCorrect).CorrectVotes == 1
+                && canceledReport.Players.Single(player => player.PlayerId == canceledCorrect).CorrectVotes == 0,
+                "취소된 동전 표는 새 보상을 만들지 않고 앞 동률의 올바른 표만 보존해야 합니다.");
+
+            var insufficient = SecondTieGame(93);
+            insufficient.Disconnect(1, 101); insufficient.Disconnect(2, 101);
+            Check(insufficient.Phase == GamePhase.MatchResults && !insufficient.Snapshot(0, 0, 101).IsJudgmentCoinToss,
+                "참가자 부족 종료는 동전 상태를 제거해야 합니다.");
+
+            var mismatch = new GameSession(new RoomSettings { LiarMode = LiarMode.Mismatch, RoundCount = 1 },
+                new GameData { Topics = new[] { new TopicData { Name = "과일", Words = new[] { "사과", "배" } } } }, 95);
+            for (int id = 0; id < 3; id++) mismatch.Join(id, "P" + id, 0, 0);
+            Check(mismatch.Start(0), "미스매치 동전 검증을 시작해야 합니다.");
+            mismatch.Tick(100); while (mismatch.Phase == GamePhase.Drawing) mismatch.EndTurn(mismatch.ArtistId, 100);
+            for (int attempt = 0; attempt < 2; attempt++) { NominateAll(mismatch, 0); SplitJudgment(mismatch, 0, 100); }
+            for (int viewer = 0; viewer < 3; viewer++)
+            {
+                var hidden = mismatch.Snapshot(viewer, 0, 100);
+                Check(hidden.IsJudgmentCoinToss && !hidden.LocalIsLiar && hidden.RevealedLiarCount == -1 && hidden.MismatchWord == ""
+                    && hidden.Players.All(player => !player.IsLiar && !player.IsCaught),
+                    "미스매치 동전 중에도 본인·공용 실제 역할과 상대 제시어를 공개하면 안 됩니다.");
+            }
+
+            var next = SecondTieGame(94, 2);
+            var nextToss = next.Snapshot(0, 0, 100);
+            next.Tick(103);
+            if (!nextToss.JudgmentCoinApproved) { NominateAll(next, 0, 103); ApproveAll(next, 103); }
+            next.Tick(200); next.Tick(300); next.Tick(400); next.Tick(500);
+            while (next.Phase == GamePhase.Drawing) next.EndTurn(next.ArtistId, 500);
+            Check(next.Round == 2 && next.Phase == GamePhase.Discussion, "새 라운드의 토론으로 진행해야 합니다.");
+            NominateAll(next, 0, 500); SplitJudgment(next, 0, 500);
+            Check(next.Phase == GamePhase.Discussion && !next.Snapshot(0, 0, 500).IsJudgmentCoinToss,
+                "새 라운드의 첫 동률은 앞 라운드의 동률 횟수와 무관하게 부결해야 합니다.");
+            third.ReturnToLobby();
+            Check(third.Phase == GamePhase.Lobby && !third.Snapshot(0, 0, 103).IsJudgmentCoinToss
+                && !third.Snapshot(0, 0, 103).JudgmentCoinApproved, "대기방 복귀는 동전 결과와 연출 상태를 제거해야 합니다.");
         }
     }
 }

@@ -13,6 +13,7 @@ var DrawLiarBrowserLibrary = {
     closedInputs: {},
     inputPointer: null,
     inputResize: null,
+    audioInitialized: false,
     string: function(value) {
       if (value === null || value === undefined) return 0;
       var length = lengthBytesUTF8(value) + 1;
@@ -552,6 +553,50 @@ var DrawLiarBrowserLibrary = {
     if (!request || request.id !== id) return;
     DrawBrowser.google = null;
     DrawBrowser.removeGoogle(request);
+  },
+
+  DrawBrowserAudioInit__deps: ['$jsAudioCreateCompressedSoundClip'],
+  DrawBrowserAudioInit: function() {
+    if (DrawBrowser.audioInitialized) return;
+    DrawBrowser.audioInitialized = true;
+    var createClip = jsAudioCreateCompressedSoundClip;
+    jsAudioCreateCompressedSoundClip = function(audioData, soundType) {
+      var clip = createClip(audioData, soundType);
+      var createSource = clip.createSourceNode;
+      clip.createSourceNode = function() {
+        var source = createSource.call(this);
+        var media = source.mediaElement;
+        var play = media.play;
+        var stopUnsupported = function() {
+          source.playPromise = null;
+          source.pauseRequested = false;
+          source.isStopped = true;
+          media.pause();
+          var ended = source.onended;
+          if (typeof ended === 'function') ended();
+          source.release();
+        };
+        var handleFailure = function(error) {
+          if (!error || error.name !== 'NotSupportedError') throw error;
+          if (!clip.error) console.warn('이 브라우저에서 지원하지 않는 배경 음악을 건너뜁니다.', error);
+          clip.error = true;
+          stopUnsupported();
+        };
+        // Unity 압축 오디오의 재생 실패만 처리하고 다른 브라우저 오류는 유지한다.
+        media.play = function() {
+          if (clip.error) return Promise.resolve().then(stopUnsupported);
+          try {
+            var pending = play.call(this);
+            return pending && typeof pending.catch === 'function' ? pending.catch(handleFailure) : pending;
+          } catch (error) {
+            if (!error || error.name !== 'NotSupportedError') throw error;
+            return Promise.resolve().then(function() { handleFailure(error); });
+          }
+        };
+        return source;
+      };
+      return clip;
+    };
   }
 };
 autoAddDeps(DrawLiarBrowserLibrary, '$DrawBrowser');

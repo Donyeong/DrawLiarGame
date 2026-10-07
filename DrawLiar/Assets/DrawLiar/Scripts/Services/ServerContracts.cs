@@ -124,6 +124,12 @@ namespace DrawLiar
     [Serializable] public sealed class ShopProduct { public string Id = ""; public string Name = ""; public int Price; public long Accessory; }
     [Serializable] public sealed class ShopResponse { public ShopProduct[] Products = Array.Empty<ShopProduct>(); }
     [Serializable] public sealed class PurchaseRequest { public string ProductId = ""; public string OperationId = ""; }
+    [Serializable] public sealed class PurchaseBatchRequest
+    {
+        public const int MAX_PRODUCTS = 7;
+        public string[] ProductIds = Array.Empty<string>();
+        public string OperationId = "";
+    }
     [Serializable] public sealed class ServerRoomSettings
     {
         public const int MAX_PLAYERS = 8;

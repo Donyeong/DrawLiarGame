@@ -13,7 +13,8 @@ namespace DrawLiar
         public const int MAX_PLAYERS = ServerRoomSettings.MAX_PLAYERS;
         public const int MAX_CANVAS_STROKES = 12000;
         public const int MAX_ROUND_STROKES = MAX_CANVAS_STROKES * MAX_PLAYERS;
-        public const string TieRule = "최다 득표 동률은 무작위로 결정 · 찬반 동수는 가결";
+        public const float JUDGMENT_COIN_TOSS_SECONDS = 3f;
+        public const string TieRule = "최다 득표 동률은 무작위로 결정 · 첫 찬반 동수는 부결, 이후 동전";
 
         public static int MinimumPlayers(LiarMode mode) => MIN_START_PLAYERS;
 

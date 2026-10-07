@@ -20,6 +20,13 @@ internal static partial class Integration
 
     public static async Task RunAsync(string[] args)
     {
+        if (args.Contains("--purchase-batch-only") || args.Contains("--purchase-batch-http-only"))
+        {
+            await VerifyPurchaseBatchDatabaseAsync();
+            if (args.Contains("--purchase-batch-http-only"))
+                await VerifyPurchaseBatchHttpAsync(args.FirstOrDefault(value => !value.StartsWith("--", StringComparison.Ordinal)) ?? "http://127.0.0.1:25550");
+            return;
+        }
         if (args.Contains("--room-custom-topics-only") || args.Contains("--room-custom-topics-database-only"))
         {
             await VerifyRoomCustomTopicsAsync();
@@ -103,6 +110,7 @@ internal static partial class Integration
         await VerifyRoomPolicyAsync();
         await VerifyRoomCustomTopicsAsync();
         await VerifyConsensusWireAsync();
+        await VerifyCoinTossWireAsync();
         await VerifyDrawingHistoryAsync();
         await VerifyMidRoundAsync();
         await VerifyOptionalLiarAsync();

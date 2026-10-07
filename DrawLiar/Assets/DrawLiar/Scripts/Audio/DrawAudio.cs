@@ -61,6 +61,9 @@ namespace DrawLiar
             Muted = PlayerPrefs.GetInt(MUTED_KEY, 0) != 0;
             _focused = Application.isFocused;
             EnsureListener();
+#if UNITY_WEBGL && !UNITY_EDITOR
+            DrawBrowserInterop.DrawBrowserAudioInit();
+#endif
             _lobbyMusic = Resources.Load<AudioClip>(RESOURCE_PATH + "LobbyMusic");
             _gameMusic = Resources.Load<AudioClip>(RESOURCE_PATH + "GameMusic");
             _musicSources = new AudioSource[2];
