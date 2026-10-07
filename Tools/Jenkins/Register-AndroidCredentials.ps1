@@ -3,10 +3,18 @@ param(
     [string]$WebhookFile,
     [string]$KeystoreFile,
     [string]$KeystorePasswordFile,
-    [string]$FirebaseServiceAccountFile
+    [string]$FirebaseServiceAccountFile,
+    [string]$UploadKeystoreFile,
+    [string]$UploadKeystorePasswordFile,
+    [string]$UploadKeyAliasFile,
+    [string]$UploadKeyPasswordFile
 )
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
+$UploadInputs = @($UploadKeystoreFile, $UploadKeystorePasswordFile, $UploadKeyAliasFile, $UploadKeyPasswordFile)
+if (@($UploadInputs | Where-Object { $_ }).Count -notin @(0, 4)) {
+    throw 'Play 업로드 키는 키 저장소·저장소 비밀번호·별칭·키 비밀번호 파일을 함께 지정하세요.'
+}
 foreach ($name in @('JENKINS_URL', 'JENKINS_USER_ID', 'JENKINS_API_TOKEN')) {
     if (![Environment]::GetEnvironmentVariable($name)) { throw "$name environment variable is required." }
 }
@@ -50,3 +58,9 @@ if ($WebhookFile) { Save-AndroidCredential 'drawliar-discord-build-webhook' $Web
 if ($KeystoreFile) { Save-AndroidCredential 'drawliar-android-keystore' $KeystoreFile $true }
 if ($KeystorePasswordFile) { Save-AndroidCredential 'drawliar-android-keystore-password' $KeystorePasswordFile $false }
 if ($FirebaseServiceAccountFile) { Save-AndroidCredential 'drawliar-firebase-app-distribution' $FirebaseServiceAccountFile $true }
+if ($UploadKeystoreFile) {
+    Save-AndroidCredential 'drawliar-android-upload-keystore' $UploadKeystoreFile $true
+    Save-AndroidCredential 'drawliar-android-upload-keystore-password' $UploadKeystorePasswordFile $false
+    Save-AndroidCredential 'drawliar-android-upload-key-alias' $UploadKeyAliasFile $false
+    Save-AndroidCredential 'drawliar-android-upload-key-password' $UploadKeyPasswordFile $false
+}

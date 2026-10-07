@@ -9,7 +9,8 @@ pipeline {
     }
     triggers { cron('TZ=Asia/Seoul\n0 1 * * *') }
     parameters {
-        choice(name: 'BUILD_FORMAT', choices: ['APK', 'AAB'], description: 'APK는 Firebase 테스트 배포, AAB는 Jenkins 보관')
+        choice(name: 'BUILD_FORMAT', choices: ['APK', 'AAB'], description: 'APK는 Firebase 테스트 배포, AAB는 Google Play 제출용 파일 생성')
+        choice(name: 'SIGNING_PROFILE', choices: ['TEST', 'PLAY_UPLOAD'], description: 'TEST는 기존 테스트 키, PLAY_UPLOAD는 Google Play 제출용 업로드 키 (AAB·일반 빌드만 허용)')
         string(name: 'BUNDLE_VERSION', defaultValue: '0.1.0', description: 'Android 표시 버전')
         booleanParam(name: 'DEVELOPMENT_BUILD', defaultValue: false, description: 'Unity Development Build')
         booleanParam(name: 'UPLOAD_FIREBASE', defaultValue: true, description: 'APK를 DrawLiar Firebase 앱에 업로드하고 테스터 그룹에 배포')
@@ -34,6 +35,11 @@ pipeline {
                     env.DRAWLIAR_DISTRIBUTION_RESULT = 'NOT_STARTED'
                     env.DRAWLIAR_SOURCE_READY = 'false'
                     env.DRAWLIAR_BUILD_ARTIFACT_READY = 'false'
+                    if (!(params.BUILD_FORMAT in ['APK', 'AAB'])) { error('Android 빌드 형식은 APK 또는 AAB여야 합니다.') }
+                    if (!(params.SIGNING_PROFILE in ['TEST', 'PLAY_UPLOAD'])) { error('Android 서명 프로필은 TEST 또는 PLAY_UPLOAD여야 합니다.') }
+                    if (params.SIGNING_PROFILE == 'PLAY_UPLOAD' && (params.BUILD_FORMAT != 'AAB' || params.DEVELOPMENT_BUILD)) {
+                        error('PLAY_UPLOAD 서명은 AAB 일반 빌드에서만 사용할 수 있습니다.')
+                    }
                     env.BUILD_FORMAT = params.BUILD_FORMAT
                     env.BUNDLE_VERSION = params.BUNDLE_VERSION
                 }
@@ -56,16 +62,32 @@ pipeline {
         }
         stage('Build Android') {
             steps {
-                withCredentials([
-                    file(credentialsId: 'drawliar-android-keystore', variable: 'DRAWLIAR_KEYSTORE_FILE'),
-                    string(credentialsId: 'drawliar-android-keystore-password', variable: 'DRAWLIAR_KEYSTORE_PASS'),
-                    string(credentialsId: 'drawliar-android-keystore-password', variable: 'DRAWLIAR_KEY_ALIAS_PASS')
-                ]) {
-                    withEnv(["DRAWLIAR_KEY_ALIAS=androiddebugkey", "DRAWLIAR_DEVELOPMENT_BUILD=${params.DEVELOPMENT_BUILD}"]) {
-                        powershell '''
-                            $ErrorActionPreference = 'Stop'
-                            & './Tools/Jenkins/Build-Android.ps1' -UnityPath $env:DRAWLIAR_UNITY_PATH -ProjectPath "$env:WORKSPACE/DrawLiar" -BuildFormat $env:BUILD_FORMAT -BundleVersion $env:BUNDLE_VERSION -BuildNumber ([int]$env:BUILD_NUMBER) -Development ([bool]::Parse($env:DRAWLIAR_DEVELOPMENT_BUILD)) | Out-Null
-                        '''
+                script {
+                    def signingCredentials = params.SIGNING_PROFILE == 'PLAY_UPLOAD' ? [
+                        file(credentialsId: 'drawliar-android-upload-keystore', variable: 'DRAWLIAR_KEYSTORE_FILE'),
+                        string(credentialsId: 'drawliar-android-upload-keystore-password', variable: 'DRAWLIAR_KEYSTORE_PASS'),
+                        string(credentialsId: 'drawliar-android-upload-key-password', variable: 'DRAWLIAR_KEY_ALIAS_PASS'),
+                        string(credentialsId: 'drawliar-android-upload-key-alias', variable: 'DRAWLIAR_KEY_ALIAS')
+                    ] : [
+                        file(credentialsId: 'drawliar-android-keystore', variable: 'DRAWLIAR_KEYSTORE_FILE'),
+                        string(credentialsId: 'drawliar-android-keystore-password', variable: 'DRAWLIAR_KEYSTORE_PASS'),
+                        string(credentialsId: 'drawliar-android-keystore-password', variable: 'DRAWLIAR_KEY_ALIAS_PASS')
+                    ]
+                    def signingEnvironment = ["DRAWLIAR_DEVELOPMENT_BUILD=${params.DEVELOPMENT_BUILD}", "DRAWLIAR_SIGNING_PROFILE=${params.SIGNING_PROFILE}"]
+                    if (params.SIGNING_PROFILE == 'TEST') { signingEnvironment.add('DRAWLIAR_KEY_ALIAS=androiddebugkey') }
+                    withCredentials(signingCredentials) {
+                        withEnv(signingEnvironment) {
+                            powershell '''
+                                $ErrorActionPreference = 'Stop'
+                                if ($env:DRAWLIAR_SIGNING_PROFILE -eq 'PLAY_UPLOAD') {
+                                    & './Tools/Jenkins/Verify-AndroidUploadKey.ps1' -UnityPath $env:DRAWLIAR_UNITY_PATH
+                                }
+                                & './Tools/Jenkins/Build-Android.ps1' -UnityPath $env:DRAWLIAR_UNITY_PATH -ProjectPath "$env:WORKSPACE/DrawLiar" -BuildFormat $env:BUILD_FORMAT -BundleVersion $env:BUNDLE_VERSION -BuildNumber ([int]$env:BUILD_NUMBER) -Development ([bool]::Parse($env:DRAWLIAR_DEVELOPMENT_BUILD)) | Out-Null
+                                if ($env:DRAWLIAR_SIGNING_PROFILE -eq 'PLAY_UPLOAD') {
+                                    & './Tools/Jenkins/Verify-AndroidUploadKey.ps1' -UnityPath $env:DRAWLIAR_UNITY_PATH -ArtifactPath "$env:WORKSPACE/Build/Android/DrawLiar.aab"
+                                }
+                            '''
+                        }
                     }
                 }
                 script { env.DRAWLIAR_BUILD_ARTIFACT_READY = 'true' }

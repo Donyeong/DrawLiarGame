@@ -26,5 +26,59 @@ if ($jobs -contains $JobName) {
     $url = "$base/job/$JobName/config.xml"
 }
 else { $url = "$base/createItem?name=$JobName" }
+$parameterProperty = $document.SelectSingleNode('/flow-definition/properties/hudson.model.ParametersDefinitionProperty')
+if (!$parameterProperty) {
+    $parameterProperty = $document.CreateElement('hudson.model.ParametersDefinitionProperty')
+    [void]$document.SelectSingleNode('/flow-definition/properties').AppendChild($parameterProperty)
+}
+$parameterDefinitions = $parameterProperty.SelectSingleNode('parameterDefinitions')
+if (!$parameterDefinitions) {
+    $parameterDefinitions = $document.CreateElement('parameterDefinitions')
+    [void]$parameterProperty.AppendChild($parameterDefinitions)
+}
+$parameterDefinitions.RemoveAll()
+$parameterLines = [regex]::Matches($pipeline, "(?m)^\s*(choice|string|booleanParam)\(name: '([A-Za-z0-9_]+)',([^\r\n]+)\)\s*$")
+if (!$parameterLines.Count) { throw 'Android pipeline parameter definitions were not found.' }
+foreach ($parameterLine in $parameterLines) {
+    $kind = $parameterLine.Groups[1].Value
+    $name = $parameterLine.Groups[2].Value
+    $options = $parameterLine.Groups[3].Value
+    $description = [regex]::Match($options, "description: '([^']*)'")
+    if (!$description.Success) { throw "Parameter description not found: $name" }
+    $class = switch ($kind) {
+        'choice' { 'hudson.model.ChoiceParameterDefinition' }
+        'string' { 'hudson.model.StringParameterDefinition' }
+        'booleanParam' { 'hudson.model.BooleanParameterDefinition' }
+    }
+    $definition = $document.CreateElement($class)
+    foreach ($field in @{ name = $name; description = $description.Groups[1].Value }.GetEnumerator()) {
+        $element = $document.CreateElement($field.Key)
+        $element.InnerText = $field.Value
+        [void]$definition.AppendChild($element)
+    }
+    if ($kind -eq 'choice') {
+        $choices = [regex]::Match($options, 'choices: \[([^\]]+)\]')
+        if (!$choices.Success) { throw "Parameter choices not found: $name" }
+        $choiceList = $document.CreateElement('choices')
+        $choiceList.SetAttribute('class', 'java.util.Arrays$ArrayList')
+        $values = $document.CreateElement('a')
+        $values.SetAttribute('class', 'string-array')
+        foreach ($choice in [regex]::Matches($choices.Groups[1].Value, "'([^']+)'")) {
+            $element = $document.CreateElement('string')
+            $element.InnerText = $choice.Groups[1].Value
+            [void]$values.AppendChild($element)
+        }
+        [void]$choiceList.AppendChild($values)
+        [void]$definition.AppendChild($choiceList)
+    }
+    else {
+        $default = [regex]::Match($options, $(if ($kind -eq 'string') { "defaultValue: '([^']*)'" } else { 'defaultValue: (true|false)' }))
+        if (!$default.Success) { throw "Parameter default not found: $name" }
+        $element = $document.CreateElement('defaultValue')
+        $element.InnerText = $default.Groups[1].Value
+        [void]$definition.AppendChild($element)
+    }
+    [void]$parameterDefinitions.AppendChild($definition)
+}
 Invoke-WebRequest $url -Headers $headers -Method Post -ContentType 'application/xml; charset=utf-8' -Body ([Text.Encoding]::UTF8.GetBytes($document.OuterXml)) -UseBasicParsing | Out-Null
 Write-Host "Jenkins Android job configured: $base/job/$JobName/"
