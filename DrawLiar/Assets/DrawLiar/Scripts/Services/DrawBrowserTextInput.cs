@@ -83,11 +83,13 @@ namespace DrawLiar
                 || !_root.Contains(field) || !IsVisible(field)) return false;
             RefreshFields();
             if (!_ids.TryGetValue(field, out int id)) return false;
+            if (_active != field) Open(field, id);
+            else if (DrawBrowserInterop.DrawBrowserInputOpen(id) != 1) Close(false);
+            if (_active != field) return false;
+            // 최초 FocusIn부터 Unity 기본 키보드 대신 브라우저 입력을 사용한다.
             field.Focus();
             if (_disposed || field.isReadOnly || field.panel != _root.panel || !_root.Contains(field)
                 || !IsVisible(field) || !_ids.TryGetValue(field, out id)) return false;
-            if (_active != field) Open(field, id);
-            else if (DrawBrowserInterop.DrawBrowserInputOpen(id) != 1) Close(false);
             return _active == field && DrawBrowserInterop.DrawBrowserInputFocused(id) == 1;
         }
 

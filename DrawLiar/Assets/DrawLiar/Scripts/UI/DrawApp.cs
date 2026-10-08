@@ -1427,7 +1427,11 @@ namespace DrawLiar
             var expectedOverlay=overlay;
             var expectedProfile=_profileOverlay;
             bool roomAtRequest=inRoom;
+#if UNITY_WEBGL && !UNITY_EDITOR
+            if(_browserTextInput?.Focus(input)==true)return;
+#else
             input.Focus();
+#endif
             int attempts=0;
             IVisualElementScheduledItem pending=null;
             pending=input.schedule.Execute(()=>
@@ -1438,10 +1442,10 @@ namespace DrawLiar
                     ||FocusedTextField()!=null&&FocusedTextField()!=input){pending?.Pause();return;}
                 if(!IsVisible(input)||input.worldBound.width<=0||input.worldBound.height<=0)
                 {if(attempts>=8)pending?.Pause();return;}
-                input.Focus();
 #if UNITY_WEBGL && !UNITY_EDITOR
                 bool focused=_browserTextInput?.Focus(input)==true;
 #else
+                input.Focus();
                 bool focused=FocusedTextField()==input;
 #endif
                 if(focused||attempts>=8)pending?.Pause();
