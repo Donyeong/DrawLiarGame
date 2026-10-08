@@ -18,6 +18,10 @@ internal sealed class GameConnection : IAsyncDisposable
     private int _frameCount, _strokeCount, _requestCount;
     private double _lastChat = double.NegativeInfinity;
     private int _stopped;
+    private volatile bool _closeAfterDrain;
+    private readonly object _moderationGate = new();
+    private bool _kickPending;
+    private bool _invalidSessionPending;
 
     public string AccountId { get; }
     public string SessionToken { get; }
@@ -82,17 +86,67 @@ internal sealed class GameConnection : IAsyncDisposable
         _socket.Abort();
     }
 
+    public bool BeginKick()
+    {
+        lock (_moderationGate)
+        {
+            if (!IsAlive) return false;
+            _kickPending = true;
+            return true;
+        }
+    }
+
+    public void EndKick()
+    {
+        lock (_moderationGate)
+        {
+            _kickPending = false;
+            if (_invalidSessionPending)
+            {
+                _invalidSessionPending = false;
+                Abort();
+            }
+        }
+    }
+
+    public void AbortInvalidSession()
+    {
+        lock (_moderationGate)
+        {
+            if (_kickPending) _invalidSessionPending = true;
+            else Abort();
+        }
+    }
+
+    public bool CloseAfterQueue(GameplayEnvelope envelope)
+    {
+        if (!Queue(envelope)) return false;
+        _closeAfterDrain = true;
+        if (Interlocked.Exchange(ref _stopped, 1) != 0) return false;
+        _outgoing.Writer.TryComplete();
+        _lifetime.CancelAfter(TimeSpan.FromSeconds(3));
+        return true;
+    }
+
     private async Task WriteAsync()
     {
         try
         {
             await foreach (var bytes in _outgoing.Reader.ReadAllAsync(_lifetime.Token))
                 await _socket.SendAsync(bytes.AsMemory(), WebSocketMessageType.Text, true, _lifetime.Token);
+            if (_closeAfterDrain)
+                await _socket.CloseOutputAsync(WebSocketCloseStatus.PolicyViolation, "RoomKicked", _lifetime.Token);
         }
         catch (Exception exception) when (exception is OperationCanceledException or WebSocketException or IOException or ObjectDisposedException)
         {
-            Abort();
+            if (_closeAfterDrain)
+            {
+                _lifetime.Cancel();
+                _socket.Abort();
+            }
+            else Abort();
         }
+        finally { if (_closeAfterDrain) _lifetime.Cancel(); }
     }
 
     public async ValueTask DisposeAsync()

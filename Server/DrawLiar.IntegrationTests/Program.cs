@@ -20,6 +20,24 @@ internal static partial class Integration
 
     public static async Task RunAsync(string[] args)
     {
+        if (args.Contains("--account-level-only") || args.Contains("--account-level-http-only"))
+        {
+            VerifyAccountLevelRules();
+            if (args.Contains("--account-level-http-only"))
+            {
+                string localUrl = args.FirstOrDefault(value => !value.StartsWith("--", StringComparison.Ordinal)) ?? "http://127.0.0.1:25550";
+                await VerifyMatchRewardsAsync(localUrl);
+                await VerifyAccountLevelHttpAsync(localUrl);
+            }
+            return;
+        }
+        if (args.Contains("--room-kick-only") || args.Contains("--room-kick-http-only"))
+        {
+            await VerifyRoomKickWireAsync();
+            if (args.Contains("--room-kick-http-only"))
+                await VerifyRoomKickHttpAsync(args.FirstOrDefault(value => !value.StartsWith("--", StringComparison.Ordinal)) ?? "http://127.0.0.1:25550");
+            return;
+        }
         if (args.Contains("--purchase-batch-only") || args.Contains("--purchase-batch-http-only"))
         {
             await VerifyPurchaseBatchDatabaseAsync();
@@ -112,6 +130,7 @@ internal static partial class Integration
             return;
         }
         DrawLiar.Editor.GameSelfCheck.Run();
+        VerifyAccountLevelRules();
         VerifyAvatarPartRules();
         await VerifyRoomPolicyAsync();
         await VerifyRoomCustomTopicsAsync();
@@ -525,6 +544,8 @@ internal sealed class Peer : IAsyncDisposable
     public ConcurrentQueue<GameplayEnvelope> Trace { get; } = new();
     public RoomSnapshot? Latest => Volatile.Read(ref _latest);
     public bool IsClosed => _closed.Task.IsCompleted;
+    public WebSocketCloseStatus? CloseStatus => _socket.CloseStatus;
+    public string? CloseDescription => _socket.CloseStatusDescription;
 
     public static async Task<Peer> ConnectAsync(DedicatedAssignment assignment, RemoteCertificateValidationCallback certificateValidation)
     {

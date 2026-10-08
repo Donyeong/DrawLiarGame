@@ -10,20 +10,22 @@ namespace DrawLiar
         private bool _clearOwnPending;
         private int? _previewAuthorId;
         private Label _drawingPreviewName;
+        private VisualElement _drawingPreviewIdentity;
         private int _drawingPreviewRound=-1, _drawingPreviewArtist=-1, _drawingPreviewVersion=-1, _drawingPreviewEpoch=-1;
         private GamePhase _drawingPreviewPhase;
         private DrawingMode _drawingPreviewMode;
 
         private void CreateDrawingPreviewName(VisualElement frame)
         {
-            _drawingPreviewName=RawText(frame,"","drawing-preview-name");
+            _drawingPreviewName=LeveledName(frame,"",1,"drawing-preview-name","drawing-preview-name");
+            _drawingPreviewIdentity=_drawingPreviewName.parent;
             _drawingPreviewName.name="drawing-preview-name";
             _drawingPreviewName.pickingMode=PickingMode.Ignore;
-            _drawingPreviewName.style.display=DisplayStyle.None;
-            var drawing=surface;var caption=_drawingPreviewName;
+            _drawingPreviewIdentity.style.display=DisplayStyle.None;
+            var drawing=surface;var caption=_drawingPreviewIdentity;
             void PositionName()
             {
-                if(surface!=drawing||_drawingPreviewName!=caption||drawing.panel==null||drawing.parent!=frame||caption.parent!=frame)return;
+                if(surface!=drawing||_drawingPreviewIdentity!=caption||drawing.panel==null||drawing.parent!=frame||caption.parent!=frame)return;
                 var paper=drawing.contentRect;
                 if(!(paper.width>0&&paper.height>0))return;
                 var origin=frame.WorldToLocal(drawing.LocalToWorld(paper.position));
@@ -98,7 +100,8 @@ namespace DrawLiar
             if(!inRoom||surface==null||player==null){ClearDrawingPreview();return;}
             surface.ShowAuthorPreview(authorId,state.Settings.Mode,network.GetAuthorStrokes(authorId));
             SetRawText(_drawingPreviewName,player.Name);
-            _drawingPreviewName.style.display=surface.HasAuthorPreview?DisplayStyle.Flex:DisplayStyle.None;
+            _drawingPreviewIdentity.Q<DrawLevelBadge>()?.SetLevel(player.Level);
+            _drawingPreviewIdentity.style.display=surface.HasAuthorPreview?DisplayStyle.Flex:DisplayStyle.None;
             RefreshAccusedSpotlight(state);
             RefreshDrawingInteractions(state);
         }
@@ -108,7 +111,7 @@ namespace DrawLiar
             if(network!=null)network.CancelQueuedAuthorDrawing();
             _previewAuthorId=null;surface?.ClearAuthorPreview();
             foreach(var card in playerCards.Values)card.RemoveFromClassList("preview-player");
-            if(_drawingPreviewName!=null)_drawingPreviewName.style.display=DisplayStyle.None;
+            if(_drawingPreviewIdentity!=null)_drawingPreviewIdentity.style.display=DisplayStyle.None;
             if(network!=null&&network.State!=null)RefreshAccusedSpotlight(network.State);
         }
 

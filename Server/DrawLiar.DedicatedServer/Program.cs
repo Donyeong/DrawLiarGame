@@ -58,6 +58,8 @@ app.Map("/play", async (HttpContext context, GameClusterClient cluster, RoomRegi
             if (message == null) break;
             if (message.Type == "request" && message.Kind == "configure")
                 await room.ConfigureAsync(connection, message, RoomRegistry.Now, cluster.ConfigureAsync);
+            else if (message.Type == "request" && message.Kind == "kick")
+                await room.KickAsync(connection, message, RoomRegistry.Now, cluster.KickAsync);
             else if (message.Type == "request" && message.Kind == "refreshProfile")
                 await room.RefreshProfileAsync(connection, message, RoomRegistry.Now, cluster.RefreshProfileAsync);
             else room.Receive(connection, message, RoomRegistry.Now);

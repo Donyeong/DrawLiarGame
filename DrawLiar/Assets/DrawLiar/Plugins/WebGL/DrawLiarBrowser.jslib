@@ -82,7 +82,7 @@ var DrawLiarBrowserLibrary = {
       if (element.parentNode !== parent) { parent.appendChild(element); return true; }
       return false;
     },
-    layoutInput: function(entry) {
+    layoutInput: function(entry, fromResize) {
       if (!entry || !Module.canvas || !entry.element) return;
       var rectangle = Module.canvas.getBoundingClientRect();
       var field = DrawBrowser.inputFields[entry.id];
@@ -93,6 +93,12 @@ var DrawLiarBrowserLibrary = {
       var moved = DrawBrowser.overlayParent(element);
       if (moved && hadFocus) element.focus({preventScroll:true});
       entry.reparenting = false;
+      var viewport = window.visualViewport;
+      // 키보드 배치의 좌표는 새 Unity 설정을 받은 뒤 갱신한다.
+      if (fromResize && entry.keyboardBounds && hadFocus && entry.inputCanvasWidth === rectangle.width
+          && Math.abs(window.innerWidth - entry.layoutWidth) <= entry.layoutWidth * .1
+          && (!viewport || Math.abs(viewport.scale - 1) <= .05)) return;
+      entry.inputCanvasWidth = rectangle.width;
       var top = rectangle.top + rectangle.height * field.Y;
       element.style.left = (rectangle.left + rectangle.width * field.X) + 'px';
       element.style.top = top + 'px';
@@ -221,6 +227,8 @@ var DrawLiarBrowserLibrary = {
       return 1;
     },
     captureViewport: function(entry) {
+      entry.keyboardBounds = null;
+      entry.keyboardRestoreAt = null;
       var viewport = window.visualViewport;
       var rectangle = Module.canvas.getBoundingClientRect();
       var previous = DrawBrowser.keyboardViewport;
@@ -393,7 +401,7 @@ var DrawLiarBrowserLibrary = {
           var viewport = window.visualViewport;
           if (!DrawBrowser.input && previous && window.innerHeight >= previous.layoutHeight - 80
               && (!viewport || viewport.height >= previous.viewportHeight - 80)) DrawBrowser.keyboardViewport = null;
-          DrawBrowser.layoutInput(DrawBrowser.input);
+          DrawBrowser.layoutInput(DrawBrowser.input, true);
           if (DrawBrowser.google && DrawBrowser.google.element) DrawBrowser.overlayParent(DrawBrowser.google.element);
         };
         window.addEventListener('resize', DrawBrowser.inputResize);
@@ -416,20 +424,40 @@ var DrawLiarBrowserLibrary = {
       DrawBrowser.captureViewport(entry);
       return 0;
     }
-    if (viewport && Math.abs(viewport.scale - 1) > .05) return 0;
+    if (viewport && Math.abs(viewport.scale - 1) > .05) {
+      entry.keyboardBounds = null; entry.keyboardRestoreAt = null;
+      DrawBrowser.keyboardViewport = null;
+      return 0;
+    }
     var visibleHeight = viewport ? viewport.height : window.innerHeight;
     var reduction = Math.max(entry.layoutHeight - window.innerHeight, entry.viewportHeight - visibleHeight,
       window.innerHeight - visibleHeight);
-    if (!(reduction > Math.max(80, entry.viewportHeight * .15))) { DrawBrowser.keyboardViewport = null; return 0; }
+    var bounds = entry.keyboardBounds;
+    if (!(reduction > Math.max(80, entry.viewportHeight * .15))) {
+      if (bounds && document.activeElement === entry.element) {
+        var now = typeof performance !== 'undefined' ? performance.now() : Date.now();
+        if (entry.keyboardRestoreAt === null) entry.keyboardRestoreAt = now;
+        // 입력 중 일시적인 viewport 복원은 키보드 배치를 유지한다.
+        if (now - entry.keyboardRestoreAt >= 150) bounds = null;
+      } else bounds = null;
+      if (!bounds) {
+        entry.keyboardBounds = null; entry.keyboardRestoreAt = null;
+        DrawBrowser.keyboardViewport = null;
+        return 0;
+      }
+    } else {
+      entry.keyboardRestoreAt = null;
+      bounds = entry.keyboardBounds || (entry.keyboardBounds = {top:0, bottom:0});
+      bounds.top = viewport ? viewport.offsetTop : 0;
+      bounds.bottom = bounds.top + visibleHeight;
+    }
     var rectangle = Module.canvas.getBoundingClientRect();
     if (!(rectangle.height > 0)) return 0;
-    var top = viewport ? viewport.offsetTop : 0;
-    var bottom = top + visibleHeight;
     DrawBrowser.keyboardViewport = {layoutWidth:entry.layoutWidth, layoutHeight:entry.layoutHeight,
       viewportHeight:entry.viewportHeight, canvasHeight:entry.canvasHeight};
     HEAPF32[pointer >> 2] = Math.max(1, entry.canvasHeight / rectangle.height);
-    HEAPF32[(pointer >> 2) + 1] = Math.max(0, Math.min(1, (top - rectangle.top) / rectangle.height));
-    HEAPF32[(pointer >> 2) + 2] = Math.max(0, Math.min(1, (rectangle.bottom - bottom) / rectangle.height));
+    HEAPF32[(pointer >> 2) + 1] = Math.max(0, Math.min(1, (bounds.top - rectangle.top) / rectangle.height));
+    HEAPF32[(pointer >> 2) + 2] = Math.max(0, Math.min(1, (rectangle.bottom - bounds.bottom) / rectangle.height));
     return 1;
   },
   DrawBrowserInputTakeChatShortcut: function() {
@@ -521,7 +549,7 @@ var DrawLiarBrowserLibrary = {
           || address.username || address.password || address.hash) return -1;
       var socket = new WebSocket(address.href);
       var id = DrawBrowser.nextSocket++;
-      var entry = {socket:socket, frames:[], offset:0, bytes:0, error:false, closeCode:1005};
+      var entry = {socket:socket, frames:[], offset:0, bytes:0, error:false, closeCode:1005, kicked:false};
       DrawBrowser.sockets[id] = entry;
       socket.onmessage = function(event) {
         if (DrawBrowser.sockets[id] !== entry || entry.error) return;
@@ -540,7 +568,7 @@ var DrawLiarBrowserLibrary = {
         entry.bytes += frame.length;
       };
       socket.onerror = function() { entry.error = true; };
-      socket.onclose = function(event) { entry.closeCode = event.code; };
+      socket.onclose = function(event) { entry.closeCode = event.code; entry.kicked = event.reason === 'RoomKicked'; };
       return id;
     } catch (_) { return -1; }
   },
@@ -586,6 +614,11 @@ var DrawLiarBrowserLibrary = {
   DrawBrowserSocketCloseCode: function(id) {
     var entry = DrawBrowser.sockets[id];
     return entry ? entry.closeCode : 1005;
+  },
+
+  DrawBrowserSocketWasKicked: function(id) {
+    var entry = DrawBrowser.sockets[id];
+    return entry && entry.kicked ? 1 : 0;
   },
 
   DrawBrowserSocketRelease: function(id) {

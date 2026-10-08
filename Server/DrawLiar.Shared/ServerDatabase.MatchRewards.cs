@@ -28,30 +28,43 @@ public sealed partial class ServerDatabase
         await using var transaction = await connection.BeginTransactionAsync(IsolationLevel.RepeatableRead, cancellationToken);
         var response = new MatchRewardResponse { MatchId = parsedId.ToString() };
         await using (var command = Command(connection, transaction,
-            "SELECT \"CoinReward\" FROM \"AccountMatch\" WHERE \"MatchId\"=$1 AND \"AccountId\"=$2", parsedId, accountId))
+            "SELECT \"CoinReward\",\"ExperienceReward\" FROM \"AccountMatch\" WHERE \"MatchId\"=$1 AND \"AccountId\"=$2", parsedId, accountId))
+        await using (var reader = await command.ExecuteReaderAsync(cancellationToken))
         {
-            object? reward = await command.ExecuteScalarAsync(cancellationToken);
-            response.Recorded = reward != null;
-            response.CoinReward = reward is int coins ? coins : 0;
+            response.Recorded = await reader.ReadAsync(cancellationToken);
+            if (response.Recorded)
+            {
+                response.CoinReward = reader.GetInt32(0);
+                response.ExperienceReward = reader.GetInt32(1);
+            }
         }
         response.Profile = await ReadProfile(connection, transaction, accountId);
         await transaction.CommitAsync(cancellationToken);
         return response;
     }
 
-    private static async Task<int> CreditMatchRewardAsync(NpgsqlConnection connection, NpgsqlTransaction transaction, Guid accountId,
+    private static async Task<(int Coins, int Experience)> CreditMatchRewardAsync(NpgsqlConnection connection, NpgsqlTransaction transaction, Guid accountId,
         MatchPlayerResult player, CancellationToken cancellationToken)
     {
         int currentCoins;
-        await using (var command = Command(connection, transaction, "SELECT \"Coins\" FROM \"Account\" WHERE \"Id\"=$1 FOR UPDATE", accountId))
-            currentCoins = Convert.ToInt32(await command.ExecuteScalarAsync(cancellationToken));
-        int reward = MatchRewardRules.Calculate(_matchRewardPolicy.Value, player.WeightedRoundParticipants, player.WeightedRoundScore, currentCoins);
-        if (reward > 0)
+        long currentExperience;
+        await using (var command = Command(connection, transaction, "SELECT \"Coins\",\"Experience\" FROM \"Account\" WHERE \"Id\"=$1 FOR UPDATE", accountId))
+        await using (var reader = await command.ExecuteReaderAsync(cancellationToken))
         {
-            await using var command = Command(connection, transaction, "UPDATE \"Account\" SET \"Coins\"=\"Coins\"+$2 WHERE \"Id\"=$1", accountId, reward);
+            if (!await reader.ReadAsync(cancellationToken)) throw new ApiException("AccountUnavailable", 403);
+            currentCoins = reader.GetInt32(0);
+            currentExperience = reader.GetInt64(1);
+        }
+        int reward = MatchRewardRules.Calculate(_matchRewardPolicy.Value, player.WeightedRoundParticipants, player.WeightedRoundScore, currentCoins);
+        int experience = (int)Math.Min(long.MaxValue - currentExperience,
+            MatchRewardRules.Calculate(_matchRewardPolicy.Value, player.WeightedRoundParticipants, player.WeightedRoundScore, 0));
+        if (reward > 0 || experience > 0)
+        {
+            await using var command = Command(connection, transaction,
+                "UPDATE \"Account\" SET \"Coins\"=\"Coins\"+$2,\"Experience\"=\"Experience\"+$3 WHERE \"Id\"=$1", accountId, reward, experience);
             await command.ExecuteNonQueryAsync(cancellationToken);
         }
-        return reward;
+        return (reward, experience);
     }
 
     private static string MatchPayloadHash(MatchResultRequest normalized)

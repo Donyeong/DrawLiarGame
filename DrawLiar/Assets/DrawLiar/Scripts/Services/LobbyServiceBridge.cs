@@ -560,8 +560,10 @@ namespace DrawLiar
         }
         private void SetProfile(ProfileData profile)
         {
-            if (profile == null || string.IsNullOrEmpty(profile.AccountId) || string.IsNullOrEmpty(profile.DisplayName))
+            if (profile == null || string.IsNullOrEmpty(profile.AccountId) || string.IsNullOrEmpty(profile.DisplayName) || profile.Experience < 0)
                 throw new InvalidOperationException("서버 프로필 응답을 확인할 수 없습니다.");
+            if (Profile?.AccountId == profile.AccountId) profile.Experience = Math.Max(Profile.Experience, profile.Experience);
+            profile.Level = AccountLevelRules.GetLevel(profile.Experience);
             if (Profile?.AccountId != profile.AccountId) { ResetTopicWorkshop(); ResetMatchRewards(); }
             Profile = profile;
             ++_rewardProfileRevision;
@@ -675,6 +677,7 @@ namespace DrawLiar
                 case "NotFriends": return "친구로 추가된 상대만 초대할 수 있습니다.";
                 case "NotRoomMember": return "방에 입장한 뒤 친구를 초대하세요.";
                 case "AlreadyInRoom": return "이미 같은 방에 있습니다.";
+                case "RoomKicked": return "이 방에서 강퇴되어 다시 입장할 수 없습니다.";
                 case "RoomInvitationCooldown": return "잠시 후 다시 초대하세요.";
                 case "RoomInvitationLimit": return "보낸 초대가 많습니다. 잠시 후 다시 시도하세요.";
                 case "RoomInvitationUnavailable":

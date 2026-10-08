@@ -5,6 +5,7 @@
   <ItemGroup><Compile Include="../../DrawLiar/Assets/DrawLiar/Scripts/Game/AvatarParts.cs" Link="AvatarParts.cs" /></ItemGroup>
   <ItemGroup><Compile Include="../../DrawLiar/Assets/DrawLiar/Scripts/Game/TopicWorkshopRules.cs" Link="TopicWorkshopRules.cs" /></ItemGroup>
   <ItemGroup><Compile Include="../../DrawLiar/Assets/DrawLiar/Scripts/Game/MatchRewardRules.cs" Link="MatchRewardRules.cs" /></ItemGroup>
+  <ItemGroup><Compile Include="../../DrawLiar/Assets/DrawLiar/Scripts/Game/AccountLevelRules.cs" Link="AccountLevelRules.cs" /></ItemGroup>
   <ItemGroup><EmbeddedResource Include="Database/*.sql" /><EmbeddedResource Include="../../DrawLiar/Assets/DrawLiar/Resources/DrawLiar/GameData.json" LogicalName="DrawLiar.BuiltInGameData.json" /></ItemGroup>
   <ItemGroup><EmbeddedResource Include="../../DrawLiar/Assets/DrawLiar/Resources/DrawLiar/TopicWorkshopPolicy.json" LogicalName="DrawLiar.TopicWorkshopPolicy.json" /></ItemGroup>
   <ItemGroup><EmbeddedResource Include="../../DrawLiar/Assets/DrawLiar/Resources/DrawLiar/MatchRewardPolicy.json" LogicalName="DrawLiar.MatchRewardPolicy.json" /></ItemGroup>

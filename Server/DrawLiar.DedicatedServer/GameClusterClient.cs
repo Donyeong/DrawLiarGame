@@ -95,6 +95,33 @@ internal sealed class GameClusterClient : BackgroundService
         return profile;
     }
 
+    public async Task<KickRoomResponse> KickAsync(KickRoomRequest request, CancellationToken cancellationToken)
+    {
+        await _controlGate.WaitAsync(cancellationToken);
+        try
+        {
+            await HeartbeatAsync(cancellationToken);
+            request.NodeId = _nodeId;
+            using var response = await _http.PostAsJsonAsync("/internal/rooms/kick", request, GameplayWire.Json, cancellationToken);
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadFromJsonAsync<ApiError>(GameplayWire.Json, cancellationToken);
+                throw new ApiException(error?.Code ?? "ServerUnavailable", (int)response.StatusCode);
+            }
+            return await response.Content.ReadFromJsonAsync<KickRoomResponse>(GameplayWire.Json, cancellationToken)
+                ?? throw new JsonException("강퇴 응답이 비어 있습니다.");
+        }
+        catch (Exception exception) when (exception is HttpRequestException or OperationCanceledException or JsonException or IOException
+            || exception is ApiException { Status: >= 500 })
+        {
+            using var recover = new CancellationTokenSource(TimeSpan.FromSeconds(3));
+            try { await HeartbeatAsync(recover.Token); }
+            catch (Exception failure) when (failure is HttpRequestException or OperationCanceledException or JsonException or IOException) { }
+            throw;
+        }
+        finally { _controlGate.Release(); }
+    }
+
     private async Task HeartbeatAsync(CancellationToken cancellationToken)
     {
         var statuses = _rooms.Statuses();
@@ -103,7 +130,7 @@ internal sealed class GameClusterClient : BackgroundService
         heartbeat.EnsureSuccessStatusCode();
         var acknowledged = await heartbeat.Content.ReadFromJsonAsync<DedicatedHeartbeatResponse>(GameplayWire.Json, cancellationToken)
             ?? throw new JsonException("방 종료 승인 응답이 비어 있습니다.");
-        _rooms.AcknowledgeHeartbeat(statuses, acknowledged.ClosedRoomIds, acknowledged.Configurations);
+        _rooms.AcknowledgeHeartbeat(statuses, acknowledged.ClosedRoomIds, acknowledged.Configurations, acknowledged.Kicks);
         _lastSuccess = RoomRegistry.Now;
     }
 
@@ -157,13 +184,13 @@ internal sealed class GameClusterClient : BackgroundService
                         {
                             AccountId = connection.AccountId, SessionToken = connection.SessionToken
                         }, GameplayWire.Json, token);
-                        if (!check.IsSuccessStatusCode) { connection.Abort(); return; }
+                        if (!check.IsSuccessStatusCode) { connection.AbortInvalidSession(); return; }
                         var result = await check.Content.ReadFromJsonAsync<SessionCheckResponse>(GameplayWire.Json, token);
-                        if (result?.Valid != true) connection.Abort();
+                        if (result?.Valid != true) connection.AbortInvalidSession();
                     }
                     catch (Exception exception) when (exception is HttpRequestException or OperationCanceledException or System.Text.Json.JsonException)
                     {
-                        if (!stoppingToken.IsCancellationRequested) connection.Abort();
+                        if (!stoppingToken.IsCancellationRequested) connection.AbortInvalidSession();
                     }
                 });
         }

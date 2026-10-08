@@ -12,6 +12,7 @@ namespace DrawLiar
             public int Id;
             public string Name, Guess = "";
             public int Score, RoundPoints, Color;
+            public int Level = 1;
             public long Accessory;
             public bool Connected = true, SeatReserved = true, Spectator, SpectatorOnly, Liar, Caught, Guessed;
             public int? Vote;
@@ -72,7 +73,7 @@ namespace DrawLiar
         public bool HoldsPlayerSeat(int id) => players.TryGetValue(id, out var player) && !player.Spectator && (player.Connected || player.SeatReserved);
         public bool HoldsSpectatorSeat(int id) => players.TryGetValue(id, out var player) && player.Spectator && (player.Connected || player.SeatReserved);
 
-        public bool Join(int id, string name, int color, long accessory, bool spectator = false, bool spectatorOnly = false)
+        public bool Join(int id, string name, int color, long accessory, bool spectator = false, bool spectatorOnly = false, int level = 1)
         {
             if (players.TryGetValue(id, out var existing))
             {
@@ -81,6 +82,7 @@ namespace DrawLiar
                 if (existing.Spectator && !existing.SeatReserved && ReservedSpectatorCount() >= 32) return false;
                 existing.Connected = true;
                 existing.SeatReserved = true;
+                existing.Level = Math.Max(1, Math.Min(AccountLevelRules.MAX_LEVEL, level));
                 AddRoundParticipant(existing);
                 Changed?.Invoke();
                 return true;
@@ -93,6 +95,7 @@ namespace DrawLiar
             {
                 Id = id, Name = GameRules.CleanText(name, 16, "그림친구"),
                 Color = Math.Max(0, Math.Min(7, color)), Accessory = AvatarParts.Sanitize(accessory),
+                Level = Math.Max(1, Math.Min(AccountLevelRules.MAX_LEVEL, level)),
                 Spectator = spectator, SpectatorOnly = spectatorOnly
             };
             players[id] = participant;
@@ -101,16 +104,18 @@ namespace DrawLiar
             return true;
         }
 
-        public void UpdateProfile(int id, string name, int color, long accessory)
+        public void UpdateProfile(int id, string name, int color, long accessory, int level = 1)
         {
             if (!players.TryGetValue(id, out var player)) return;
             player.Name = GameRules.CleanText(name, 16, "그림친구");
             player.Color = Math.Max(0, Math.Min(7, color));
             player.Accessory = AvatarParts.Sanitize(accessory);
+            player.Level = Math.Max(1, Math.Min(AccountLevelRules.MAX_LEVEL, level));
             Changed?.Invoke();
         }
 
         public string PlayerName(int id) => players.TryGetValue(id, out var player) ? player.Name : "그림친구";
+        public int PlayerLevel(int id) => players.TryGetValue(id, out var player) ? player.Level : 1;
 
         public void Disconnect(int id, double now, bool reserveSeat = true)
         {
@@ -344,7 +349,7 @@ namespace DrawLiar
                 Settings = Settings.Copy(), AvailableTopics = KnownTopicNames(), Winners = winners.ToArray(), Summary = summary,
                 Players = players.Values.Where(player => player.Connected || player.SeatReserved || result && player.RoundsPlayed > 0).OrderBy(player => player.Id).Select(player => new PlayerView
                 {
-                    Id = player.Id, Name = player.Name, Score = player.Score, RoundPoints = result ? player.RoundPoints : 0,
+                    Id = player.Id, Name = player.Name, Level = player.Level, Score = player.Score, RoundPoints = result ? player.RoundPoints : 0,
                     IsSpectator = player.Spectator, IsConnected = player.Connected, IsLiar = reveal && player.Liar,
                     IsCaught = reveal && player.Caught, AvatarColor = player.Color, Accessory = player.Accessory,
                     HasVoted = player.Vote.HasValue, HasJudged = player.Judgment.HasValue, HasGuessed = reveal && player.Guessed,

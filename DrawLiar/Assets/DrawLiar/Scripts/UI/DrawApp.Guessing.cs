@@ -76,7 +76,7 @@ namespace DrawLiar
             bool noLiarSelected = IsNoLiarSelected(state);
             var votedTarget = local?.HasVoted == true ? state.Players.FirstOrDefault(player => player.Id == state.LocalVoteTargetId) : null;
             bool votedNoLiar = local?.HasVoted == true && state.Settings.LiarMode == LiarMode.Optional && state.LocalVoteTargetId == GameRules.NO_LIAR_TARGET;
-            string key = $"nomination/{state.Phase}/{state.BallotVersion}/{state.Settings.LiarMode}/{state.LocalPlayerId}/{state.LocalIsSpectator}/{local?.IsConnected}/{local?.IsSpectator}/{local?.HasVoted}/{state.LocalVoteTargetId}/{state.RemainingSeconds > 0}/{selectedPlayerId}/{_hasSelectedPlayer}/{target?.Name}/{votedTarget?.Name}/{voteSubmitted}/{DrawLocalization.CurrentLanguageCode}";
+            string key = $"nomination/{state.Phase}/{state.BallotVersion}/{state.Settings.LiarMode}/{state.LocalPlayerId}/{state.LocalIsSpectator}/{local?.IsConnected}/{local?.IsSpectator}/{local?.HasVoted}/{state.LocalVoteTargetId}/{state.RemainingSeconds > 0}/{selectedPlayerId}/{_hasSelectedPlayer}/{target?.Name}/{target?.Level}/{votedTarget?.Name}/{votedTarget?.Level}/{voteSubmitted}/{DrawLocalization.CurrentLanguageCode}";
             if (key != _judgmentPanelKey)
             {
                 _judgmentPanelKey = key;
@@ -90,9 +90,13 @@ namespace DrawLiar
                 if (!spectator && local?.IsConnected == true)
                 {
                     if (votedTarget != null || votedNoLiar)
-                        Text(_judgmentPanel, "현재 투표 · {0}", "nomination-current", votedNoLiar ? DrawLocalization.Text("라이어 없음") : votedTarget.Name).name = "nomination-current";
+                    {
+                        var current = Text(_judgmentPanel, "현재 투표 · {0}", "nomination-current", votedNoLiar ? DrawLocalization.Text("라이어 없음") : votedTarget.Name);
+                        current.name = "nomination-current";
+                        if (votedTarget != null) AddLevelBadge(current, votedTarget.Level, "nomination-current", votedTarget.AccountId);
+                    }
                     bool selectionConfirmed = local.HasVoted && _hasSelectedPlayer && selectedPlayerId == state.LocalVoteTargetId;
-                    if (!selectionConfirmed && target != null) RawText(_judgmentPanel, target.Name, "nomination-target").name = "nomination-target";
+                    if (!selectionConfirmed && target != null) LeveledName(_judgmentPanel, target.Name, target.Level, "nomination-target", "nomination-target", target.AccountId);
                     else if (!selectionConfirmed && noLiarSelected) Text(_judgmentPanel, "라이어 없음", "nomination-target").name = "nomination-target";
                     VisualElement actions = _judgmentPanel;
                     if (state.Settings.LiarMode == LiarMode.Optional)
@@ -309,7 +313,7 @@ namespace DrawLiar
                 var row = Box(results, "guess-result-row");
                 row.name = "guess-result-" + liar.Id;
                 var identity = Box(row, "row");
-                RawText(identity, liar.Name, "guess-result-name grow");
+                LeveledName(identity, liar.Name, liar.Level, "guess-result-name grow", "guess-name-" + liar.Id, liar.AccountId);
                 string outcome = liar.GuessOutcome == GuessOutcome.Correct ? "정답" : liar.GuessOutcome == GuessOutcome.Incorrect ? "오답" : "미제출";
                 var status = Text(identity, outcome, "guess-result-status");
                 status.AddToClassList(liar.GuessOutcome == GuessOutcome.Correct ? "guess-correct" : "guess-incorrect");

@@ -24,6 +24,10 @@ internal sealed partial class DedicatedRoom
     private bool _dirty, _closeRequested;
     private double _lastSnapshot, _closeAfter;
     private bool _configurationPending, _configurationSyncRequired;
+    private bool _kickPending;
+    private string _pendingKickAccountId = "";
+    private readonly HashSet<string> _kickedAccountIds = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, (string Owner, int Target)> _kickReceipts = new(StringComparer.Ordinal);
     private long _configurationVersion, _accessVersion;
     private RoomConfigurationData? _deferredConfiguration;
 
@@ -79,7 +83,8 @@ internal sealed partial class DedicatedRoom
     {
         lock (_gate)
         {
-            if (_admittedIds.Count >= MAX_PENDING_ADMISSIONS || _configurationPending || _configurationSyncRequired
+            if (_admittedIds.Count >= MAX_PENDING_ADMISSIONS || _configurationPending || _configurationSyncRequired || _kickPending
+                || _kickedAccountIds.Contains(ticket.AccountId)
                 || ticket.Room.AccessVersion != _accessVersion) return false;
             _session.Tick(now);
             if (!_playerIds.TryGetValue(ticket.AccountId, out int playerId))
@@ -88,14 +93,14 @@ internal sealed partial class DedicatedRoom
                 _playerIds[ticket.AccountId] = playerId;
             }
             if (!_session.Contains(playerId) && !_session.Join(playerId, ticket.Profile.DisplayName,
-                ticket.Profile.AvatarColor, ticket.Profile.Accessory, ticket.SpectatorOnly, ticket.SpectatorOnly)) return false;
+                ticket.Profile.AvatarColor, ticket.Profile.Accessory, ticket.SpectatorOnly, ticket.SpectatorOnly, ticket.Profile.Level)) return false;
             if (_connections.TryGetValue(ticket.AccountId, out var previous)) previous.Abort();
             connection.PlayerId = playerId;
             _connections[ticket.AccountId] = connection;
             if (ticket.AdmissionId.Length > 0) _admittedIds.Add(ticket.AdmissionId);
             _reconnectUntil.Remove(ticket.AccountId);
             _closeRequested = false;
-            _session.UpdateProfile(playerId, ticket.Profile.DisplayName, ticket.Profile.AvatarColor, ticket.Profile.Accessory);
+            _session.UpdateProfile(playerId, ticket.Profile.DisplayName, ticket.Profile.AvatarColor, ticket.Profile.Accessory, ticket.Profile.Level);
             EnsureHostLocked();
             QueueReplayLocked(connection, now);
             BroadcastSnapshotsLocked(now);
@@ -253,7 +258,7 @@ internal sealed partial class DedicatedRoom
 
     private void EnsureHostLocked()
     {
-        if (_configurationPending) return;
+        if (_configurationPending || _kickPending) return;
         if (_connections.TryGetValue(_ownerAccountId, out var owner) && owner.IsAlive) return;
         var candidate = _connections.Values.Where(connection => connection.IsAlive)
             .OrderBy(connection => _session.Snapshot(connection.PlayerId, -1, 0).LocalIsSpectator)
@@ -292,7 +297,7 @@ internal sealed partial class DedicatedRoom
     {
         text = GameRules.CleanText(text, 160);
         if (text.Length == 0 || !connection.AcceptChat(now)) return false;
-        var line = new ChatLine { PlayerId = connection.PlayerId, Name = _session.PlayerName(connection.PlayerId), Text = text };
+        var line = new ChatLine { PlayerId = connection.PlayerId, Name = _session.PlayerName(connection.PlayerId), Text = text, Level = _session.PlayerLevel(connection.PlayerId) };
         var envelope = new GameplayEnvelope { Type = "chat", Line = line, Sequence = ++_sequence };
         bool spectatorOnly = _session.Phase != GamePhase.Lobby && _session.Phase != GamePhase.MatchResults
             && _session.Snapshot(connection.PlayerId, -1, now).LocalIsSpectator;

@@ -9757,6 +9757,278 @@
         "{0} शब्द · {1} डाउनलोड · {2} अनुशंसाएँ",
         "{0} كلمات · {1} تنزيلات · {2} توصيات"
       ]
+    },
+    {
+      "Key": "강퇴",
+      "Values": [
+        "강퇴",
+        "Kick",
+        "移出房间",
+        "移出房間",
+        "退出させる",
+        "Expulsar",
+        "Expulsar",
+        "Exclure",
+        "Entfernen",
+        "Keluarkan",
+        "निकालें",
+        "طرد"
+      ]
+    },
+    {
+      "Key": "{0}님을 강퇴할까요?",
+      "Values": [
+        "{0}님을 강퇴할까요?",
+        "Kick {0} from the room?",
+        "要将{0}移出房间吗？",
+        "要將{0}移出房間嗎？",
+        "{0}を退出させますか？",
+        "¿Expulsar a {0} de la sala?",
+        "Expulsar {0} da sala?",
+        "Exclure {0} du salon ?",
+        "{0} aus dem Raum entfernen?",
+        "Keluarkan {0} dari ruang?",
+        "क्या {0} को कमरे से निकालें?",
+        "هل تريد طرد {0} من الغرفة؟"
+      ]
+    },
+    {
+      "Key": "강퇴하면 이 방에 다시 입장할 수 없습니다.",
+      "Values": [
+        "강퇴하면 이 방에 다시 입장할 수 없습니다.",
+        "If kicked, they cannot rejoin this room.",
+        "移出后将无法再次加入此房间。",
+        "移出後將無法再次加入此房間。",
+        "退出させると、この部屋には再入室できません。",
+        "Tras la expulsión, no podrá volver a entrar en esta sala.",
+        "Após a expulsão, não poderá voltar a entrar nesta sala.",
+        "Une fois exclu, ce joueur ne pourra plus rejoindre ce salon.",
+        "Nach dem Entfernen ist ein erneuter Beitritt zu diesem Raum gesperrt.",
+        "Setelah dikeluarkan, pemain tidak dapat bergabung kembali ke ruang ini.",
+        "निकाले जाने के बाद वे इस कमरे में दोबारा नहीं आ सकेंगे।",
+        "بعد الطرد، لن يتمكن من الانضمام إلى هذه الغرفة مجددًا."
+      ]
+    },
+    {
+      "Key": "{0}님을 강퇴했습니다.",
+      "Values": [
+        "{0}님을 강퇴했습니다.",
+        "{0} was kicked from the room.",
+        "已将{0}移出房间。",
+        "已將{0}移出房間。",
+        "{0}を退出させました。",
+        "Se expulsó a {0} de la sala.",
+        "{0} foi expulso da sala.",
+        "{0} a été exclu du salon.",
+        "{0} wurde aus dem Raum entfernt.",
+        "{0} telah dikeluarkan dari ruang.",
+        "{0} को कमरे से निकाल दिया गया।",
+        "تم طرد {0} من الغرفة."
+      ]
+    },
+    {
+      "Key": "취소",
+      "Values": [
+        "취소",
+        "Cancel",
+        "取消",
+        "取消",
+        "キャンセル",
+        "Cancelar",
+        "Cancelar",
+        "Annuler",
+        "Abbrechen",
+        "Batal",
+        "रद्द करें",
+        "إلغاء"
+      ]
+    },
+    {
+      "Key": "강퇴 권한이 없습니다.",
+      "Values": [
+        "강퇴 권한이 없습니다.",
+        "You do not have permission to kick players.",
+        "您无权移出玩家。",
+        "您無權移出玩家。",
+        "参加者を退出させる権限がありません。",
+        "No tienes permiso para expulsar jugadores.",
+        "Você não tem permissão para expulsar jogadores.",
+        "Vous n’avez pas l’autorisation d’exclure des joueurs.",
+        "Du hast keine Berechtigung, Spieler zu entfernen.",
+        "Anda tidak memiliki izin untuk mengeluarkan pemain.",
+        "आपको खिलाड़ियों को निकालने की अनुमति नहीं है।",
+        "ليس لديك صلاحية طرد اللاعبين."
+      ]
+    },
+    {
+      "Key": "강퇴할 참가자가 방에 없습니다.",
+      "Values": [
+        "강퇴할 참가자가 방에 없습니다.",
+        "The player to kick is no longer in the room.",
+        "待移出的玩家已不在房间中。",
+        "待移出的玩家已不在房間中。",
+        "対象の参加者はすでに部屋を退出しています。",
+        "El jugador que quieres expulsar ya no está en la sala.",
+        "O jogador que você quer expulsar não está mais na sala.",
+        "Le joueur à exclure n’est plus dans le salon.",
+        "Der zu entfernende Spieler ist nicht mehr im Raum.",
+        "Pemain yang akan dikeluarkan sudah tidak ada di ruang.",
+        "जिस खिलाड़ी को निकालना है वह अब कमरे में नहीं है।",
+        "اللاعب المراد طرده لم يعد في الغرفة."
+      ]
+    },
+    {
+      "Key": "강퇴 요청을 처리하고 있습니다. 잠시 기다려 주세요.",
+      "Values": [
+        "강퇴 요청을 처리하고 있습니다. 잠시 기다려 주세요.",
+        "A kick request is in progress. Please wait.",
+        "正在处理移出请求，请稍候。",
+        "正在處理移出請求，請稍候。",
+        "退出リクエストを処理しています。しばらくお待ちください。",
+        "Se está procesando una expulsión. Espera un momento.",
+        "Uma solicitação de expulsão está em andamento. Aguarde.",
+        "Une demande d’exclusion est en cours. Veuillez patienter.",
+        "Eine Anfrage zum Entfernen wird bearbeitet. Bitte warte.",
+        "Permintaan pengeluaran sedang diproses. Mohon tunggu.",
+        "निकालने का अनुरोध संसाधित हो रहा है। कृपया प्रतीक्षा करें।",
+        "جارٍ معالجة طلب الطرد. يرجى الانتظار."
+      ]
+    },
+    {
+      "Key": "강퇴하지 못했습니다. 다시 시도하세요.",
+      "Values": [
+        "강퇴하지 못했습니다. 다시 시도하세요.",
+        "Could not kick the player. Try again.",
+        "无法移出该玩家，请重试。",
+        "無法移出該玩家，請重試。",
+        "参加者を退出させられませんでした。もう一度お試しください。",
+        "No se pudo expulsar al jugador. Inténtalo de nuevo.",
+        "Não foi possível expulsar o jogador. Tente novamente.",
+        "Impossible d’exclure le joueur. Réessayez.",
+        "Der Spieler konnte nicht entfernt werden. Versuche es erneut.",
+        "Pemain tidak dapat dikeluarkan. Coba lagi.",
+        "खिलाड़ी को नहीं निकाला जा सका। फिर से कोशिश करें।",
+        "تعذر طرد اللاعب. حاول مجددًا."
+      ]
+    },
+    {
+      "Key": "방장에 의해 강퇴되었습니다.",
+      "Values": [
+        "방장에 의해 강퇴되었습니다.",
+        "You were kicked by the host.",
+        "您已被房主移出房间。",
+        "您已被房主移出房間。",
+        "部屋主によって退出させられました。",
+        "El anfitrión te ha expulsado.",
+        "Você foi expulso pelo anfitrião.",
+        "Vous avez été exclu par l’hôte.",
+        "Du wurdest vom Gastgeber entfernt.",
+        "Anda dikeluarkan oleh host.",
+        "मेज़बान ने आपको कमरे से निकाल दिया।",
+        "تم طردك بواسطة المضيف."
+      ]
+    },
+    {
+      "Key": "이 방에서 강퇴되어 다시 입장할 수 없습니다.",
+      "Values": [
+        "이 방에서 강퇴되어 다시 입장할 수 없습니다.",
+        "You were kicked from this room and cannot rejoin.",
+        "您已被移出此房间，无法再次加入。",
+        "您已被移出此房間，無法再次加入。",
+        "この部屋から退出させられたため、再入室できません。",
+        "Se te expulsó de esta sala y no puedes volver a entrar.",
+        "Você foi expulso desta sala e não pode voltar a entrar.",
+        "Vous avez été exclu de ce salon et ne pouvez plus le rejoindre.",
+        "Du wurdest aus diesem Raum entfernt und kannst nicht erneut beitreten.",
+        "Anda dikeluarkan dari ruang ini dan tidak dapat bergabung kembali.",
+        "आपको इस कमरे से निकाल दिया गया है और आप दोबारा नहीं आ सकते।",
+        "تم طردك من هذه الغرفة ولا يمكنك الانضمام إليها مجددًا."
+      ]
+    },
+    {
+      "Key": "참가자 관리",
+      "Values": [
+        "참가자 관리",
+        "Manage players",
+        "管理玩家",
+        "管理玩家",
+        "参加者管理",
+        "Gestionar jugadores",
+        "Gerenciar jogadores",
+        "Gérer les joueurs",
+        "Spieler verwalten",
+        "Kelola pemain",
+        "खिलाड़ियों का प्रबंधन",
+        "إدارة اللاعبين"
+      ]
+    },
+    {
+      "Key": "레벨 {0}",
+      "Values": [
+        "레벨 {0}",
+        "Level {0}",
+        "等级 {0}",
+        "等級 {0}",
+        "レベル {0}",
+        "Nivel {0}",
+        "Nível {0}",
+        "Niveau {0}",
+        "Level {0}",
+        "Level {0}",
+        "स्तर {0}",
+        "المستوى {0}"
+      ]
+    },
+    {
+      "Key": "경험치 {0} / {1}",
+      "Values": [
+        "경험치 {0} / {1}",
+        "XP {0} / {1}",
+        "经验 {0} / {1}",
+        "經驗 {0} / {1}",
+        "経験値 {0} / {1}",
+        "EXP {0} / {1}",
+        "EXP {0} / {1}",
+        "EXP {0} / {1}",
+        "EP {0} / {1}",
+        "XP {0} / {1}",
+        "अनुभव {0} / {1}",
+        "خبرة {0} / {1}"
+      ]
+    },
+    {
+      "Key": "최고 레벨",
+      "Values": [
+        "최고 레벨",
+        "Max level",
+        "最高等级",
+        "最高等級",
+        "最高レベル",
+        "Nivel máximo",
+        "Nível máximo",
+        "Niveau maximum",
+        "Maximales Level",
+        "Level maksimum",
+        "अधिकतम स्तर",
+        "المستوى الأقصى"
+      ]
+    },
+    {
+      "Key": "획득 경험치 {0}",
+      "Values": [
+        "획득 경험치 {0}",
+        "Earned {0} XP",
+        "获得经验 {0}",
+        "獲得經驗 {0}",
+        "獲得経験値 {0}",
+        "EXP ganada: {0}",
+        "EXP obtida: {0}",
+        "EXP gagnée : {0}",
+        "{0} EP erhalten",
+        "Mendapat {0} XP",
+        "{0} अनुभव प्राप्त",
+        "الخبرة المكتسبة {0}"
+      ]
     }
   ]
 }

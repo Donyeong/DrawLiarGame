@@ -15,6 +15,7 @@ namespace DrawLiar
         [DllImport("__Internal")] private static extern int DrawBrowserSocketSend(int id, byte[] buffer, int offset, int count);
         [DllImport("__Internal")] private static extern int DrawBrowserSocketClose(int id, int code);
         [DllImport("__Internal")] private static extern int DrawBrowserSocketCloseCode(int id);
+        [DllImport("__Internal")] private static extern int DrawBrowserSocketWasKicked(int id);
         [DllImport("__Internal")] private static extern void DrawBrowserSocketRelease(int id);
 
         private readonly int _id;
@@ -24,11 +25,12 @@ namespace DrawLiar
         private ArraySegment<byte> _receiveBuffer;
         private bool _hasOpened, _closeSent, _closeReceived, _aborted, _disposed;
         private WebSocketCloseStatus? _closeStatus;
+        private string _closeDescription = "";
 
         private DrawBrowserWebSocket(int id) => _id = id;
 
         public override WebSocketCloseStatus? CloseStatus => _closeStatus;
-        public override string CloseStatusDescription => "";
+        public override string CloseStatusDescription => _closeDescription;
         public override string SubProtocol => null;
         public override WebSocketState State
         {
@@ -95,7 +97,8 @@ namespace DrawLiar
             {
                 _closeReceived = true;
                 _closeStatus = (WebSocketCloseStatus)DrawBrowserSocketCloseCode(_id);
-                result = new WebSocketReceiveResult(0, WebSocketMessageType.Close, true, _closeStatus, "");
+                _closeDescription = DrawBrowserSocketWasKicked(_id) == 1 ? "RoomKicked" : "";
+                result = new WebSocketReceiveResult(0, WebSocketMessageType.Close, true, _closeStatus, _closeDescription);
                 return true;
             }
             if (read < 0) throw new WebSocketException("웹소켓 메시지를 읽지 못했습니다.");

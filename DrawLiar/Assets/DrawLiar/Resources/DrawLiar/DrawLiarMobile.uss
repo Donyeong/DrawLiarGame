@@ -6,6 +6,25 @@
  .app.mobile .lobby-chat-panel.lobby-chat-in-modal { height: auto; min-height: 0; flex-basis: 0; flex-grow: 1; flex-shrink: 1; }
  .mobile .lobby-chat-heading { min-height: 22px; margin-bottom: 8px; justify-content: flex-end; }
 .mobile .lobby-chat-name { width: 96px; min-width: 96px; font-size: 14px; }
+.mobile .account-level-badge { width: 20px; height: 20px; min-width: 20px; min-height: 20px; margin-right: 4px; }
+.mobile .account-level-number { font-size: 10px; }
+.mobile .level-tier-5 .account-level-number { font-size: 8px; }
+.mobile .level-name-lobby-chat-name { width: 96px; min-width: 96px; }
+.mobile .level-name-shop-profile-name { height: 24px; margin-bottom: 8px; align-self: stretch; }
+.mobile-landscape .level-name-shop-profile-name { height: 14px; margin-bottom: 2px; }
+.mobile-landscape .level-name-shop-profile-name .account-level-badge { width: 20px; height: 14px; min-width: 20px; min-height: 14px; }
+.mobile-landscape .level-name-shop-profile-name .account-level-number { font-size: 8px; }
+.mobile-landscape .level-name-shop-profile-name .level-tier-5 .account-level-number { font-size: 8px; }
+.mobile.in-game .player .level-name-player-name { height: 16px; }
+.app.mobile.in-game .player .level-name-player-name Label.leveled-name { width: auto; min-width: 0; flex-basis: 0; flex-grow: 1; flex-shrink: 1; }
+.mobile.in-game .player .level-name-player-name .account-level-badge { width: 20px; height: 14px; min-width: 20px; min-height: 14px; margin-right: 2px; }
+.mobile.in-game .player .level-name-player-name .account-level-number { font-size: 8px; }
+.mobile.in-game .player .level-name-player-name .level-tier-5 .account-level-number { font-size: 8px; }
+.mobile.in-game .level-name-chat-name .account-level-badge { width: 18px; height: 16px; min-width: 18px; min-height: 16px; }
+.mobile.in-game .level-name-chat-name .account-level-number { font-size: 9px; }
+.mobile.in-game .level-name-chat-name .level-tier-5 .account-level-number { font-size: 7px; }
+.app.mobile .mobile-playing .level-name-nomination-target { margin-bottom: 4px; }
+.mobile .match-experience-reward { font-size: 14px; }
  .mobile .lobby-chat-message { font-size: 14px; }
  .app.mobile .lobby-chat-close { width: 72px; flex-shrink: 0; min-height: 48px; margin: 0; }
 .mobile .app-content { min-height: 0; min-width: 0; flex-basis: 0; position: relative; }
@@ -395,6 +414,15 @@
 .app.mobile-landscape .shop-page .shop-cart-buy { height: 40px; min-height: 40px; padding: 4px 8px; font-size: 14px; }
 .app.mobile .modal.utility-popup { width: 100%; max-width: 100%; height: 88%; max-height: 704px; min-height: 0; padding: 16px; border-width: 2px; border-color: #34304B; border-radius: 20px 20px 0 0; background-color: #FFFFFF; }
 .app.mobile .modal.public-profile-popup { max-height: 90%; }
+.app.mobile .public-profile-popup .public-profile-footer .button { min-width: 0; min-height: 48px; margin-top: 0; padding: 8px; }
+.app.mobile .profile-kick-overlay { justify-content: center; }
+.app.mobile .modal.profile-kick-popup { width: 100%; max-width: 94%; height: auto; max-height: 90%; padding: 20px; align-self: center; border-radius: 16px; }
+.mobile .profile-kick-question { font-size: 18px; }
+.mobile .profile-kick-actions { margin-top: 12px; }
+.app.mobile .profile-kick-popup .profile-kick-actions .button { padding: 8px; }
+.app.mobile .modal.room-moderation-popup { width: 100%; max-width: 94%; padding: 20px; align-self: center; }
+.mobile .room-moderation-scroll { max-height: 320px; }
+.mobile .room-moderation-name { font-size: 16px; }
 .mobile .public-profile-avatar { width: 88px; height: 88px; margin-right: 12px; }
 .mobile .public-profile-name { font-size: 22px; }
 .mobile .public-profile-stat { width: 48%; padding: 10px; }

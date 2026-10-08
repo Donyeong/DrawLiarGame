@@ -42,7 +42,7 @@ public sealed partial class ServerDatabase
         var outgoing = new List<FriendData>();
         await using var connection = await _source.OpenConnectionAsync();
         const string sql = """
-            SELECT a."Id",a."DisplayName",a."AvatarColor",a."Accessory",f."Accepted",f."FromAccountId"
+            SELECT a."Id",a."DisplayName",a."AvatarColor",a."Accessory",f."Accepted",f."FromAccountId",a."Experience"
             FROM "Friendship" f JOIN "Account" a ON a."Id"=CASE WHEN f."FromAccountId"=$1 THEN f."ToAccountId" ELSE f."FromAccountId" END
             WHERE (f."FromAccountId"=$1 OR f."ToAccountId"=$1) AND NOT a."IsBanned" ORDER BY a."DisplayName"
             """;
@@ -50,7 +50,7 @@ public sealed partial class ServerDatabase
         await using var reader = await command.ExecuteReaderAsync();
         while (await reader.ReadAsync())
         {
-            var friend = new FriendData { AccountId = reader.GetGuid(0).ToString(), DisplayName = reader.GetString(1), AvatarColor = reader.GetInt32(2), Accessory = AvatarParts.Sanitize(reader.GetInt64(3)) };
+            var friend = new FriendData { AccountId = reader.GetGuid(0).ToString(), DisplayName = reader.GetString(1), AvatarColor = reader.GetInt32(2), Accessory = AvatarParts.Sanitize(reader.GetInt64(3)), Level = AccountLevelRules.GetLevel(reader.GetInt64(6)) };
             if (reader.GetBoolean(4)) friends.Add(friend);
             else if (reader.GetGuid(5) == accountId) outgoing.Add(friend);
             else incoming.Add(friend);

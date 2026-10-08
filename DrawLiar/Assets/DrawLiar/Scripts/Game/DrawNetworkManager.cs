@@ -36,8 +36,10 @@ namespace DrawLiar
         private long _sequence;
         private bool _configuringRoom;
         private bool _refreshingProfile;
+        private string _kickRequestId;
         private event Action<GameplayEnvelope> RoomConfigurationReceived;
         private event Action<GameplayEnvelope> ProfileRefreshReceived;
+        private event Action<GameplayEnvelope> KickResultReceived;
 
         public RoomSnapshot State { get; private set; }
         public bool IsConnected => _socket != null && _socket.State == WebSocketState.Open && State != null;
@@ -49,6 +51,7 @@ namespace DrawLiar
         public event Action CanvasCleared;
         public event Action<ChatLine> ChatReceived;
         public event Action<string> Notice;
+        public event Action<string> Kicked;
 
         public async Task ConnectAsync(DedicatedAssignment assignment)
         {
@@ -183,6 +186,58 @@ namespace DrawLiar
         public void Chat(string text) => Request("chat", GameRules.CleanText(text, 160));
         public void ReturnToLobby() => Request("lobby");
 
+        public bool CanKickPlayer(int playerId) => IsConnected && State.IsHost && playerId > 0 && playerId != State.LocalPlayerId
+            && State.Players.Any(player => player.Id == playerId && player.IsConnected);
+
+        public async Task KickPlayerAsync(int playerId)
+        {
+            if (!IsConnected || !State.IsHost)
+                throw new InvalidOperationException(DrawLocalization.Text("강퇴 권한이 없습니다."));
+            if (!CanKickPlayer(playerId))
+                throw new InvalidOperationException(DrawLocalization.Text("강퇴할 참가자가 방에 없습니다."));
+            if (_kickRequestId != null)
+                throw new InvalidOperationException(DrawLocalization.Text("강퇴 요청을 처리하고 있습니다. 잠시 기다려 주세요."));
+            string requestId = Guid.NewGuid().ToString("N");
+            int generation = _generation;
+            var completion = DrawAsync.Completion<bool>();
+            void OnResult(GameplayEnvelope message)
+            {
+                if (message.RequestId != requestId || generation != _generation) return;
+                if (message.Accepted) completion.TrySetResult(true);
+                else completion.TrySetException(new InvalidOperationException(KickFailureMessage(message.Code)));
+            }
+            _kickRequestId = requestId;
+            KickResultReceived += OnResult;
+            try
+            {
+                using var timeout = CancellationTokenSource.CreateLinkedTokenSource(_lifetime.Token);
+                DrawAsync.CancelAfter(timeout, TimeSpan.FromSeconds(10));
+                await SendAsync(new GameplayEnvelope { Type = "request", Kind = "kick", Target = playerId, RequestId = requestId }, generation, timeout.Token);
+                using (timeout.Token.Register(() => completion.TrySetCanceled())) await completion.Task;
+            }
+            catch (OperationCanceledException)
+            {
+                throw new InvalidOperationException(DrawLocalization.Text("강퇴하지 못했습니다. 다시 시도하세요."));
+            }
+            catch (Exception exception) when (exception is WebSocketException || exception is IOException || exception is ObjectDisposedException)
+            {
+                throw new InvalidOperationException(DrawLocalization.Text("강퇴하지 못했습니다. 다시 시도하세요."));
+            }
+            finally
+            {
+                KickResultReceived -= OnResult;
+                if (_kickRequestId == requestId) _kickRequestId = null;
+            }
+        }
+
+        private static string KickFailureMessage(string code) => DrawLocalization.Text(code switch
+        {
+            "RoomKickDenied" => "강퇴 권한이 없습니다.",
+            "RoomKickTargetUnavailable" => "강퇴할 참가자가 방에 없습니다.",
+            "RoomKickPending" => "강퇴 요청을 처리하고 있습니다. 잠시 기다려 주세요.",
+            _ => "강퇴하지 못했습니다. 다시 시도하세요."
+        });
+
         public void SendStroke(DrawStroke stroke)
         {
             if (!CanDraw) return;
@@ -211,6 +266,7 @@ namespace DrawLiar
             _initialState = null;
             DrawAsync.Exchange(ref _incoming, new IncomingQueue(generation));
             _sequence = 0;
+            _kickRequestId = null;
             _canvas.Clear();
             _canvasVersion = 0;
             ResetDrawingHistory(0, 0, false);
@@ -296,6 +352,11 @@ namespace DrawLiar
                         do
                         {
                             result = await socket.ReceiveAsync(new ArraySegment<byte>(buffer), cancellation);
+                            if (result.MessageType == WebSocketMessageType.Close && result.CloseStatusDescription == "RoomKicked")
+                            {
+                                Enqueue(new GameplayEnvelope { Type = "kicked", Code = "RoomKicked" }, generation);
+                                return;
+                            }
                             if (result.MessageType == WebSocketMessageType.Close) throw new IOException("서버가 연결을 종료했습니다.");
                             if (result.MessageType != WebSocketMessageType.Text || frame.Length + result.Count > MAXIMUM_FRAME_BYTES) throw new IOException("서버 메시지가 올바르지 않습니다.");
                             frame.Write(buffer, 0, result.Count);
@@ -366,6 +427,14 @@ namespace DrawLiar
                     case "notice": Notice?.Invoke(message.Text); break;
                     case "configured": RoomConfigurationReceived?.Invoke(message); break;
                     case "profile-refreshed": ProfileRefreshReceived?.Invoke(message); break;
+                    case "kickResult": KickResultReceived?.Invoke(message); break;
+                    case "kicked":
+                        string kickedNotice = DrawLocalization.Text("방장에 의해 강퇴되었습니다.");
+                        _initialState?.TrySetException(new InvalidOperationException(kickedNotice));
+                        Kicked?.Invoke(kickedNotice);
+                        Leave();
+                        Notice?.Invoke(kickedNotice);
+                        return;
                     case "disconnected":
                         _initialState?.TrySetException(new IOException(message.Text));
                         Leave();

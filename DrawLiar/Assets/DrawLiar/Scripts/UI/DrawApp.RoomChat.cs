@@ -189,8 +189,8 @@ namespace DrawLiar
             update.FollowLatest |= mobile || compact || atBottom || ownMessage;
             update.OwnMessage |= mobile || compact || ownMessage;
             var entry = Box(history, "chat-entry");
-            var name = RawText(entry, line.Name, "chat-name");
             var player = network?.State?.Players.FirstOrDefault(value => value.Id == line.PlayerId);
+            var name = LeveledName(entry, line.Name, line.Level, "chat-name", "chat-" + line.PlayerId, player?.AccountId);
             BindProfileTarget(name, player?.AccountId);
             var message = RawText(entry, line.Text, "chat-message");
             message.tooltip = line.Text;

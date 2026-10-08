@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -13,9 +14,11 @@ namespace DrawLiar
         private readonly HashSet<string> _queuedMatchRewards = new HashSet<string>();
         private readonly Queue<string> _rewardCacheOrder = new Queue<string>();
         private bool _matchRewardPolling;
+        private bool _roomLevelRefreshing;
         private string _activeRewardMatchId = "";
         private int _matchRewardRevision, _rewardProfileRevision;
         private double _nextMatchRewardPoll;
+        private double _nextRoomLevelRefresh;
         public event Action MatchRewardsChanged;
 
         public MatchRewardResponse MatchReward(string matchId) => !string.IsNullOrEmpty(matchId)
@@ -46,6 +49,39 @@ namespace DrawLiar
             if (IsAuthenticated && !_loggingOut && !_matchRewardPolling && !IsBusy
                 && _pendingMatchRewards.Count > 0 && Time.realtimeSinceStartupAsDouble >= _nextMatchRewardPoll)
                 _ = RefreshMatchRewardAsync();
+            if (IsAuthenticated && !_loggingOut && !IsBusy && !_roomLevelRefreshing && IsOnlineRoom
+                && Time.realtimeSinceStartupAsDouble >= _nextRoomLevelRefresh)
+            {
+                _nextRoomLevelRefresh = Time.realtimeSinceStartupAsDouble + 5;
+                var local = _manager.State.Players.FirstOrDefault(player => player.Id == _manager.LocalPlayerId);
+                if (local != null && Math.Max(1, local.Level) != Profile.Level) _ = RefreshRoomLevelAsync(local.Level > Profile.Level);
+            }
+        }
+
+        private async Task RefreshRoomLevelAsync(bool refreshAccount)
+        {
+            _roomLevelRefreshing = true;
+            int revision = _matchRewardRevision, profileRevision = _rewardProfileRevision;
+            string session = _gameSession, account = Profile.AccountId;
+            try
+            {
+                if (!refreshAccount) await _manager.RefreshProfileAsync();
+                else
+                {
+                    var profile = await SendAsync<ProfileData>(_gameServerUrl, "/api/profile", "GET", bearer: session);
+                    if (this == null || _loggingOut || _lifetime.IsCancellationRequested || session != _gameSession
+                        || revision != _matchRewardRevision || profileRevision != _rewardProfileRevision || IsBusy || Profile?.AccountId != account) return;
+                    if (profile?.AccountId != account || profile.Coins < 0 || profile.Experience < 0) throw new InvalidOperationException();
+                    Profile.Coins = profile.Coins;
+                    Profile.Experience = Math.Max(Profile.Experience, profile.Experience);
+                    Profile.Level = AccountLevelRules.GetLevel(Profile.Experience);
+                    ++_rewardProfileRevision;
+                    MatchRewardsChanged?.Invoke();
+                }
+            }
+            catch (Exception exception) when (exception is InvalidOperationException || exception is OperationCanceledException
+                || exception is System.IO.IOException || exception is System.Net.WebSockets.WebSocketException || exception is ObjectDisposedException) { }
+            finally { _roomLevelRefreshing = false; _nextRoomLevelRefresh = Time.realtimeSinceStartupAsDouble + 5; }
         }
 
         private async Task RefreshMatchRewardAsync()
@@ -62,8 +98,10 @@ namespace DrawLiar
                 var reward = await SendAsync<MatchRewardResponse>(_gameServerUrl,
                     "/api/matches/" + Uri.EscapeDataString(matchId) + "/reward", "GET", bearer: session);
                 if (!Current()) return;
-                if (reward.MatchId != matchId || reward.CoinReward < 0 || reward.Profile?.AccountId != account || reward.Profile.Coins < 0)
+                if (reward.MatchId != matchId || reward.CoinReward < 0 || reward.ExperienceReward < 0
+                    || reward.Profile?.AccountId != account || reward.Profile.Coins < 0 || reward.Profile.Experience < 0)
                     throw new InvalidOperationException();
+                reward.Profile.Level = AccountLevelRules.GetLevel(reward.Profile.Experience);
                 if (!reward.Recorded) return;
                 if (!_matchRewards.ContainsKey(matchId)) _rewardCacheOrder.Enqueue(matchId);
                 _matchRewards[matchId] = reward;
@@ -71,6 +109,8 @@ namespace DrawLiar
                 if (profileRevision == _rewardProfileRevision && !IsBusy)
                 {
                     Profile.Coins = reward.Profile.Coins;
+                    Profile.Experience = Math.Max(Profile.Experience, reward.Profile.Experience);
+                    Profile.Level = AccountLevelRules.GetLevel(Profile.Experience);
                     ++_rewardProfileRevision;
                     settled = true;
                 }
@@ -96,6 +136,7 @@ namespace DrawLiar
             _matchRewards.Clear(); _rewardCacheOrder.Clear(); _pendingMatchRewards.Clear(); _queuedMatchRewards.Clear();
             _activeRewardMatchId = "";
             _nextMatchRewardPoll = 0;
+            _nextRoomLevelRefresh = 0;
             MatchRewardsChanged?.Invoke();
         }
     }

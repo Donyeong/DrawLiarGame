@@ -1,4 +1,44 @@
 :root { -unity-font: resource("DrawLiar/Pretendard-Regular"); color: #34304B; font-size: 15px; --ink: #34304B; --muted: #736957; --brand: #645797; --soft: #eee4c9; --border: #b7a88b; --mint: #237c62; }
+.account-level-badge { width: 24px; height: 24px; min-width: 24px; min-height: 24px; flex-shrink: 0; margin-right: 6px; }
+.account-level-number { position: absolute; left: 0; right: 0; top: 0; bottom: 0; margin: 0; padding: 0; font-size: 11px; -unity-font-style: bold; -unity-text-align: middle-center; white-space: nowrap; }
+.level-tier-5 .account-level-number { font-size: 9px; }
+.level-name-row { flex-direction: row; align-items: center; min-width: 0; flex-shrink: 0; }
+.app .level-name-row Label.leveled-name { position: relative; width: auto; height: auto; min-width: 0; max-width: 100%; flex-grow: 1; flex-shrink: 1; margin: 0; padding: 0; }
+.level-name-character-name { max-width: 90%; margin-bottom: 15px; }
+.level-name-pc-lobby-name { max-width: 100%; margin-bottom: 16px; }
+.level-name-mobile-lobby-name, .level-name-mobile-card-title { max-width: 100%; }
+.level-name-section-title { margin-bottom: 12px; }
+.level-name-shop-profile-name { max-width: 100%; height: 30px; margin-bottom: 16px; align-self: center; }
+.level-name-lobby-chat-name { width: 160px; min-width: 160px; margin-right: 8px; }
+.level-name-lobby-chat-name .account-level-badge { width: 20px; height: 20px; min-width: 20px; min-height: 20px; margin-right: 4px; }
+.level-name-chat-name { max-width: 100%; margin-bottom: 2px; }
+.level-name-chat-name .account-level-badge { width: 18px; height: 16px; min-width: 18px; min-height: 16px; margin-right: 4px; }
+.level-name-chat-name .account-level-number { font-size: 9px; }
+.level-name-chat-name .level-tier-5 .account-level-number { font-size: 8px; }
+.pc-game .pc-chat-collapsed .level-name-chat-name { width: 88px; max-width: 88px; height: 16px; margin-right: 8px; margin-bottom: 0; }
+.player .level-name-player-name { width: 100%; height: 18px; justify-content: center; }
+.player .level-name-player-name .account-level-badge { width: 22px; height: 16px; min-width: 22px; min-height: 16px; margin-right: 3px; }
+.player .level-name-player-name .account-level-number { font-size: 9px; }
+.player .level-name-player-name .level-tier-5 .account-level-number { font-size: 8px; }
+.friend-profile-identity .level-name-row { flex-grow: 1; flex-basis: 0; }
+.level-name-public-profile-name { max-width: 100%; margin-bottom: 8px; }
+.level-name-round-result-player-name { flex-grow: 1; min-width: 0; }
+.level-name-guess-result-name { min-width: 0; }
+.level-name-room-moderation-name { flex-basis: 0; min-width: 0; margin-right: 8px; }
+.level-name-accused-name { max-width: 90%; margin-top: 8px; }
+.level-name-nomination-target { max-width: 100%; margin-bottom: 12px; align-self: center; }
+.level-name-nomination-current { max-width: 100%; margin-bottom: 6px; align-self: center; }
+.level-name-drawing-preview-name { position: absolute; top: 8px; left: 8px; padding: 5px 10px; border-radius: 8px; border-width: 1px; border-color: #DED5EA; background-color: #FFFFFF; }
+.app .level-name-drawing-preview-name .leveled-name { border-width: 0; background-color: rgba(0, 0, 0, 0); }
+.level-name-workshop-creator { flex-basis: 0; min-width: 0; }
+.level-name-phase-detail { margin-left: 22px; }
+.account-level-progress { min-width: 0; flex-shrink: 0; margin-bottom: 12px; }
+.account-level-progress-heading { min-width: 0; align-items: center; flex-wrap: wrap; margin-bottom: 4px; }
+.account-level-title { font-size: 13px; color: #645797; margin: 0 8px 0 0; padding: 0; }
+.account-level-progress-text { font-size: 12px; color: #736957; margin: 0; padding: 0; white-space: normal; }
+.account-level-track { height: 6px; min-height: 6px; border-radius: 3px; background-color: #E9E3D4; overflow: hidden; }
+.account-level-fill { height: 100%; background-color: #8A77B5; border-radius: 3px; }
+.match-experience-reward { color: #645797; font-size: 16px; margin: 0 0 12px; padding: 0; white-space: normal; }
  .pc-lobby { flex-grow: 1; min-height: 0; min-width: 0; padding: 24px; overflow: hidden; }
  .pc-lobby-header { height: 56px; min-height: 56px; flex-shrink: 0; margin-bottom: 24px; }
  .app .pc-lobby-workspace { flex-basis: 0; min-width: 0; align-items: stretch; }
@@ -584,6 +624,25 @@
 .friend-profile-identity { min-width: 0; min-height: 48px; }
 .utility-friend-list .friend-pending { flex-shrink: 0; margin: 0 0 0 8px; font-size: 14px; }
 .app .modal.public-profile-popup { width: 760px; height: 720px; max-width: 94%; max-height: 90%; }
+.public-profile-footer { flex-shrink: 0; min-width: 0; margin-top: 16px; align-items: stretch; }
+.app .public-profile-footer .button { flex-basis: 0; flex-grow: 1; min-width: 0; height: auto; min-height: 48px; margin: 0; white-space: normal; }
+.app .public-profile-footer .public-profile-kick { margin-right: 8px; }
+.app .modal.profile-kick-popup { width: 480px; height: auto; min-height: 0; max-height: 90%; }
+.profile-kick-scroll { min-height: 0; max-height: 240px; flex-shrink: 1; }
+.profile-kick-question { min-width: 0; margin: 12px 0; font-size: 20px; white-space: normal; }
+.profile-kick-note { min-width: 0; margin: 0; padding: 0; white-space: normal; }
+.profile-kick-actions { flex-shrink: 0; min-width: 0; margin-top: 16px; align-items: stretch; }
+.app .profile-kick-actions .button { flex-basis: 0; flex-grow: 1; min-width: 0; height: auto; min-height: 48px; white-space: normal; }
+.app .profile-kick-actions .button.secondary { margin-right: 8px; }
+.app .modal.room-moderation-popup { width: 560px; max-width: 94%; min-height: 0; max-height: 90%; }
+.room-moderation-scroll { min-height: 0; max-height: 400px; flex-shrink: 1; margin: 12px 0; }
+.room-moderation-player { min-width: 0; min-height: 56px; flex-shrink: 0; margin-bottom: 8px; }
+.room-moderation-name { flex-basis: 0; min-width: 0; margin: 0 8px 0 0; padding: 0; font-size: 18px; white-space: normal; }
+.room-moderation-spectator { flex-shrink: 0; margin: 0 8px 0 0; padding: 0; font-size: 13px; }
+.app .room-moderation-player .room-moderation-profile { min-width: 96px; min-height: 48px; height: auto; flex-shrink: 0; margin: 0; padding: 6px 8px; font-size: 14px; white-space: normal; }
+.room-moderation-actions { flex-shrink: 0; min-width: 0; align-items: stretch; }
+.app .room-moderation-actions .button { flex-basis: 0; min-width: 0; margin: 0; height: auto; min-height: 48px; white-space: normal; }
+.app .room-moderation-actions .room-moderation-back { margin-right: 8px; }
 .public-profile-body { min-width: 0; padding: 4px; }
 .public-profile-hero { min-width: 0; margin-bottom: 16px; }
 .public-profile-avatar { width: 104px; height: 104px; flex-shrink: 0; margin-right: 20px; }

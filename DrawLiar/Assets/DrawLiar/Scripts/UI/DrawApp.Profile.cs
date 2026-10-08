@@ -16,6 +16,13 @@ namespace DrawLiar
         private int _profileVersion;
         private bool _profileActionBusy;
         private PublicProfileData _loadedPublicProfile;
+        private VisualElement _profileKickOverlay;
+        private Button _profileKickButton, _profileKickConfirm;
+        private bool _profileKickBusy;
+        private int _profileKickPlayerId = -1, _profileKickActorId = -1, _profileKickVersion;
+        private string _profileKickAccountId, _profileKickRoomCode;
+        private VisualElement _roomModerationModal, _roomModerationList;
+        private string _roomModerationKey;
         private VisualElement _roomCustomizeOverlay;
         private string _roomCustomizeAccountId;
         private VisualElement _roomCustomizeReturnFocus;
@@ -54,7 +61,7 @@ namespace DrawLiar
         {
             var identity = Box(row, "row friend-profile-identity grow");
             identity.Add(new AvatarElement(friend.AvatarColor, friend.Accessory));
-            RawText(identity, friend.DisplayName, "player-name grow");
+            LeveledName(identity, friend.DisplayName, friend.Level, "player-name grow", "friend-" + friend.AccountId, friend.AccountId);
             BindProfileTarget(identity, friend.AccountId);
         }
 
@@ -81,8 +88,11 @@ namespace DrawLiar
             modal.Add(scroll);
             _profileBody = Box(scroll, "public-profile-body");
             _profileBody.name = "public-profile-body";
-            Button(modal, _utilityPopupScreen == LobbyScreen.Friends ? "친구 목록으로" : "닫기",
-                () => ClosePublicProfile(), "secondary utility-popup-close", DrawSound.UiCancel).name = "public-profile-close";
+            var footer = Box(modal, "row public-profile-footer");
+            _profileKickButton = Button(footer, "강퇴", OpenPublicProfileKick, "danger grow public-profile-kick");
+            _profileKickButton.name = "public-profile-kick";
+            Button(footer, _utilityPopupScreen == LobbyScreen.Friends ? "친구 목록으로" : "닫기",
+                () => ClosePublicProfile(), "secondary grow utility-popup-close", DrawSound.UiCancel).name = "public-profile-close";
             popup.focusable = true;
             popup.Focus();
             popup.RegisterCallback<PointerDownEvent>(evt =>
@@ -99,6 +109,7 @@ namespace DrawLiar
             DrawUIMotion.ShowModal(popup, modal);
             HideMobileScrollers();
             BeginPublicProfileLoad();
+            RefreshPublicProfileActions();
         }
 
         private void PublicProfileShortcut(KeyDownEvent evt)
@@ -169,10 +180,11 @@ namespace DrawLiar
             avatar.AddToClassList("public-profile-avatar");
             hero.Add(avatar);
             var identity = Box(hero, "grow public-profile-identity");
-            RawText(identity, profile.DisplayName, "public-profile-name");
+            LeveledName(identity, profile.DisplayName, profile.Level, "public-profile-name", "public-profile-name", profile.AccountId);
             var joined = Box(identity, "row public-profile-joined");
             Text(joined, "가입일", "public-profile-label");
             RawText(joined, PublicProfileDate(profile.JoinedAt), "public-profile-label");
+            if (profile.AccountId == lobby.Profile?.AccountId) AccountExperience(_profileBody);
             var actions = Box(_profileBody, "row public-profile-friend-actions");
             RenderPublicProfileFriendship(actions, profile);
             Text(_profileBody, "통산 전적", "section-title");
@@ -247,7 +259,198 @@ namespace DrawLiar
         private void RefreshPublicProfileActions()
         {
             _profileBody?.Q<VisualElement>(className: "public-profile-friend-actions")?.Query<Button>()
-                .ForEach(button => button.SetEnabled(!_profileActionBusy && !lobby.IsBusy));
+                .ForEach(button => button.SetEnabled(!_profileActionBusy && !_profileKickBusy && !lobby.IsBusy));
+            RefreshPublicProfileKick();
+        }
+
+        private void OpenRoomModeration()
+        {
+            if (!inRoom || !lobby.IsOnlineRoom || network.State?.IsHost != true) return;
+            var modal = _roomModerationModal = Modal("참가자 관리", false);
+            modal.name = "room-moderation-popup";
+            modal.AddToClassList("room-moderation-popup");
+            var scroll = DrawSmoothScroll.Create();
+            scroll.name = "room-moderation-scroll";
+            scroll.AddToClassList("room-moderation-scroll"); modal.Add(scroll);
+            _roomModerationList = Box(scroll, "room-moderation-list");
+            _roomModerationList.name = "room-moderation-list";
+            _roomModerationKey = null;
+            var actions = Box(modal, "row room-moderation-actions");
+            var back = Button(actions, "뒤로", RoomMenu, "secondary grow room-moderation-back", DrawSound.UiCancel);
+            back.name = "room-moderation-back";
+            Button(actions, "닫기", CloseModal, "secondary grow", DrawSound.UiCancel).name = "room-moderation-close";
+            modal.RegisterCallback<DetachFromPanelEvent>(evt =>
+            {
+                if (!ReferenceEquals(evt.target, modal) || _roomModerationModal != modal) return;
+                _roomModerationModal = _roomModerationList = null; _roomModerationKey = null;
+            });
+            RefreshRoomModeration(network.State); back.Focus();
+        }
+
+        private void RefreshRoomModeration(RoomSnapshot state)
+        {
+            var modal = _roomModerationModal;
+            if (modal == null || _roomModerationList == null) return;
+            if (overlay == null || modal.parent != overlay || modal.panel == null)
+            {
+                _roomModerationModal = _roomModerationList = null; _roomModerationKey = null;
+                return;
+            }
+            if (!inRoom || !lobby.IsOnlineRoom || state?.IsHost != true) { CloseModal(); return; }
+            var players = state.Players.Where(player => player.IsConnected && player.Id != state.LocalPlayerId
+                && network.CanKickPlayer(player.Id) && Guid.TryParse(player.AccountId, out _)).ToArray();
+            string key = string.Join("|", players.Select(player => $"{player.Id}/{player.AccountId}/{player.Name}/{player.Level}/{player.IsSpectator}"));
+            if (key == _roomModerationKey) return;
+            _roomModerationKey = key;
+            var scroll = _roomModerationList.GetFirstAncestorOfType<ScrollView>();
+            DrawSmoothScroll.Bind(scroll);
+            if (scroll != null) scroll.scrollOffset = Vector2.zero;
+            _roomModerationList.Clear();
+            foreach (var player in players)
+            {
+                var row = Box(_roomModerationList, "row room-moderation-player");
+                row.name = "room-moderation-player-" + player.Id;
+                LeveledName(row, player.Name, player.Level, "grow room-moderation-name", "moderation-" + player.Id, player.AccountId);
+                if (player.IsSpectator) Text(row, "관전", "room-moderation-spectator");
+                Button profile = null;
+                profile = Button(row, "프로필 보기", () =>
+                {
+                    if (_roomModerationModal != modal || modal.parent != overlay || !network.CanKickPlayer(player.Id)) return;
+                    var current = network.State?.Players.FirstOrDefault(value => value.Id == player.Id && value.IsConnected);
+                    if (current?.AccountId == player.AccountId) OpenPublicProfile(player.AccountId, profile);
+                }, "secondary room-moderation-profile");
+                profile.name = "room-moderation-profile-" + player.Id;
+            }
+        }
+
+        private PlayerView PublicProfileKickTarget()
+        {
+            if (!inRoom || !lobby.IsOnlineRoom || _profileOverlay == null || !lobby.IsAuthenticated
+                || lobby.Profile?.AccountId != _profileViewerAccountId) return null;
+            var state = network.State;
+            if (state == null || !state.IsHost) return null;
+            return state.Players.FirstOrDefault(player => player.AccountId == _profileAccountId
+                && player.IsConnected && player.Id != state.LocalPlayerId);
+        }
+
+        private void RefreshPublicProfileKick()
+        {
+            if (_profileKickButton == null) return;
+            var target = PublicProfileKickTarget();
+            bool allowed = target != null && network.CanKickPlayer(target.Id);
+            _profileKickButton.style.display = target != null ? DisplayStyle.Flex : DisplayStyle.None;
+            _profileKickButton.SetEnabled(allowed && !_profileKickBusy && !_profileActionBusy && !lobby.IsBusy);
+            if (_profileKickOverlay == null) return;
+            if (target == null || target.Id != _profileKickPlayerId || target.AccountId != _profileKickAccountId
+                || lobby.RoomCode != _profileKickRoomCode || network.State.LocalPlayerId != _profileKickActorId
+                || !allowed && !_profileKickBusy)
+            {
+                ClosePublicProfileKick(false);
+                return;
+            }
+            _profileKickConfirm?.SetEnabled(allowed && !_profileKickBusy && !_profileActionBusy && !lobby.IsBusy);
+        }
+
+        private void OpenPublicProfileKick()
+        {
+            if (_profileKickBusy || _profileActionBusy || lobby.IsBusy) return;
+            var target = PublicProfileKickTarget();
+            if (target == null || !network.CanKickPlayer(target.Id)) return;
+            ClosePublicProfileKick(false, true);
+            _profileKickPlayerId = target.Id;
+            _profileKickAccountId = target.AccountId;
+            _profileKickRoomCode = lobby.RoomCode;
+            _profileKickActorId = network.State.LocalPlayerId;
+            _profileModal.SetEnabled(false);
+            var popup = _profileKickOverlay = Box(root, "overlay enter utility-overlay profile-kick-overlay");
+            popup.name = "profile-kick-overlay";
+            var modal = Box(popup, "modal utility-popup profile-kick-popup");
+            modal.name = "profile-kick-popup";
+            Text(modal, "강퇴", "title");
+            var scroll = DrawSmoothScroll.Create();
+            scroll.AddToClassList("profile-kick-scroll"); modal.Add(scroll);
+            Text(scroll, "{0}님을 강퇴할까요?", "profile-kick-question", target.Name);
+            Text(scroll, "강퇴하면 이 방에 다시 입장할 수 없습니다.", "rules profile-kick-note");
+            var actions = Box(modal, "row profile-kick-actions");
+            var cancel = Button(actions, "취소", () => ClosePublicProfileKick(), "secondary grow", DrawSound.UiCancel);
+            cancel.name = "profile-kick-cancel";
+            _profileKickConfirm = Button(actions, "강퇴", SubmitPublicProfileKick, "danger grow");
+            _profileKickConfirm.name = "profile-kick-confirm";
+            popup.focusable = true;
+            popup.RegisterCallback<PointerDownEvent>(evt =>
+            {
+                if (_profileKickOverlay != popup || !ReferenceEquals(evt.target, popup)) return;
+                ClosePublicProfileKick(); evt.StopImmediatePropagation();
+            });
+            popup.RegisterCallback<KeyDownEvent>(evt =>
+            {
+                if (evt.keyCode == KeyCode.Escape) { ClosePublicProfileKick(); evt.StopImmediatePropagation(); }
+                else if (evt.keyCode == KeyCode.Tab)
+                {
+                    var buttons = modal.Query<Button>().ToList().Where(button => button.canGrabFocus && button.enabledInHierarchy).ToList();
+                    if (buttons.Count == 0) return;
+                    int index = buttons.IndexOf(root.focusController?.focusedElement as Button);
+                    int next = index < 0 ? (evt.shiftKey ? buttons.Count - 1 : 0) : (index + (evt.shiftKey ? -1 : 1) + buttons.Count) % buttons.Count;
+                    root.focusController?.IgnoreEvent(evt); buttons[next].Focus(); evt.StopImmediatePropagation();
+                }
+            }, TrickleDown.TrickleDown);
+            popup.RegisterCallback<DetachFromPanelEvent>(evt =>
+            {
+                if (ReferenceEquals(evt.target, popup) && _profileKickOverlay == popup) ClosePublicProfileKick(false, true);
+            });
+            DrawUIMotion.ShowModal(popup, modal); cancel.Focus();
+            RefreshPublicProfileActions();
+        }
+
+        private void SubmitPublicProfileKick()
+        {
+            if (_profileKickBusy || _profileActionBusy || lobby.IsBusy || _profileKickOverlay == null) return;
+            var target = PublicProfileKickTarget();
+            if (target == null || target.Id != _profileKickPlayerId || target.AccountId != _profileKickAccountId
+                || lobby.RoomCode != _profileKickRoomCode || network.State.LocalPlayerId != _profileKickActorId
+                || !network.CanKickPlayer(target.Id)) { ClosePublicProfileKick(false); return; }
+            _profileKickBusy = true;
+            RefreshPublicProfileActions();
+            _ = PublicProfileKickAsync(target.Id, target.Name, _profileOverlay, _profileViewerAccountId, _profileKickRoomCode);
+        }
+
+        private async Task PublicProfileKickAsync(int playerId, string playerName, VisualElement profile, string viewer, string roomCode)
+        {
+            bool Current() => this != null && isActiveAndEnabled && inRoom && _profileOverlay == profile
+                && lobby.Profile?.AccountId == viewer && lobby.RoomCode == roomCode;
+            try
+            {
+                await network.KickPlayerAsync(playerId);
+                if (Current()) { ClosePublicProfile(); Toast(DrawLocalization.Format("{0}님을 강퇴했습니다.", playerName)); }
+            }
+            catch (Exception exception)
+            {
+                if (Current()) { DrawAudio.Instance?.Play(DrawSound.UiError); Toast(exception.Message); }
+            }
+            finally { _profileKickBusy = false; RefreshPublicProfileActions(); }
+        }
+
+        private void ClosePublicProfileKick(bool restoreFocus = true, bool immediate = false)
+        {
+            var popup = _profileKickOverlay;
+            var profile = _profileOverlay;
+            var parentOverlay = overlay;
+            int version = ++_profileKickVersion;
+            _profileKickOverlay = null; _profileKickConfirm = null;
+            _profileKickPlayerId = _profileKickActorId = -1;
+            _profileKickAccountId = _profileKickRoomCode = null;
+            _profileModal?.SetEnabled(true);
+            if (popup == null) return;
+            if (immediate) popup.RemoveFromHierarchy();
+            else DrawUIMotion.HideModal(popup, popup.Q<VisualElement>(className: "modal"));
+            if (!restoreFocus || root == null) return;
+            root.schedule.Execute(() =>
+            {
+                if (this != null && isActiveAndEnabled && version == _profileKickVersion && _profileKickOverlay == null
+                    && _profileOverlay == profile && overlay == parentOverlay && !ChatInputHasFocus()
+                    && _profileKickButton?.panel != null && _profileKickButton.enabledInHierarchy)
+                    _profileKickButton.Focus();
+            }).StartingIn(180);
         }
 
         private void OpenSelfCustomization()
@@ -355,7 +558,7 @@ namespace DrawLiar
 
         private void StartPublicProfileFriendAction(Func<Task> action)
         {
-            if (_profileActionBusy || _profileOverlay == null || lobby.IsBusy) return;
+            if (_profileActionBusy || _profileKickBusy || _profileKickOverlay != null || _profileOverlay == null || lobby.IsBusy) return;
             _profileActionBusy = true;
             var actions = _profileBody.Q<VisualElement>(className: "public-profile-friend-actions");
             actions.Query<Button>().ForEach(button => button.SetEnabled(false));
@@ -402,6 +605,7 @@ namespace DrawLiar
 
         private void ClosePublicProfile(bool restoreFocus = true)
         {
+            ClosePublicProfileKick(false, true);
             CancelPublicProfileRequest();
             ++_profileVersion;
             var popup = _profileOverlay;
@@ -411,6 +615,7 @@ namespace DrawLiar
             _profileOverlay = _profileModal = _profileBody = _profileReturnFocus = null;
             _profileAccountId = _profileViewerAccountId = null;
             _profileActionBusy = false;
+            _profileKickButton = null;
             _loadedPublicProfile = null;
             if (popup == null) return;
             DrawUIMotion.HideModal(popup, modal);

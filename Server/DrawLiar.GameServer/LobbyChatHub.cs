@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace DrawLiar.GameServer;
 
-public sealed record LobbyChatIdentity(Guid AccountId, string DisplayName, DateTimeOffset ExpiresAt);
+public sealed record LobbyChatIdentity(Guid AccountId, string DisplayName, DateTimeOffset ExpiresAt, int Level = 1);
 
 public sealed class LobbyChatHub
 {
@@ -104,7 +104,7 @@ public sealed class LobbyChatHub
                     identity = await _authenticate(connection.Token, connection.ReadCancellation);
                     if (identity.AccountId != connection.AccountId || identity.ExpiresAt <= _clock.GetUtcNow())
                         throw new ApiException("Unauthorized", 401);
-                    Publish(connection, identity.DisplayName, text, request.RequestId);
+                    Publish(connection, identity.DisplayName, identity.Level, text, request.RequestId);
                 }
             }
             catch (ApiException exception) when (exception.Status is 401 or 403) { connection.Stop("InvalidSession"); }
@@ -154,7 +154,7 @@ public sealed class LobbyChatHub
         }
     }
 
-    private void Publish(Connection connection, string displayName, string text, string requestId)
+    private void Publish(Connection connection, string displayName, int level, string text, string requestId)
     {
         lock (_gate)
         {
@@ -172,7 +172,7 @@ public sealed class LobbyChatHub
             var message = new LobbyChatMessage
             {
                 Id = ++_sequence, AccountId = connection.AccountId.ToString(), DisplayName = displayName,
-                Text = text, SentAt = ServerRuntime.Timestamp(now)
+                Text = text, SentAt = ServerRuntime.Timestamp(now), Level = Math.Clamp(level, 1, AccountLevelRules.MAX_LEVEL)
             };
             _history.Enqueue(message);
             while (_history.Count > HISTORY_LIMIT) _history.Dequeue();

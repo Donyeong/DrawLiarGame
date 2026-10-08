@@ -7,7 +7,7 @@ public sealed partial class ServerDatabase
     private const int INVITATION_LIMIT = 50;
     private const string INVITATION_SELECT = """
         SELECT i."Id",r."RoomId",r."RoomCode",r."Settings"->>'RoomName',
-            a."Id",a."DisplayName",a."AvatarColor",a."Accessory",i."ExpiresAt"
+            a."Id",a."DisplayName",a."AvatarColor",a."Accessory",i."ExpiresAt",a."Experience"
         FROM "RoomInvitation" i JOIN "Room" r ON r."RoomId"=i."RoomId"
         JOIN "DedicatedNode" d ON d."NodeId"=r."NodeId"
         JOIN "Account" a ON a."Id"=i."FromAccountId"
@@ -149,7 +149,7 @@ public sealed partial class ServerDatabase
     private static RoomInvitationData ReadInvitation(NpgsqlDataReader reader) => new()
     {
         InvitationId = reader.GetGuid(0).ToString(), RoomId = reader.GetGuid(1).ToString(), RoomCode = reader.GetString(2), RoomName = reader.GetString(3),
-        Sender = new FriendData { AccountId = reader.GetGuid(4).ToString(), DisplayName = reader.GetString(5), AvatarColor = reader.GetInt32(6), Accessory = AvatarParts.Sanitize(reader.GetInt64(7)) },
+        Sender = new FriendData { AccountId = reader.GetGuid(4).ToString(), DisplayName = reader.GetString(5), AvatarColor = reader.GetInt32(6), Accessory = AvatarParts.Sanitize(reader.GetInt64(7)), Level = AccountLevelRules.GetLevel(reader.GetInt64(9)) },
         ExpiresAt = ServerRuntime.Timestamp(reader.GetFieldValue<DateTimeOffset>(8))
     };
 

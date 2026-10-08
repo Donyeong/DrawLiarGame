@@ -10,7 +10,7 @@ public sealed partial class ServerDatabase
         await using var transaction = await connection.BeginTransactionAsync(IsolationLevel.RepeatableRead, cancellationToken);
         var profile = new PublicProfileData { AccountId = target.ToString() };
         await using (var command = Command(connection, transaction,
-            "SELECT \"DisplayName\",\"AvatarColor\",\"Accessory\",\"CreatedAt\" FROM \"Account\" WHERE \"Id\"=$1 AND NOT \"IsBanned\"", target))
+            "SELECT \"DisplayName\",\"AvatarColor\",\"Accessory\",\"CreatedAt\",\"Experience\" FROM \"Account\" WHERE \"Id\"=$1 AND NOT \"IsBanned\"", target))
         await using (var reader = await command.ExecuteReaderAsync(cancellationToken))
         {
             if (!await reader.ReadAsync(cancellationToken)) throw new ApiException("AccountNotFound", 404);
@@ -18,6 +18,7 @@ public sealed partial class ServerDatabase
             profile.AvatarColor = reader.GetInt32(1);
             profile.Accessory = AvatarParts.Sanitize(reader.GetInt64(2));
             profile.JoinedAt = ServerRuntime.Timestamp(reader.GetFieldValue<DateTimeOffset>(3));
+            profile.Level = AccountLevelRules.GetLevel(reader.GetInt64(4));
         }
         if (requester == target) profile.Friendship = "Self";
         else
@@ -108,12 +109,12 @@ public sealed partial class ServerDatabase
         foreach (var player in normalized.Players)
         {
             Guid accountId = Guid.Parse(player.AccountId);
-            int coinReward = await CreditMatchRewardAsync(connection, transaction, accountId, player, cancellationToken);
+            var reward = await CreditMatchRewardAsync(connection, transaction, accountId, player, cancellationToken);
             await using var command = Command(connection, transaction, """
-                INSERT INTO "AccountMatch" ("MatchId","AccountId","Score","Rank","Won","RoundsPlayed","CitizenRounds","LiarRounds","CorrectVotes","CorrectGuesses","CoinReward")
-                VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
+                INSERT INTO "AccountMatch" ("MatchId","AccountId","Score","Rank","Won","RoundsPlayed","CitizenRounds","LiarRounds","CorrectVotes","CorrectGuesses","CoinReward","ExperienceReward")
+                VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)
                 """, matchId, accountId, player.Score, player.Rank, player.Won,
-                player.RoundsPlayed, player.CitizenRounds, player.LiarRounds, player.CorrectVotes, player.CorrectGuesses, coinReward);
+                player.RoundsPlayed, player.CitizenRounds, player.LiarRounds, player.CorrectVotes, player.CorrectGuesses, reward.Coins, reward.Experience);
             await command.ExecuteNonQueryAsync(cancellationToken);
         }
         await transaction.CommitAsync(cancellationToken);

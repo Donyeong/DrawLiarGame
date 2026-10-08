@@ -8,6 +8,7 @@ namespace DrawLiar
 {
     internal sealed class DrawBrowserTextInput : IDisposable
     {
+        private const float CHAT_LAYOUT_GRACE_SECONDS = .3f;
         [Serializable] private sealed class InputFields { public InputField[] Fields; public int ChatShortcutToken; }
         [Serializable] private sealed class InputField
         {
@@ -61,7 +62,7 @@ namespace DrawLiar
         private bool _hideKeyboard, _captureKeyboard, _reading, _disposed;
         private string _knownValue;
         private int _nextId, _activeId, _chatShortcutVersion;
-        private float _nextLayout;
+        private float _nextLayout, _chatLayoutGraceUntil;
 
         public DrawBrowserTextInput(VisualElement root, Func<VisualElement> chatShortcutTarget, Action openChatShortcut)
         {
@@ -193,7 +194,8 @@ namespace DrawLiar
                 configuration.Add(layout);
             }
             if (_active != null && !found.Contains(_active) && _active == chatShortcut
-                && DrawBrowserInterop.IsMobile && DrawBrowserInterop.DrawBrowserKeyboardMetrics(_keyboardMetrics) == 1
+                && DrawBrowserInterop.IsMobile && (Time.unscaledTime < _chatLayoutGraceUntil
+                    || DrawBrowserInterop.DrawBrowserKeyboardMetrics(_keyboardMetrics) == 1)
                 && !_active.isReadOnly && IsVisible(_active)
                 && _root.Contains(_active) && ParentField(_root.panel.focusController.focusedElement as VisualElement) == _active
                 && _layouts.TryGetValue(_active, out var activeLayout) && configuration.Count < 128)
@@ -231,6 +233,8 @@ namespace DrawLiar
             if (_active == field) return;
             Close(false);
             _active = field; _activeId = id;
+            _chatLayoutGraceUntil = field == _configuredChatShortcut && DrawBrowserInterop.IsMobile
+                ? Time.unscaledTime + CHAT_LAYOUT_GRACE_SECONDS : 0;
             _knownValue = field.value;
             field.RegisterValueChangedCallback(OnValueChanged);
             _hideKeyboard = field.textEdition.hideSoftKeyboard;
@@ -351,7 +355,7 @@ namespace DrawLiar
             SynchronizeValue();
             var field = _active; var text = _text; int id = _activeId;
             string value = DrawBrowserInterop.DrawBrowserInputValue(id);
-            _active = null; _text = null; _activeId = 0;
+            _active = null; _text = null; _activeId = 0; _chatLayoutGraceUntil = 0;
             field.UnregisterValueChangedCallback(OnValueChanged);
             if (text != null) text.style.opacity = _opacity;
             field.textEdition.hideSoftKeyboard = _hideKeyboard;

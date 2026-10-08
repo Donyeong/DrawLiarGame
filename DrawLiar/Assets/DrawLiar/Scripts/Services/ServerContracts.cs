@@ -24,6 +24,8 @@ namespace DrawLiar
         public int AvatarColor;
         public long Accessory;
         public int Coins;
+        public long Experience;
+        public int Level = 1;
         public bool IsGuest;
         public bool HasGoogleAccount;
         public long[] OwnedAccessories = Array.Empty<long>();
@@ -35,6 +37,7 @@ namespace DrawLiar
         public string DisplayName = "";
         public int AvatarColor;
         public long Accessory;
+        public int Level = 1;
         public string JoinedAt = "";
         public string Friendship = "None";
         public ProfileStatsData Stats = new ProfileStatsData();
@@ -73,6 +76,7 @@ namespace DrawLiar
         public string MatchId = "";
         public bool Recorded;
         public int CoinReward;
+        public int ExperienceReward;
         public ProfileData Profile = new ProfileData();
     }
     [Serializable] public sealed class MatchResultRequest
@@ -102,7 +106,7 @@ namespace DrawLiar
     [Serializable] public sealed class GoogleChallengeRequest { public string Platform = "desktop"; }
     [Serializable] public sealed class GoogleChallengeResponse { public string ChallengeId = ""; public string Nonce = ""; public string ClientId = ""; public string ExpiresAt = ""; }
     [Serializable] public sealed class GoogleAuthRequest { public string ChallengeId = ""; public string IdToken = ""; public string Code = ""; public string CodeVerifier = ""; public string RedirectUri = ""; }
-    [Serializable] public sealed class FriendData { public string AccountId = ""; public string DisplayName = ""; public int AvatarColor; public long Accessory; }
+    [Serializable] public sealed class FriendData { public string AccountId = ""; public string DisplayName = ""; public int AvatarColor; public long Accessory; public int Level = 1; }
     [Serializable] public sealed class FriendListResponse { public FriendData[] Friends = Array.Empty<FriendData>(); public FriendData[] Incoming = Array.Empty<FriendData>(); public FriendData[] Outgoing = Array.Empty<FriendData>(); }
     [Serializable] public sealed class FriendRequest { public string AccountId = ""; }
     [Serializable] public sealed class FriendRespondRequest { public string AccountId = ""; public bool Accept; }
@@ -177,7 +181,19 @@ namespace DrawLiar
     [Serializable] public sealed class RegisterDedicatedRequest { public string NodeId = ""; public string PublicUrl = ""; public int Capacity = 32; }
     [Serializable] public sealed class RoomStatusData { public string RoomId = ""; public int PlayerCount; public int SpectatorCount; public bool IsInProgress; public string OwnerAccountId = ""; public bool Closed; public string[] PlayerAccountIds = Array.Empty<string>(); public string[] SpectatorAccountIds = Array.Empty<string>(); public string[] AdmissionIds = Array.Empty<string>(); public ServerRoomSettings Settings = new ServerRoomSettings(); public long ConfigurationVersion; }
     [Serializable] public sealed class DedicatedHeartbeatRequest { public string NodeId = ""; public RoomStatusData[] Rooms = Array.Empty<RoomStatusData>(); }
-    [Serializable] public sealed class DedicatedHeartbeatResponse { public string[] ClosedRoomIds = Array.Empty<string>(); public RoomConfigurationData[] Configurations = Array.Empty<RoomConfigurationData>(); }
+    [Serializable] public sealed class DedicatedHeartbeatResponse { public string[] ClosedRoomIds = Array.Empty<string>(); public RoomConfigurationData[] Configurations = Array.Empty<RoomConfigurationData>(); public RoomKickData[] Kicks = Array.Empty<RoomKickData>(); }
+    [Serializable] public sealed class RoomKickData { public string RoomId = ""; public string[] AccountIds = Array.Empty<string>(); }
+    [Serializable] public sealed class KickRoomRequest
+    {
+        public string NodeId = "";
+        public string RoomId = "";
+        public string OwnerAccountId = "";
+        public string OwnerSessionToken = "";
+        public string TargetAccountId = "";
+        public string TargetSessionToken = "";
+        public string OperationId = "";
+    }
+    [Serializable] public sealed class KickRoomResponse { public string RoomId = ""; public string AccountId = ""; public string OperationId = ""; }
     [Serializable] public sealed class ConfigureRoomRequest
     {
         public string NodeId = "";
@@ -200,6 +216,7 @@ namespace DrawLiar
         public long Id;
         public string AccountId = "";
         public string DisplayName = "";
+        public int Level = 1;
         public string Text = "";
         public string SentAt = "";
     }
@@ -227,6 +244,7 @@ namespace DrawLiar
         public string Id = "";
         public string CreatorAccountId = "";
         public string CreatorName = "";
+        public int CreatorLevel = 1;
         public string Name = "";
         public string LanguageCode = "";
         public int WordCount;

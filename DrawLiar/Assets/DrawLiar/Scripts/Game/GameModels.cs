@@ -71,6 +71,7 @@ namespace DrawLiar
         public int Id;
         public string AccountId = "";
         public string Name;
+        public int Level = 1;
         public int Score;
         public int RoundPoints;
         public bool IsSpectator;
@@ -166,6 +167,7 @@ namespace DrawLiar
     {
         public int PlayerId;
         public string Name;
+        public int Level;
         public string Text;
     }
 

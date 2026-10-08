@@ -44,7 +44,7 @@ internal sealed partial class DedicatedRoom
                 ProfileReplyLocked(connection, requestId, false, "InvalidProfile");
                 return;
             }
-            _session.UpdateProfile(connection.PlayerId, profile.DisplayName, profile.AvatarColor, profile.Accessory);
+            _session.UpdateProfile(connection.PlayerId, profile.DisplayName, profile.AvatarColor, profile.Accessory, profile.Level);
             BroadcastSnapshotsLocked(RoomRegistry.Now);
             ProfileReplyLocked(connection, requestId, true, "");
         }

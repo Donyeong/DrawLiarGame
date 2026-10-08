@@ -356,7 +356,7 @@ namespace DrawLiar
             {
                 var row = Box(_workshopList, "workshop-entry"); row.name = "workshop-topic-" + entry.Id;
                 RawText(row, entry.Name, "workshop-topic-name");
-                var metadata = Box(row, "row workshop-metadata"); RawText(metadata, entry.CreatorName, "workshop-creator grow");
+                var metadata = Box(row, "row workshop-metadata"); LeveledName(metadata, entry.CreatorName, entry.CreatorLevel, "workshop-creator grow", "workshop-creator-" + entry.Id);
                 RawText(metadata, L.AvailableLanguages.FirstOrDefault(language => language.Code == entry.LanguageCode)?.DisplayName ?? entry.LanguageCode, "workshop-entry-language");
                 var rating = Box(row, "row workshop-rating");
                 Text(rating, "제시어 {0}개 · 다운로드 {1}회 · 추천 {2}개", "rules workshop-topic-count grow", entry.WordCount, entry.DownloadCount, entry.RecommendationCount);

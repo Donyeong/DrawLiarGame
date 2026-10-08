@@ -45,7 +45,7 @@ public sealed partial class ServerDatabase
         var entries = new List<TopicWorkshopEntry>();
         await using (var command = Command(connection, transaction, """
             SELECT t."Id",t."CreatorAccountId",a."DisplayName",t."Name",t."LanguageCode",jsonb_array_length(t."Words"),t."DownloadCount",t."CreatedAt",
-                t."RecommendationCount",EXISTS(SELECT 1 FROM "TopicWorkshopRecommendation" r WHERE r."TopicId"=t."Id" AND r."AccountId"=$1)
+                t."RecommendationCount",EXISTS(SELECT 1 FROM "TopicWorkshopRecommendation" r WHERE r."TopicId"=t."Id" AND r."AccountId"=$1),a."Experience"
             """ + " " + filter + " ORDER BY " + order + " OFFSET $5 LIMIT $6", accountId, language, mine, pattern, offset, limit))
         await using (var reader = await command.ExecuteReaderAsync(cancellationToken))
             while (await reader.ReadAsync(cancellationToken)) entries.Add(ReadWorkshopEntry(reader, accountId));
@@ -63,9 +63,15 @@ public sealed partial class ServerDatabase
         await using var connection = await _source.OpenConnectionAsync(cancellationToken);
         await using var transaction = await connection.BeginTransactionAsync(cancellationToken);
         string creator;
+        int creatorLevel;
         await using (var command = Command(connection, transaction,
-            "SELECT \"DisplayName\" FROM \"Account\" WHERE \"Id\"=$1 AND NOT \"IsBanned\" FOR UPDATE", accountId))
-            creator = await command.ExecuteScalarAsync(cancellationToken) as string ?? throw new ApiException("AccountUnavailable", 403);
+            "SELECT \"DisplayName\",\"Experience\" FROM \"Account\" WHERE \"Id\"=$1 AND NOT \"IsBanned\" FOR UPDATE", accountId))
+        await using (var reader = await command.ExecuteReaderAsync(cancellationToken))
+        {
+            if (!await reader.ReadAsync(cancellationToken)) throw new ApiException("AccountUnavailable", 403);
+            creator = reader.GetString(0);
+            creatorLevel = AccountLevelRules.GetLevel(reader.GetInt64(1));
+        }
         await using (var duplicate = Command(connection, transaction,
             "SELECT 1 FROM \"TopicWorkshop\" WHERE \"CreatorAccountId\"=$1 AND \"LanguageCode\"=$2 AND \"Name\"=$3", accountId, normalized.LanguageCode, normalized.Name))
             if (await duplicate.ExecuteScalarAsync(cancellationToken) != null) throw new ApiException("TopicWorkshopNameConflict", 409);
@@ -85,7 +91,7 @@ public sealed partial class ServerDatabase
         {
             Topic = new TopicWorkshopEntry
             {
-                Id = id.ToString(), CreatorAccountId = accountId.ToString(), CreatorName = creator,
+                Id = id.ToString(), CreatorAccountId = accountId.ToString(), CreatorName = creator, CreatorLevel = creatorLevel,
                 Name = normalized.Name, LanguageCode = normalized.LanguageCode, WordCount = normalized.Words.Length,
                 CreatedAt = ServerRuntime.Timestamp(createdAt), IsMine = true
             },
@@ -100,7 +106,7 @@ public sealed partial class ServerDatabase
         await using var connection = await _source.OpenConnectionAsync(cancellationToken);
         await using var command = Command(connection, null, """
             SELECT t."Id",t."CreatorAccountId",a."DisplayName",t."Name",t."LanguageCode",jsonb_array_length(t."Words"),t."DownloadCount",t."CreatedAt",
-                t."RecommendationCount",EXISTS(SELECT 1 FROM "TopicWorkshopRecommendation" r WHERE r."TopicId"=t."Id" AND r."AccountId"=$2),t."Words"::text
+                t."RecommendationCount",EXISTS(SELECT 1 FROM "TopicWorkshopRecommendation" r WHERE r."TopicId"=t."Id" AND r."AccountId"=$2),a."Experience",t."Words"::text
             FROM "TopicWorkshop" t JOIN "Account" a ON a."Id"=t."CreatorAccountId"
             WHERE t."Id"=$1 AND NOT a."IsBanned"
             """, id, accountId);
@@ -109,7 +115,7 @@ public sealed partial class ServerDatabase
         return new TopicWorkshopDetailResponse
         {
             Topic = ReadWorkshopEntry(reader, accountId),
-            Words = JsonSerializer.Deserialize<string[]>(reader.GetString(10), ServerRuntime.Json)!
+            Words = JsonSerializer.Deserialize<string[]>(reader.GetString(11), ServerRuntime.Json)!
         };
     }
 
@@ -122,14 +128,14 @@ public sealed partial class ServerDatabase
             UPDATE "TopicWorkshop" t SET "DownloadCount"=CASE WHEN t."DownloadCount"<2147483647 THEN t."DownloadCount"+1 ELSE t."DownloadCount" END
             FROM "Account" a WHERE t."Id"=$1 AND a."Id"=t."CreatorAccountId" AND NOT a."IsBanned"
             RETURNING t."Id",t."CreatorAccountId",a."DisplayName",t."Name",t."LanguageCode",jsonb_array_length(t."Words"),t."DownloadCount",t."CreatedAt",
-                t."RecommendationCount",EXISTS(SELECT 1 FROM "TopicWorkshopRecommendation" r WHERE r."TopicId"=t."Id" AND r."AccountId"=$2),t."Words"::text
+                t."RecommendationCount",EXISTS(SELECT 1 FROM "TopicWorkshopRecommendation" r WHERE r."TopicId"=t."Id" AND r."AccountId"=$2),a."Experience",t."Words"::text
             """, id, accountId);
         await using var reader = await command.ExecuteReaderAsync(cancellationToken);
         if (!await reader.ReadAsync(cancellationToken)) throw new ApiException("TopicWorkshopUnavailable", 404);
         return new TopicWorkshopDetailResponse
         {
             Topic = ReadWorkshopEntry(reader, accountId),
-            Words = JsonSerializer.Deserialize<string[]>(reader.GetString(10), ServerRuntime.Json)!
+            Words = JsonSerializer.Deserialize<string[]>(reader.GetString(11), ServerRuntime.Json)!
         };
     }
 
@@ -155,7 +161,7 @@ public sealed partial class ServerDatabase
         TopicWorkshopEntry entry;
         await using (var command = Command(connection, transaction, """
             SELECT t."Id",t."CreatorAccountId",a."DisplayName",t."Name",t."LanguageCode",jsonb_array_length(t."Words"),t."DownloadCount",t."CreatedAt",
-                t."RecommendationCount",EXISTS(SELECT 1 FROM "TopicWorkshopRecommendation" r WHERE r."TopicId"=t."Id" AND r."AccountId"=$2)
+                t."RecommendationCount",EXISTS(SELECT 1 FROM "TopicWorkshopRecommendation" r WHERE r."TopicId"=t."Id" AND r."AccountId"=$2),a."Experience"
             FROM "TopicWorkshop" t JOIN "Account" a ON a."Id"=t."CreatorAccountId" WHERE t."Id"=$1
             """, id, accountId))
         await using (var reader = await command.ExecuteReaderAsync(cancellationToken))
@@ -183,7 +189,7 @@ public sealed partial class ServerDatabase
 
     private static TopicWorkshopEntry ReadWorkshopEntry(NpgsqlDataReader reader, Guid accountId) => new()
     {
-        Id = reader.GetGuid(0).ToString(), CreatorAccountId = reader.GetGuid(1).ToString(), CreatorName = reader.GetString(2),
+        Id = reader.GetGuid(0).ToString(), CreatorAccountId = reader.GetGuid(1).ToString(), CreatorName = reader.GetString(2), CreatorLevel = AccountLevelRules.GetLevel(reader.GetInt64(10)),
         Name = reader.GetString(3), LanguageCode = reader.GetString(4), WordCount = reader.GetInt32(5),
         DownloadCount = ProfileCount(reader.GetInt64(6)), CreatedAt = ServerRuntime.Timestamp(reader.GetFieldValue<DateTimeOffset>(7)),
         RecommendationCount = ProfileCount(reader.GetInt64(8)), IsRecommended = reader.GetBoolean(9),

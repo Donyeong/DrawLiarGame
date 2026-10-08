@@ -84,7 +84,7 @@ internal sealed class RoomRegistry : BackgroundService
         lock (_resultGate) _pendingResults.Remove(matchId);
     }
 
-    public void AcknowledgeHeartbeat(RoomStatusData[] statuses, string[] roomIds, RoomConfigurationData[]? configurations = null)
+    public void AcknowledgeHeartbeat(RoomStatusData[] statuses, string[] roomIds, RoomConfigurationData[]? configurations = null, RoomKickData[]? kicks = null)
     {
         lock (_gate)
         {
@@ -92,6 +92,8 @@ internal sealed class RoomRegistry : BackgroundService
                 if (_rooms.TryGetValue(status.RoomId, out var room)) room.AcknowledgeAdmissions(status.AdmissionIds);
             foreach (var configuration in configurations ?? [])
                 if (_rooms.TryGetValue(configuration.RoomId, out var room)) room.ApplyConfiguration(configuration);
+            foreach (var data in kicks ?? [])
+                if (_rooms.TryGetValue(data.RoomId, out var room)) room.ApplyKicks(data);
             foreach (string roomId in roomIds)
                 if (_rooms.TryGetValue(roomId, out var room) && room.Status().Closed) _rooms.Remove(roomId);
         }

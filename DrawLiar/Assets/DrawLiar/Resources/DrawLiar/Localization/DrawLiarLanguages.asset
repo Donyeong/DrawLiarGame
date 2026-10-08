@@ -11335,6 +11335,330 @@ MonoBehaviour:
         \xB7 {2} \u062A\u0648\u0635\u064A\u0627\u062A"
       Flags: 000000000000000000000000
       Languages_Touch: []
+    - Term: UI/6rCV7Ye0
+      TermType: 0
+      Description: "\uAC15\uD1F4"
+      Languages:
+      - "\uAC15\uD1F4"
+      - Kick
+      - "\u79FB\u51FA\u623F\u95F4"
+      - "\u79FB\u51FA\u623F\u9593"
+      - "\u9000\u51FA\u3055\u305B\u308B"
+      - Expulsar
+      - Expulsar
+      - Exclure
+      - Entfernen
+      - Keluarkan
+      - "\u0928\u093F\u0915\u093E\u0932\u0947\u0902"
+      - "\u0637\u0631\u062F"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/ezB964uY7J2EIOqwle2HtO2VoOq5jOyalD8
+      TermType: 0
+      Description: "{0}\uB2D8\uC744 \uAC15\uD1F4\uD560\uAE4C\uC694?"
+      Languages:
+      - "{0}\uB2D8\uC744 \uAC15\uD1F4\uD560\uAE4C\uC694?"
+      - Kick {0} from the room?
+      - "\u8981\u5C06{0}\u79FB\u51FA\u623F\u95F4\u5417\uFF1F"
+      - "\u8981\u5C07{0}\u79FB\u51FA\u623F\u9593\u55CE\uFF1F"
+      - "{0}\u3092\u9000\u51FA\u3055\u305B\u307E\u3059\u304B\uFF1F"
+      - "\xBFExpulsar a {0} de la sala?"
+      - Expulsar {0} da sala?
+      - Exclure {0} du salon ?
+      - '{0} aus dem Raum entfernen?'
+      - Keluarkan {0} dari ruang?
+      - "\u0915\u094D\u092F\u093E {0} \u0915\u094B \u0915\u092E\u0930\u0947 \u0938\u0947
+        \u0928\u093F\u0915\u093E\u0932\u0947\u0902?"
+      - "\u0647\u0644 \u062A\u0631\u064A\u062F \u0637\u0631\u062F {0} \u0645\u0646
+        \u0627\u0644\u063A\u0631\u0641\u0629\u061F"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/6rCV7Ye07ZWY66m0IOydtCDrsKnsl5Ag64uk7IucIOyeheyepe2VoCDsiJgg7JeG7Iq164uI64ukLg
+      TermType: 0
+      Description: "\uAC15\uD1F4\uD558\uBA74 \uC774 \uBC29\uC5D0 \uB2E4\uC2DC \uC785\uC7A5\uD560
+        \uC218 \uC5C6\uC2B5\uB2C8\uB2E4."
+      Languages:
+      - "\uAC15\uD1F4\uD558\uBA74 \uC774 \uBC29\uC5D0 \uB2E4\uC2DC \uC785\uC7A5\uD560
+        \uC218 \uC5C6\uC2B5\uB2C8\uB2E4."
+      - If kicked, they cannot rejoin this room.
+      - "\u79FB\u51FA\u540E\u5C06\u65E0\u6CD5\u518D\u6B21\u52A0\u5165\u6B64\u623F\u95F4\u3002"
+      - "\u79FB\u51FA\u5F8C\u5C07\u7121\u6CD5\u518D\u6B21\u52A0\u5165\u6B64\u623F\u9593\u3002"
+      - "\u9000\u51FA\u3055\u305B\u308B\u3068\u3001\u3053\u306E\u90E8\u5C4B\u306B\u306F\u518D\u5165\u5BA4\u3067\u304D\u307E\u305B\u3093\u3002"
+      - "Tras la expulsi\xF3n, no podr\xE1 volver a entrar en esta sala."
+      - "Ap\xF3s a expuls\xE3o, n\xE3o poder\xE1 voltar a entrar nesta sala."
+      - Une fois exclu, ce joueur ne pourra plus rejoindre ce salon.
+      - Nach dem Entfernen ist ein erneuter Beitritt zu diesem Raum gesperrt.
+      - Setelah dikeluarkan, pemain tidak dapat bergabung kembali ke ruang ini.
+      - "\u0928\u093F\u0915\u093E\u0932\u0947 \u091C\u093E\u0928\u0947 \u0915\u0947
+        \u092C\u093E\u0926 \u0935\u0947 \u0907\u0938 \u0915\u092E\u0930\u0947 \u092E\u0947\u0902
+        \u0926\u094B\u092C\u093E\u0930\u093E \u0928\u0939\u0940\u0902 \u0906 \u0938\u0915\u0947\u0902\u0917\u0947\u0964"
+      - "\u0628\u0639\u062F \u0627\u0644\u0637\u0631\u062F\u060C \u0644\u0646 \u064A\u062A\u0645\u0643\u0646
+        \u0645\u0646 \u0627\u0644\u0627\u0646\u0636\u0645\u0627\u0645 \u0625\u0644\u0649
+        \u0647\u0630\u0647 \u0627\u0644\u063A\u0631\u0641\u0629 \u0645\u062C\u062F\u062F\u064B\u0627."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/ezB964uY7J2EIOqwle2HtO2WiOyKteuLiOuLpC4
+      TermType: 0
+      Description: "{0}\uB2D8\uC744 \uAC15\uD1F4\uD588\uC2B5\uB2C8\uB2E4."
+      Languages:
+      - "{0}\uB2D8\uC744 \uAC15\uD1F4\uD588\uC2B5\uB2C8\uB2E4."
+      - '{0} was kicked from the room.'
+      - "\u5DF2\u5C06{0}\u79FB\u51FA\u623F\u95F4\u3002"
+      - "\u5DF2\u5C07{0}\u79FB\u51FA\u623F\u9593\u3002"
+      - "{0}\u3092\u9000\u51FA\u3055\u305B\u307E\u3057\u305F\u3002"
+      - "Se expuls\xF3 a {0} de la sala."
+      - '{0} foi expulso da sala.'
+      - "{0} a \xE9t\xE9 exclu du salon."
+      - '{0} wurde aus dem Raum entfernt.'
+      - '{0} telah dikeluarkan dari ruang.'
+      - "{0} \u0915\u094B \u0915\u092E\u0930\u0947 \u0938\u0947 \u0928\u093F\u0915\u093E\u0932
+        \u0926\u093F\u092F\u093E \u0917\u092F\u093E\u0964"
+      - "\u062A\u0645 \u0637\u0631\u062F {0} \u0645\u0646 \u0627\u0644\u063A\u0631\u0641\u0629."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7Leo7IaM
+      TermType: 0
+      Description: "\uCDE8\uC18C"
+      Languages:
+      - "\uCDE8\uC18C"
+      - Cancel
+      - "\u53D6\u6D88"
+      - "\u53D6\u6D88"
+      - "\u30AD\u30E3\u30F3\u30BB\u30EB"
+      - Cancelar
+      - Cancelar
+      - Annuler
+      - Abbrechen
+      - Batal
+      - "\u0930\u0926\u094D\u0926 \u0915\u0930\u0947\u0902"
+      - "\u0625\u0644\u063A\u0627\u0621"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/6rCV7Ye0IOq2jO2VnOydtCDsl4bsirXri4jri6Qu
+      TermType: 0
+      Description: "\uAC15\uD1F4 \uAD8C\uD55C\uC774 \uC5C6\uC2B5\uB2C8\uB2E4."
+      Languages:
+      - "\uAC15\uD1F4 \uAD8C\uD55C\uC774 \uC5C6\uC2B5\uB2C8\uB2E4."
+      - You do not have permission to kick players.
+      - "\u60A8\u65E0\u6743\u79FB\u51FA\u73A9\u5BB6\u3002"
+      - "\u60A8\u7121\u6B0A\u79FB\u51FA\u73A9\u5BB6\u3002"
+      - "\u53C2\u52A0\u8005\u3092\u9000\u51FA\u3055\u305B\u308B\u6A29\u9650\u304C\u3042\u308A\u307E\u305B\u3093\u3002"
+      - No tienes permiso para expulsar jugadores.
+      - "Voc\xEA n\xE3o tem permiss\xE3o para expulsar jogadores."
+      - "Vous n\u2019avez pas l\u2019autorisation d\u2019exclure des joueurs."
+      - Du hast keine Berechtigung, Spieler zu entfernen.
+      - Anda tidak memiliki izin untuk mengeluarkan pemain.
+      - "\u0906\u092A\u0915\u094B \u0916\u093F\u0932\u093E\u0921\u093C\u093F\u092F\u094B\u0902
+        \u0915\u094B \u0928\u093F\u0915\u093E\u0932\u0928\u0947 \u0915\u0940 \u0905\u0928\u0941\u092E\u0924\u093F
+        \u0928\u0939\u0940\u0902 \u0939\u0948\u0964"
+      - "\u0644\u064A\u0633 \u0644\u062F\u064A\u0643 \u0635\u0644\u0627\u062D\u064A\u0629
+        \u0637\u0631\u062F \u0627\u0644\u0644\u0627\u0639\u0628\u064A\u0646."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/6rCV7Ye07ZWgIOywuOqwgOyekOqwgCDrsKnsl5Ag7JeG7Iq164uI64ukLg
+      TermType: 0
+      Description: "\uAC15\uD1F4\uD560 \uCC38\uAC00\uC790\uAC00 \uBC29\uC5D0 \uC5C6\uC2B5\uB2C8\uB2E4."
+      Languages:
+      - "\uAC15\uD1F4\uD560 \uCC38\uAC00\uC790\uAC00 \uBC29\uC5D0 \uC5C6\uC2B5\uB2C8\uB2E4."
+      - The player to kick is no longer in the room.
+      - "\u5F85\u79FB\u51FA\u7684\u73A9\u5BB6\u5DF2\u4E0D\u5728\u623F\u95F4\u4E2D\u3002"
+      - "\u5F85\u79FB\u51FA\u7684\u73A9\u5BB6\u5DF2\u4E0D\u5728\u623F\u9593\u4E2D\u3002"
+      - "\u5BFE\u8C61\u306E\u53C2\u52A0\u8005\u306F\u3059\u3067\u306B\u90E8\u5C4B\u3092\u9000\u51FA\u3057\u3066\u3044\u307E\u3059\u3002"
+      - "El jugador que quieres expulsar ya no est\xE1 en la sala."
+      - "O jogador que voc\xEA quer expulsar n\xE3o est\xE1 mais na sala."
+      - "Le joueur \xE0 exclure n\u2019est plus dans le salon."
+      - Der zu entfernende Spieler ist nicht mehr im Raum.
+      - Pemain yang akan dikeluarkan sudah tidak ada di ruang.
+      - "\u091C\u093F\u0938 \u0916\u093F\u0932\u093E\u0921\u093C\u0940 \u0915\u094B
+        \u0928\u093F\u0915\u093E\u0932\u0928\u093E \u0939\u0948 \u0935\u0939 \u0905\u092C
+        \u0915\u092E\u0930\u0947 \u092E\u0947\u0902 \u0928\u0939\u0940\u0902 \u0939\u0948\u0964"
+      - "\u0627\u0644\u0644\u0627\u0639\u0628 \u0627\u0644\u0645\u0631\u0627\u062F
+        \u0637\u0631\u062F\u0647 \u0644\u0645 \u064A\u0639\u062F \u0641\u064A \u0627\u0644\u063A\u0631\u0641\u0629."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/6rCV7Ye0IOyalOyyreydhCDsspjrpqztlZjqs6Ag7J6I7Iq164uI64ukLiDsnqDsi5wg6riw64uk66CkIOyjvOyEuOyalC4
+      TermType: 0
+      Description: "\uAC15\uD1F4 \uC694\uCCAD\uC744 \uCC98\uB9AC\uD558\uACE0 \uC788\uC2B5\uB2C8\uB2E4.
+        \uC7A0\uC2DC \uAE30\uB2E4\uB824 \uC8FC\uC138\uC694."
+      Languages:
+      - "\uAC15\uD1F4 \uC694\uCCAD\uC744 \uCC98\uB9AC\uD558\uACE0 \uC788\uC2B5\uB2C8\uB2E4.
+        \uC7A0\uC2DC \uAE30\uB2E4\uB824 \uC8FC\uC138\uC694."
+      - A kick request is in progress. Please wait.
+      - "\u6B63\u5728\u5904\u7406\u79FB\u51FA\u8BF7\u6C42\uFF0C\u8BF7\u7A0D\u5019\u3002"
+      - "\u6B63\u5728\u8655\u7406\u79FB\u51FA\u8ACB\u6C42\uFF0C\u8ACB\u7A0D\u5019\u3002"
+      - "\u9000\u51FA\u30EA\u30AF\u30A8\u30B9\u30C8\u3092\u51E6\u7406\u3057\u3066\u3044\u307E\u3059\u3002\u3057\u3070\u3089\u304F\u304A\u5F85\u3061\u304F\u3060\u3055\u3044\u3002"
+      - "Se est\xE1 procesando una expulsi\xF3n. Espera un momento."
+      - "Uma solicita\xE7\xE3o de expuls\xE3o est\xE1 em andamento. Aguarde."
+      - "Une demande d\u2019exclusion est en cours. Veuillez patienter."
+      - Eine Anfrage zum Entfernen wird bearbeitet. Bitte warte.
+      - Permintaan pengeluaran sedang diproses. Mohon tunggu.
+      - "\u0928\u093F\u0915\u093E\u0932\u0928\u0947 \u0915\u093E \u0905\u0928\u0941\u0930\u094B\u0927
+        \u0938\u0902\u0938\u093E\u0927\u093F\u0924 \u0939\u094B \u0930\u0939\u093E
+        \u0939\u0948\u0964 \u0915\u0943\u092A\u092F\u093E \u092A\u094D\u0930\u0924\u0940\u0915\u094D\u0937\u093E
+        \u0915\u0930\u0947\u0902\u0964"
+      - "\u062C\u0627\u0631\u064D \u0645\u0639\u0627\u0644\u062C\u0629 \u0637\u0644\u0628
+        \u0627\u0644\u0637\u0631\u062F. \u064A\u0631\u062C\u0649 \u0627\u0644\u0627\u0646\u062A\u0638\u0627\u0631."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/6rCV7Ye07ZWY7KeAIOuqu-2WiOyKteuLiOuLpC4g64uk7IucIOyLnOuPhO2VmOyEuOyalC4
+      TermType: 0
+      Description: "\uAC15\uD1F4\uD558\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4. \uB2E4\uC2DC
+        \uC2DC\uB3C4\uD558\uC138\uC694."
+      Languages:
+      - "\uAC15\uD1F4\uD558\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4. \uB2E4\uC2DC \uC2DC\uB3C4\uD558\uC138\uC694."
+      - Could not kick the player. Try again.
+      - "\u65E0\u6CD5\u79FB\u51FA\u8BE5\u73A9\u5BB6\uFF0C\u8BF7\u91CD\u8BD5\u3002"
+      - "\u7121\u6CD5\u79FB\u51FA\u8A72\u73A9\u5BB6\uFF0C\u8ACB\u91CD\u8A66\u3002"
+      - "\u53C2\u52A0\u8005\u3092\u9000\u51FA\u3055\u305B\u3089\u308C\u307E\u305B\u3093\u3067\u3057\u305F\u3002\u3082\u3046\u4E00\u5EA6\u304A\u8A66\u3057\u304F\u3060\u3055\u3044\u3002"
+      - "No se pudo expulsar al jugador. Int\xE9ntalo de nuevo."
+      - "N\xE3o foi poss\xEDvel expulsar o jogador. Tente novamente."
+      - "Impossible d\u2019exclure le joueur. R\xE9essayez."
+      - Der Spieler konnte nicht entfernt werden. Versuche es erneut.
+      - Pemain tidak dapat dikeluarkan. Coba lagi.
+      - "\u0916\u093F\u0932\u093E\u0921\u093C\u0940 \u0915\u094B \u0928\u0939\u0940\u0902
+        \u0928\u093F\u0915\u093E\u0932\u093E \u091C\u093E \u0938\u0915\u093E\u0964
+        \u092B\u093F\u0930 \u0938\u0947 \u0915\u094B\u0936\u093F\u0936 \u0915\u0930\u0947\u0902\u0964"
+      - "\u062A\u0639\u0630\u0631 \u0637\u0631\u062F \u0627\u0644\u0644\u0627\u0639\u0628.
+        \u062D\u0627\u0648\u0644 \u0645\u062C\u062F\u062F\u064B\u0627."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/67Cp7J6l7JeQIOydmO2VtCDqsJXth7TrkJjsl4jsirXri4jri6Qu
+      TermType: 0
+      Description: "\uBC29\uC7A5\uC5D0 \uC758\uD574 \uAC15\uD1F4\uB418\uC5C8\uC2B5\uB2C8\uB2E4."
+      Languages:
+      - "\uBC29\uC7A5\uC5D0 \uC758\uD574 \uAC15\uD1F4\uB418\uC5C8\uC2B5\uB2C8\uB2E4."
+      - You were kicked by the host.
+      - "\u60A8\u5DF2\u88AB\u623F\u4E3B\u79FB\u51FA\u623F\u95F4\u3002"
+      - "\u60A8\u5DF2\u88AB\u623F\u4E3B\u79FB\u51FA\u623F\u9593\u3002"
+      - "\u90E8\u5C4B\u4E3B\u306B\u3088\u3063\u3066\u9000\u51FA\u3055\u305B\u3089\u308C\u307E\u3057\u305F\u3002"
+      - "El anfitri\xF3n te ha expulsado."
+      - "Voc\xEA foi expulso pelo anfitri\xE3o."
+      - "Vous avez \xE9t\xE9 exclu par l\u2019h\xF4te."
+      - Du wurdest vom Gastgeber entfernt.
+      - Anda dikeluarkan oleh host.
+      - "\u092E\u0947\u091C\u093C\u092C\u093E\u0928 \u0928\u0947 \u0906\u092A\u0915\u094B
+        \u0915\u092E\u0930\u0947 \u0938\u0947 \u0928\u093F\u0915\u093E\u0932 \u0926\u093F\u092F\u093E\u0964"
+      - "\u062A\u0645 \u0637\u0631\u062F\u0643 \u0628\u0648\u0627\u0633\u0637\u0629
+        \u0627\u0644\u0645\u0636\u064A\u0641."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7J20IOuwqeyXkOyEnCDqsJXth7TrkJjslrQg64uk7IucIOyeheyepe2VoCDsiJgg7JeG7Iq164uI64ukLg
+      TermType: 0
+      Description: "\uC774 \uBC29\uC5D0\uC11C \uAC15\uD1F4\uB418\uC5B4 \uB2E4\uC2DC
+        \uC785\uC7A5\uD560 \uC218 \uC5C6\uC2B5\uB2C8\uB2E4."
+      Languages:
+      - "\uC774 \uBC29\uC5D0\uC11C \uAC15\uD1F4\uB418\uC5B4 \uB2E4\uC2DC \uC785\uC7A5\uD560
+        \uC218 \uC5C6\uC2B5\uB2C8\uB2E4."
+      - You were kicked from this room and cannot rejoin.
+      - "\u60A8\u5DF2\u88AB\u79FB\u51FA\u6B64\u623F\u95F4\uFF0C\u65E0\u6CD5\u518D\u6B21\u52A0\u5165\u3002"
+      - "\u60A8\u5DF2\u88AB\u79FB\u51FA\u6B64\u623F\u9593\uFF0C\u7121\u6CD5\u518D\u6B21\u52A0\u5165\u3002"
+      - "\u3053\u306E\u90E8\u5C4B\u304B\u3089\u9000\u51FA\u3055\u305B\u3089\u308C\u305F\u305F\u3081\u3001\u518D\u5165\u5BA4\u3067\u304D\u307E\u305B\u3093\u3002"
+      - "Se te expuls\xF3 de esta sala y no puedes volver a entrar."
+      - "Voc\xEA foi expulso desta sala e n\xE3o pode voltar a entrar."
+      - "Vous avez \xE9t\xE9 exclu de ce salon et ne pouvez plus le rejoindre."
+      - Du wurdest aus diesem Raum entfernt und kannst nicht erneut beitreten.
+      - Anda dikeluarkan dari ruang ini dan tidak dapat bergabung kembali.
+      - "\u0906\u092A\u0915\u094B \u0907\u0938 \u0915\u092E\u0930\u0947 \u0938\u0947
+        \u0928\u093F\u0915\u093E\u0932 \u0926\u093F\u092F\u093E \u0917\u092F\u093E
+        \u0939\u0948 \u0914\u0930 \u0906\u092A \u0926\u094B\u092C\u093E\u0930\u093E
+        \u0928\u0939\u0940\u0902 \u0906 \u0938\u0915\u0924\u0947\u0964"
+      - "\u062A\u0645 \u0637\u0631\u062F\u0643 \u0645\u0646 \u0647\u0630\u0647 \u0627\u0644\u063A\u0631\u0641\u0629
+        \u0648\u0644\u0627 \u064A\u0645\u0643\u0646\u0643 \u0627\u0644\u0627\u0646\u0636\u0645\u0627\u0645
+        \u0625\u0644\u064A\u0647\u0627 \u0645\u062C\u062F\u062F\u064B\u0627."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7LC46rCA7J6QIOq0gOumrA
+      TermType: 0
+      Description: "\uCC38\uAC00\uC790 \uAD00\uB9AC"
+      Languages:
+      - "\uCC38\uAC00\uC790 \uAD00\uB9AC"
+      - Manage players
+      - "\u7BA1\u7406\u73A9\u5BB6"
+      - "\u7BA1\u7406\u73A9\u5BB6"
+      - "\u53C2\u52A0\u8005\u7BA1\u7406"
+      - Gestionar jugadores
+      - Gerenciar jogadores
+      - "G\xE9rer les joueurs"
+      - Spieler verwalten
+      - Kelola pemain
+      - "\u0916\u093F\u0932\u093E\u0921\u093C\u093F\u092F\u094B\u0902 \u0915\u093E
+        \u092A\u094D\u0930\u092C\u0902\u0927\u0928"
+      - "\u0625\u062F\u0627\u0631\u0629 \u0627\u0644\u0644\u0627\u0639\u0628\u064A\u0646"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/66CI67KoIHswfQ
+      TermType: 0
+      Description: "\uB808\uBCA8 {0}"
+      Languages:
+      - "\uB808\uBCA8 {0}"
+      - Level {0}
+      - "\u7B49\u7EA7 {0}"
+      - "\u7B49\u7D1A {0}"
+      - "\u30EC\u30D9\u30EB {0}"
+      - Nivel {0}
+      - "N\xEDvel {0}"
+      - Niveau {0}
+      - Level {0}
+      - Level {0}
+      - "\u0938\u094D\u0924\u0930 {0}"
+      - "\u0627\u0644\u0645\u0633\u062A\u0648\u0649 {0}"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/6rK97ZeY7LmYIHswfSAvIHsxfQ
+      TermType: 0
+      Description: "\uACBD\uD5D8\uCE58 {0} / {1}"
+      Languages:
+      - "\uACBD\uD5D8\uCE58 {0} / {1}"
+      - XP {0} / {1}
+      - "\u7ECF\u9A8C {0} / {1}"
+      - "\u7D93\u9A57 {0} / {1}"
+      - "\u7D4C\u9A13\u5024 {0} / {1}"
+      - EXP {0} / {1}
+      - EXP {0} / {1}
+      - EXP {0} / {1}
+      - EP {0} / {1}
+      - XP {0} / {1}
+      - "\u0905\u0928\u0941\u092D\u0935 {0} / {1}"
+      - "\u062E\u0628\u0631\u0629 {0} / {1}"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7LWc6rOgIOugiOuyqA
+      TermType: 0
+      Description: "\uCD5C\uACE0 \uB808\uBCA8"
+      Languages:
+      - "\uCD5C\uACE0 \uB808\uBCA8"
+      - Max level
+      - "\u6700\u9AD8\u7B49\u7EA7"
+      - "\u6700\u9AD8\u7B49\u7D1A"
+      - "\u6700\u9AD8\u30EC\u30D9\u30EB"
+      - "Nivel m\xE1ximo"
+      - "N\xEDvel m\xE1ximo"
+      - Niveau maximum
+      - Maximales Level
+      - Level maksimum
+      - "\u0905\u0927\u093F\u0915\u0924\u092E \u0938\u094D\u0924\u0930"
+      - "\u0627\u0644\u0645\u0633\u062A\u0648\u0649 \u0627\u0644\u0623\u0642\u0635\u0649"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7ZqN65OdIOqyve2XmOy5mCB7MH0
+      TermType: 0
+      Description: "\uD68D\uB4DD \uACBD\uD5D8\uCE58 {0}"
+      Languages:
+      - "\uD68D\uB4DD \uACBD\uD5D8\uCE58 {0}"
+      - Earned {0} XP
+      - "\u83B7\u5F97\u7ECF\u9A8C {0}"
+      - "\u7372\u5F97\u7D93\u9A57 {0}"
+      - "\u7372\u5F97\u7D4C\u9A13\u5024 {0}"
+      - 'EXP ganada: {0}'
+      - 'EXP obtida: {0}'
+      - "EXP gagn\xE9e : {0}"
+      - '{0} EP erhalten'
+      - Mendapat {0} XP
+      - "{0} \u0905\u0928\u0941\u092D\u0935 \u092A\u094D\u0930\u093E\u092A\u094D\u0924"
+      - "\u0627\u0644\u062E\u0628\u0631\u0629 \u0627\u0644\u0645\u0643\u062A\u0633\u0628\u0629
+        {0}"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
     CaseInsensitiveTerms: 0
     OnMissingTranslation: 0
     mTerm_AppName:

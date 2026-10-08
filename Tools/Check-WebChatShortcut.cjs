@@ -10,6 +10,7 @@ const source = fs.readFileSync(path.join(__dirname,
 function fixture() {
   const library = {};
   const listeners = [];
+  let clockMs = 0;
   const rectangle = {
     left: 0, top: 0, width: 1200, height: 800,
     get right() { return this.left + this.width; },
@@ -34,7 +35,7 @@ function fixture() {
   const context = {
     LibraryManager: { library }, autoAddDeps() {}, mergeInto: Object.assign,
     UTF8ToString: value => value,
-    setTimeout, clearTimeout, HEAPF32: new Float32Array(16),
+    setTimeout, clearTimeout, HEAPF32: new Float32Array(16), performance: { now: () => clockMs },
     window: {
       innerWidth: 1200, innerHeight: 800, visualViewport: viewport, matchMedia: () => ({ matches: false }),
       addEventListener(type, callback, capture) { listeners.push({ type, callback, capture }); },
@@ -103,6 +104,7 @@ function fixture() {
   }
   configure();
   return { browser, library, context, field, configure, configureFields, key, viewport, rectangle,
+    advance(ms) { clockMs += ms; },
     createParent: () => ({ appendChild }),
     resizeViewport() {
       for (const listener of [...listeners]) if (listener.surface === 'viewport' && listener.type === 'resize') listener.callback();
@@ -463,6 +465,100 @@ test('키보드가 canvas 높이까지 줄이면 입력 전 높이비율과 현�
   assert.equal(metrics.bottom, 0);
 });
 
+test('입력 중 순간적인 viewport 복원은 키보드 배치를 유지하고 초안·DOM·포커스를 보존한다', () => {
+  const f = mobileFixture();
+  const input = f.browser.input.element;
+  const focusCount = input.focusCount;
+  input.value = '작성 중인 채팅';
+  f.viewport.height = 500;
+  const keyboard = f.metrics();
+  for (const delay of [0, 80, 60]) {
+    f.advance(delay);
+    f.viewport.height = 900;
+    f.resizeViewport();
+    assert.deepEqual(f.metrics(), keyboard);
+    assert.equal(f.browser.input.element, input);
+    assert.equal(f.library.DrawBrowserInputValue(1), '작성 중인 채팅');
+    assert.equal(f.library.DrawBrowserInputFocused(1), 1);
+    assert.equal(f.state(), 0);
+  }
+  f.viewport.height = 500;
+  assert.deepEqual(f.metrics(), keyboard);
+  f.advance(200);
+  f.viewport.height = 900;
+  assert.deepEqual(f.metrics(), keyboard);
+  assert.equal(input.focusCount, focusCount);
+});
+
+test('canvas까지 순간적으로 복원되면 현재 크기로 가림을 환산해 기준 높이와 입력 위치를 유지한다', () => {
+  const f = mobileFixture();
+  const input = f.browser.input.element;
+  const focusCount = input.focusCount;
+  f.context.window.innerHeight = f.rectangle.height = f.viewport.height = 500;
+  f.resizeViewport();
+  assert.equal(input.style.top, '400px');
+  const reduced = f.metrics();
+  assert.ok(Math.abs(reduced.ratio * 500 - 900) < 1e-4);
+  f.context.window.innerHeight = f.rectangle.height = f.viewport.height = 900;
+  f.resizeViewport();
+  assert.equal(input.style.top, '400px');
+  const restored = f.metrics();
+  assert.equal(restored.open, 1);
+  assert.equal(restored.ratio, 1);
+  assert.ok(Math.abs(900 * (1 - restored.bottom) - 500) < 1e-4);
+  f.configure({ Y: 400 / 900, ClipY: 400 / 900 });
+  assert.ok(Math.abs(parseFloat(input.style.top) - 400) < 1e-4);
+  f.context.window.innerHeight = f.rectangle.height = f.viewport.height = 500;
+  f.resizeViewport();
+  assert.ok(Math.abs(parseFloat(input.style.top) - 400) < 1e-4);
+  assert.deepEqual(f.metrics(), reduced);
+  f.configure({ Y: .8, ClipY: .8 });
+  assert.equal(input.style.top, '400px');
+  assert.equal(input.focusCount, focusCount);
+  assert.equal(f.state(), 0);
+});
+
+test('키보드 닫힘이 150ms 유지되면 focus가 남아도 배치를 정상 복원한다', () => {
+  const f = mobileFixture();
+  f.viewport.height = 500;
+  assert.equal(f.metrics().open, 1);
+  f.viewport.height = 900;
+  assert.equal(f.metrics().open, 1);
+  f.advance(149);
+  assert.equal(f.metrics().open, 1);
+  f.advance(1);
+  assert.equal(f.metrics().open, 0);
+  assert.equal(f.browser.keyboardViewport, null);
+  assert.equal(f.library.DrawBrowserInputFocused(1), 1);
+  f.viewport.height = 500;
+  assert.equal(f.metrics().open, 1);
+});
+
+test('입력 닫기·다른 HTML focus·pinch·회전은 이전 키보드 배치를 붙잡지 않는다', () => {
+  for (const change of [
+    f => f.library.DrawBrowserInputClose(1, 1),
+    f => { f.context.document.activeElement = { closest: () => 'input' }; },
+    f => { f.viewport.scale = 1.2; },
+    f => { f.context.window.innerWidth = f.viewport.width = f.rectangle.width = 800; }
+  ]) {
+    const f = mobileFixture();
+    f.context.window.matchMedia = () => ({ matches: true });
+    f.viewport.height = 500;
+    assert.equal(f.metrics().open, 1);
+    f.viewport.height = 900;
+    change(f);
+    assert.equal(f.metrics().open, 0);
+  }
+  const f = mobileFixture();
+  f.viewport.height = 500;
+  assert.equal(f.metrics().open, 1);
+  f.viewport.height = 900;
+  f.viewport.scale = 1.2;
+  assert.equal(f.metrics().open, 0);
+  f.viewport.scale = 1;
+  assert.equal(f.metrics().open, 0);
+});
+
 test('주소표시줄 변화·pinch·큰 폭 변경·PC 입력은 모바일 키보드로 취급하지 않는다', () => {
   for (const change of [
     f => { f.viewport.height = 830; },
@@ -499,6 +595,8 @@ test('키보드 resize와 같은 입력의 재배치는 DOM·초안·포커스�
 
 test('fullscreen 재부모화의 blur는 입력을 닫지 않고 실제 변경 때만 focus를 복원한다', () => {
   const f = mobileFixture();
+  f.viewport.height = 500;
+  assert.equal(f.metrics().open, 1);
   const input = f.browser.input.element;
   const focusCount = input.focusCount;
   const parent = f.createParent();

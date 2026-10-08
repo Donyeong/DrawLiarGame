@@ -41,7 +41,8 @@ internal static partial class Integration
         string[] accounts = users.Take(8).Select(user => user.Login.AccountId).ToArray();
         var first = RewardFixture(accounts.Take(3).ToArray(), assignment.RoomId, 1, 3, new[] { 4, 4, 0 });
         var pending = await RewardGetAsync(game, first.MatchId, users[0].Session.SessionToken);
-        Check(!pending.Recorded && pending.CoinReward == 0 && pending.Profile.Coins == 500,
+        Check(!pending.Recorded && pending.CoinReward == 0 && pending.ExperienceReward == 0 && pending.Profile.Coins == 500
+            && pending.Profile.Experience == 0 && pending.Profile.Level == 1,
             "미정산 결과 조회는 현재 잔액만 반환하고 코인을 지급하면 안 됩니다.");
         await RewardHttpErrorAsync(game, HttpMethod.Get, "/api/matches/" + first.MatchId + "/reward", null, null, HttpStatusCode.Unauthorized);
         await RewardHttpErrorAsync(game, HttpMethod.Get, "/api/matches/" + first.MatchId + "/reward", null, users[0].Login.SessionToken, HttpStatusCode.Unauthorized);
@@ -59,16 +60,19 @@ internal static partial class Integration
         {
             var receipt = await RewardGetAsync(game, first.MatchId, users[index].Session.SessionToken);
             Check(receipt.Recorded && receipt.MatchId == first.MatchId && receipt.CoinReward == firstCoins[index]
-                && receipt.Profile.AccountId == accounts[index] && receipt.Profile.Coins == 500 + firstCoins[index],
+                && receipt.Profile.AccountId == accounts[index] && receipt.Profile.Coins == 500 + firstCoins[index]
+                && receipt.ExperienceReward == firstCoins[index] && receipt.Profile.Experience == firstCoins[index],
                 "3명 한 라운드는 실제 점수에 비례해18/18/6코인을 한 번만 지급해야 합니다.");
         }
         var outsider = await RewardGetAsync(game, first.MatchId, users[8].Session.SessionToken);
-        Check(!outsider.Recorded && outsider.CoinReward == 0 && outsider.Profile.AccountId == users[8].Login.AccountId && outsider.Profile.Coins == 500,
+        Check(!outsider.Recorded && outsider.CoinReward == 0 && outsider.ExperienceReward == 0 && outsider.Profile.AccountId == users[8].Login.AccountId
+            && outsider.Profile.Coins == 500 && outsider.Profile.Experience == 0,
             "다른 계정의 경기 보상은 공개하지 않고 조회자의 재화만 반환해야 합니다.");
         Check(await ProfileRowCountAsync(owner, "MatchRecord") == 1 && await ProfileRowCountAsync(owner, "AccountMatch") == 3,
             "동일 경기8개 병렬 보고와 정규화 재시도는 전적·보상 ledger를 하나만 저장해야 합니다.");
         await RewardGetAsync(game, first.MatchId, users[0].Session.SessionToken);
-        Check((await database.ProfileAsync(Guid.Parse(accounts[0]))).Coins == 518, "보상 조회의 반복 요청은 재지급하면 안 됩니다.");
+        var repeat = await database.ProfileAsync(Guid.Parse(accounts[0]));
+        Check(repeat.Coins == 518 && repeat.Experience == 18, "보상 조회의 반복 요청은 코인·XP를 재지급하면 안 됩니다.");
         var conflicting = CloneProfileMatch(first); conflicting.Players[0].WeightedRoundScore--;
         await RewardClusterErrorAsync(game, conflicting, HttpStatusCode.Conflict, "MatchResultConflict");
         Report("실제 PostgreSQL 정산·0점 기본 보상·8중복 보고/정규화·조회 반복 멱등 검증");
@@ -76,7 +80,7 @@ internal static partial class Integration
         var eight = RewardFixture(accounts, assignment.RoomId, 2, 8, new[] { 6, 4, 0, 0, 0, 0, 0, 0 });
         await RewardClusterPostAsync(game, "/internal/dedicated/matches", eight);
         var large = await RewardGetAsync(game, eight.MatchId, users[0].Session.SessionToken);
-        Check(large.CoinReward == 80 && large.Profile.Coins == 598,
+        Check(large.CoinReward == 80 && large.Profile.Coins == 598 && large.ExperienceReward == 80 && large.Profile.Experience == 98,
             "8명 두 라운드6점은 참여32코인+점수48코인으로3명보다 인원·라운드에 비례해 증가해야 합니다.");
         Check((await RewardGetAsync(game, eight.MatchId, users[2].Session.SessionToken)).CoinReward == 32,
             "8명 두 라운드0점 참가자도 완료 참여분32코인을 받아야 합니다.");
@@ -86,19 +90,27 @@ internal static partial class Integration
         await Task.WhenAll(simultaneous.Select(request => RewardClusterPostAsync(game, "/internal/dedicated/matches", request)));
         Check((await database.ProfileAsync(Guid.Parse(accounts[0]))).Coins == 754
             && (await database.ProfileAsync(Guid.Parse(accounts[1]))).Coins == 738
-            && (await database.ProfileAsync(Guid.Parse(accounts[2]))).Coins == 586,
+            && (await database.ProfileAsync(Guid.Parse(accounts[2]))).Coins == 586
+            && (await database.ProfileAsync(Guid.Parse(accounts[0]))).Experience == 254
+            && (await database.ProfileAsync(Guid.Parse(accounts[1]))).Experience == 238
+            && (await database.ProfileAsync(Guid.Parse(accounts[2]))).Experience == 86,
             "서로 다른8경기가 같은 계정을 동시에 정산해도 계정 lock으로 잔액과 합계를 보존해야 합니다.");
-        int beforePurchase = (await database.ProfileAsync(Guid.Parse(accounts[0]))).Coins;
-        var product = ServerDatabase.ShopProducts.First(item => item.Price > 0 && item.Price < beforePurchase && item.Accessory != 0);
+        var purchasingProfile = await database.ProfileAsync(Guid.Parse(accounts[0]));
+        int beforePurchase = purchasingProfile.Coins;
+        long experienceBeforePurchase = purchasingProfile.Experience;
+        var product = ServerDatabase.ShopProducts.First(item => item.Price > 0 && item.Price < beforePurchase
+            && item.Accessory != 0 && !AvatarParts.IsOwned(purchasingProfile.OwnedAccessories, item.Accessory));
         var purchaseMatch = RewardFixture(accounts.Take(3).ToArray(), assignment.RoomId, 1, 3, new[] { 1, 1, 0 });
         await Task.WhenAll(RewardClusterPostAsync(game, "/internal/dedicated/matches", purchaseMatch),
             PostAsync<ProfileData>(game, "/api/shop/purchase", new PurchaseRequest { ProductId = product.Id, OperationId = Guid.NewGuid().ToString() }, users[0].Session.SessionToken));
-        Check((await database.ProfileAsync(Guid.Parse(accounts[0]))).Coins == beforePurchase + 9 - product.Price,
+        Check((await database.ProfileAsync(Guid.Parse(accounts[0]))).Coins == beforePurchase + 9 - product.Price
+            && (await database.ProfileAsync(Guid.Parse(accounts[0]))).Experience == experienceBeforePurchase + 9,
             "상점 구매와 보상이 동시에 발생해도 추가·차감 둘 다 보존해야 합니다.");
         Report("인원/완료 라운드/점수 비례·다른 경기 동시 정산·구매와 보상 동시 잔액 검증");
 
         long savedMatches = await ProfileRowCountAsync(owner, "MatchRecord");
         int savedCoins = (await database.ProfileAsync(Guid.Parse(accounts[0]))).Coins;
+        long savedExperience = (await database.ProfileAsync(Guid.Parse(accounts[0]))).Experience;
         foreach (Action<MatchResultRequest> change in new Action<MatchResultRequest>[]
         {
             value => value.Players[0].WeightedRoundParticipants = -1,
@@ -114,18 +126,32 @@ internal static partial class Integration
             await RewardClusterErrorAsync(game, invalid, null, null);
         }
         Check(await ProfileRowCountAsync(owner, "MatchRecord") == savedMatches
-            && (await database.ProfileAsync(Guid.Parse(accounts[0]))).Coins == savedCoins,
+            && (await database.ProfileAsync(Guid.Parse(accounts[0]))).Coins == savedCoins
+            && (await database.ProfileAsync(Guid.Parse(accounts[0]))).Experience == savedExperience,
             "범위를 벗어난 가중치·미참가 계정·다른 노드 보고는 전적과 코인을 부분 저장하면 안 됩니다.");
         await using (var cap = new NpgsqlCommand("UPDATE \"Account\" SET \"Coins\"=$2 WHERE \"Id\"=$1", owner))
         { cap.Parameters.AddWithValue(Guid.Parse(accounts[0])); cap.Parameters.AddWithValue(int.MaxValue - 2); await cap.ExecuteNonQueryAsync(); }
         var capped = RewardFixture(accounts.Take(3).ToArray(), assignment.RoomId, 1, 3, new[] { 4, 4, 0 });
         await RewardClusterPostAsync(game, "/internal/dedicated/matches", capped);
         var cappedReceipt = await RewardGetAsync(game, capped.MatchId, users[0].Session.SessionToken);
-        Check(cappedReceipt.CoinReward == 2 && cappedReceipt.Profile.Coins == int.MaxValue,
+        Check(cappedReceipt.CoinReward == 2 && cappedReceipt.Profile.Coins == int.MaxValue
+            && cappedReceipt.ExperienceReward == 18 && cappedReceipt.Profile.Experience == savedExperience + 18,
             "잔액 상한에서는 실제 지급 가능한2코인만 ledger에 기록하고 정수 overflow를 막아야 합니다.");
         await RewardClusterPostAsync(game, "/internal/dedicated/matches", capped);
         Check((await RewardGetAsync(game, capped.MatchId, users[0].Session.SessionToken)).CoinReward == 2,
             "상한에 도달한 보고서를 재시도해도 원래 실제 지급액을 보존해야 합니다.");
+        var saturatedWallet = RewardFixture(accounts.Take(3).ToArray(), assignment.RoomId, 1, 3, new[] { 4, 4, 0 });
+        await RewardClusterPostAsync(game, "/internal/dedicated/matches", saturatedWallet);
+        var uncappedExperience = await RewardGetAsync(game, saturatedWallet.MatchId, users[0].Session.SessionToken);
+        Check(uncappedExperience.CoinReward == 0 && uncappedExperience.ExperienceReward == 18
+            && uncappedExperience.Profile.Experience == savedExperience + 36, "가득 찬 코인 지갑도 코인 원식의 XP18을 지급해야 합니다.");
+        await using (var cap = new NpgsqlCommand("UPDATE \"Account\" SET \"Experience\"=$2 WHERE \"Id\"=$1", owner))
+        { cap.Parameters.AddWithValue(Guid.Parse(accounts[0])); cap.Parameters.AddWithValue(long.MaxValue - 2); await cap.ExecuteNonQueryAsync(); }
+        var experienceCap = RewardFixture(accounts.Take(3).ToArray(), assignment.RoomId, 1, 3, new[] { 4, 4, 0 });
+        await RewardClusterPostAsync(game, "/internal/dedicated/matches", experienceCap);
+        var experienceCapped = await RewardGetAsync(game, experienceCap.MatchId, users[0].Session.SessionToken);
+        Check(experienceCapped.ExperienceReward == 2 && experienceCapped.Profile.Experience == long.MaxValue && experienceCapped.Profile.Level == 100,
+            "XP bigint 상한에서는 실제 증가량2만 ledger에 기록하고 레벨100을 유지해야 합니다.");
         Report("가중치/참가/노드 검증·실제 지급액 ledger·잔액 상한/overflow·재시도 검증");
         await VerifyDedicatedRewardMappingAsync(game, database, users, assignment.RoomId);
     }
@@ -317,11 +343,12 @@ internal static partial class Integration
             using var database = new ServerDatabase(new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
             { ["ConnectionStrings:DrawLiarDatabase"] = scoped.ConnectionString }).Build());
             await database.InitializeAsync(); await database.InitializeAsync(); await database.RecordMatchAsync(legacy);
-            Check((await database.ProfileAsync(accounts[0])).Coins == 321 && (await database.PublicProfileAsync(accounts[0], accounts[0])).Stats.MatchesPlayed == 1,
+            Check((await database.ProfileAsync(accounts[0])).Coins == 321 && (await database.ProfileAsync(accounts[0])).Experience == 0
+                && (await database.ProfileAsync(accounts[0])).Level == 1 && (await database.PublicProfileAsync(accounts[0], accounts[0])).Stats.MatchesPlayed == 1,
                 "이전 전적 마이그레이션과 legacy 보고서 재시도는 기존 전적·잔액을 보존하고 소급 보상을 지급하면 안 됩니다.");
-            await using var reward = new NpgsqlCommand("SELECT sum(\"CoinReward\") FROM \"AccountMatch\"", owner);
-            Check(Convert.ToInt64(await reward.ExecuteScalarAsync()) == 0, "기존 경기의 보상 ledger는0으로 초기화해야 합니다.");
-            Report("기존 스키마11→12·반복 마이그레이션·기존 payload hash 재시도·소급 지급 제외 검증");
+            await using var reward = new NpgsqlCommand("SELECT sum(\"CoinReward\")+sum(\"ExperienceReward\") FROM \"AccountMatch\"", owner);
+            Check(Convert.ToInt64(await reward.ExecuteScalarAsync()) == 0, "기존 경기의 코인·XP 보상 ledger는0으로 초기화해야 합니다.");
+            Report("기존 스키마11→18·반복 마이그레이션·기존 payload hash 재시도·XP0/레벨1·소급 지급 제외 검증");
         }
         finally
         {

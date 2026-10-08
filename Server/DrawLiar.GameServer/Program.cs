@@ -18,7 +18,7 @@ Task<ServerSession> Authenticate(HttpContext context) => database.AuthenticateAs
 var lobbyChat = new LobbyChatHub(async (token, cancellation) =>
 {
     var identity = await database.AuthenticateLobbyAsync(token, "game:" + nodeId, cancellation);
-    return new LobbyChatIdentity(identity.Session.AccountId, identity.DisplayName, identity.Session.ExpiresAt);
+    return new LobbyChatIdentity(identity.Session.AccountId, identity.DisplayName, identity.Session.ExpiresAt, identity.Level);
 });
 app.Map("/ws/lobby", lobbyChat.HandleAsync);
 
@@ -67,6 +67,11 @@ app.MapPost("/internal/rooms/configure", async (HttpContext context, ConfigureRo
 {
     ServerRuntime.RequireCluster(context, app.Configuration);
     return await database.ConfigureRoomAsync(request, context.RequestAborted);
+});
+app.MapPost("/internal/rooms/kick", async (HttpContext context, KickRoomRequest request) =>
+{
+    ServerRuntime.RequireCluster(context, app.Configuration);
+    return await database.KickRoomAsync(request, context.RequestAborted);
 });
 app.MapPost("/internal/dedicated/register", async (HttpContext context, RegisterDedicatedRequest request) => { ServerRuntime.RequireCluster(context, app.Configuration); await database.RegisterDedicatedAsync(request, app.Environment.IsDevelopment()); return Results.NoContent(); });
 app.MapPost("/internal/dedicated/heartbeat", async (HttpContext context, DedicatedHeartbeatRequest request) => { ServerRuntime.RequireCluster(context, app.Configuration); return await database.DedicatedHeartbeatAsync(request); });

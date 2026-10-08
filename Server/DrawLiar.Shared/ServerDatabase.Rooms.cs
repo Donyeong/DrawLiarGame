@@ -82,6 +82,7 @@ public sealed partial class ServerDatabase
         if (request.Rooms == null || request.Rooms.Length > 1024) throw new ApiException("InvalidHeartbeat");
         var closed = new List<string>();
         var configurations = new List<RoomConfigurationData>();
+        var kicks = new List<RoomKickData>();
         await using var connection = await _source.OpenConnectionAsync();
         await using var transaction = await connection.BeginTransactionAsync();
         if (await Execute(connection, transaction, "UPDATE \"DedicatedNode\" SET \"HeartbeatAt\"=now() WHERE \"NodeId\"=$1", request.NodeId) != 1)
@@ -98,15 +99,23 @@ public sealed partial class ServerDatabase
             Guid owner = ServerRuntime.AccountId(room.OwnerAccountId);
             ValidateSettings(room.Settings);
             foreach (string id in room.PlayerAccountIds.Concat(room.SpectatorAccountIds)) ServerRuntime.AccountId(id);
+            var blocked = new List<string>();
+            await using (var command = Command(connection, transaction,
+                "SELECT \"AccountId\" FROM \"RoomKick\" WHERE \"RoomId\"=$1 AND \"AccountId\"=ANY($2)", roomId,
+                room.PlayerAccountIds.Concat(room.SpectatorAccountIds).Select(Guid.Parse).ToArray()))
+            await using (var reader = await command.ExecuteReaderAsync())
+                while (await reader.ReadAsync()) blocked.Add(reader.GetGuid(0).ToString());
+            if (blocked.Count > 0) kicks.Add(new RoomKickData { RoomId = room.RoomId, AccountIds = blocked.ToArray() });
             await Execute(connection, transaction, "DELETE FROM \"RoomAdmission\" WHERE \"RoomId\"=$1 AND \"Id\"=ANY($2)", roomId, room.AdmissionIds);
             await Execute(connection, transaction, """
-                UPDATE "Room" SET "PlayerCount"=$3,"SpectatorCount"=$4,"IsInProgress"=$5,"OwnerAccountId"=$6,"UpdatedAt"=now(),
+                UPDATE "Room" SET "PlayerCount"=CASE WHEN $12 THEN "PlayerCount" ELSE $3 END,
+                "SpectatorCount"=CASE WHEN $12 THEN "SpectatorCount" ELSE $4 END,"IsInProgress"=$5,"OwnerAccountId"=$6,"UpdatedAt"=now(),
                 "PlayerAccountIds"=$7::jsonb,"SpectatorAccountIds"=$8::jsonb,
                 "ConfirmedPlayerAccountIds"=$7::jsonb,"ConfirmedSpectatorAccountIds"=$8::jsonb,
                 "Settings"=CASE WHEN "ConfigurationVersion"=$11 THEN $9::jsonb || jsonb_build_object('IsPrivate',"Settings"->'IsPrivate') ELSE "Settings" END,
                 "Established"="Established" OR $10 WHERE "RoomId"=$1 AND "NodeId"=$2
                 """, roomId, request.NodeId, room.PlayerCount, room.SpectatorCount, room.IsInProgress, owner,
-                JsonSerializer.Serialize(room.PlayerAccountIds), JsonSerializer.Serialize(room.SpectatorAccountIds), JsonSerializer.Serialize(room.Settings, ServerRuntime.Json), room.AdmissionIds.Length > 0 || room.PlayerCount + room.SpectatorCount > 0, room.ConfigurationVersion);
+                JsonSerializer.Serialize(room.PlayerAccountIds.Except(blocked)), JsonSerializer.Serialize(room.SpectatorAccountIds.Except(blocked)), JsonSerializer.Serialize(room.Settings, ServerRuntime.Json), room.AdmissionIds.Length > 0 || room.PlayerCount + room.SpectatorCount > 0, room.ConfigurationVersion, blocked.Count > 0);
             await using (var configuration = Command(connection, transaction, "SELECT \"Settings\"::text,\"ConfigurationVersion\",\"AccessVersion\",\"CustomTopics\"::text FROM \"Room\" WHERE \"RoomId\"=$1 AND \"NodeId\"=$2 AND \"ConfigurationVersion\"<>$3", roomId, request.NodeId, room.ConfigurationVersion))
             await using (var reader = await configuration.ExecuteReaderAsync())
                 if (await reader.ReadAsync()) configurations.Add(new RoomConfigurationData { RoomId = room.RoomId,
@@ -128,7 +137,7 @@ public sealed partial class ServerDatabase
         await Execute(connection, transaction, "DELETE FROM \"RoomAdmission\" WHERE \"ExpiresAt\"<=now()");
         await RemoveUnoccupiedRooms(connection, transaction);
         await transaction.CommitAsync();
-        return new DedicatedHeartbeatResponse { ClosedRoomIds = closed.ToArray(), Configurations = configurations.ToArray() };
+        return new DedicatedHeartbeatResponse { ClosedRoomIds = closed.ToArray(), Configurations = configurations.ToArray(), Kicks = kicks.ToArray() };
     }
 
     private const string ROOM_SELECT = """
@@ -232,6 +241,7 @@ public sealed partial class ServerDatabase
             spectators = JsonSerializer.Deserialize<string[]>(reader.GetString(9))!;
         }
         Guid roomId = Guid.Parse(room.RoomId);
+        await EnsureNotKicked(connection, transaction, roomId, session.AccountId);
         bool reconnectPlayer, reconnectSpectator;
         await using (var membership = Command(connection, transaction, "SELECT \"ConfirmedPlayerAccountIds\" ? $2::text,\"ConfirmedSpectatorAccountIds\" ? $2::text,\"PasswordHash\" FROM \"Room\" WHERE \"RoomId\"=$1", roomId, session.AccountId))
         await using (var reader = await membership.ExecuteReaderAsync())
@@ -307,6 +317,7 @@ public sealed partial class ServerDatabase
             accessVersion = reader.GetInt64(5);
         }
         string admissionId = ServerRuntime.Hash(request.JoinTicket);
+        await EnsureNotKicked(connection, transaction, roomId, accountId);
         await Execute(connection, transaction, "INSERT INTO \"RoomAdmission\" (\"Id\",\"RoomId\",\"AccountId\",\"IsSpectator\",\"ExpiresAt\",\"AccessVersion\") VALUES ($1,$2,$3,$4,$5,$6)", admissionId, roomId, accountId, spectator, admissionUntil, accessVersion);
         string scope = (string)(await Scalar(connection, transaction, "SELECT \"Scope\" FROM \"Session\" WHERE \"Hash\"=$1", sessionHash) ?? "");
         if (!scope.StartsWith("game:", StringComparison.Ordinal)) throw new ApiException("InvalidTicket", 401);
@@ -352,6 +363,7 @@ public sealed partial class ServerDatabase
         await Execute(connection, transaction, "UPDATE \"RoomAdmission\" SET \"IsSpectator\"=$2 WHERE \"Id\"=$1", admissionId, spectator);
         await Execute(connection, transaction, "DELETE FROM \"Session\" WHERE \"AccountId\"=$1 AND \"Scope\"=$2", accountId, "dedicated:" + request.NodeId);
         var issued = await IssueSession(connection, transaction, accountId, "dedicated:" + request.NodeId, sessionHash, session.ExpiresAt);
+        await Execute(connection, transaction, "UPDATE \"Session\" SET \"DedicatedRoomId\"=$2 WHERE \"Hash\"=$1", ServerRuntime.Hash(issued.Token), roomId);
         var profile = await ReadProfile(connection, transaction, accountId);
         var customTopics = JsonSerializer.Deserialize<ServerTopicData[]>((string)(await Scalar(connection, transaction, "SELECT \"CustomTopics\"::text FROM \"Room\" WHERE \"RoomId\"=$1", roomId))!, ServerRuntime.Json)!;
         await Execute(connection, transaction, "INSERT INTO \"RoomGameAdmission\" (\"RoomId\",\"AccountId\") VALUES ($1,$2) ON CONFLICT DO NOTHING", roomId, accountId);

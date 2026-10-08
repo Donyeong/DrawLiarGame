@@ -28,7 +28,7 @@ namespace DrawLiar
                 BindProfileTarget(avatar, player.AccountId);
                 string template = state.Winners.Contains(player.Id)
                     ? (player.IsLiar ? "★ {0} · 라이어" : "★ {0} · 시민") : (player.IsLiar ? "{0} · 라이어" : "{0} · 시민");
-                Text(identity, template, "round-result-player-name", player.Name);
+                AddLevelBadge(Text(identity, template, "round-result-player-name", player.Name), player.Level, "result-" + player.Id, player.AccountId);
                 Text(row, "{0}점 (+{1})", "player-score", player.Score, player.RoundPoints);
             }
             Button(modal, "닫기", CloseModal, "primary round-result-dismiss", DrawSound.UiCancel).name = "results-close";
@@ -50,7 +50,7 @@ namespace DrawLiar
                 avatar.AddToClassList("avatar-preview");
                 identity.Add(avatar);
                 BindProfileTarget(avatar, player.AccountId);
-                RawText(identity, player.Name, "player-name");
+                LeveledName(identity, player.Name, player.Level, "player-name", "revealed-" + player.Id, player.AccountId);
                 Text(identity, player.IsCaught ? "지목됨" : "지목 안 됨", "rules");
             }
             Enter(identities, 120, 0, 400);
