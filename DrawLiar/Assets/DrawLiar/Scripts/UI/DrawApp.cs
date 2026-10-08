@@ -183,7 +183,11 @@ namespace DrawLiar
             _webRenderedMode=IsMobile;
 #endif
             _mobileLayout.LayoutChanged+=OnMobileLayoutChanged;
-            root.RegisterCallback<GeometryChangedEvent>(_=>root.EnableInClassList("compact",root.contentRect.width<1400||root.contentRect.height<880));
+            root.RegisterCallback<GeometryChangedEvent>(_=>
+            {
+                root.EnableInClassList("compact",root.contentRect.width<1400||root.contentRect.height<880);
+                if(inRoom&&!IsMobile)RefreshPcRoomGeometry(_pcCenter?.Q<VisualElement>("pc-game-canvas"));
+            });
             root.RegisterCallback<KeyDownEvent>(ChatFocusShortcut,TrickleDown.TrickleDown);
             root.RegisterCallback<NavigationSubmitEvent>(ChatNavigationSubmit,TrickleDown.TrickleDown);
             root.RegisterCallback<PointerDownEvent>(RoomChatOutsidePointer,TrickleDown.TrickleDown);
@@ -278,7 +282,7 @@ namespace DrawLiar
             if(lobbyScreen!=LobbyScreen.Shop)ClearShopPreview();
             if(lobbyScreen==LobbyScreen.Main)_nextRoomRefresh=0;
             root.RemoveFromClassList("in-game");root.RemoveFromClassList("pc-game");content.RemoveFromClassList("room-layout");root.AddToClassList("at-home");
-            if(!IsMobile)panelSettings.referenceResolution=new Vector2Int(1600,1000);
+            if(!IsMobile){panelSettings.referenceResolution=new Vector2Int(1600,1000);panelSettings.match=.5f;}
             _mobileLayout.Refresh();
             if(lobbyScreen==LobbyScreen.CreateRoom){CreateRoomPage();HideMobileScrollers();return;}
             if(lobbyScreen==LobbyScreen.Shop){ShopPage();HideMobileScrollers();return;}
@@ -1187,8 +1191,9 @@ namespace DrawLiar
             root.EnableInClassList("pc-game",!IsMobile);
             root.RemoveFromClassList("at-home");root.AddToClassList("in-game");content.AddToClassList("room-layout");lobbyScreen=LobbyScreen.Main;
             if(IsMobile){MobileRoom();HideMobileScrollers();return;}
-            panelSettings.referenceResolution=new Vector2Int(1600,900);
-            var hud=Box(content,"room-hud");var round=Box(hud,"round-label");
+            panelSettings.referenceResolution=new Vector2Int(1600,900);panelSettings.match=1f;
+            var shell=_pcRoomShell=Box(content,"pc-room-shell");shell.name="pc-room-shell";
+            var hud=Box(shell,"room-hud");var round=Box(hud,"round-label");
             roomBadge=Text(round,"","round-number");roundCaption=Text(round,"대기실","muted round-caption");
             phaseBanner=Box(hud,"phase-bar");phaseTitle=Text(phaseBanner,"대기실","phase-title");phaseDetail=Text(phaseBanner,"","phase-detail");
             AddLevelBadge(phaseDetail,1,"artist");
@@ -1197,7 +1202,7 @@ namespace DrawLiar
             timer.languageDirection=LanguageDirection.LTR;roomBadge.languageDirection=LanguageDirection.LTR;
             var numeralFont=Resources.Load<Font>("DrawLiar/Fonts/BarlowCondensed-SemiBold");
             if(numeralFont!=null){timer.style.unityFontDefinition=FontDefinition.FromFont(numeralFont);roomBadge.style.unityFontDefinition=FontDefinition.FromFont(numeralFont);}
-            var workspace=Box(content,"workspace pc-game-workspace");workspace.name="pc-game-workspace";
+            var workspace=Box(shell,"workspace pc-game-workspace");workspace.name="pc-game-workspace";
             var secret=_pcRoomSecret=Box(workspace,"secret-bar pc-secret-bar");secret.name="pc-secret-bar";CreateRoomSecretContext(secret,"게임 대기");
             role=Text(secret,"","role");word=Text(secret,"","word grow");
             secretToggle=Button(secret,"숨기기",()=>{secretHidden=!secretHidden;RefreshSecret(network.State);},"secret-toggle");
@@ -1212,12 +1217,13 @@ namespace DrawLiar
             stage.RegisterCallback<GeometryChangedEvent>(_=>RefreshPcRoomGeometry(frame));
             _pcLeftPlayers.RegisterCallback<GeometryChangedEvent>(_=>RefreshPcRoomGeometry(frame));
             CreateAccusedSpotlight(frame);CreateDrawingPreviewName(frame);
-            var controls=_pcRoomControls=Box(workspace,"pc-game-controls");controls.name="pc-game-controls";CreateDrawingTools(controls);CreateJudgmentPanel(controls);
-            var judgment=Box(controls,"pc-phase-controls row");contextInfo=Box(judgment,"context-info grow");phaseActions=Box(judgment,"phase-actions");
+            var controls=Box(workspace,"pc-game-controls");controls.name="pc-game-controls";CreateDrawingTools(controls);CreateJudgmentPanel(controls);
+            var footer=Box(controls,"pc-room-footer row");footer.name="pc-room-footer";
+            var chatDock=Box(footer,"pc-chat-dock");chatDock.name="pc-chat-dock";CreatePcRoomChat(chatDock);
+            var judgment=Box(footer,"pc-phase-controls row grow");contextInfo=Box(judgment,"context-info");phaseActions=Box(judgment,"phase-actions grow");
             _pcRightPlayers=Box(stage,"pc-player-rail pc-player-right");_pcRightPlayers.name="pc-player-right";
             _pcRightPlayers.RegisterCallback<GeometryChangedEvent>(_=>RefreshPcRoomGeometry(frame));
             playerStrip=null;CreateSpeechLayer(workspace);
-            CreatePcRoomChat(content);
             network.ReplayCanvas();foreach(var stroke in pendingStrokes)surface.Apply(stroke);pendingStrokes.Clear();
         }
 

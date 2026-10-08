@@ -5,30 +5,41 @@ namespace DrawLiar
 {
     public sealed partial class DrawApp
     {
-        private VisualElement _pcRoomSecret, _pcRoomControls;
+        private VisualElement _pcRoomShell, _pcRoomSecret;
 
         private void RefreshPcRoomGeometry(VisualElement frame)
         {
-            if (IsMobile || _pcCenter?.panel == null || frame == null || surface == null || frame.contentRect.height <= 0) return;
-            var stage = _pcCenter.parent;
-            var workspace = stage.parent;
-            bool compact = stage.contentRect.height < 480;
-            stage.EnableInClassList("pc-room-compact", compact);
-            if (_pcLeftPlayers != null && _pcRightPlayers != null)
+            if (IsMobile || _pcCenter?.panel == null || _pcRoomShell?.parent == null || _pcLeftPlayers == null || _pcRightPlayers == null
+                || frame == null || surface == null || frame.contentRect.height <= 0) return;
+            if (Screen.width > 0 && Screen.height > 0)
             {
-                float availableWidth = Mathf.Max(0, workspace.contentRect.width - _pcLeftPlayers.resolvedStyle.width
-                    - _pcRightPlayers.resolvedStyle.width - _pcCenter.resolvedStyle.marginLeft - _pcCenter.resolvedStyle.marginRight);
-                SetPcRoomWidthLimit(_pcRoomSecret, availableWidth);
-                SetPcRoomWidthLimit(_pcRoomControls, availableWidth);
+                int referenceHeight = Mathf.Max(900, Mathf.CeilToInt(Screen.height * 1280f / Screen.width));
+                if (panelSettings.referenceResolution.y != referenceHeight)
+                {
+                    panelSettings.referenceResolution = new Vector2Int(1600, referenceHeight);
+                    return;
+                }
             }
+            var stage = _pcCenter.parent;
             float horizontalInset = surface.resolvedStyle.borderLeftWidth + surface.resolvedStyle.borderRightWidth
                 + surface.resolvedStyle.paddingLeft + surface.resolvedStyle.paddingRight;
             float verticalInset = surface.resolvedStyle.borderTopWidth + surface.resolvedStyle.borderBottomWidth
                 + surface.resolvedStyle.paddingTop + surface.resolvedStyle.paddingBottom;
+            float sides = _pcLeftPlayers.resolvedStyle.width + _pcRightPlayers.resolvedStyle.width
+                + _pcCenter.resolvedStyle.marginLeft + _pcCenter.resolvedStyle.marginRight;
+            float stageHeight = Mathf.Max(0, (_pcRoomShell.parent.contentRect.width - sides - horizontalInset)
+                / DrawingSurface.AspectRatio + verticalInset);
+            if (stage.style.maxHeight.keyword != StyleKeyword.Undefined || float.IsNaN(stage.style.maxHeight.value.value)
+                || Mathf.Abs(stage.style.maxHeight.value.value - stageHeight) > .5f) stage.style.maxHeight = stageHeight;
             float width = Mathf.Max(0, (frame.contentRect.height - verticalInset) * DrawingSurface.AspectRatio + horizontalInset);
             SetPcRoomWidthLimit(_pcCenter, width);
-            SizePcPlayerRail(_pcLeftPlayers, compact);
-            SizePcPlayerRail(_pcRightPlayers, compact);
+            SetPcRoomWidthLimit(_pcRoomShell, width + sides);
+            if (_pcRoomChat != null)
+            {
+                float height = Mathf.Max(112, stage.parent.contentRect.height * .65f);
+                if (_pcRoomChat.style.maxHeight.keyword != StyleKeyword.Undefined || float.IsNaN(_pcRoomChat.style.maxHeight.value.value)
+                    || Mathf.Abs(_pcRoomChat.style.maxHeight.value.value - height) > .5f) _pcRoomChat.style.maxHeight = height;
+            }
         }
 
         private static void SetPcRoomWidthLimit(VisualElement element, float width)
@@ -36,22 +47,6 @@ namespace DrawLiar
             if (element == null || !float.IsFinite(width)) return;
             if (element.style.maxWidth.keyword != StyleKeyword.Undefined || float.IsNaN(element.style.maxWidth.value.value)
                 || Mathf.Abs(element.style.maxWidth.value.value - width) > .5f) element.style.maxWidth = width;
-        }
-
-        private static void SizePcPlayerRail(VisualElement rail, bool compact)
-        {
-            if (rail == null || rail.contentRect.height <= 0) return;
-            float height = Mathf.Min(112, Mathf.Max(0, (rail.contentRect.height - 16) / 2));
-            foreach (var card in rail.Children())
-            {
-                if (compact)
-                {
-                    if (card.style.height.keyword != StyleKeyword.Undefined || float.IsNaN(card.style.height.value.value)
-                        || Mathf.Abs(card.style.height.value.value - height) > .5f)
-                        card.style.height = height;
-                }
-                else if (card.style.height.keyword != StyleKeyword.Auto) card.style.height = StyleKeyword.Auto;
-            }
         }
 
         private static void SizePcPlayerAvatar(VisualElement card, AvatarElement avatar)

@@ -327,8 +327,7 @@
 .in-game .toast { background-color: #30342f; color: #efeadf; border-width: 1px; border-color: #50554d; border-radius: 4px; }
 .app.pc-game { background-color: #F8F4E9; color: #34304B; padding: 20px 28px; --ink: #34304B; --muted: #817A87; --brand: #F5B553; --border: #DED5EA; }
 .pc-game .room-hud { margin-bottom: 12px; }
-.pc-game .round-label, .pc-game .room-menu { width: 184px; }
-.pc-game .room-menu { width: 240px; }
+.pc-game .round-label, .pc-game .room-menu { width: 240px; }
 .pc-game .phase-detail { color: #78679E; }
 .pc-game .timer { color: #78679E; }
 .pc-game .timer-urgent { color: #BD594A; }
@@ -342,11 +341,12 @@
 .pc-game .hud-timer { margin-left: 24px; }
 .guess-timer-control { width: 112px; min-width: 112px; margin-right: 12px; }
 .app .guess-popup .game-timer .timer.timer-value { font-size: 28px; margin: 0; }
-.pc-game .pc-game-workspace { margin-bottom: 120px; position: relative; flex-direction: column; align-items: center; }
+.pc-game .pc-room-shell { width: 100%; flex-grow: 1; flex-basis: 0; max-height: 860px; min-height: 0; min-width: 0; align-self: center; }
+.pc-game .pc-game-workspace { margin-bottom: 0; position: relative; flex-direction: column; align-items: center; }
 .pc-game .pc-canvas-stage { width: 100%; flex-grow: 1; flex-basis: 0; min-height: 0; flex-direction: row; align-items: stretch; justify-content: center; }
-.pc-game .pc-player-rail { width: 184px; min-width: 184px; flex-shrink: 0; justify-content: center; min-height: 0; }
+.pc-game .pc-player-rail { width: 184px; min-width: 184px; flex-shrink: 0; flex-direction: column; flex-wrap: nowrap; justify-content: center; min-height: 0; }
 .pc-game .pc-game-center { margin: 0 20px; }
-.pc-game .pc-player-rail .player { width: 100%; flex-grow: 1; flex-basis: 0; min-height: 0; max-height: 184px; height: auto; margin: 4px 0; padding: 16px 8px 8px; border-width: 1px; border-color: #E3DDD4; border-radius: 16px; background-color: #FFFFFF; }
+.pc-game .pc-player-rail .player { width: 100%; flex-grow: 1; flex-basis: 0; min-height: 0; max-height: 184px; height: auto; margin: 4px 0; padding: 14px 8px 6px; border-width: 1px; border-color: #E3DDD4; border-radius: 16px; background-color: #FFFFFF; }
 .pc-game .player > .player-identity { flex-direction: column; align-items: center; justify-content: center; flex-grow: 1; min-height: 0; }
 .pc-game .player .avatar { width: 128px; height: 128px; flex-shrink: 0; margin: 0 0 4px; }
 .pc-game .player .grow { width: 100%; flex-grow: 0; flex-shrink: 0; align-items: center; }
@@ -355,8 +355,6 @@
 .pc-game .player .player-summary { width: 100%; height: 16px; flex-shrink: 0; flex-direction: row; align-items: center; justify-content: center; margin-top: 3px; }
 .pc-game .player .player-score { height: 16px; flex-shrink: 0; margin: 0; padding: 0; font-size: 12px; color: #645797; -unity-font-style: bold; -unity-text-align: middle-center; }
 .pc-game .player .player-summary .player-status { min-width: 0; flex-shrink: 1; margin: 0 0 0 6px; }
-.pc-game .pc-room-compact .pc-player-rail { flex-direction: row; flex-wrap: wrap; align-content: center; }
-.pc-game .pc-room-compact .pc-player-rail .player { width: 48%; flex-grow: 0; flex-basis: auto; margin: 4px 1%; padding: 8px 4px 4px; border-radius: 12px; }
 .pc-game .pc-player-rail .player.player-empty { padding: 8px; align-items: center; justify-content: center; background-color: #F7F3EA; border-color: #E3DDD4; }
 .player-empty-icon { width: 32px; height: 32px; flex-shrink: 0; color: #B2AABD; margin-bottom: 6px; }
 .player-empty-label { font-size: 12px; color: #A099AA; padding: 0; margin: 0; -unity-text-align: middle-center; white-space: nowrap; }
@@ -387,6 +385,11 @@
 .spectator-count { flex-shrink: 0; margin-left: 12px; font-size: 12px; color: #817A87; }
 .pc-game .drawing-surface { border-width: 2px; border-color: #34304B; }
 .pc-game .pc-game-controls { width: 100%; flex-shrink: 0; margin-top: 8px; }
+.pc-game .pc-room-footer { min-height: 112px; align-items: center; }
+.pc-game .pc-chat-dock { position: relative; width: 28%; min-width: 300px; max-width: 360px; min-height: 112px; flex-shrink: 0; align-self: stretch; margin-right: 16px; }
+.pc-game .pc-room-footer .pc-phase-controls { min-width: 0; min-height: 112px; flex-basis: 0; }
+.pc-game .pc-room-footer .context-info { flex-shrink: 1; max-width: 30%; }
+.pc-game .pc-room-footer .phase-actions { min-width: 0; max-width: none; flex-basis: 0; }
 .pc-game .pc-phase-controls { min-height: 48px; align-items: center; }
 .pc-game .context-info { min-width: 0; padding-right: 12px; }
 .pc-game .room-settings-summary { align-self: flex-start; max-width: 100%; min-width: 0; padding: 8px 12px; border-width: 1px; border-color: #E3DDD4; border-radius: 12px; background-color: #FFFCF5; }
@@ -418,12 +421,12 @@
 .pc-game .brush-sizes .button { height: 36px; min-height: 36px; }
 .pc-game .brush-sizes .selected { border-color: #78679E; background-color: #EEE8F5; }
 .pc-game .room-layout { position: relative; }
-.pc-game .pc-room-chat { position: absolute; left: 0; bottom: 0; width: 460px; max-width: 48%; height: 320px; max-height: 65%; min-height: 0; padding: 12px; border-width: 1px; border-color: #DED5EA; border-radius: 12px; background-color: rgba(255,255,255,.82); }
+.pc-game .pc-room-chat { position: absolute; left: 0; bottom: 0; width: 100%; height: 320px; min-height: 0; padding: 12px; border-width: 1px; border-color: #DED5EA; border-radius: 12px; background-color: rgba(255,255,255,.82); }
 .pc-game .pc-chat-header { height: 28px; min-height: 28px; flex-shrink: 0; margin-bottom: 8px; }
 .pc-game .pc-chat-title { min-height: 24px; flex-shrink: 0; margin: 0; padding: 0; font-size: 16px; -unity-font-style: bold; color: #34304B; }
 .pc-game .pc-chat-header .chat-open { height: 24px; min-height: 24px; margin: 0; padding: 0; border-width: 0; background-color: transparent; font-size: 13px; color: #78679E; -unity-text-align: middle-left; }
 .app.pc-game .pc-chat-close { width: 28px; height: 28px; min-height: 28px; margin: 0; padding: 0; border-width: 1px; border-radius: 7px; }
-.pc-game .pc-room-chat.pc-chat-collapsed { width: 360px; height: 112px; padding: 8px 10px; background-color: rgba(255,255,255,.62); }
+.pc-game .pc-room-chat.pc-chat-collapsed { height: 112px; padding: 8px 10px; background-color: rgba(255,255,255,.62); }
 .pc-game .pc-chat-collapsed .pc-chat-header { display: none; }
 .pc-game .pc-chat-collapsed .pc-chat-title, .pc-game .pc-chat-collapsed .pc-chat-close { display: none; }
 .pc-game .pc-room-chat.pc-chat-collapsed .chat-history { margin-bottom: 8px; }
