@@ -9536,6 +9536,227 @@
         "आपका वोट दर्ज नहीं हुआ। कृपया फिर से कोशिश करें।",
         "لم يُسجل تصويتك. يرجى المحاولة مرة أخرى."
       ]
+    },
+    {
+      "Key": "주제 검색",
+      "Values": [
+        "주제 검색",
+        "Search topics",
+        "搜索主题",
+        "搜尋主題",
+        "テーマ検索",
+        "Buscar temas",
+        "Buscar temas",
+        "Rechercher des thèmes",
+        "Themen suchen",
+        "Cari topik",
+        "विषय खोजें",
+        "البحث عن المواضيع"
+      ]
+    },
+    {
+      "Key": "정렬",
+      "Values": [
+        "정렬",
+        "Sort",
+        "排序",
+        "排序",
+        "並び替え",
+        "Ordenar",
+        "Ordenar",
+        "Trier",
+        "Sortieren",
+        "Urutkan",
+        "क्रम",
+        "الترتيب"
+      ]
+    },
+    {
+      "Key": "최신순",
+      "Values": [
+        "최신순",
+        "Newest",
+        "最新",
+        "最新",
+        "新しい順",
+        "Más recientes",
+        "Mais recentes",
+        "Plus récents",
+        "Neueste zuerst",
+        "Terbaru",
+        "नवीनतम",
+        "الأحدث"
+      ]
+    },
+    {
+      "Key": "다운로드순",
+      "Values": [
+        "다운로드순",
+        "Most downloaded",
+        "下载最多",
+        "下載最多",
+        "ダウンロード順",
+        "Más descargados",
+        "Mais baixados",
+        "Plus téléchargés",
+        "Meiste Downloads",
+        "Unduhan terbanyak",
+        "सबसे अधिक डाउनलोड",
+        "الأكثر تنزيلاً"
+      ]
+    },
+    {
+      "Key": "인기순",
+      "Values": [
+        "인기순",
+        "Most recommended",
+        "推荐最多",
+        "推薦最多",
+        "おすすめ順",
+        "Más recomendados",
+        "Mais recomendados",
+        "Plus recommandés",
+        "Meistempfohlen",
+        "Rekomendasi terbanyak",
+        "सबसे अधिक अनुशंसित",
+        "الأكثر توصية"
+      ]
+    },
+    {
+      "Key": "추천",
+      "Values": [
+        "추천",
+        "Recommend",
+        "推荐",
+        "推薦",
+        "おすすめ",
+        "Recomendar",
+        "Recomendar",
+        "Recommander",
+        "Empfehlen",
+        "Rekomendasikan",
+        "अनुशंसा करें",
+        "توصية"
+      ]
+    },
+    {
+      "Key": "추천 취소",
+      "Values": [
+        "추천 취소",
+        "Undo recommendation",
+        "取消推荐",
+        "取消推薦",
+        "おすすめを取消",
+        "Quitar recomendación",
+        "Remover recomendação",
+        "Retirer la recommandation",
+        "Empfehlung zurücknehmen",
+        "Batalkan rekomendasi",
+        "अनुशंसा हटाएँ",
+        "إلغاء التوصية"
+      ]
+    },
+    {
+      "Key": "검색 결과가 없습니다.",
+      "Values": [
+        "검색 결과가 없습니다.",
+        "No results found.",
+        "没有搜索结果。",
+        "沒有搜尋結果。",
+        "検索結果がありません。",
+        "No se encontraron resultados.",
+        "Nenhum resultado encontrado.",
+        "Aucun résultat.",
+        "Keine Ergebnisse gefunden.",
+        "Tidak ada hasil.",
+        "कोई परिणाम नहीं मिला।",
+        "لم يتم العثور على نتائج."
+      ]
+    },
+    {
+      "Key": "검색어를 확인하세요.",
+      "Values": [
+        "검색어를 확인하세요.",
+        "Check your search text.",
+        "请检查搜索词。",
+        "請檢查搜尋詞。",
+        "検索語を確認してください。",
+        "Revisa el texto de búsqueda.",
+        "Verifique o texto da busca.",
+        "Vérifiez votre recherche.",
+        "Prüfe deinen Suchtext.",
+        "Periksa teks pencarian.",
+        "खोज शब्द जाँचें।",
+        "تحقق من نص البحث."
+      ]
+    },
+    {
+      "Key": "정렬 방식을 선택하세요.",
+      "Values": [
+        "정렬 방식을 선택하세요.",
+        "Choose a sort order.",
+        "请选择排序方式。",
+        "請選擇排序方式。",
+        "並び順を選んでください。",
+        "Elige un orden.",
+        "Escolha uma ordem.",
+        "Choisissez un ordre de tri.",
+        "Wähle eine Sortierung.",
+        "Pilih urutan.",
+        "क्रम चुनें।",
+        "اختر ترتيباً."
+      ]
+    },
+    {
+      "Key": "게시하려면 중복을 제외한 제시어가 최소 {0}개 필요합니다.",
+      "Values": [
+        "게시하려면 중복을 제외한 제시어가 최소 {0}개 필요합니다.",
+        "At least {0} unique words are required to publish.",
+        "发布至少需要 {0} 个不重复的提示词。",
+        "發布至少需要 {0} 個不重複的提示詞。",
+        "公開には重複を除いて{0}語以上必要です。",
+        "Necesitas al menos {0} palabras únicas para publicar.",
+        "É preciso ter pelo menos {0} palavras únicas para publicar.",
+        "Au moins {0} mots distincts sont nécessaires pour publier.",
+        "Zum Veröffentlichen sind mindestens {0} verschiedene Wörter nötig.",
+        "Perlu setidaknya {0} kata unik untuk menerbitkan.",
+        "प्रकाशित करने के लिए कम से कम {0} अलग शब्द चाहिए।",
+        "يلزم {0} كلمات فريدة على الأقل للنشر."
+      ]
+    },
+    {
+      "Key": "이름 {0}자 · 제시어 {1}자 · 게시 {2}~{3}개",
+      "Values": [
+        "이름 {0}자 · 제시어 {1}자 · 게시 {2}~{3}개",
+        "Name: {0} characters · Word: {1} characters · Publish: {2}–{3} words",
+        "名称 {0} 字符 · 提示词 {1} 字符 · 发布 {2}～{3} 个",
+        "名稱 {0} 字元 · 提示詞 {1} 字元 · 發布 {2}～{3} 個",
+        "名前{0}文字 · 提示語{1}文字 · 公開{2}～{3}語",
+        "Nombre: {0} caracteres · Palabra: {1} caracteres · Publicar: {2}–{3} palabras",
+        "Nome: {0} caracteres · Palavra: {1} caracteres · Publicar: {2}–{3} palavras",
+        "Nom : {0} caractères · Mot : {1} caractères · Publication : {2}–{3} mots",
+        "Name: {0} Zeichen · Wort: {1} Zeichen · Veröffentlichen: {2}–{3} Wörter",
+        "Nama: {0} karakter · Kata: {1} karakter · Terbitkan: {2}–{3} kata",
+        "नाम: {0} अक्षर · शब्द: {1} अक्षर · प्रकाशन: {2}–{3} शब्द",
+        "الاسم: {0} أحرف · الكلمة: {1} أحرف · النشر: {2}–{3} كلمات"
+      ]
+    },
+    {
+      "Key": "제시어 {0}개 · 다운로드 {1}회 · 추천 {2}개",
+      "Values": [
+        "제시어 {0}개 · 다운로드 {1}회 · 추천 {2}개",
+        "{0} words · {1} downloads · {2} recommendations",
+        "{0} 个提示词 · {1} 次下载 · {2} 个推荐",
+        "{0} 個提示詞 · {1} 次下載 · {2} 個推薦",
+        "{0}語 · ダウンロード{1}回 · おすすめ{2}件",
+        "{0} palabras · {1} descargas · {2} recomendaciones",
+        "{0} palavras · {1} downloads · {2} recomendações",
+        "{0} mots · {1} téléchargements · {2} recommandations",
+        "{0} Wörter · {1} Downloads · {2} Empfehlungen",
+        "{0} kata · {1} unduhan · {2} rekomendasi",
+        "{0} शब्द · {1} डाउनलोड · {2} अनुशंसाएँ",
+        "{0} كلمات · {1} تنزيلات · {2} توصيات"
+      ]
     }
   ]
 }

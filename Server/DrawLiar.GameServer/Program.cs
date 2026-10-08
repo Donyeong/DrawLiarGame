@@ -41,14 +41,16 @@ app.MapGet("/api/shop", (Func<HttpContext, Task<ShopResponse>>)(async context =>
 app.MapPost("/api/shop/purchase", async (HttpContext context, PurchaseRequest request) => await database.PurchaseAsync((await Authenticate(context)).AccountId, request));
 app.MapPost("/api/shop/purchase-batch", async (HttpContext context, PurchaseBatchRequest request) =>
     await database.PurchaseBatchAsync((await Authenticate(context)).AccountId, request, context.RequestAborted));
-app.MapGet("/api/topic-workshop", async (HttpContext context, string? language, bool? mine, int? offset, int? limit) =>
-    await database.ListWorkshopTopicsAsync((await Authenticate(context)).AccountId, language, mine ?? false, offset ?? 0, limit ?? 20, context.RequestAborted));
+app.MapGet("/api/topic-workshop", async (HttpContext context, string? language, bool? mine, int? offset, int? limit, string? search, string? sort) =>
+    await database.ListWorkshopTopicsAsync((await Authenticate(context)).AccountId, language, mine ?? false, offset ?? 0, limit ?? 20, context.RequestAborted, search, sort));
 app.MapPost("/api/topic-workshop", async (HttpContext context, TopicWorkshopPublishRequest request) =>
     await database.PublishWorkshopTopicAsync((await Authenticate(context)).AccountId, request, context.RequestAborted));
 app.MapGet("/api/topic-workshop/{topicId}", async (HttpContext context, string topicId) =>
     await database.DownloadWorkshopTopicAsync((await Authenticate(context)).AccountId, topicId, context.RequestAborted));
 app.MapGet("/api/topic-workshop/{topicId}/preview", async (HttpContext context, string topicId) =>
     await database.PreviewWorkshopTopicAsync((await Authenticate(context)).AccountId, topicId, context.RequestAborted));
+app.MapPost("/api/topic-workshop/{topicId}/recommend", async (HttpContext context, string topicId, TopicWorkshopRecommendationRequest request) =>
+    await database.RecommendWorkshopTopicAsync((await Authenticate(context)).AccountId, topicId, request.IsRecommended, context.RequestAborted));
 app.MapDelete("/api/topic-workshop/{topicId}", async (HttpContext context, string topicId) =>
 {
     await database.DeleteWorkshopTopicAsync((await Authenticate(context)).AccountId, topicId, context.RequestAborted);

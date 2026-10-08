@@ -16,8 +16,10 @@
  .app .pc-lobby-services .button.pc-lobby-service-last { margin-bottom: 0; }
  .pc-lobby-rooms { flex-basis: 0; margin-bottom: 16px; }
  .pc-lobby-room-heading { min-height: 48px; flex-shrink: 0; margin-bottom: 16px; }
- .pc-lobby-room-heading .section-title { font-size: 20px; margin: 0; padding: 0; }
- .app .pc-lobby-room-heading .button { min-width: 160px; margin-left: 8px; }
+ .pc-lobby-room-heading .section-title { flex-basis: 0; min-width: 0; font-size: 20px; margin: 0; padding: 0; }
+ .app .pc-lobby-room-actions { flex-grow: 3; flex-basis: 0; min-width: 0; align-items: stretch; margin-left: 12px; }
+ .app .pc-lobby-room-actions .button { flex-basis: 0; flex-grow: 1; flex-shrink: 1; min-width: 0; height: auto; min-height: 48px; margin: 0 8px 0 0; padding: 8px; white-space: normal; }
+ .app .pc-lobby-room-actions .mobile-last { margin-right: 0; }
  .pc-lobby .room-search { margin-bottom: 16px; }
  .app .pc-lobby .room-search .room-refresh { margin-left: 8px; }
  .app .pc-lobby-room-list { flex-basis: 0; height: auto; min-height: 0; margin: 0; }
@@ -309,6 +311,9 @@
 .pc-game .player .grow { width: 100%; flex-grow: 0; flex-shrink: 0; align-items: center; }
 .pc-game .player .player-name { max-width: 100%; height: 18px; flex-shrink: 0; font-size: 14px; -unity-font-style: normal; -unity-text-align: middle-center; color: #34304B; margin: 0; padding: 0; }
 .pc-game .player-status { height: 16px; flex-shrink: 0; font-size: 12px; color: #817A87; margin-top: 3px; -unity-text-align: middle-center; }
+.pc-game .player .player-summary { width: 100%; height: 16px; flex-shrink: 0; flex-direction: row; align-items: center; justify-content: center; margin-top: 3px; }
+.pc-game .player .player-score { height: 16px; flex-shrink: 0; margin: 0; padding: 0; font-size: 12px; color: #645797; -unity-font-style: bold; -unity-text-align: middle-center; }
+.pc-game .player .player-summary .player-status { min-width: 0; flex-shrink: 1; margin: 0 0 0 6px; }
 .pc-game .pc-player-placeholder { visibility: hidden; }
 .pc-game .player.active-player, .pc-game .player.selected-player, .pc-game .player.accused-player { background-color: #EEE8F5; border-color: #78679E; }
 .pc-game .player.vote-selectable:hover, .pc-game .player.vote-selectable:focus { background-color: #EEE8F5; border-color: #78679E; }
@@ -323,14 +328,14 @@
 .nomination-player .player-drawing-order, .pc-game .nomination-player .player-host-badge { visibility: hidden; }
 .pc-game .pc-secret-bar { height: auto; min-height: 52px; flex-direction: row; align-items: center; margin-bottom: 8px; padding: 6px 12px; border-width: 1px; border-color: #DED5EA; border-radius: 12px; background-color: #EEE8F5; }
 .pc-game .pc-secret-bar .topic { min-width: 0; flex-shrink: 1; margin: 0 12px 0 0; font-size: 16px; white-space: normal; overflow: visible; text-overflow: clip; }
-.pc-game .pc-secret-bar .role { flex-shrink: 0; margin: 0 12px 0 0; padding: 0; border-width: 0; font-size: 14px; color: #78679E; }
-.pc-game .pc-secret-bar .word { min-width: 0; margin: 0; font-size: 24px; color: #34304B; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pc-game .pc-secret-bar .role { min-width: 0; max-width: 18%; flex-shrink: 1; margin: 0 12px 0 0; padding: 0; border-width: 0; font-size: 14px; color: #78679E; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pc-game .pc-secret-bar .word { flex-basis: 0; min-width: 0; margin: 0; font-size: 24px; color: #34304B; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pc-game .pc-secret-bar .secret-toggle { min-width: 64px; height: 32px; min-height: 32px; margin-left: 8px; font-size: 12px; color: #78679E; }
-.room-secret-context { flex-shrink: 1; min-width: 0; max-width: 45%; margin-right: 12px; }
-.room-mode-badges { flex-direction: row; align-items: center; flex-shrink: 0; min-width: 0; height: 18px; margin-bottom: 2px; }
+.room-secret-context { flex-direction: row; align-items: center; flex-grow: 1; flex-basis: 0; flex-shrink: 1; min-width: 0; max-width: 55%; margin-right: 12px; }
+.room-mode-badges { flex-direction: row; align-items: center; flex-shrink: 1; min-width: 0; max-width: 75%; height: 18px; margin-right: 8px; }
 .room-mode-badge { flex-shrink: 1; min-width: 0; height: 18px; margin: 0 4px 0 0; padding: 1px 6px; border-radius: 5px; background-color: #FFFFFF; color: #645797; font-size: 11px; -unity-text-align: middle-center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .room-mode-badge:hover { background-color: #FFF0C7; }
-.pc-game .pc-secret-bar .room-secret-context .topic { margin: 0; height: 18px; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pc-game .pc-secret-bar .room-secret-context .topic { flex-grow: 1; flex-basis: 0; min-width: 0; margin: 0; height: 18px; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .spectator-count { flex-shrink: 0; margin-left: 12px; font-size: 12px; color: #817A87; }
 .pc-game .drawing-surface { border-width: 2px; border-color: #34304B; }
 .pc-game .pc-game-controls { flex-shrink: 0; margin-top: 8px; }
@@ -359,15 +364,15 @@
 .pc-game .brush-sizes .button { height: 36px; min-height: 36px; }
 .pc-game .brush-sizes .selected { border-color: #78679E; background-color: #EEE8F5; }
 .pc-game .room-layout { position: relative; }
-.pc-game .pc-room-chat { position: absolute; left: 0; bottom: 0; width: 460px; max-width: 48%; height: 320px; max-height: 65%; min-height: 0; padding: 12px; border-width: 1px; border-color: #DED5EA; border-radius: 12px; background-color: #FFFFFF; }
+.pc-game .pc-room-chat { position: absolute; left: 0; bottom: 0; width: 460px; max-width: 48%; height: 320px; max-height: 65%; min-height: 0; padding: 12px; border-width: 1px; border-color: #DED5EA; border-radius: 12px; background-color: rgba(255,255,255,.82); }
 .pc-game .pc-chat-header { height: 28px; min-height: 28px; flex-shrink: 0; margin-bottom: 8px; }
 .pc-game .pc-chat-title { min-height: 24px; flex-shrink: 0; margin: 0; padding: 0; font-size: 16px; -unity-font-style: bold; color: #34304B; }
 .pc-game .pc-chat-header .chat-open { height: 24px; min-height: 24px; margin: 0; padding: 0; border-width: 0; background-color: transparent; font-size: 13px; color: #78679E; -unity-text-align: middle-left; }
 .app.pc-game .pc-chat-close { width: 28px; height: 28px; min-height: 28px; margin: 0; padding: 0; border-width: 1px; border-radius: 7px; }
-.pc-game .pc-room-chat.pc-chat-collapsed { width: 360px; height: 112px; padding: 8px 10px; background-color: rgba(255,255,255,.9); }
-.pc-game .pc-chat-collapsed .pc-chat-header { height: 24px; min-height: 24px; margin-bottom: 6px; }
+.pc-game .pc-room-chat.pc-chat-collapsed { width: 360px; height: 112px; padding: 8px 10px; background-color: rgba(255,255,255,.62); }
+.pc-game .pc-chat-collapsed .pc-chat-header { display: none; }
 .pc-game .pc-chat-collapsed .pc-chat-title, .pc-game .pc-chat-collapsed .pc-chat-close { display: none; }
-.pc-game .pc-room-chat.pc-chat-collapsed .chat-history { margin-bottom: 0; }
+.pc-game .pc-room-chat.pc-chat-collapsed .chat-history { margin-bottom: 8px; }
 .pc-game .pc-chat-collapsed .chat-entry { flex-direction: row; align-items: flex-start; margin-bottom: 4px; }
 .pc-game .pc-chat-collapsed .chat-name { width: 88px; max-width: 88px; height: 16px; margin-right: 8px; margin-bottom: 0; }
 .pc-game .pc-chat-collapsed .chat-message { flex-grow: 1; flex-basis: 0; height: 16px; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -722,6 +727,14 @@
 .app .topic-workshop .workshop-local-publish { margin-right: 8px; }
 .workshop-filters { align-items: center; margin-bottom: 8px; }
 .workshop-filters .workshop-language { flex-grow: 1; flex-basis: 0; margin-right: 12px; }
+.workshop-search-row { min-width: 0; align-items: flex-end; margin-bottom: 8px; }
+.topic-workshop .workshop-search-field { flex-grow: 1; flex-basis: 0; margin: 0 8px 0 0; }
+.workshop-search-row .button { flex-shrink: 0; }
+.topic-workshop .workshop-sort { flex-grow: 1; flex-basis: 0; min-width: 120px; margin-right: 12px; }
+.workshop-rating { min-width: 0; align-items: center; margin-bottom: 10px; }
+.workshop-rating .workshop-topic-count { flex-basis: 0; flex-shrink: 1; min-width: 0; margin: 0 8px 0 0; }
+.app .topic-workshop .workshop-recommend { flex-shrink: 0; min-width: 78px; max-width: 45%; min-height: 44px; padding: 6px 10px; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.app .topic-workshop .workshop-recommended { background-color: #E9E4F3; border-color: #78679E; }
 .home-panel .workshop-mine { flex-shrink: 0; max-width: 42%; margin: 0; min-height: 48px; flex-direction: row-reverse; align-items: center; }
 .home-panel .workshop-mine > .unity-base-field__label { min-width: 0; flex-shrink: 1; margin: 0 0 0 8px; font-size: 14px; white-space: normal; }
 .workshop-browse-scroll { min-height: 120px; max-height: 340px; }

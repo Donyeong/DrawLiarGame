@@ -10,17 +10,20 @@ namespace DrawLiar
     public sealed partial class DrawApp
     {
         private VisualElement _workshopView, _workshopEditor, _workshopBrowser, _workshopLocalList, _workshopList;
-        private TextField _workshopName, _workshopWords;
-        private DropdownField _workshopPublishLanguageField, _workshopBrowseLanguageField;
+        private TextField _workshopName, _workshopWords, _workshopSearchField;
+        private DropdownField _workshopPublishLanguageField, _workshopBrowseLanguageField, _workshopSortField;
         private Label _workshopLimits, _workshopError, _workshopOwnCount, _workshopTotal, _workshopPage;
-        private Button _workshopSave, _workshopPublish, _workshopPrevious, _workshopNext, _workshopRefresh;
+        private Button _workshopSave, _workshopPublish, _workshopPrevious, _workshopNext, _workshopRefresh, _workshopSearchButton;
         private Toggle _workshopMineField;
         private bool _workshopActive, _workshopEventsAttached, _workshopBrowse, _workshopMine, _workshopBusy, _workshopLoading, _workshopRefreshPending, _workshopReady;
         private bool _workshopPublishLanguageChosen, _workshopBrowseLanguageChosen;
-        private int _workshopVersion, _workshopOffset, _workshopPendingCalls;
+        private int _workshopVersion, _workshopOffset, _workshopPendingCalls, _workshopListRevision;
         private string _workshopAccountId, _workshopPublishLanguage, _workshopBrowseLanguage, _workshopNameDraft = "", _workshopWordsDraft = "";
         private TopicData _workshopSelectedLocal;
         private string _workshopLoadError = "";
+        private string _workshopSearch = "", _workshopSearchDraft = "", _workshopSort = "latest";
+        private static readonly string[] WORKSHOP_SORT_CODES = { "latest", "downloads", "popular" };
+        private static readonly string[] WORKSHOP_SORT_LABELS = { "최신순", "다운로드순", "인기순" };
 
         private void AttachTopicWorkshopEvents()
         {
@@ -49,6 +52,7 @@ namespace DrawLiar
             _workshopBrowse = _workshopMine = _workshopBusy = _workshopLoading = _workshopReady = false;
             _workshopLoadError = "";
             _workshopOffset = 0;
+            _workshopSearch = _workshopSearchDraft = ""; _workshopSort = "latest";
             _workshopRefreshPending = true;
         }
 
@@ -73,10 +77,10 @@ namespace DrawLiar
         {
             CloseWorkshopPreview(false);
             _workshopView = _workshopEditor = _workshopBrowser = _workshopLocalList = _workshopList = null;
-            _workshopName = _workshopWords = null;
-            _workshopPublishLanguageField = _workshopBrowseLanguageField = null;
+            _workshopName = _workshopWords = _workshopSearchField = null;
+            _workshopPublishLanguageField = _workshopBrowseLanguageField = _workshopSortField = null;
             _workshopLimits = _workshopError = _workshopOwnCount = _workshopTotal = _workshopPage = null;
-            _workshopSave = _workshopPublish = _workshopPrevious = _workshopNext = _workshopRefresh = null;
+            _workshopSave = _workshopPublish = _workshopPrevious = _workshopNext = _workshopRefresh = _workshopSearchButton = null;
             _workshopMineField = null; _workshopTitle = null;
         }
 
@@ -127,18 +131,40 @@ namespace DrawLiar
             _workshopLocalList = Box(localScroll, "workshop-local-list");
 
             _workshopBrowser = Box(view, "workshop-browser");
+            var search = Box(_workshopBrowser, "row workshop-search-row");
+            _workshopSearchField = Field(search, "주제 검색", _workshopSearchDraft); _workshopSearchField.name = "workshop-search";
+            _workshopSearchField.maxLength = TopicWorkshopRules.MAX_SEARCH_LENGTH; _workshopSearchField.AddToClassList("workshop-search-field");
+            _workshopSearchField.RegisterValueChangedCallback(evt =>
+            {
+                if (ReferenceEquals(evt.target, _workshopSearchField)) _workshopSearchDraft = evt.newValue;
+            });
+            _workshopSearchField.RegisterCallback<KeyDownEvent>(evt =>
+            {
+                if (evt.keyCode != KeyCode.Return && evt.keyCode != KeyCode.KeypadEnter) return;
+                if (!string.IsNullOrEmpty(Input.compositionString)) return;
+                ApplyWorkshopSearch(); root.focusController?.IgnoreEvent(evt); evt.StopImmediatePropagation();
+            });
+            _workshopSearchButton = Button(search, "검색", ApplyWorkshopSearch, "secondary workshop-action"); _workshopSearchButton.name = "workshop-search-submit";
             var filters = Box(_workshopBrowser, "row workshop-filters");
             _workshopBrowseLanguageField = WorkshopLanguageField(filters, "언어", true, _workshopBrowseLanguage, code =>
             {
-                _workshopBrowseLanguage = code; _workshopBrowseLanguageChosen = true; _workshopOffset = 0; QueueTopicWorkshopRefresh();
+                _workshopBrowseLanguage = code; _workshopBrowseLanguageChosen = true; _workshopOffset = 0; ResetWorkshopBrowseScroll(); QueueTopicWorkshopRefresh();
             });
             _workshopBrowseLanguageField.name = "workshop-browse-language";
+            _workshopSortField = new DropdownField(L.Text("정렬"), WORKSHOP_SORT_LABELS.Select(L.Text).ToList(), Math.Max(0, Array.IndexOf(WORKSHOP_SORT_CODES, _workshopSort))) { name = "workshop-sort" };
+            SetText(_workshopSortField.labelElement, "정렬"); Classes(_workshopSortField, "field workshop-sort"); filters.Add(_workshopSortField);
+            _workshopSortField.RegisterValueChangedCallback(evt =>
+            {
+                if (!ReferenceEquals(evt.target, _workshopSortField) || _workshopSortField.index < 0 || _workshopSortField.index >= WORKSHOP_SORT_CODES.Length) return;
+                if (_workshopBusy || _workshopLoading || lobby.IsBusy) { UpdateWorkshopSortField(); return; }
+                _workshopSort = WORKSHOP_SORT_CODES[_workshopSortField.index]; _workshopOffset = 0; ResetWorkshopBrowseScroll(); QueueTopicWorkshopRefresh();
+            });
             _workshopMineField = new Toggle(L.Text("내 게시물")) { name = "workshop-mine", value = _workshopMine }; SetText(_workshopMineField.labelElement, "내 게시물"); _workshopMineField.AddToClassList("workshop-mine"); filters.Add(_workshopMineField);
             _workshopMineField.RegisterValueChangedCallback(evt =>
             {
                 if (!ReferenceEquals(evt.target, _workshopMineField)) return;
                 if (_workshopBusy || _workshopLoading || lobby.IsBusy) { _workshopMineField.SetValueWithoutNotify(_workshopMine); return; }
-                _workshopMine = evt.newValue; _workshopOffset = 0; QueueTopicWorkshopRefresh();
+                _workshopMine = evt.newValue; _workshopOffset = 0; ResetWorkshopBrowseScroll(); QueueTopicWorkshopRefresh();
             });
             var browserHeading = Box(_workshopBrowser, "row workshop-list-heading");
             _workshopTotal = Text(browserHeading, "", "rules grow");
@@ -188,10 +214,10 @@ namespace DrawLiar
             if (entering) QueueTopicWorkshopRefresh();
         }
 
-        private bool TryWorkshopTopic(string name, string words, out TopicWorkshopPublishRequest topic, out string error)
+        private bool TryWorkshopTopic(string name, string words, out TopicWorkshopPublishRequest topic, out string error, bool forPublish = false)
         {
             var request = new TopicWorkshopPublishRequest { Name = name, Words = TopicWorkshopRules.SplitWords(words), LanguageCode = _workshopPublishLanguage };
-            bool valid = TopicWorkshopRules.TryNormalize(request, lobby.TopicWorkshopPolicy, out topic, out string code);
+            bool valid = TopicWorkshopRules.TryNormalize(request, lobby.TopicWorkshopPolicy, out topic, out string code, requirePublishMinimum: forPublish);
             error = valid ? "" : lobby.TopicWorkshopErrorMessage(code);
             return valid;
         }
@@ -208,16 +234,19 @@ namespace DrawLiar
             _workshopName.isReadOnly = _workshopWords.isReadOnly = blocked || legacy;
             _workshopName.maxLength = legacy || TopicWorkshopRules.TextLength(_workshopNameDraft) > limits.NameMaxLength ? -1 : limits.NameMaxLength;
             _workshopPublishLanguageField.SetEnabled(!blocked); _workshopBrowseLanguageField.SetEnabled(!blocked); _workshopMineField.SetEnabled(!blocked);
+            _workshopSearchField.isReadOnly = blocked; _workshopSortField.SetEnabled(!blocked);
             _workshopView.Query<Button>(className: "workshop-action").ForEach(button => button.SetEnabled(!blocked));
             int ownCount = lobby.TopicWorkshop?.OwnCount ?? 0;
-            _workshopView.Query<Button>(className: "workshop-row-action").ForEach(button => button.SetEnabled(!blocked && ownCount < limits.MaxUploadsPerAccount && !(button.userData is TopicData value && IsLegacyWorkshopTopic(value))));
+            _workshopView.Query<Button>(className: "workshop-row-action").ForEach(button => button.SetEnabled(!blocked && ownCount < limits.MaxUploadsPerAccount
+                && button.userData is TopicData value && TryWorkshopTopic(value.Name, string.Join("\n", value.Words ?? Array.Empty<string>()), out _, out _, forPublish: true)));
             bool valid = TryWorkshopTopic(_workshopNameDraft, _workshopWordsDraft, out _, out string error);
-            SetText(_workshopLimits, "이름 {0}자 · 제시어 {1}자 · 최대 {2}개", limits.NameMaxLength, limits.WordMaxLength, limits.MaxWordsPerTopic);
+            bool publishValid = TryWorkshopTopic(_workshopNameDraft, _workshopWordsDraft, out _, out string publishError, forPublish: true);
+            SetText(_workshopLimits, "이름 {0}자 · 제시어 {1}자 · 게시 {2}~{3}개", limits.NameMaxLength, limits.WordMaxLength, limits.MinWordsPerTopic, limits.MaxWordsPerTopic);
             SetText(_workshopOwnCount, "내 게시물 {0} / {1}", ownCount, limits.MaxUploadsPerAccount);
             _workshopOwnCount.style.display = lobby.TopicWorkshop == null ? DisplayStyle.None : DisplayStyle.Flex;
             _workshopSave.SetEnabled(!blocked && !legacy && valid);
-            _workshopPublish.SetEnabled(!blocked && !legacy && valid && ownCount < limits.MaxUploadsPerAccount);
-            SetRawText(_workshopError, legacy ? L.Text("현재 제한을 초과한 기존 주제는 읽기 전용입니다.") : _workshopNameDraft.Length + _workshopWordsDraft.Length > 0 ? error : "");
+            _workshopPublish.SetEnabled(!blocked && !legacy && publishValid && ownCount < limits.MaxUploadsPerAccount);
+            SetRawText(_workshopError, legacy ? L.Text("현재 제한을 초과한 기존 주제는 읽기 전용입니다.") : _workshopNameDraft.Length + _workshopWordsDraft.Length > 0 ? valid ? publishError : error : "");
             _workshopError.style.display = string.IsNullOrEmpty(_workshopError.text) ? DisplayStyle.None : DisplayStyle.Flex;
             _workshopRefresh.SetEnabled(!blocked);
             _workshopPrevious.SetEnabled(!blocked && _workshopOffset > 0);
@@ -297,7 +326,7 @@ namespace DrawLiar
             if (local != null && IsLegacyWorkshopTopic(local)) return;
             RunTopicWorkshopAction(async (version, account, view) =>
             {
-                if (!TryWorkshopTopic(name, words, out var topic, out string error)) throw new ArgumentException(error);
+                if (!TryWorkshopTopic(name, words, out var topic, out string error, forPublish: true)) throw new ArgumentException(error);
                 await lobby.PublishTopicWorkshopAsync(topic.Name, string.Join("\n", topic.Words), topic.LanguageCode);
                 if (IsCurrentTopicWorkshop(version, account, view)) Toast("주제를 게시했습니다.");
             });
@@ -306,6 +335,11 @@ namespace DrawLiar
         private void RenderTopicWorkshopList()
         {
             if (_workshopList == null) return;
+            var list = _workshopList;
+            var scroll = list.GetFirstAncestorOfType<ScrollView>();
+            var offset = scroll?.scrollOffset ?? Vector2.zero;
+            int revision = ++_workshopListRevision;
+            DrawSmoothScroll.Bind(scroll);
             var response = lobby.TopicWorkshop;
             _workshopList.Clear();
             if (!_workshopReady || response == null)
@@ -317,14 +351,20 @@ namespace DrawLiar
             }
             SetText(_workshopTotal, "게시물 {0}개", response.Total);
             int limit = Math.Max(1, response.Limit); SetRawText(_workshopPage, response.Total == 0 ? "0 / 0" : (response.Offset / limit + 1) + " / " + ((response.Total + limit - 1) / limit));
-            if (response.Items.Length == 0) Text(_workshopList, "게시된 주제가 없습니다.", "workshop-empty muted");
+            if (response.Items.Length == 0) Text(_workshopList, string.IsNullOrEmpty(_workshopSearch) ? "게시된 주제가 없습니다." : "검색 결과가 없습니다.", "workshop-empty muted");
             foreach (var entry in response.Items)
             {
                 var row = Box(_workshopList, "workshop-entry"); row.name = "workshop-topic-" + entry.Id;
                 RawText(row, entry.Name, "workshop-topic-name");
                 var metadata = Box(row, "row workshop-metadata"); RawText(metadata, entry.CreatorName, "workshop-creator grow");
                 RawText(metadata, L.AvailableLanguages.FirstOrDefault(language => language.Code == entry.LanguageCode)?.DisplayName ?? entry.LanguageCode, "workshop-entry-language");
-                Text(row, "제시어 {0}개 · 다운로드 {1}회", "rules workshop-topic-count", entry.WordCount, entry.DownloadCount);
+                var rating = Box(row, "row workshop-rating");
+                Text(rating, "제시어 {0}개 · 다운로드 {1}회 · 추천 {2}개", "rules workshop-topic-count grow", entry.WordCount, entry.DownloadCount, entry.RecommendationCount);
+                var recommend = Button(rating, entry.IsRecommended ? "추천 취소" : "추천", () => RunTopicWorkshopAction((version, account, view) =>
+                    lobby.RecommendTopicWorkshopAsync(entry.Id, !entry.IsRecommended)), "secondary workshop-action workshop-recommend");
+                recommend.name = "workshop-recommend-" + entry.Id;
+                SetTooltip(recommend, entry.IsRecommended ? "추천 취소" : "추천");
+                recommend.EnableInClassList("workshop-recommended", entry.IsRecommended);
                 var actions = Box(row, "row workshop-entry-actions");
                 Button preview = null;
                 preview = Button(actions, "미리보기", () => OpenWorkshopPreview(entry, preview), "secondary grow workshop-action workshop-preview");
@@ -341,6 +381,11 @@ namespace DrawLiar
                     if (IsCurrentTopicWorkshop(version, account, view)) Toast("게시물을 삭제했습니다.");
                 }), "secondary grow workshop-action workshop-delete").name = "workshop-delete-" + entry.Id;
             }
+            scroll?.schedule.Execute(() =>
+            {
+                if (_workshopList != list || revision != _workshopListRevision || scroll.panel == null) return;
+                scroll.scrollOffset = new Vector2(0, Mathf.Clamp(offset.y, 0, Mathf.Max(0, scroll.verticalScroller.highValue)));
+            }).StartingIn(20);
         }
 
         private void RunTopicWorkshopAction(Func<int, string, VisualElement, Task> action)
@@ -376,13 +421,24 @@ namespace DrawLiar
 
         private async Task RefreshTopicWorkshopPageAsync()
         {
-            int version = _workshopVersion; string account = _workshopAccountId, language = _workshopBrowseLanguage; bool mine = _workshopMine; int offset = _workshopOffset; var view = _workshopView;
-            bool CurrentQuery() => language == _workshopBrowseLanguage && mine == _workshopMine && offset == _workshopOffset;
+            int version = _workshopVersion; string account = _workshopAccountId, language = _workshopBrowseLanguage, search = _workshopSearch, sort = _workshopSort; bool mine = _workshopMine; int offset = _workshopOffset; var view = _workshopView;
+            bool CurrentQuery() => language == _workshopBrowseLanguage && mine == _workshopMine && offset == _workshopOffset && search == _workshopSearch && sort == _workshopSort;
             _workshopRefreshPending = false; _workshopLoading = true; _workshopPendingCalls++; RefreshTopicWorkshopControls();
             try
             {
-                await lobby.RefreshTopicWorkshopAsync(language, mine, offset);
-                if (IsCurrentTopicWorkshop(version, account) && CurrentQuery()) { _workshopReady = true; RenderTopicWorkshopList(); }
+                await lobby.RefreshTopicWorkshopAsync(language, mine, offset, search, sort);
+                if (IsCurrentTopicWorkshop(version, account) && CurrentQuery())
+                {
+                    var response = lobby.TopicWorkshop;
+                    if (response != null && _workshopOffset > 0 && _workshopOffset >= response.Total)
+                    {
+                        int limit = Math.Max(1, response.Limit);
+                        _workshopOffset = response.Total == 0 ? 0 : (response.Total - 1) / limit * limit;
+                        ResetWorkshopBrowseScroll();
+                        QueueTopicWorkshopRefresh();
+                    }
+                    else { _workshopReady = true; RenderTopicWorkshopList(); }
+                }
             }
             catch (OperationCanceledException) { }
             catch (Exception exception)
@@ -403,7 +459,28 @@ namespace DrawLiar
         private void ChangeTopicWorkshopPage(int direction)
         {
             if (_workshopBusy || _workshopLoading || lobby.IsBusy) return;
-            _workshopOffset = Math.Max(0, _workshopOffset + direction * Math.Max(1, lobby.TopicWorkshop?.Limit ?? 1)); QueueTopicWorkshopRefresh();
+            _workshopOffset = Math.Max(0, _workshopOffset + direction * Math.Max(1, lobby.TopicWorkshop?.Limit ?? 1)); ResetWorkshopBrowseScroll(); QueueTopicWorkshopRefresh();
+        }
+
+        private void ApplyWorkshopSearch()
+        {
+            if (_workshopBusy || _workshopLoading || lobby.IsBusy || !IsCurrentTopicWorkshop(_workshopVersion, _workshopAccountId, _workshopView)) return;
+            _workshopSearch = _workshopSearchDraft.Trim(); _workshopOffset = 0; ResetWorkshopBrowseScroll(); QueueTopicWorkshopRefresh();
+        }
+
+        private void ResetWorkshopBrowseScroll()
+        {
+            _workshopListRevision++;
+            var scroll = _workshopList?.GetFirstAncestorOfType<ScrollView>();
+            if (scroll == null) return;
+            DrawSmoothScroll.Bind(scroll); scroll.scrollOffset = Vector2.zero;
+        }
+
+        private void UpdateWorkshopSortField()
+        {
+            if (_workshopSortField == null) return;
+            _workshopSortField.choices = WORKSHOP_SORT_LABELS.Select(L.Text).ToList();
+            _workshopSortField.SetValueWithoutNotify(_workshopSortField.choices[Math.Max(0, Array.IndexOf(WORKSHOP_SORT_CODES, _workshopSort))]);
         }
 
         private void OnTopicWorkshopChanged()
@@ -415,6 +492,7 @@ namespace DrawLiar
             if (!_workshopLoading && response != null && _workshopOffset > 0 && _workshopOffset >= response.Total)
             {
                 int limit = Math.Max(1, response.Limit); _workshopOffset = response.Total == 0 ? 0 : (response.Total - 1) / limit * limit;
+                ResetWorkshopBrowseScroll();
                 QueueTopicWorkshopRefresh(); return;
             }
             if (!_workshopLoading) RenderTopicWorkshopList();
@@ -427,7 +505,7 @@ namespace DrawLiar
             CloseWorkshopPreview(false);
             if (!_workshopPublishLanguageChosen) _workshopPublishLanguage = L.CurrentLanguageCode;
             bool refresh = !_workshopBrowseLanguageChosen && _workshopBrowseLanguage != L.CurrentLanguageCode;
-            if (refresh) { _workshopBrowseLanguage = L.CurrentLanguageCode; _workshopOffset = 0; }
+            if (refresh) { _workshopBrowseLanguage = L.CurrentLanguageCode; _workshopOffset = 0; ResetWorkshopBrowseScroll(); }
             void Update(DropdownField field, bool all, string code)
             {
                 var choices = (all ? new[] { L.Text("전체") }.Concat(L.AvailableLanguages.Select(language => language.DisplayName)) : L.AvailableLanguages.Select(language => language.DisplayName)).ToList();
@@ -435,6 +513,7 @@ namespace DrawLiar
                 field.choices = choices; field.SetValueWithoutNotify(choices[Mathf.Clamp(index, 0, choices.Count - 1)]);
             }
             Update(_workshopPublishLanguageField, false, _workshopPublishLanguage); Update(_workshopBrowseLanguageField, true, _workshopBrowseLanguage);
+            UpdateWorkshopSortField();
             if (refresh) QueueTopicWorkshopRefresh(); else RefreshTopicWorkshopControls();
         }
     }

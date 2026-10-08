@@ -11,6 +11,15 @@ function fixture(options = {}) {
   const timers = new Map();
   const library = {};
   let timerId = 0;
+  const rectangle = { left: 0, top: 0, width: 1200, height: 800 };
+  function appendChild(element) {
+    const moving = element.parentNode && element.parentNode !== this;
+    element.parentNode = this;
+    if (moving && context.document.activeElement === element) {
+      context.document.activeElement = null;
+      element.events.blur?.();
+    }
+  }
   const context = {
     LibraryManager: { library },
     autoAddDeps() {},
@@ -18,20 +27,27 @@ function fixture(options = {}) {
     UTF8ToString: value => value,
     setTimeout(callback) { timers.set(++timerId, callback); return timerId; },
     clearTimeout(id) { timers.delete(id); },
-    window: { innerWidth: 1200, matchMedia: () => ({ matches: false }) },
+    window: { innerWidth: 1200, innerHeight: 800, matchMedia: () => ({ matches: false }),
+      addEventListener() {}, removeEventListener() {},
+      visualViewport: { width: 1200, height: 800, offsetTop: 0, scale: 1, addEventListener() {}, removeEventListener() {} } },
     document: {
-      body: { appendChild(element) { element.parentNode = this; } },
+      body: { appendChild },
+      addEventListener() {}, removeEventListener() {},
       createElement() {
         return {
           value: '', style: {}, events: {},
           setAttribute() {}, select() {},
           remove() { if (context.document.activeElement === this) context.document.activeElement = null; },
-          focus() { context.document.activeElement = this; },
+          focus() {
+            const changed = context.document.activeElement !== this;
+            context.document.activeElement = this;
+            if (changed) this.events.focus?.();
+          },
           addEventListener(name, callback) { this.events[name] = callback; }
         };
       }
     },
-    Module: { canvas: { focus() {}, getBoundingClientRect: () => ({ left: 0, top: 0, width: 1200, height: 800 }) } }
+    Module: { canvas: { focus() {}, getBoundingClientRect: () => rectangle } }
   };
   vm.createContext(context);
   vm.runInContext(source, context);
@@ -52,6 +68,13 @@ function fixture(options = {}) {
   };
   return {
     input, browser, library, context, key,
+    reparent() {
+      context.Module.canvas.parentElement = { appendChild };
+      browser.layoutInput(browser.input);
+    },
+    configure(overrides = {}) {
+      library.DrawBrowserInputConfigure(JSON.stringify({ Fields: [{ ...browser.inputFields[1], ...overrides }], ChatShortcutToken: 0 }));
+    },
     poll: () => library.DrawBrowserInputState(1) & 1,
     flush() {
       const pending = [...timers.values()];
@@ -158,4 +181,25 @@ test('다른 텍스트 필드와 여러 줄 입력은 조합 확정 Enter로 전
     f.flush();
     assert.equal(f.poll(), 0);
   }
+});
+
+test('모바일 viewport 변화·재부모화·동일 입력 설정 중에도 조합 초안과 Enter 한 번 전송을 유지한다', () => {
+  const f = fixture();
+  f.context.window.innerWidth = 640;
+  f.context.window.visualViewport.height = 400;
+  f.input.events.compositionstart();
+  f.input.value = '완성할 초';
+  f.reparent();
+  f.configure({ Value: '이전 관리 값' });
+  assert.equal(f.browser.input.element, f.input);
+  assert.equal(f.library.DrawBrowserInputFocused(1), 1);
+  assert.equal(f.library.DrawBrowserInputValue(1), '완성할 초');
+  assert.equal(f.poll(), 0);
+  f.key('keydown', { isComposing: true, keyCode: 229 });
+  f.end('완성할 초안');
+  f.key('keyup');
+  f.flush();
+  assert.equal(f.poll(), 1);
+  assert.equal(f.library.DrawBrowserInputValue(1), '완성할 초안');
+  assert.equal(f.poll(), 0);
 });

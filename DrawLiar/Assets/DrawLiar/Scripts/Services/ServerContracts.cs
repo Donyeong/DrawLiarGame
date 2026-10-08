@@ -207,6 +207,7 @@ namespace DrawLiar
     {
         public int NameMaxLength;
         public int WordMaxLength;
+        public int MinWordsPerTopic;
         public int MaxWordsPerTopic;
         public int MaxUploadsPerAccount;
     }
@@ -230,8 +231,14 @@ namespace DrawLiar
         public string LanguageCode = "";
         public int WordCount;
         public int DownloadCount;
+        public int RecommendationCount;
+        public bool IsRecommended;
         public string CreatedAt = "";
         public bool IsMine;
+    }
+    [Serializable] public sealed class TopicWorkshopRecommendationRequest
+    {
+        public bool IsRecommended;
     }
     [Serializable] public sealed class TopicWorkshopDetailResponse
     {

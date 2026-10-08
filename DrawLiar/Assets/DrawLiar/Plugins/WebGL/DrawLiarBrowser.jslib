@@ -1,4 +1,5 @@
 var DrawLiarBrowserLibrary = {
+  $DrawBrowser__postset: 'DrawBrowser.installChatShortcut();',
   $DrawBrowser: {
     sockets: {},
     nextSocket: 1,
@@ -13,7 +14,47 @@ var DrawLiarBrowserLibrary = {
     closedInputs: {},
     inputPointer: null,
     inputResize: null,
+    keyboardViewport: null,
+    inputShortcut: null,
+    chatShortcutToken: 0,
+    chatShortcutRequest: 0,
     audioInitialized: false,
+    installChatShortcut: function() {
+      if (DrawBrowser.inputShortcut || typeof window.addEventListener !== 'function') return;
+      DrawBrowser.inputShortcut = function(event) {
+        var target = event.target;
+        if (target && (target.isContentEditable || target.closest && target.closest('input,textarea,select,button,a,[contenteditable="true"]'))) return;
+        if (target !== Module.canvas && target !== document.body && target !== document.documentElement && target !== document && target !== window) return;
+        if (event.key === 'Escape' && DrawBrowser.chatShortcutRequest && !event.isComposing && event.keyCode !== 229) {
+          DrawBrowser.chatShortcutRequest = 0;
+          return;
+        }
+        var enter = event.key === 'Enter' || event.code === 'Enter' || event.code === 'NumpadEnter' || event.keyCode === 13;
+        if (!enter || event.repeat || event.isComposing || event.keyCode === 229 || event.altKey || event.ctrlKey || event.metaKey) return;
+        var ids = Object.keys(DrawBrowser.inputFields);
+        for (var index = ids.length - 1; index >= 0; index--) {
+          var field = DrawBrowser.inputFields[ids[index]];
+          if (!field.ChatShortcut) continue;
+          if (DrawBrowser.openInput(field.Id) !== 1) break;
+          DrawBrowser.input.enterDown = true;
+          DrawBrowser.input.flags |= 128;
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          return;
+        }
+        if (!DrawBrowser.chatShortcutToken) return;
+        DrawBrowser.chatShortcutRequest = DrawBrowser.chatShortcutToken;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+      };
+      window.addEventListener('keydown', DrawBrowser.inputShortcut, true);
+      if (Module.deinitializers) Module.deinitializers.push(function() {
+        if (DrawBrowser.inputShortcut) window.removeEventListener('keydown', DrawBrowser.inputShortcut, true);
+        DrawBrowser.inputShortcut = null;
+        DrawBrowser.chatShortcutToken = 0;
+        DrawBrowser.chatShortcutRequest = 0;
+      });
+    },
     string: function(value) {
       if (value === null || value === undefined) return 0;
       var length = lengthBytesUTF8(value) + 1;
@@ -38,7 +79,8 @@ var DrawLiarBrowserLibrary = {
       var parent = Module.canvas && Module.canvas.parentElement || document.body;
       var fullscreen = document.fullscreenElement;
       if (fullscreen && fullscreen.tagName !== 'CANVAS' && fullscreen.contains(Module.canvas)) parent = fullscreen;
-      if (element.parentNode !== parent) parent.appendChild(element);
+      if (element.parentNode !== parent) { parent.appendChild(element); return true; }
+      return false;
     },
     layoutInput: function(entry) {
       if (!entry || !Module.canvas || !entry.element) return;
@@ -48,15 +90,10 @@ var DrawLiarBrowserLibrary = {
       var element = entry.element;
       entry.reparenting = true;
       var hadFocus = document.activeElement === element;
-      DrawBrowser.overlayParent(element);
-      if (hadFocus) element.focus({preventScroll:true});
+      var moved = DrawBrowser.overlayParent(element);
+      if (moved && hadFocus) element.focus({preventScroll:true});
       entry.reparenting = false;
       var top = rectangle.top + rectangle.height * field.Y;
-      var viewport = window.visualViewport;
-      var mobile = window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 720;
-      var lifted = mobile && viewport && viewport.height < window.innerHeight - 80
-        && top + rectangle.height * field.Height > viewport.offsetTop + viewport.height - 12;
-      if (lifted) top = Math.max(viewport.offsetTop + 8, viewport.offsetTop + viewport.height - rectangle.height * field.Height - 12);
       element.style.left = (rectangle.left + rectangle.width * field.X) + 'px';
       element.style.top = top + 'px';
       element.style.width = (rectangle.width * field.Width) + 'px';
@@ -66,8 +103,8 @@ var DrawLiarBrowserLibrary = {
       element.style.color = field.Color;
       element.style.caretColor = field.Color;
       element.style.direction = field.Rtl ? 'rtl' : 'ltr';
-      element.style.backgroundColor = lifted ? field.Background : 'transparent';
-      element.style.boxShadow = lifted ? '0 0 0 6px ' + field.Background : 'none';
+      element.style.backgroundColor = 'transparent';
+      element.style.boxShadow = 'none';
       element.style.clipPath = 'inset(' + Math.max(0, (field.ClipY - field.Y) * rectangle.height) + 'px '
         + Math.max(0, (field.X + field.Width - field.ClipX - field.ClipWidth) * rectangle.width) + 'px '
         + Math.max(0, (field.Y + field.Height - field.ClipY - field.ClipHeight) * rectangle.height) + 'px '
@@ -104,6 +141,7 @@ var DrawLiarBrowserLibrary = {
       var element = document.createElement(field.Multiline ? 'textarea' : 'input');
       var entry = {id:id, element:element, limit:field.Limit, flags:0, composing:false, ending:false,
         submitAfterComposition:false, enterDown:false, imeKeyDown:false, compositionTimer:0};
+      DrawBrowser.captureViewport(entry);
       delete DrawBrowser.closedInputs[id];
       DrawBrowser.input = entry;
       element.id = 'drawliar-text-input';
@@ -175,11 +213,31 @@ var DrawLiarBrowserLibrary = {
         if (DrawBrowser.input !== entry || entry.reparenting) return;
         entry.submitAfterComposition = false; entry.enterDown = false; entry.imeKeyDown = false; entry.flags |= 4;
       });
+      element.addEventListener('focus', function() { entry.flags &= ~4; });
       DrawBrowser.overlayParent(element);
       DrawBrowser.layoutInput(entry);
       element.focus({preventScroll:true});
       if (!field.Multiline) element.select();
       return 1;
+    },
+    captureViewport: function(entry) {
+      var viewport = window.visualViewport;
+      var rectangle = Module.canvas.getBoundingClientRect();
+      var previous = DrawBrowser.keyboardViewport;
+      var visibleHeight = viewport ? viewport.height : window.innerHeight;
+      if (previous && Math.abs(window.innerWidth - previous.layoutWidth) <= previous.layoutWidth * .1
+          && (!viewport || Math.abs(viewport.scale - 1) <= .05)
+          && Math.max(previous.layoutHeight - window.innerHeight, previous.viewportHeight - visibleHeight)
+            > Math.max(80, previous.viewportHeight * .15)) {
+        entry.layoutWidth = previous.layoutWidth; entry.layoutHeight = previous.layoutHeight;
+        entry.viewportHeight = previous.viewportHeight; entry.canvasHeight = previous.canvasHeight;
+        return;
+      }
+      DrawBrowser.keyboardViewport = null;
+      entry.layoutWidth = window.innerWidth;
+      entry.layoutHeight = window.innerHeight;
+      entry.viewportHeight = viewport ? viewport.height : window.innerHeight;
+      entry.canvasHeight = rectangle.height;
     },
     renderGoogle: function(request) {
       if (DrawBrowser.google !== request || request.state !== 0) return;
@@ -289,8 +347,13 @@ var DrawLiarBrowserLibrary = {
 
   DrawBrowserInputConfigure: function(pointer) {
     try {
-      var fields = JSON.parse(UTF8ToString(pointer)).Fields;
+      DrawBrowser.installChatShortcut();
+      var configuration = JSON.parse(UTF8ToString(pointer));
+      var fields = configuration.Fields;
       if (!Array.isArray(fields) || fields.length > 128) return;
+      var shortcutToken = Number.isInteger(configuration.ChatShortcutToken) && configuration.ChatShortcutToken > 0 ? configuration.ChatShortcutToken : 0;
+      if (DrawBrowser.chatShortcutToken !== shortcutToken) DrawBrowser.chatShortcutRequest = 0;
+      DrawBrowser.chatShortcutToken = shortcutToken;
       var previous = DrawBrowser.inputFields;
       var current = {};
       fields.forEach(function(field) {
@@ -304,6 +367,8 @@ var DrawLiarBrowserLibrary = {
         }
       });
       DrawBrowser.inputFields = current;
+      if (DrawBrowser.input && !current[DrawBrowser.input.id])
+        DrawBrowser.closeInput(DrawBrowser.input.id, document.activeElement === DrawBrowser.input.element);
       DrawBrowser.layoutInput(DrawBrowser.input);
       if (!DrawBrowser.inputPointer) {
         DrawBrowser.inputPointer = function(event) {
@@ -324,23 +389,63 @@ var DrawLiarBrowserLibrary = {
         };
         document.addEventListener('pointerdown', DrawBrowser.inputPointer, true);
         DrawBrowser.inputResize = function() {
+          var previous = DrawBrowser.keyboardViewport;
+          var viewport = window.visualViewport;
+          if (!DrawBrowser.input && previous && window.innerHeight >= previous.layoutHeight - 80
+              && (!viewport || viewport.height >= previous.viewportHeight - 80)) DrawBrowser.keyboardViewport = null;
           DrawBrowser.layoutInput(DrawBrowser.input);
           if (DrawBrowser.google && DrawBrowser.google.element) DrawBrowser.overlayParent(DrawBrowser.google.element);
         };
         window.addEventListener('resize', DrawBrowser.inputResize);
         window.addEventListener('scroll', DrawBrowser.inputResize, true);
         document.addEventListener('fullscreenchange', DrawBrowser.inputResize);
-        if (window.visualViewport) window.visualViewport.addEventListener('resize', DrawBrowser.inputResize);
+        if (window.visualViewport) {
+          window.visualViewport.addEventListener('resize', DrawBrowser.inputResize);
+          window.visualViewport.addEventListener('scroll', DrawBrowser.inputResize);
+        }
       }
     } catch (_) { }
   },
 
   DrawBrowserInputActive: function() { return DrawBrowser.input ? DrawBrowser.input.id : 0; },
+  DrawBrowserKeyboardMetrics: function(pointer) {
+    var entry = DrawBrowser.input;
+    var viewport = window.visualViewport;
+    if (!entry || !Module.canvas || !(window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 720)) return 0;
+    if (Math.abs(window.innerWidth - entry.layoutWidth) > entry.layoutWidth * .1) {
+      DrawBrowser.captureViewport(entry);
+      return 0;
+    }
+    if (viewport && Math.abs(viewport.scale - 1) > .05) return 0;
+    var visibleHeight = viewport ? viewport.height : window.innerHeight;
+    var reduction = Math.max(entry.layoutHeight - window.innerHeight, entry.viewportHeight - visibleHeight,
+      window.innerHeight - visibleHeight);
+    if (!(reduction > Math.max(80, entry.viewportHeight * .15))) { DrawBrowser.keyboardViewport = null; return 0; }
+    var rectangle = Module.canvas.getBoundingClientRect();
+    if (!(rectangle.height > 0)) return 0;
+    var top = viewport ? viewport.offsetTop : 0;
+    var bottom = top + visibleHeight;
+    DrawBrowser.keyboardViewport = {layoutWidth:entry.layoutWidth, layoutHeight:entry.layoutHeight,
+      viewportHeight:entry.viewportHeight, canvasHeight:entry.canvasHeight};
+    HEAPF32[pointer >> 2] = Math.max(1, entry.canvasHeight / rectangle.height);
+    HEAPF32[(pointer >> 2) + 1] = Math.max(0, Math.min(1, (top - rectangle.top) / rectangle.height));
+    HEAPF32[(pointer >> 2) + 2] = Math.max(0, Math.min(1, (rectangle.bottom - bottom) / rectangle.height));
+    return 1;
+  },
+  DrawBrowserInputTakeChatShortcut: function() {
+    var token = DrawBrowser.chatShortcutRequest;
+    DrawBrowser.chatShortcutRequest = 0;
+    return token;
+  },
   DrawBrowserInputOpen: function(id) { return DrawBrowser.openInput(id); },
+  DrawBrowserInputFocused: function(id) {
+    return DrawBrowser.input && DrawBrowser.input.id === id && document.activeElement === DrawBrowser.input.element ? 1 : 0;
+  },
   DrawBrowserInputState: function(id) {
     var entry = DrawBrowser.input;
     if (!entry || entry.id !== id) return 4;
     var flags = entry.flags | (entry.composing ? 32 : 0);
+    if (document.activeElement === entry.element) flags &= ~4;
     entry.flags = 0;
     return flags;
   },
@@ -369,9 +474,14 @@ var DrawLiarBrowserLibrary = {
       window.removeEventListener('resize', DrawBrowser.inputResize);
       window.removeEventListener('scroll', DrawBrowser.inputResize, true);
       document.removeEventListener('fullscreenchange', DrawBrowser.inputResize);
-      if (window.visualViewport) window.visualViewport.removeEventListener('resize', DrawBrowser.inputResize);
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', DrawBrowser.inputResize);
+        window.visualViewport.removeEventListener('scroll', DrawBrowser.inputResize);
+      }
     }
     DrawBrowser.inputFields = {}; DrawBrowser.closedInputs = {}; DrawBrowser.inputPointer = null; DrawBrowser.inputResize = null;
+    DrawBrowser.keyboardViewport = null;
+    DrawBrowser.chatShortcutToken = 0; DrawBrowser.chatShortcutRequest = 0;
   },
 
   DrawBrowserClipboardStart: function(pointer, read) {

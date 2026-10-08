@@ -21,7 +21,6 @@ namespace DrawLiar
         private Label _roomLiarMode, _roomDrawingMode;
         private VisualElement _modeTooltipTarget;
         private Label _modeTooltip;
-        private IVisualElementScheduledItem _modeTooltipDelay;
 
         private void CreateRoomSecretContext(VisualElement parent, string topicTitle)
         {
@@ -150,7 +149,7 @@ namespace DrawLiar
                 if (!ReferenceEquals(evt.target, target) || evt.pointerType != UnityEngine.UIElements.PointerType.mouse) return;
                 HideModeTooltip();
                 _modeTooltipTarget = target;
-                _modeTooltipDelay = target.schedule.Execute(() => ShowModeTooltip(target)).StartingIn(350);
+                ShowModeTooltip(target);
             });
             target.RegisterCallback<PointerLeaveEvent>(evt =>
             {
@@ -207,8 +206,6 @@ namespace DrawLiar
 
         private void HideModeTooltip()
         {
-            _modeTooltipDelay?.Pause();
-            _modeTooltipDelay = null;
             _modeTooltipTarget = null;
             if (_modeTooltip != null) _modeTooltip.style.display = DisplayStyle.None;
         }

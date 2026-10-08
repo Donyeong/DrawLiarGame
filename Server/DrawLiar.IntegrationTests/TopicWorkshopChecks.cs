@@ -36,13 +36,15 @@ internal static partial class Integration
             var policy = empty.GetProperty("Policy"); var limits = policy.GetProperty("Limits");
             int nameLimit = limits.GetProperty("NameMaxLength").GetInt32(), wordLimit = limits.GetProperty("WordMaxLength").GetInt32();
             int wordCount = limits.GetProperty("MaxWordsPerTopic").GetInt32(), quota = limits.GetProperty("MaxUploadsPerAccount").GetInt32();
-            Check(nameLimit == 10 && wordLimit == 10 && wordCount == 30 && quota == 5,
-                "서버 응답은 공유 데이터의 이름·단어10자, 단어30개, 계정5개 정책을 전달해야 합니다.");
+            Check(nameLimit == 10 && wordLimit == 10 && wordCount == 80 && quota == 20 && limits.GetProperty("MinWordsPerTopic").GetInt32() == 10,
+                "서버 응답은 이름·단어10자, 게시 최소10개·최대80개, 계정20개 정책을 전달해야 합니다.");
             var languages = policy.GetProperty("LanguageCodes").EnumerateArray().Select(value => value.GetString()).ToArray();
             Check(languages.Length == 12 && languages.Distinct().Count() == 12 && languages.Contains("ko-KR") && languages.Contains("en"),
                 "업로드 언어 정책은 지원12언어를 중복 없이 전달해야 합니다.");
             await using (var version = new NpgsqlCommand("SELECT count(*) FROM \"SchemaVersion\" WHERE \"Version\"=11", owner))
                 Check(Convert.ToInt32(await version.ExecuteScalarAsync()) == 1, "격리 DB에 작업실 마이그레이션11을 적용해야 합니다.");
+            await using (var version = new NpgsqlCommand("SELECT count(*) FROM \"SchemaVersion\" WHERE \"Version\"=16", owner))
+                Check(Convert.ToInt32(await version.ExecuteScalarAsync()) == 1, "격리 DB에 추천 마이그레이션16을 적용해야 합니다.");
             foreach (var invalid in new object[]
             {
                 new { Name = "", LanguageCode = "ko-KR", Words = new[] { "사과" } },
@@ -97,16 +99,16 @@ internal static partial class Integration
             Check(await WorkshopStoredTopicsAsync(owner) == storedBeforePreview,
                 "미리보기 성공·인증 실패·404는 모든 게시물 값과 PostgreSQL 행 버전을 변경하면 안 됩니다.");
             Report("미리보기 인증·본인/타인 메타데이터·반복/읽기 전용 SELECT·404·게시물/다운로드 수 불변 검증");
-            await WorkshopErrorAsync(game, HttpMethod.Post, WORKSHOP_PATH, new { Name = exactName, LanguageCode = "ko-KR", Words = new[] { "다른단어" } },
+            await WorkshopErrorAsync(game, HttpMethod.Post, WORKSHOP_PATH, new { Name = exactName, LanguageCode = "ko-KR", Words = WorkshopPublishWords() },
                 author.Session.SessionToken, HttpStatusCode.Conflict, "TopicWorkshopNameConflict");
             using (var data = JsonDocument.Parse(typeof(ServerDatabase).Assembly.GetManifestResourceStream("DrawLiar.BuiltInGameData.json")!))
             {
                 string builtin = data.RootElement.GetProperty("Topics").EnumerateArray().Select(value => value.GetProperty("Name").GetString()!).First(value => value.Length <= nameLimit);
-                await WorkshopErrorAsync(game, HttpMethod.Post, WORKSHOP_PATH, new { Name = builtin, LanguageCode = "ko-KR", Words = new[] { "사과" } },
+                await WorkshopErrorAsync(game, HttpMethod.Post, WORKSHOP_PATH, new { Name = builtin, LanguageCode = "ko-KR", Words = WorkshopPublishWords() },
                     author.Session.SessionToken, HttpStatusCode.Conflict, "TopicWorkshopNameConflict");
             }
-            await PostAsync<JsonElement>(game, WORKSHOP_PATH, new { Name = "영어검증", LanguageCode = "en", Words = new[] { "alpha", "bravo" } }, author.Session.SessionToken);
-            await PostAsync<JsonElement>(game, WORKSHOP_PATH, new { Name = exactName, LanguageCode = "ko-KR", Words = new[] { "타인의단어" } }, downloader.Session.SessionToken);
+            await PostAsync<JsonElement>(game, WORKSHOP_PATH, new { Name = "영어검증", LanguageCode = "en", Words = WorkshopPublishWords() }, author.Session.SessionToken);
+            await PostAsync<JsonElement>(game, WORKSHOP_PATH, new { Name = exactName, LanguageCode = "ko-KR", Words = WorkshopPublishWords() }, downloader.Session.SessionToken);
             var downloaded = await GetAsync<JsonElement>(game, WORKSHOP_PATH + "/" + firstId, downloader.Session.SessionToken);
             Check(WorkshopWords(downloaded).SequenceEqual(exactWords) && downloaded.GetProperty("Topic").GetProperty("Name").GetString() == exactName
                 && downloaded.GetProperty("Topic").GetProperty("CreatorAccountId").GetString() == author.Login.AccountId
@@ -130,14 +132,16 @@ internal static partial class Integration
                 "내 업로드 필터는 해당 언어만 보여주되 전체 언어의 개인 슬롯 수를 반환해야 합니다.");
             Report("한도 콘텐츠 보존·이름 충돌·다른 사용자의 동일 다운로드·언어/내 업로드·메타데이터 검증");
 
+            await VerifyWorkshopDiscoveryAsync(game, owner, author, downloader, concurrentAuthor, firstId);
+
             var responses = await Task.WhenAll(Enumerable.Range(0, quota + 1).Select(index => SendAsync(game, WORKSHOP_PATH,
-                new { Name = "동시" + index, LanguageCode = "ko-KR", Words = new[] { "사과", "배" } }, concurrentAuthor.Session.SessionToken)));
+                new { Name = "동시" + index, LanguageCode = "ko-KR", Words = WorkshopPublishWords() }, concurrentAuthor.Session.SessionToken)));
             var createdIds = new List<string>();
             try
             {
                 Check(responses.Count(response => response.IsSuccessStatusCode) == quota
                     && responses.Count(response => response.StatusCode == HttpStatusCode.Conflict) == 1,
-                    "비어 있는 계정의6개 동시 업로드는 정확히5개만 성공해야 합니다.");
+                    "비어 있는 계정의 한도+1 동시 업로드는 정확히 한도 개수만 성공해야 합니다.");
                 foreach (var response in responses)
                 {
                     if (response.IsSuccessStatusCode) createdIds.Add(WorkshopId(await response.Content.ReadFromJsonAsync<JsonElement>(Json)));
@@ -147,7 +151,7 @@ internal static partial class Integration
             finally { foreach (var response in responses) response.Dispose(); }
             var mine = await WorkshopListAsync(game, concurrentAuthor, "?mine=true");
             Check(mine.GetProperty("OwnCount").GetInt32() == quota && mine.GetProperty("Total").GetInt32() == quota,
-                "동시 생성 이후 실제 DB 목록·개인 슬롯 수는5개여야 합니다.");
+                "동시 생성 이후 실제 DB 목록·개인 슬롯 수는20개여야 합니다.");
             await WorkshopErrorAsync(game, HttpMethod.Post, WORKSHOP_PATH,
                 new { Name = "한도중오류", LanguageCode = "ko-KR", Words = new[] { new string('나', wordLimit + 1) } },
                 concurrentAuthor.Session.SessionToken, HttpStatusCode.BadRequest);
@@ -160,7 +164,7 @@ internal static partial class Integration
                 downloader.Session.SessionToken, HttpStatusCode.NotFound, "TopicWorkshopUnavailable");
             await WorkshopErrorAsync(game, HttpMethod.Get, WORKSHOP_PATH + "/" + createdIds[0] + "/preview", null,
                 downloader.Session.SessionToken, HttpStatusCode.NotFound, "TopicWorkshopUnavailable");
-            await PostAsync<JsonElement>(game, WORKSHOP_PATH, new { Name = "슬롯복원", LanguageCode = "ko-KR", Words = new[] { "사과" } }, concurrentAuthor.Session.SessionToken);
+            await PostAsync<JsonElement>(game, WORKSHOP_PATH, new { Name = "슬롯복원", LanguageCode = "ko-KR", Words = WorkshopPublishWords() }, concurrentAuthor.Session.SessionToken);
             Check((await WorkshopListAsync(game, concurrentAuthor, "?mine=true")).GetProperty("OwnCount").GetInt32() == quota,
                 "반환된 슬롯은 새로운 업로드에 사용할 수 있어야 합니다.");
             var all = await WorkshopListAsync(game, downloader); int total = all.GetProperty("Total").GetInt32();
@@ -177,7 +181,7 @@ internal static partial class Integration
             var capped = await WorkshopListAsync(game, downloader, "?offset=-10&limit=999");
             Check(capped.GetProperty("Offset").GetInt32() == 0 && capped.GetProperty("Limit").GetInt32() == 50,
                 "페이지 입력은 음수 offset을0으로, 과도한 limit을50으로 정규화해야 합니다.");
-            Report("실제 PostgreSQL6개 동시 업로드·정확5슬롯·삭제 권한/슬롯 반환·페이지 중복/누락 검증");
+            Report("실제 PostgreSQL21개 동시 업로드·정확20슬롯·삭제 권한/슬롯 반환·페이지 중복/누락 검증");
 
             using (var database = new ServerDatabase(new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
             { ["ConnectionStrings:DrawLiarDatabase"] = scoped.ConnectionString }).Build()))
@@ -203,6 +207,8 @@ internal static partial class Integration
             Check(await WorkshopStoredTopicsAsync(owner) == storedBeforeBannedPreview,
                 "제재 작성자의 게시물 미리보기 거부는 게시물과 다운로드 수를 변경하면 안 됩니다.");
             await WorkshopErrorAsync(game, HttpMethod.Get, WORKSHOP_PATH + "/" + firstId, null,
+                downloader.Session.SessionToken, HttpStatusCode.NotFound, "TopicWorkshopUnavailable");
+            await WorkshopErrorAsync(game, HttpMethod.Post, WORKSHOP_PATH + "/" + firstId + "/recommend", new TopicWorkshopRecommendationRequest { IsRecommended = true },
                 downloader.Session.SessionToken, HttpStatusCode.NotFound, "TopicWorkshopUnavailable");
             Check(WorkshopItems(await WorkshopListAsync(game, downloader)).All(item => item.GetProperty("CreatorAccountId").GetString() != author.Login.AccountId),
                 "제재된 계정의 콘텐츠는 다른 사용자에게 목록·다운로드로 노출하면 안 됩니다.");

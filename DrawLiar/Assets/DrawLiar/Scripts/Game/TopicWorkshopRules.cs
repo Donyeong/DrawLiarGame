@@ -8,6 +8,8 @@ namespace DrawLiar
 {
     public static class TopicWorkshopRules
     {
+        public const int MAX_SEARCH_LENGTH = 100;
+
         public static int TextLength(string value) => (value ?? "").Length;
 
         public static bool ValidatePolicy(TopicWorkshopPolicy policy)
@@ -16,6 +18,7 @@ namespace DrawLiar
             return limits != null && limits.NameMaxLength >= 1 && limits.NameMaxLength <= 40
                 && limits.WordMaxLength >= 1 && limits.WordMaxLength <= 40
                 && limits.MaxWordsPerTopic >= 1 && limits.MaxWordsPerTopic <= 200
+                && limits.MinWordsPerTopic >= 1 && limits.MinWordsPerTopic <= limits.MaxWordsPerTopic
                 && limits.MaxUploadsPerAccount >= 1 && policy.LanguageCodes != null && policy.LanguageCodes.Length > 0
                 && !policy.LanguageCodes.Any(string.IsNullOrWhiteSpace)
                 && policy.LanguageCodes.Distinct(StringComparer.OrdinalIgnoreCase).Count() == policy.LanguageCodes.Length;
@@ -26,7 +29,7 @@ namespace DrawLiar
             .Where(word => !string.IsNullOrWhiteSpace(word)).ToArray();
 
         public static bool TryNormalize(TopicWorkshopPublishRequest request, TopicWorkshopPolicy policy,
-            out TopicWorkshopPublishRequest normalized, out string errorCode)
+            out TopicWorkshopPublishRequest normalized, out string errorCode, bool requirePublishMinimum = false)
         {
             normalized = null;
             errorCode = "";
@@ -67,6 +70,11 @@ namespace DrawLiar
                 string key = new string(word.Normalize(NormalizationForm.FormKC)
                     .Where(character => !char.IsWhiteSpace(character)).ToArray()).ToLowerInvariant();
                 if (distinct.Add(key)) words.Add(word);
+            }
+            if (requirePublishMinimum && words.Count < policy.Limits.MinWordsPerTopic)
+            {
+                errorCode = "TopicWorkshopTooFewWords";
+                return false;
             }
             normalized = new TopicWorkshopPublishRequest { Name = name, LanguageCode = language, Words = words.ToArray() };
             return true;

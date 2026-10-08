@@ -46,8 +46,14 @@ internal static partial class Integration
             await VerifyMatchRewardsAsync(args.FirstOrDefault(value => !value.StartsWith("--", StringComparison.Ordinal)) ?? "http://127.0.0.1:25550");
             return;
         }
+        if (args.Contains("--topic-workshop-rules-only"))
+        {
+            VerifyTopicWorkshopRules();
+            return;
+        }
         if (args.Contains("--topic-workshop-only"))
         {
+            VerifyTopicWorkshopRules();
             await VerifyTopicWorkshopAsync(args.FirstOrDefault(value => !value.StartsWith("--", StringComparison.Ordinal)) ?? "http://127.0.0.1:25550");
             return;
         }

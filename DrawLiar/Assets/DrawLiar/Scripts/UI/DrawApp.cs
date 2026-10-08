@@ -45,12 +45,14 @@ namespace DrawLiar
         private long accessory;
         private enum LobbyScreen { Login, Main, JoinCode, CreateRoom, Topics, Options, Customize, Account, Friends, Shop, Notifications, InviteFriends }
         private LobbyScreen lobbyScreen = LobbyScreen.Login;
+        private LobbyScreen _workshopReturnScreen = LobbyScreen.Main;
         private bool inRoom;
         private bool runningAction;
         private GamePhase previousPhase=(GamePhase)(-1);
         private string playerKey="", actionKey="";
         private readonly Dictionary<int,VisualElement> playerCards=new Dictionary<int,VisualElement>();
         private readonly Dictionary<int,Label> playerStatuses=new Dictionary<int,Label>();
+        private readonly Dictionary<int,Label> _playerScores=new Dictionary<int,Label>();
         private readonly Dictionary<int,DrawVoteStack> _playerVoteStacks=new Dictionary<int,DrawVoteStack>();
         private readonly List<DrawStroke> pendingStrokes=new List<DrawStroke>();
         private RoomSettings draft=new RoomSettings();
@@ -123,7 +125,7 @@ namespace DrawLiar
             AttachTopicWorkshopEvents();
             AttachMatchRewardEvents();
 #if UNITY_WEBGL && !UNITY_EDITOR
-            if(root!=null)_browserTextInput=new DrawBrowserTextInput(root);
+            if(root!=null)_browserTextInput=new DrawBrowserTextInput(root,ChatShortcutTarget,OpenChatShortcut);
 #endif
 #if ENABLE_INPUT_SYSTEM
             if(_lobbyChatPanel!=null)AttachLobbyChatKeyboard();
@@ -174,7 +176,7 @@ namespace DrawLiar
             root.styleSheets.Add(Resources.Load<StyleSheet>("DrawLiar/DrawLiarMobile"));
             DrawLocalizedTypography.Apply(root);root.EnableInClassList("rtl",L.IsRightToLeft);
 #if UNITY_WEBGL && !UNITY_EDITOR
-            _browserTextInput=new DrawBrowserTextInput(root);
+            _browserTextInput=new DrawBrowserTextInput(root,ChatShortcutTarget,OpenChatShortcut);
 #endif
             _mobileLayout=new MobileUILayout(root,panelSettings);
 #if UNITY_WEBGL && !UNITY_EDITOR
@@ -183,10 +185,11 @@ namespace DrawLiar
             _mobileLayout.LayoutChanged+=OnMobileLayoutChanged;
             root.RegisterCallback<GeometryChangedEvent>(_=>root.EnableInClassList("compact",root.contentRect.width<1400||root.contentRect.height<880));
             root.RegisterCallback<KeyDownEvent>(ChatFocusShortcut,TrickleDown.TrickleDown);
+            root.RegisterCallback<NavigationSubmitEvent>(ChatNavigationSubmit,TrickleDown.TrickleDown);
             root.RegisterCallback<PointerDownEvent>(RoomChatOutsidePointer,TrickleDown.TrickleDown);
             root.RegisterCallback<PointerDownEvent>(_=>HideModeTooltip(),TrickleDown.TrickleDown);
             root.RegisterCallback<FocusInEvent>(_=>{if(IsRoomModeTooltipBlocked(_modeTooltipTarget))HideModeTooltip();},TrickleDown.TrickleDown);
-            root.RegisterCallback<KeyDownEvent>(RoomShortcut);
+            root.RegisterCallback<KeyDownEvent>(RoomShortcut,TrickleDown.TrickleDown);
             network.StateChanged+=RefreshState;network.Notice+=message=>
             {
                 if(_clearOwnPending){_clearOwnPending=false;if(inRoom&&network.State!=null)RefreshDrawingInteractions(network.State);}
@@ -267,7 +270,7 @@ namespace DrawLiar
             CloseModal();
             SyncProfile();
             ResetLobbyChatView();_mobileLobbyChatButton=null;
-            inRoom=false;ResetMobileRoomView();surface=null;publicRoomList=null;_roomSearchField=null;friendList=null;shopList=null;avatarStage=null;serviceNotice=null;_shopPreviewStatus=null;_shopPreviewReset=null;chatHistory=null;chatInput=null;content.Clear();playerCards.Clear();playerStatuses.Clear();_playerVoteStacks.Clear();previousPhase=(GamePhase)(-1);
+            inRoom=false;ResetMobileRoomView();surface=null;publicRoomList=null;_roomSearchField=null;friendList=null;shopList=null;avatarStage=null;serviceNotice=null;_shopPreviewStatus=null;_shopPreviewReset=null;chatHistory=null;chatInput=null;content.Clear();playerCards.Clear();playerStatuses.Clear();_playerScores.Clear();_playerVoteStacks.Clear();previousPhase=(GamePhase)(-1);
             ClearShopCartView();
             _speeches.Clear();_speechVisuals.Clear();_speechLayer=null;_pcLeftPlayers=_pcRightPlayers=_pcCenter=_accusedSpotlight=null;
             if(!lobby.IsAuthenticated)lobbyScreen=LobbyScreen.Login;
@@ -392,13 +395,11 @@ namespace DrawLiar
             var services=Box(sidebar,"pc-lobby-card pc-lobby-services");
             Button(services,"상점",()=>{Navigate(LobbyScreen.Shop);Run(lobby.RefreshShopAsync);},"secondary");
             Button(services,"친구",()=>Navigate(LobbyScreen.Friends),"secondary");
-            Button(services,"주제 관리",()=>Navigate(LobbyScreen.Topics),"secondary").name="lobby-manage-topics";
             Button(services,"내 계정",()=>Navigate(LobbyScreen.Account),"secondary pc-lobby-service-last");
             var main=Box(workspace,"pc-lobby-main grow");main.name="pc-lobby-main";
             var rooms=Box(main,"pc-lobby-card pc-lobby-rooms grow");rooms.name="pc-lobby-rooms";
             var heading=Box(rooms,"row pc-lobby-room-heading");Text(heading,"공개 방","section-title grow");
-            Button(heading,"코드로 입장",()=>Navigate(LobbyScreen.JoinCode),"secondary").name="lobby-join-code";
-            Button(heading,"방 만들기",()=>Navigate(LobbyScreen.CreateRoom),"primary").name="lobby-create";
+            LobbyRoomActions(heading,"row pc-lobby-room-actions");
             RoomSearch(rooms);
             IconButton(rooms.Q<VisualElement>(className:"room-search"),"새로고침",DrawUIIcon.Kind.Refresh,()=>SearchRooms(_roomSearchDraft),"room-refresh");
             publicRoomList=DrawSmoothScroll.Create(ScrollViewMode.Vertical);Classes(publicRoomList,"room-list lobby-room-list pc-lobby-room-list grow");rooms.Add(publicRoomList);RefreshPublicRooms();
@@ -409,6 +410,7 @@ namespace DrawLiar
         private void LobbyRoomActions(VisualElement parent,string classes)
         {
             var actions=Box(parent,classes);
+            Button(actions,"주제 관리",()=>Navigate(LobbyScreen.Topics),"secondary grow").name="lobby-manage-topics";
             Button(actions,"방 만들기",()=>Navigate(LobbyScreen.CreateRoom),"primary menu-orange grow").name="lobby-create";
             Button(actions,"코드로 입장",()=>Navigate(LobbyScreen.JoinCode),"secondary grow mobile-last").name="lobby-join-code";
         }
@@ -416,9 +418,10 @@ namespace DrawLiar
         private void OpenLobbyChat()
         {
             if(inRoom||!lobby.IsAuthenticated)return;
-            var modal=Modal("로비 채팅",false);modal.AddToClassList("lobby-chat-modal");
+            var modal=Modal("",false);modal.AddToClassList("lobby-chat-modal");
+            var heading=Box(modal,"row lobby-chat-modal-heading");Text(heading,"로비 채팅","title grow");
+            Button(heading,"닫기",CloseModal,"secondary lobby-chat-close",DrawSound.UiCancel);
             BuildLobbyChat(modal,true);
-            Button(modal,"닫기",CloseModal,"secondary lobby-chat-close",DrawSound.UiCancel);
             HideMobileScrollers();
         }
 
@@ -441,22 +444,46 @@ namespace DrawLiar
 #endif
             input.RegisterCallback<KeyDownEvent>(e=>
             {
+                if(e.keyCode==KeyCode.Escape)
+                {
+                    CloseLobbyChatInput(input,modal);e.StopImmediatePropagation();return;
+                }
                 if(e.keyCode!=KeyCode.Return&&e.keyCode!=KeyCode.KeypadEnter)return;
 #if UNITY_WEBGL && !UNITY_EDITOR
-                _=SendLobbyChatAsync();
+                SubmitLobbyChatInput(input,modal);
 #elif ENABLE_INPUT_SYSTEM
-                if(!_lobbyChatComposing&&Time.frameCount!=_lobbyChatCompositionFrame)_=SendLobbyChatAsync();
+                if(!_lobbyChatComposing&&Time.frameCount!=_lobbyChatCompositionFrame)SubmitLobbyChatInput(input,modal);
 #else
-                if(string.IsNullOrEmpty(Input.compositionString))_=SendLobbyChatAsync();
+                if(string.IsNullOrEmpty(Input.compositionString))SubmitLobbyChatInput(input,modal);
 #endif
-                e.StopPropagation();
+                e.StopImmediatePropagation();
             },TrickleDown.TrickleDown);
             _lobbyChatSend=Button(composer,"보내기",()=>_=SendLobbyChatAsync(),"primary lobby-chat-send",DrawSound.UiConfirm);_lobbyChatSend.name="lobby-chat-send";
             RefreshLobbyChat();
         }
 
+        private void SubmitLobbyChatInput(TextField input,bool modal)
+        {
+            _chatShortcutFrame=Time.frameCount;
+            if(string.IsNullOrWhiteSpace(input.value)){CloseLobbyChatInput(input,modal);return;}
+            _=SendLobbyChatAsync();
+        }
+
+        private void CloseLobbyChatInput(TextField input,bool modal)
+        {
+            _chatFocusVersion++;
+#if UNITY_WEBGL && !UNITY_EDITOR
+            _browserTextInput?.Blur(input,true);
+#endif
+            input.Blur();if(modal)CloseModal();
+        }
+
         private void ResetLobbyChatView()
         {
+            _chatFocusVersion++;
+#if UNITY_WEBGL && !UNITY_EDITOR
+            _browserTextInput?.Blur(_lobbyChatInput,true);
+#endif
 #if ENABLE_INPUT_SYSTEM
             DetachLobbyChatKeyboard();
 #endif
@@ -889,14 +916,15 @@ namespace DrawLiar
             }
             if(screen==LobbyScreen.CreateRoom&&lobbyScreen!=LobbyScreen.CreateRoom&&lobbyScreen!=LobbyScreen.Topics)
             {_createRulesExpanded=false;_createTimeExpanded=false;_createTopicsExpanded=false;_createRoomScrollOffset=Vector2.zero;_createRoomPassword="";}
-            if(screen==LobbyScreen.Topics&&lobbyScreen!=LobbyScreen.Topics)BeginTopicWorkshopPage();
+            if(screen==LobbyScreen.Topics&&lobbyScreen!=LobbyScreen.Topics)
+            {_workshopReturnScreen=lobbyScreen==LobbyScreen.CreateRoom?LobbyScreen.CreateRoom:LobbyScreen.Main;BeginTopicWorkshopPage();}
             else if(screen!=LobbyScreen.Topics&&lobbyScreen==LobbyScreen.Topics)EndTopicWorkshopPage();
             if(screen!=LobbyScreen.Shop||lobbyScreen!=LobbyScreen.Shop)ClearShopPreview();
             lobbyScreen=screen;Home();
         }
         private void Back()
         {
-            var destination=lobbyScreen==LobbyScreen.Topics?LobbyScreen.CreateRoom:LobbyScreen.Main;
+            var destination=lobbyScreen==LobbyScreen.Topics?_workshopReturnScreen:LobbyScreen.Main;
             Navigate(destination);
         }
         private void CreateRoomPage()
@@ -1144,7 +1172,7 @@ namespace DrawLiar
             ClosePublicProfile(false);
             ResetLobbyChatView();_mobileLobbyChatButton=null;
             inRoom=true;ResetMobileRoomView();content.Clear();publicRoomList=null;serviceNotice=null;playerKey="";actionKey="";contextKey="";
-            playerCards.Clear();playerStatuses.Clear();_playerVoteStacks.Clear();selectedPlayerId=-1;secretHidden=false;voteSubmitted=false;
+            playerCards.Clear();playerStatuses.Clear();_playerScores.Clear();_playerVoteStacks.Clear();selectedPlayerId=-1;secretHidden=false;voteSubmitted=false;
             _hasSelectedPlayer=_judgmentSubmitted=false;_ballotVersion=-1;_accusedKey="";_speechVisuals.Clear();
             _pcLeftPlayers=_pcRightPlayers=_pcCenter=_accusedSpotlight=null;_spectatorCount=null;
             root.EnableInClassList("pc-game",!IsMobile);
@@ -1249,7 +1277,10 @@ namespace DrawLiar
             var sheet=Box(_mobileChatSheet,"modal mobile-chat-sheet");var chatHeading=Box(sheet,"row mobile-page-heading");Text(chatHeading,"채팅","title grow");Button(chatHeading,"닫기",CloseChat,"secondary mobile-back",DrawSound.UiCancel);
             chatHistory=DrawSmoothScroll.Create(ScrollViewMode.Vertical);chatHistory.AddToClassList("chat-history");sheet.Add(chatHistory);
             chatbar=Box(sheet,"chatbar");chatbar.style.display=DisplayStyle.None;chatInput=new TextField{maxLength=160,name="room-chat-input"};Placeholder(chatInput,"채팅 입력");chatInput.AddToClassList("chat-input");chatbar.Add(chatInput);
-            chatInput.RegisterCallback<KeyDownEvent>(e=>{if(e.keyCode==KeyCode.Return||e.keyCode==KeyCode.KeypadEnter){if(!string.IsNullOrWhiteSpace(chatInput.value))DrawAudio.Instance?.Play(DrawSound.UiConfirm);SendChat();e.StopPropagation();}});
+            chatInput.RegisterCallback<KeyDownEvent>(e=>
+            {
+                if(e.keyCode==KeyCode.Return||e.keyCode==KeyCode.KeypadEnter){SubmitChatInput();e.StopImmediatePropagation();}
+            },TrickleDown.TrickleDown);
             Button(chatbar,"보내기",SendChat,"primary",DrawSound.UiConfirm).name="room-chat-send";
             CreateSpeechLayer(content);
             OnMobileLayoutChanged();
@@ -1315,15 +1346,17 @@ namespace DrawLiar
             if(!IsMobile||_mobileRoomStack==null||!_mobileRoomStack.ClassListContains("mobile-waiting")||playerStrip?.panel==null)return;
             float width=_mobileRosterScroll.contentViewport.contentRect.width;
             if(width<=0)return;
-            const float GAP=12;
-            int columns=Mathf.Clamp(Mathf.FloorToInt((width+GAP)/180),2,4);
-            float cardWidth=Mathf.Floor((width-GAP*(columns-1))/columns);
-            float avatarSize=Mathf.Min(Mathf.Clamp(cardWidth-62,96,144),Mathf.Max(0,cardWidth-26));
+            const int COLUMNS=4;
+            const float GAP=6,MAX_CARD_WIDTH=96,CARD_HEIGHT=144;
+            float gridWidth=Mathf.Min(width,COLUMNS*MAX_CARD_WIDTH+GAP*(COLUMNS-1));
+            float cardWidth=Mathf.Max(0,Mathf.Floor((gridWidth-GAP*(COLUMNS-1))/COLUMNS)-1);
+            float avatarSize=Mathf.Min(64,Mathf.Max(0,cardWidth-10));
             int index=0;
             foreach(var card in playerStrip.Children())
             {
-                card.style.width=cardWidth;card.style.height=Mathf.Max(cardWidth+56,avatarSize+108);
-                card.style.marginRight=++index%columns==0?0:GAP;
+                card.style.width=cardWidth;card.style.height=CARD_HEIGHT;
+                card.style.marginRight=++index%COLUMNS==0?0:GAP;
+                card.style.marginBottom=index<=playerStrip.childCount-(playerStrip.childCount%COLUMNS==0?COLUMNS:playerStrip.childCount%COLUMNS)?GAP:0;
                 var avatar=card.Q<AvatarElement>();
                 if(avatar!=null){avatar.style.width=avatarSize;avatar.style.height=avatarSize;}
             }
@@ -1397,9 +1430,11 @@ namespace DrawLiar
                 {if(attempts>=8)pending?.Pause();return;}
                 input.Focus();
 #if UNITY_WEBGL && !UNITY_EDITOR
-                _browserTextInput?.Focus(input);
+                bool focused=_browserTextInput?.Focus(input)==true;
+#else
+                bool focused=FocusedTextField()==input;
 #endif
-                if(FocusedTextField()==input||attempts>=8)pending?.Pause();
+                if(focused||attempts>=8)pending?.Pause();
             }).StartingIn(1).Every(16);
         }
         private TextField FocusedTextField()
@@ -1407,28 +1442,27 @@ namespace DrawLiar
             var focused=root?.focusController?.focusedElement as VisualElement;
             return focused as TextField??focused?.GetFirstAncestorOfType<TextField>();
         }
-        private bool ChatInputHasFocus()
-        {
-            var focused=FocusedTextField();
-            return focused!=null&&(focused==chatInput||focused==_lobbyChatInput);
-        }
         private void ChatFocusShortcut(KeyDownEvent e)
         {
             if((e.keyCode!=KeyCode.Return&&e.keyCode!=KeyCode.KeypadEnter)||e.altKey||e.ctrlKey||e.commandKey)return;
-            if(_roomPasswordOverlay!=null||_roomCustomizeOverlay!=null||_profileOverlay!=null)return;
-            bool lobbyChatModal=_lobbyChatPanel?.ClassListContains("lobby-chat-in-modal")==true&&overlay?.Contains(_lobbyChatPanel)==true;
-            if(overlay!=null&&!lobbyChatModal)return;
             var target=e.target as VisualElement;
             if(!inRoom&&target?.ClassListContains("profile-trigger")==true)return;
             if(target is TextField||target?.GetFirstAncestorOfType<TextField>()!=null||FocusedTextField()!=null)return;
+            if(ChatShortcutTarget()==null)return;
+            OpenChatShortcut();
+            _chatShortcutFrame=Time.frameCount;
+            root.focusController?.IgnoreEvent(e);
+            e.StopImmediatePropagation();
+        }
+        private void OpenChatShortcut()
+        {
+            if(ChatShortcutTarget()==null)return;
             if(inRoom)
             {
-                if(chatInput?.panel==null)return;
                 OpenChat();
             }
             else
             {
-                if(!lobby.IsAuthenticated||lobbyScreen!=LobbyScreen.Main)return;
                 if(_lobbyChatInput?.panel==null||!IsVisible(_lobbyChatInput))
                 {
                     if(!IsMobile||overlay!=null)return;
@@ -1436,6 +1470,10 @@ namespace DrawLiar
                 }
                 FocusChatInput(_lobbyChatInput);
             }
+        }
+        private void ChatNavigationSubmit(NavigationSubmitEvent e)
+        {
+            if(_chatShortcutFrame!=Time.frameCount)return;
             root.focusController?.IgnoreEvent(e);
             e.StopImmediatePropagation();
         }
@@ -1447,6 +1485,10 @@ namespace DrawLiar
                 CollapsePcRoomChat(true);
                 return;
             }
+            _chatFocusVersion++;
+#if UNITY_WEBGL && !UNITY_EDITOR
+            _browserTextInput?.Blur(chatInput,true);
+#endif
             chatInput.Blur();chatbar.style.display=DisplayStyle.None;chatOpen.style.display=DisplayStyle.Flex;
             if(_mobileChatSheet!=null&&_mobileChatSheet.style.display!=DisplayStyle.None)
             {
@@ -1461,22 +1503,19 @@ namespace DrawLiar
         }
         private void RoomShortcut(KeyDownEvent e)
         {
-            if(_workshopPreviewOverlay!=null){if(e.keyCode==KeyCode.Escape)CloseWorkshopPreview();e.StopPropagation();return;}
+            if(e.keyCode!=KeyCode.Escape)return;
+            if(_workshopPreviewOverlay!=null){CloseWorkshopPreview();e.StopImmediatePropagation();return;}
             if(_roomPasswordOverlay!=null)return;
-            if(_roomTopicWorkshopOverlay!=null){if(e.keyCode==KeyCode.Escape)CloseRoomTopicWorkshop();e.StopPropagation();return;}
+            if(_roomTopicWorkshopOverlay!=null){CloseRoomTopicWorkshop();e.StopImmediatePropagation();return;}
             if(_roomCustomizeOverlay!=null&&overlay==null)
-            {if(e.keyCode==KeyCode.Escape)CloseRoomCustomization();e.StopPropagation();return;}
-            if(_profileOverlay!=null){if(e.keyCode==KeyCode.Escape)ClosePublicProfile();e.StopPropagation();return;}
-            if(!inRoom&&e.keyCode==KeyCode.Escape&&overlay!=null){CloseModal();e.StopPropagation();return;}
+            {CloseRoomCustomization();e.StopImmediatePropagation();return;}
+            if(_profileOverlay!=null){ClosePublicProfile();e.StopImmediatePropagation();return;}
+            if(!inRoom&&overlay!=null){CloseModal();e.StopImmediatePropagation();return;}
             if(!inRoom)return;
-            if(e.keyCode==KeyCode.Escape&&_roomOptionsSaving){e.StopPropagation();return;}
-            if(e.keyCode==KeyCode.Escape)
-            {
-                bool chatFocused=ChatInputHasFocus();
-                bool chatVisible=IsMobile?chatbar!=null&&chatbar.resolvedStyle.display!=DisplayStyle.None:
-                    _pcChatExpanded;
-                if(overlay!=null)CloseModal();else if(chatVisible||chatFocused)CloseChat();else RoomMenu();e.StopPropagation();
-            }
+            if(_roomOptionsSaving){e.StopImmediatePropagation();return;}
+            bool chatVisible=IsMobile?chatbar?.style.display==DisplayStyle.Flex:_pcChatExpanded;
+            if(overlay!=null)CloseModal();else if(chatVisible)CloseChat();else RoomMenu();
+            root.focusController?.IgnoreEvent(e);e.StopImmediatePropagation();
         }
         private void RoomMenu()
         {
@@ -1705,7 +1744,7 @@ namespace DrawLiar
         {
             ClearDrawingPreview();
             int previousCount=playerCards.Count;
-            playerStrip?.Clear();_pcLeftPlayers?.Clear();_pcRightPlayers?.Clear();playerCards.Clear();playerStatuses.Clear();_playerVoteStacks.Clear();
+            playerStrip?.Clear();_pcLeftPlayers?.Clear();_pcRightPlayers?.Clear();playerCards.Clear();playerStatuses.Clear();_playerScores.Clear();_playerVoteStacks.Clear();
             bool currentPlayersOnly=state.Phase==GamePhase.RoundResults||state.Phase==GamePhase.MatchResults;
             var players=state.Players.Where(p=>!p.IsSpectator&&(!currentPlayersOnly||p.IsConnected)).ToArray();
             playerStrip?.EnableInClassList("crowded",players.Length>8);
@@ -1721,7 +1760,9 @@ namespace DrawLiar
                 name.name="player-name-"+p.Id;if(!IsMobile)BindProfileTarget(name,p.AccountId,()=>!IsNominationPhase(network.State));card.tooltip=p.Name;
                 if(IsMobile)CreatePlayerProfileButton(card,p);
                 if(CanSelectVote(state,p))SetTooltip(card,"지목하기");
-                playerStatuses[p.Id]=Text(info,"","player-status");
+                var summary=Box(info,"player-summary");
+                var score=Text(summary,"{0}점","player-score",p.Score);score.name="player-score-"+p.Id;score.pickingMode=PickingMode.Ignore;_playerScores[p.Id]=score;
+                playerStatuses[p.Id]=Text(summary,"","player-status");
                 var host=Text(card,"방장","player-host-badge");host.style.display=p.Id==state.HostPlayerId?DisplayStyle.Flex:DisplayStyle.None;
                 card.EnableInClassList("host-player",p.Id==state.HostPlayerId);
                 var order=RawText(card,"","player-drawing-order");order.name="drawing-order-"+p.Id;order.pickingMode=PickingMode.Ignore;
@@ -1780,10 +1821,11 @@ namespace DrawLiar
                 foreach(var target in card.Query<VisualElement>(className:"profile-trigger").ToList())
                     SetTooltip(target,target.ClassListContains("player-profile-button")?"프로필 보기":IsNominationPhase(state)?CanSelectVote(state,player)?"지목하기":"":"프로필 보기");
                 var label=playerStatuses[player.Id];
-                if(player.IsConnected&&!player.IsLiar&&(state.Phase==GamePhase.Lobby||state.Phase==GamePhase.RoundResults||state.Phase==GamePhase.MatchResults))SetText(label,"{0}점",player.Score);
-                else SetText(label,!player.IsConnected?"연결 끊김":IsNominationPhase(state)?(player.HasVoted?"지목 완료":_hasSelectedPlayer&&player.Id==selectedPlayerId?"선택됨":""):
+                SetText(_playerScores[player.Id],"{0}점",player.Score);
+                SetText(label,!player.IsConnected?"연결 끊김":IsNominationPhase(state)?(player.HasVoted?"지목 완료":_hasSelectedPlayer&&player.Id==selectedPlayerId?"선택됨":""):
                     state.Phase==GamePhase.Rebuttal?(state.IsJudgmentCoinToss?"동전 던지기":state.HasAccused&&player.Id==state.AccusedPlayerId?"반론 중":player.HasJudged?"투표 완료":""):
                     player.IsLiar&&!HasHiddenMismatchRole(state)?"라이어":state.Phase==GamePhase.Drawing?(player.Id==state.ArtistId?"그리는 중":""):"");
+                label.style.display=string.IsNullOrEmpty(label.text)?DisplayStyle.None:DisplayStyle.Flex;
             }
         }
         private void RefreshContext(RoomSnapshot state)
@@ -2269,6 +2311,9 @@ namespace DrawLiar
             HideModeTooltip();
             if(IsMobile)CloseChat();
             CloseModal();overlay=Box(IsMobile&&_roomCustomizeOverlay==null?content:root,"overlay enter");var modal=Box(overlay,"modal");
+#if UNITY_WEBGL && !UNITY_EDITOR
+            _browserTextInput?.RefreshChatShortcut();
+#endif
             VisualElement body=modal;
             if(IsMobile&&mobileScroll){var scroll=DrawSmoothScroll.Create(ScrollViewMode.Vertical);scroll.AddToClassList("mobile-modal-scroll");modal.Add(scroll);body=Box(scroll,"mobile-modal-body");}
             if(!string.IsNullOrEmpty(title))Text(body,title,"title");HideMobileScrollers();DrawUIMotion.ShowModal(overlay,modal);

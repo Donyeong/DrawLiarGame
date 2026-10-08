@@ -12,6 +12,7 @@ namespace DrawLiar
         private RoomChatScrollUpdate _roomChatScrollUpdate;
         private bool _pcChatExpanded;
         private int _chatFocusVersion;
+        private int _chatShortcutFrame = -1;
         private IVisualElementScheduledItem _pcChatTailUpdate;
 
         private void CreatePcRoomChat(VisualElement parent)
@@ -20,7 +21,7 @@ namespace DrawLiar
             chat.name = "pc-room-chat";
             var header = Box(chat, "row pc-chat-header");
             Text(header, "채팅", "pc-chat-title grow");
-            chatOpen = Button(header, "Enter  채팅", OpenChat, "chat-open grow");
+            chatOpen = Button(header, "", OpenChat, "chat-open grow");
             chatOpen.name = "pc-chat-open";
             IconButton(header, "닫기", DrawUIIcon.Kind.Close, CloseChat, "pc-chat-close").name = "pc-chat-close";
             chatHistory = DrawSmoothScroll.Create(ScrollViewMode.Vertical);
@@ -30,21 +31,20 @@ namespace DrawLiar
             chatHistory.verticalScrollerVisibility = ScrollerVisibility.Hidden;
             chat.Add(chatHistory);
             chatbar = Box(chat, "chatbar");
-            chatbar.style.display = DisplayStyle.None;
+            chatbar.style.display = DisplayStyle.Flex;
             chatInput = new TextField { maxLength = 160, name = "room-chat-input" };
             Placeholder(chatInput, "채팅 입력");
             chatInput.AddToClassList("chat-input");
             chatInput.textEdition.autoCorrection = false;
             chatbar.Add(chatInput);
+            chatInput.RegisterCallback<FocusInEvent>(_ => SetPcRoomChatExpanded(true));
             chatInput.RegisterCallback<KeyDownEvent>(evt =>
             {
                 if (evt.keyCode == KeyCode.Return || evt.keyCode == KeyCode.KeypadEnter)
                 {
-                    if (!string.IsNullOrWhiteSpace(chatInput.value)) DrawAudio.Instance?.Play(DrawSound.UiConfirm);
-                    SendChat();
-                    evt.StopPropagation();
+                    SubmitChatInput();
+                    evt.StopImmediatePropagation();
                 }
-                else if (evt.keyCode == KeyCode.Escape) { CloseChat(); evt.StopPropagation(); }
             });
             Button(chatbar, "보내기", SendChat, "secondary", DrawSound.UiConfirm).name = "room-chat-send";
             chat.RegisterCallback<PointerDownEvent>(evt =>
@@ -77,7 +77,7 @@ namespace DrawLiar
             _pcChatExpanded = expanded;
             _pcRoomChat.EnableInClassList("pc-chat-collapsed", !expanded);
             _pcRoomChat.EnableInClassList("pc-chat-expanded", expanded);
-            chatbar.style.display = expanded ? DisplayStyle.Flex : DisplayStyle.None;
+            chatbar.style.display = DisplayStyle.Flex;
             chatOpen.style.display = expanded ? DisplayStyle.None : DisplayStyle.Flex;
             chatHistory.verticalScrollerVisibility = expanded ? ScrollerVisibility.Auto : ScrollerVisibility.Hidden;
             if (changed || !expanded) ScrollPcRoomChatToLatest();
@@ -92,6 +92,37 @@ namespace DrawLiar
 #endif
             if (FocusedTextField() == chatInput) root.focusController?.focusedElement?.Blur();
             SetPcRoomChatExpanded(false);
+        }
+
+        private void SubmitChatInput()
+        {
+            if (chatInput == null) return;
+            _chatShortcutFrame = Time.frameCount;
+            if (string.IsNullOrWhiteSpace(chatInput.value)) { CloseChat(); return; }
+            DrawAudio.Instance?.Play(DrawSound.UiConfirm);
+            SendChat();
+        }
+
+        private bool ChatInputHasFocus()
+        {
+            var focused = FocusedTextField();
+            return focused != null && (focused == chatInput || focused == _lobbyChatInput);
+        }
+
+        private VisualElement ChatShortcutTarget()
+        {
+            if (_profileOverlay != null || _roomPasswordOverlay != null || _roomCustomizeOverlay != null
+                || _roomTopicWorkshopOverlay != null || _workshopPreviewOverlay != null) return null;
+            bool lobbyChatModal = !inRoom && _lobbyChatPanel?.ClassListContains("lobby-chat-in-modal") == true
+                && overlay?.Contains(_lobbyChatPanel) == true;
+            if (overlay != null && !lobbyChatModal) return null;
+            if (!inRoom && (lobby?.IsAuthenticated != true || lobbyScreen != LobbyScreen.Main)) return null;
+            var input = inRoom ? chatInput : _lobbyChatInput;
+            var focused = FocusedTextField();
+            if (focused != null && focused != input) return null;
+            if (input?.panel != null && !input.isReadOnly && input.enabledInHierarchy) return input;
+            return !inRoom && IsMobile && overlay == null && _mobileLobbyChatButton?.panel != null
+                ? _mobileLobbyChatButton : null;
         }
 
         private void RoomChatOutsidePointer(PointerDownEvent evt)

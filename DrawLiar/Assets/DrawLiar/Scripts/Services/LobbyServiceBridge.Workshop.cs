@@ -10,6 +10,7 @@ namespace DrawLiar
     {
         private TopicWorkshopPolicy _topicWorkshopPolicy;
         private string _topicWorkshopLanguage = "";
+        private string _topicWorkshopSearch = "", _topicWorkshopSort = "latest";
         private bool _topicWorkshopMine;
         private int _topicWorkshopOffset, _topicWorkshopRevision;
         public TopicWorkshopListResponse TopicWorkshop { get; private set; }
@@ -28,12 +29,14 @@ namespace DrawLiar
             }
         }
 
-        public Task RefreshTopicWorkshopAsync(string language, bool mine = false, int offset = 0) => RunAsync(async () =>
+        public Task RefreshTopicWorkshopAsync(string language, bool mine = false, int offset = 0, string search = "", string sort = "latest") => RunAsync(async () =>
         {
             RequireLogin();
             _topicWorkshopLanguage = language ?? DrawLocalization.CurrentLanguageCode;
             _topicWorkshopMine = mine;
             _topicWorkshopOffset = Math.Max(0, offset);
+            _topicWorkshopSearch = (search ?? "").Trim();
+            _topicWorkshopSort = sort ?? "latest";
             int revision = ++_topicWorkshopRevision;
             await FetchTopicWorkshopAsync(_gameSession, Profile.AccountId, revision);
         });
@@ -42,7 +45,8 @@ namespace DrawLiar
         {
             string path = "/api/topic-workshop?language=" + Uri.EscapeDataString(_topicWorkshopLanguage)
                 + "&mine=" + (_topicWorkshopMine ? "true" : "false")
-                + "&offset=" + _topicWorkshopOffset.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                + "&offset=" + _topicWorkshopOffset.ToString(System.Globalization.CultureInfo.InvariantCulture)
+                + "&search=" + Uri.EscapeDataString(_topicWorkshopSearch) + "&sort=" + Uri.EscapeDataString(_topicWorkshopSort);
             var result = await SendAsync<TopicWorkshopListResponse>(_gameServerUrl, path, "GET", bearer: session);
             EnsureTopicWorkshopIdentity(session, accountId, revision);
             if (!TopicWorkshopRules.ValidatePolicy(result.Policy) || result.Offset < 0 || result.Limit <= 0
@@ -62,7 +66,7 @@ namespace DrawLiar
             {
                 Name = name, Words = TopicWorkshopRules.SplitWords(words), LanguageCode = language
             };
-            if (!TopicWorkshopRules.TryNormalize(request, TopicWorkshopPolicy, out var normalized, out string error))
+            if (!TopicWorkshopRules.TryNormalize(request, TopicWorkshopPolicy, out var normalized, out string error, requirePublishMinimum: true))
                 throw new InvalidOperationException(TopicWorkshopErrorMessage(error));
             string session = _gameSession, accountId = Profile.AccountId;
             int revision = ++_topicWorkshopRevision;
@@ -122,6 +126,22 @@ namespace DrawLiar
             SetStatus("게시물을 삭제했습니다.");
         });
 
+        public Task RecommendTopicWorkshopAsync(string id, bool isRecommended) => RunAsync(async () =>
+        {
+            RequireLogin();
+            if (!Guid.TryParse(id, out _))
+                throw new InvalidOperationException(DrawLocalization.Text("게시물을 찾지 못했습니다. 목록을 새로고침하세요."));
+            string session = _gameSession, accountId = Profile.AccountId;
+            int revision = ++_topicWorkshopRevision;
+            var entry = await SendGameAsync<TopicWorkshopEntry>("/api/topic-workshop/" + Uri.EscapeDataString(id) + "/recommend", "POST",
+                new TopicWorkshopRecommendationRequest { IsRecommended = isRecommended });
+            EnsureTopicWorkshopIdentity(session, accountId, revision);
+            if (entry == null || !string.Equals(entry.Id, id, StringComparison.OrdinalIgnoreCase)
+                || entry.RecommendationCount < 0 || entry.IsRecommended != isRecommended)
+                throw new InvalidOperationException(DrawLocalization.Text("창작마당 설정을 불러오지 못했습니다."));
+            await RefreshAfterWorkshopMutationAsync(session, accountId, revision);
+        });
+
         private async Task RefreshAfterWorkshopMutationAsync(string session, string accountId, int revision)
         {
             try { await FetchTopicWorkshopAsync(session, accountId, revision); }
@@ -148,6 +168,7 @@ namespace DrawLiar
             _topicWorkshopLanguage = "";
             _topicWorkshopMine = false;
             _topicWorkshopOffset = 0;
+            _topicWorkshopSearch = ""; _topicWorkshopSort = "latest";
             TopicWorkshopChanged?.Invoke();
         }
 
@@ -159,6 +180,9 @@ namespace DrawLiar
                 case "TopicWorkshopInvalidName": return DrawLocalization.Format("주제 이름은 1~{0}자로 입력하세요.", limits.NameMaxLength);
                 case "TopicWorkshopInvalidWords": return DrawLocalization.Format("제시어는 1~{0}자로 입력하세요.", limits.WordMaxLength);
                 case "TopicWorkshopTooManyWords": return DrawLocalization.Format("제시어는 최대 {0}개까지 입력할 수 있습니다.", limits.MaxWordsPerTopic);
+                case "TopicWorkshopTooFewWords": return DrawLocalization.Format("게시하려면 중복을 제외한 제시어가 최소 {0}개 필요합니다.", limits.MinWordsPerTopic);
+                case "TopicWorkshopInvalidSearch": return DrawLocalization.Text("검색어를 확인하세요.");
+                case "TopicWorkshopInvalidSort": return DrawLocalization.Text("정렬 방식을 선택하세요.");
                 case "TopicWorkshopUploadLimit": return DrawLocalization.Format("게시할 수 있는 주제는 최대 {0}개입니다.", limits.MaxUploadsPerAccount);
                 case "TopicWorkshopInvalidLanguage": return DrawLocalization.Text("게시 언어를 선택하세요.");
                 case "TopicWorkshopNameConflict": return DrawLocalization.Text("주제 이름이 이미 사용 중입니다. 다른 이름을 입력하세요.");

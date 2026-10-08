@@ -12,13 +12,17 @@ namespace DrawLiar
         private Vector2Int _pcReferenceResolution;
         private float _pcMatch;
         private readonly IVisualElementScheduledItem _poll;
-        private bool _editorMobilePreview, _disposed, _keyboardOpen, _hasMetrics, _geometryDirty = true;
+        private bool _editorMobilePreview, _disposed, _keyboardOpen, _hasMetrics, _refreshing, _geometryDirty = true;
+        private StyleLength _pcPaddingLeft, _pcPaddingTop, _pcPaddingRight, _pcPaddingBottom;
         private int _screenWidth, _screenHeight, _unoccludedHeight;
         private ScreenOrientation _orientation;
         private Rect _safeArea;
-        private float _keyboardHeight;
+        private float _keyboardHeight, _keyboardTop;
         private VisualElement _focusedField;
         private Vector4 _padding = new Vector4(-1, -1, -1, -1);
+#if UNITY_WEBGL && !UNITY_EDITOR
+        private readonly float[] _browserKeyboardMetrics = new float[3];
+#endif
 #if UNITY_ANDROID && !UNITY_EDITOR
         private AndroidJavaObject _decorView, _visibleFrame, _windowManager;
         private bool _androidUnavailable;
@@ -59,6 +63,14 @@ namespace DrawLiar
         public void Refresh()
         {
             if (_disposed) return;
+            if (_refreshing) { _geometryDirty = true; return; }
+            _refreshing = true;
+            try { RefreshLayout(); }
+            finally { _refreshing = false; }
+        }
+
+        private void RefreshLayout()
+        {
             int width = Screen.width, height = Screen.height;
             if (width <= 0 || height <= 0) return;
 #if UNITY_EDITOR
@@ -71,12 +83,19 @@ namespace DrawLiar
 #endif
             ScreenOrientation orientation = Screen.orientation;
             bool portrait = height >= width;
+#if UNITY_WEBGL && !UNITY_EDITOR
+            bool browserKeyboardOpen = mobile && DrawBrowserInterop.DrawBrowserKeyboardMetrics(_browserKeyboardMetrics) == 1;
+            bool preserveBrowserLayout = browserKeyboardOpen && _hasMetrics && IsMobile && width == _screenWidth;
+#endif
             if (Application.isMobilePlatform)
             {
                 if (orientation is ScreenOrientation.Portrait or ScreenOrientation.PortraitUpsideDown) portrait = true;
                 else if (orientation is ScreenOrientation.LandscapeLeft or ScreenOrientation.LandscapeRight) portrait = false;
                 else if (_hasMetrics && _keyboardOpen && orientation == _orientation) portrait = IsPortrait;
             }
+#if UNITY_WEBGL && !UNITY_EDITOR
+            if (preserveBrowserLayout) portrait = height * Mathf.Max(1, _browserKeyboardMetrics[0]) >= width;
+#endif
             if (!_hasMetrics || width != _screenWidth || portrait != IsPortrait)
             {
                 _unoccludedHeight = height;
@@ -86,7 +105,7 @@ namespace DrawLiar
             }
 
             Rect safeArea = Screen.safeArea;
-            float keyboardHeight = 0;
+            float keyboardHeight = 0, keyboardTop = 0;
             bool keyboardOpen = false;
             if (_focusedField != null && _focusedField.panel == null) _focusedField = null;
             bool inspectKeyboard = mobile && (_focusedField != null || _keyboardOpen);
@@ -104,24 +123,37 @@ namespace DrawLiar
 #if UNITY_EDITOR
             if (_previewSafeArea.HasValue) safeArea = _previewSafeArea.Value;
             if (_previewKeyboardHeight > 0) { keyboardOpen = true; keyboardHeight = _previewKeyboardHeight; }
+#elif UNITY_WEBGL
+            keyboardOpen = browserKeyboardOpen;
+            if (keyboardOpen)
+            {
+                _unoccludedHeight = Mathf.RoundToInt(height * Mathf.Max(1, _browserKeyboardMetrics[0]));
+                keyboardTop = height * Mathf.Clamp01(_browserKeyboardMetrics[1]);
+                keyboardHeight = height * Mathf.Clamp01(_browserKeyboardMetrics[2]);
+            }
 #endif
-            if (!keyboardOpen) _unoccludedHeight = Math.Max(_unoccludedHeight, height);
+            if (!keyboardOpen) _unoccludedHeight = height;
             keyboardHeight = mobile ? Mathf.Clamp(keyboardHeight, 0, height) : 0;
             bool changed = !_hasMetrics || mobile != IsMobile || portrait != IsPortrait || width != _screenWidth || height != _screenHeight
-                || orientation != _orientation || safeArea != _safeArea || Mathf.Abs(keyboardHeight - _keyboardHeight) > .5f || keyboardOpen != _keyboardOpen;
+                || orientation != _orientation || safeArea != _safeArea || Mathf.Abs(keyboardHeight - _keyboardHeight) > .5f
+                || Mathf.Abs(keyboardTop - _keyboardTop) > .5f || keyboardOpen != _keyboardOpen;
             if (mobile && !IsMobile)
             {
                 _pcReferenceResolution = _panelSettings.referenceResolution;
                 _pcMatch = _panelSettings.match;
+                _pcPaddingLeft = _root.style.paddingLeft; _pcPaddingTop = _root.style.paddingTop;
+                _pcPaddingRight = _root.style.paddingRight; _pcPaddingBottom = _root.style.paddingBottom;
             }
             else if (!mobile && IsMobile)
             {
                 _panelSettings.referenceResolution = _pcReferenceResolution;
                 _panelSettings.match = _pcMatch;
+                _root.style.paddingLeft = _pcPaddingLeft; _root.style.paddingTop = _pcPaddingTop;
+                _root.style.paddingRight = _pcPaddingRight; _root.style.paddingBottom = _pcPaddingBottom;
             }
             IsMobile = mobile; IsPortrait = portrait;
             _screenWidth = width; _screenHeight = height; _orientation = orientation;
-            _safeArea = safeArea; _keyboardHeight = keyboardHeight; _keyboardOpen = mobile && keyboardOpen; _hasMetrics = true;
+            _safeArea = safeArea; _keyboardHeight = keyboardHeight; _keyboardTop = keyboardTop; _keyboardOpen = mobile && keyboardOpen; _hasMetrics = true;
             if (!changed && !_geometryDirty) return;
             _geometryDirty = false;
             _root.EnableInClassList("mobile", IsMobile);
@@ -131,6 +163,8 @@ namespace DrawLiar
             if (mobile)
             {
                 var reference = portrait ? new Vector2Int(432, 936) : new Vector2Int(936, 432);
+                float scale = Mathf.Min(width / (float)reference.x, Mathf.Max(1, _unoccludedHeight) / (float)reference.y);
+                reference.x = Mathf.Max(reference.x, Mathf.CeilToInt(width / scale));
                 if (_panelSettings.referenceResolution != reference) _panelSettings.referenceResolution = reference;
                 if (_panelSettings.match != 0) _panelSettings.match = 0;
             }
@@ -155,7 +189,8 @@ namespace DrawLiar
                 Vector2 topLeft = RuntimePanelUtils.ScreenToPanel(_root.panel, safeStart);
                 Vector2 bottomRight = RuntimePanelUtils.ScreenToPanel(_root.panel, safeEnd);
                 float keyboardBottom = screenEnd.y - RuntimePanelUtils.ScreenToPanel(_root.panel, new Vector2(0, _screenHeight - _keyboardHeight)).y;
-                padding = new Vector4(Mathf.Max(0, topLeft.x - screenStart.x), Mathf.Max(0, topLeft.y - screenStart.y),
+                float keyboardTop = RuntimePanelUtils.ScreenToPanel(_root.panel, new Vector2(0, _keyboardTop)).y - screenStart.y;
+                padding = new Vector4(Mathf.Max(0, topLeft.x - screenStart.x), Mathf.Max(0, topLeft.y - screenStart.y, keyboardTop),
                     Mathf.Max(0, screenEnd.x - bottomRight.x), Mathf.Max(0, screenEnd.y - bottomRight.y, keyboardBottom));
             }
             Vector2 available = new Vector2(Mathf.Max(0, screenEnd.x - screenStart.x - padding.x - padding.z), Mathf.Max(0, screenEnd.y - screenStart.y - padding.y - padding.w));

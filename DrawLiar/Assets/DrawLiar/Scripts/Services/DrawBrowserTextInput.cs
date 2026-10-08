@@ -8,12 +8,12 @@ namespace DrawLiar
 {
     internal sealed class DrawBrowserTextInput : IDisposable
     {
-        [Serializable] private sealed class InputFields { public InputField[] Fields; }
+        [Serializable] private sealed class InputFields { public InputField[] Fields; public int ChatShortcutToken; }
         [Serializable] private sealed class InputField
         {
             public int Id, Limit, Keyboard;
             public float X, Y, Width, Height, ClipX, ClipY, ClipWidth, ClipHeight, HitX, HitY, HitWidth, HitHeight, FontSize;
-            public bool Multiline, Password, Correction, Rtl, SubmitOnCompositionEnd;
+            public bool Multiline, Password, Correction, Rtl, SubmitOnCompositionEnd, ChatShortcut;
             public string Value, Placeholder, Name, Color, Background;
         }
 
@@ -38,25 +38,36 @@ namespace DrawLiar
             protected override void PostDispatch(IPanel panel)
             {
                 try { base.PostDispatch(panel); }
-                finally { Owner = null; _field = null; }
+                finally
+                {
+                    if (keyCode == KeyCode.Escape && Owner?._active == _field) Owner?.Close(true);
+                    Owner = null; _field = null;
+                }
             }
         }
 
         private readonly VisualElement _root;
+        private readonly Func<VisualElement> _chatShortcutTarget;
+        private readonly Action _openChatShortcut;
         private readonly Dictionary<TextField, int> _ids = new Dictionary<TextField, int>();
         private readonly Dictionary<int, TextField> _fields = new Dictionary<int, TextField>();
+        private readonly Dictionary<TextField, InputField> _layouts = new Dictionary<TextField, InputField>();
+        private readonly float[] _keyboardMetrics = new float[3];
         private readonly IVisualElementScheduledItem _poller;
         private TextField _active;
+        private VisualElement _configuredChatShortcut;
         private TextElement _text;
         private StyleFloat _opacity;
         private bool _hideKeyboard, _captureKeyboard, _reading, _disposed;
         private string _knownValue;
-        private int _nextId, _activeId;
+        private int _nextId, _activeId, _chatShortcutVersion;
         private float _nextLayout;
 
-        public DrawBrowserTextInput(VisualElement root)
+        public DrawBrowserTextInput(VisualElement root, Func<VisualElement> chatShortcutTarget, Action openChatShortcut)
         {
             _root = root;
+            _chatShortcutTarget = chatShortcutTarget;
+            _openChatShortcut = openChatShortcut;
             root.RegisterCallback<FocusInEvent>(OnFocusIn, TrickleDown.TrickleDown);
             root.RegisterCallback<FocusOutEvent>(OnFocusOut, TrickleDown.TrickleDown);
             root.RegisterCallback<KeyDownEvent>(OnKeyDown, TrickleDown.TrickleDown);
@@ -65,24 +76,33 @@ namespace DrawLiar
             RefreshFields();
         }
 
-        public void Focus(TextField field)
+        public bool Focus(TextField field)
         {
             if (_disposed || field == null || field.isReadOnly || field.panel != _root.panel
-                || !_root.Contains(field) || !IsVisible(field)) return;
+                || !_root.Contains(field) || !IsVisible(field)) return false;
             RefreshFields();
-            if (!_ids.TryGetValue(field, out int id)) return;
+            if (!_ids.TryGetValue(field, out int id)) return false;
             field.Focus();
             if (_disposed || field.isReadOnly || field.panel != _root.panel || !_root.Contains(field)
-                || !IsVisible(field) || !_ids.TryGetValue(field, out id)) return;
+                || !IsVisible(field) || !_ids.TryGetValue(field, out id)) return false;
             if (_active != field) Open(field, id);
             else if (DrawBrowserInterop.DrawBrowserInputOpen(id) != 1) Close(false);
+            return _active == field && DrawBrowserInterop.DrawBrowserInputFocused(id) == 1;
         }
 
         public void Blur(TextField field, bool focusCanvas)
         {
-            if (_disposed || field == null || _active != field) return;
+            if (_disposed || field == null) return;
+            DrawBrowserInterop.DrawBrowserInputTakeChatShortcut();
+            if (_active != field) return;
+            SynchronizeValue();
             ReadValue(true);
             if (_active == field) Close(focusCanvas);
+        }
+
+        public void RefreshChatShortcut()
+        {
+            if (!_disposed) RefreshFields();
         }
 
         private static TextField ParentField(VisualElement element)
@@ -124,6 +144,12 @@ namespace DrawLiar
             if (panel.width <= 0 || panel.height <= 0) return;
             var found = new HashSet<TextField>();
             var configuration = new List<InputField>();
+            var chatShortcut = _chatShortcutTarget?.Invoke();
+            if (_configuredChatShortcut != chatShortcut)
+            {
+                _configuredChatShortcut = chatShortcut;
+                _chatShortcutVersion++;
+            }
             foreach (var field in _root.Query<TextField>().ToList())
             {
                 if (field.isReadOnly || !IsVisible(field) || configuration.Count >= 128) continue;
@@ -144,7 +170,7 @@ namespace DrawLiar
                 if (!_ids.TryGetValue(field, out int id)) { id = ++_nextId; _ids.Add(field, id); _fields.Add(id, field); }
                 var text = input.Q<TextElement>();
                 var style = (text ?? input).resolvedStyle;
-                configuration.Add(new InputField
+                var layout = new InputField
                 {
                     Id = id, X = (bounds.x - panel.x) / panel.width, Y = (bounds.y - panel.y) / panel.height,
                     Width = bounds.width / panel.width, Height = bounds.height / panel.height,
@@ -160,14 +186,31 @@ namespace DrawLiar
                     Multiline = field.multiline, Password = field.isPasswordField,
                     Keyboard = (int)field.textEdition.keyboardType, Correction = field.textEdition.autoCorrection,
                     Rtl = IsRightToLeft(text ?? input),
+                    ChatShortcut = field == chatShortcut,
                     SubmitOnCompositionEnd = field.ClassListContains("chat-input") || field.ClassListContains("lobby-chat-input") || field.ClassListContains("guess-input")
-                });
+                };
+                _layouts[field] = layout;
+                configuration.Add(layout);
+            }
+            if (_active != null && !found.Contains(_active) && _active == chatShortcut
+                && DrawBrowserInterop.IsMobile && DrawBrowserInterop.DrawBrowserKeyboardMetrics(_keyboardMetrics) == 1
+                && !_active.isReadOnly && IsVisible(_active)
+                && _root.Contains(_active) && ParentField(_root.panel.focusController.focusedElement as VisualElement) == _active
+                && _layouts.TryGetValue(_active, out var activeLayout) && configuration.Count < 128)
+            {
+                activeLayout.Value = _active.value ?? "";
+                activeLayout.ChatShortcut = _active == chatShortcut;
+                found.Add(_active);
+                configuration.Add(activeLayout);
             }
             if (_active != null && !found.Contains(_active)) Close(false);
             var removed = new List<TextField>();
             foreach (var field in _ids.Keys) if (!found.Contains(field)) removed.Add(field);
-            foreach (var field in removed) { _fields.Remove(_ids[field]); _ids.Remove(field); }
-            DrawBrowserInterop.DrawBrowserInputConfigure(JsonUtility.ToJson(new InputFields { Fields = configuration.ToArray() }));
+            foreach (var field in removed) { _fields.Remove(_ids[field]); _ids.Remove(field); _layouts.Remove(field); }
+            DrawBrowserInterop.DrawBrowserInputConfigure(JsonUtility.ToJson(new InputFields
+            {
+                Fields = configuration.ToArray(), ChatShortcutToken = chatShortcut != null ? _chatShortcutVersion : 0
+            }));
             var focused = ParentField(_root.panel?.focusController.focusedElement as VisualElement);
             if (_active == null && focused != null && found.Contains(focused) && _ids.TryGetValue(focused, out int focusedId))
                 Open(focused, focusedId);
@@ -176,6 +219,7 @@ namespace DrawLiar
         private void OnFocusIn(FocusInEvent evt)
         {
             if (_disposed) return;
+            if (_chatShortcutTarget?.Invoke() != _configuredChatShortcut) RefreshFields();
             var field = ParentField(evt.target as VisualElement);
             if (field == null || field.isReadOnly) return;
             if (!_ids.ContainsKey(field)) RefreshFields();
@@ -215,7 +259,22 @@ namespace DrawLiar
         private void Poll()
         {
             if (_disposed) return;
+            if (_chatShortcutTarget?.Invoke() != _configuredChatShortcut) RefreshFields();
+            int shortcutToken = DrawBrowserInterop.DrawBrowserInputTakeChatShortcut();
+            if (shortcutToken != 0 && shortcutToken == _chatShortcutVersion && _configuredChatShortcut != null
+                && _chatShortcutTarget?.Invoke() == _configuredChatShortcut) _openChatShortcut?.Invoke();
             int browserId = DrawBrowserInterop.DrawBrowserInputActive();
+            int browserState = browserId != 0 ? DrawBrowserInterop.DrawBrowserInputState(browserId) : 0;
+            if ((browserState & 128) != 0 && _fields.TryGetValue(browserId, out var shortcut))
+            {
+                if (_chatShortcutTarget?.Invoke() != shortcut)
+                {
+                    DrawBrowserInterop.DrawBrowserInputClose(browserId, 0);
+                    RefreshFields();
+                    return;
+                }
+                shortcut.Focus();
+            }
             if (browserId != _activeId && _fields.TryGetValue(browserId, out var focused))
             {
                 Open(focused, browserId);
@@ -224,10 +283,11 @@ namespace DrawLiar
             if (_active != null)
             {
                 SynchronizeValue();
-                int state = DrawBrowserInterop.DrawBrowserInputState(_activeId);
+                int state = _activeId == browserId ? browserState : DrawBrowserInterop.DrawBrowserInputState(_activeId);
+                var source = _active;
                 if ((state & 64) != 0) ReadValue(false);
                 if ((state & 1) != 0) { ReadValue(true); Dispatch(KeyCode.Return, EventModifiers.None); }
-                if ((state & 2) != 0) { ReadValue(true); Dispatch(KeyCode.Escape, EventModifiers.None); Close(true); }
+                if ((state & 2) != 0) { ReadValue(true); Dispatch(KeyCode.Escape, EventModifiers.None, source); }
                 else if ((state & 8) != 0) { ReadValue(true); MoveFocus((state & 16) != 0); }
                 else if ((state & 4) != 0) { var blurred = _active; Close(false); blurred?.Blur(); }
                 if (_active != null && !IsVisible(_active)) Close(false);
@@ -262,11 +322,12 @@ namespace DrawLiar
             DrawBrowserInterop.DrawBrowserInputSetValue(_activeId, _knownValue ?? "");
         }
 
-        private void Dispatch(KeyCode key, EventModifiers modifiers)
+        private void Dispatch(KeyCode key, EventModifiers modifiers, TextField source = null)
         {
-            if (_active == null) return;
-            var target = key == KeyCode.Return ? _active : (VisualElement)_text ?? _active;
-            var evt = new BrowserKeyDownEvent(this, _active, key, modifiers) { target = target };
+            var field = source ?? _active;
+            if (field?.panel != _root.panel || _root.panel == null) return;
+            var target = key == KeyCode.Return || field != _active ? field : (VisualElement)_text ?? field;
+            var evt = new BrowserKeyDownEvent(this, field, key, modifiers) { target = target };
             target.SendEvent(evt);
         }
 
@@ -312,7 +373,7 @@ namespace DrawLiar
             _root.UnregisterCallback<KeyDownEvent>(OnKeyDown, TrickleDown.TrickleDown);
             _root.UnregisterCallback<DetachFromPanelEvent>(OnDetached);
             DrawBrowserInterop.DrawBrowserInputShutdown();
-            _fields.Clear(); _ids.Clear();
+            _fields.Clear(); _ids.Clear(); _layouts.Clear();
         }
     }
 }

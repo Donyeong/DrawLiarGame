@@ -107,7 +107,7 @@ namespace DrawLiar
                 RawText(metadata, entry.CreatorName, "workshop-creator grow");
                 RawText(metadata, L.AvailableLanguages.FirstOrDefault(language => language.Code == entry.LanguageCode)?.DisplayName
                     ?? entry.LanguageCode, "workshop-entry-language");
-                Text(_workshopPreviewBody, "제시어 {0}개 · 다운로드 {1}회", "rules workshop-preview-count", detail.Words.Length, entry.DownloadCount);
+                Text(_workshopPreviewBody, "제시어 {0}개 · 다운로드 {1}회 · 추천 {2}개", "rules workshop-preview-count", detail.Words.Length, entry.DownloadCount, entry.RecommendationCount);
                 var words = Box(_workshopPreviewBody, "row workshop-preview-words");
                 for (int index = 0; index < detail.Words.Length; index++)
                     RawText(words, detail.Words[index], "workshop-preview-word").name = "workshop-preview-word-" + index;

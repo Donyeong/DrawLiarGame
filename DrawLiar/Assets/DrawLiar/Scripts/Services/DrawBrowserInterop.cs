@@ -27,7 +27,10 @@ namespace DrawLiar
         [DllImport("__Internal")] internal static extern void DrawBrowserGoogleCancel(int id);
         [DllImport("__Internal")] internal static extern void DrawBrowserInputConfigure(string configuration);
         [DllImport("__Internal")] internal static extern int DrawBrowserInputActive();
+        [DllImport("__Internal")] internal static extern int DrawBrowserKeyboardMetrics(float[] metrics);
+        [DllImport("__Internal")] internal static extern int DrawBrowserInputTakeChatShortcut();
         [DllImport("__Internal")] internal static extern int DrawBrowserInputOpen(int id);
+        [DllImport("__Internal")] internal static extern int DrawBrowserInputFocused(int id);
         [DllImport("__Internal")] internal static extern int DrawBrowserInputState(int id);
         [DllImport("__Internal")] internal static extern string DrawBrowserInputValue(int id);
         [DllImport("__Internal")] internal static extern void DrawBrowserInputSetValue(int id, string value);
