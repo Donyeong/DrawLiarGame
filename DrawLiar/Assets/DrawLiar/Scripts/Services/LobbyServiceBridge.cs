@@ -18,6 +18,7 @@ namespace DrawLiar
         public int MaxPlayers;
         public int Spectators;
         public LiarMode LiarMode;
+        public string[] Topics = Array.Empty<string>();
         public bool IsInProgress;
         public bool AllowMidRoundJoin = true;
     }
@@ -516,7 +517,7 @@ namespace DrawLiar
             foreach (var room in response.Rooms)
                 _publicRooms.Add(new PublicRoomInfo { Id = room.RoomId, Code = room.RoomCode, Name = room.Name, Players = room.PlayerCount,
                     MaxPlayers = room.Settings.MaxPlayers, Spectators = room.SpectatorCount, LiarMode = (LiarMode)room.Settings.LiarMode, IsInProgress = room.IsInProgress,
-                    AllowMidRoundJoin = room.Settings.AllowMidRoundJoin });
+                    AllowMidRoundJoin = room.Settings.AllowMidRoundJoin, Topics = room.Settings.Topics?.ToArray() ?? Array.Empty<string>() });
             if (_publicRooms.Count == 0) SetStatus("공개 방이 없습니다.");
             else SetStatus("공개 방 {0}개를 찾았습니다.", _publicRooms.Count);
         });

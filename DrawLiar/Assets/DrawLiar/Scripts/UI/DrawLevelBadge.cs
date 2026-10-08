@@ -40,7 +40,7 @@ namespace DrawLiar
             float size = Mathf.Min(contentRect.width, contentRect.height);
             if (size <= 0) return;
             var painter = context.painter2D;
-            Vector2 Point(float x, float y) => contentRect.center + new Vector2((x - .5f) * contentRect.width, (y - .5f) * contentRect.height);
+            Vector2 Point(float x, float y) => contentRect.center + new Vector2((x - .5f) * size, (y - .5f) * size);
             painter.fillColor = FILLS[Tier];
             painter.strokeColor = INKS[Tier];
             painter.lineWidth = Mathf.Max(1f, size / 20f);

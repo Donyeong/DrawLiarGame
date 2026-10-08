@@ -14,15 +14,15 @@
 .mobile-landscape .level-name-shop-profile-name { height: 14px; margin-bottom: 2px; }
 .mobile-landscape .level-name-shop-profile-name .account-level-badge { width: 20px; height: 14px; min-width: 20px; min-height: 14px; }
 .mobile-landscape .level-name-shop-profile-name .account-level-number { font-size: 8px; }
-.mobile-landscape .level-name-shop-profile-name .level-tier-5 .account-level-number { font-size: 8px; }
+.mobile-landscape .level-name-shop-profile-name .level-tier-5 .account-level-number { font-size: 6px; }
 .mobile.in-game .player .level-name-player-name { height: 16px; }
 .app.mobile.in-game .player .level-name-player-name Label.leveled-name { width: auto; min-width: 0; flex-basis: 0; flex-grow: 1; flex-shrink: 1; }
 .mobile.in-game .player .level-name-player-name .account-level-badge { width: 20px; height: 14px; min-width: 20px; min-height: 14px; margin-right: 2px; }
 .mobile.in-game .player .level-name-player-name .account-level-number { font-size: 8px; }
-.mobile.in-game .player .level-name-player-name .level-tier-5 .account-level-number { font-size: 8px; }
+.mobile.in-game .player .level-name-player-name .level-tier-5 .account-level-number { font-size: 6px; }
 .mobile.in-game .level-name-chat-name .account-level-badge { width: 18px; height: 16px; min-width: 18px; min-height: 16px; }
 .mobile.in-game .level-name-chat-name .account-level-number { font-size: 9px; }
-.mobile.in-game .level-name-chat-name .level-tier-5 .account-level-number { font-size: 7px; }
+.mobile.in-game .level-name-chat-name .level-tier-5 .account-level-number { font-size: 6px; }
 .app.mobile .mobile-playing .level-name-nomination-target { margin-bottom: 4px; }
 .mobile .match-experience-reward { font-size: 14px; }
  .mobile .lobby-chat-message { font-size: 14px; }
@@ -172,6 +172,11 @@
 .app.mobile .guess-timer-control { width: 96px; min-width: 96px; }
 .mobile.in-game .mobile-round-card { padding: 2px 12px; min-height: 52px; border-radius: 12px; background-color: #FFFFFF; border-width: 1px; border-color: #E3DDD4; align-items: center; margin-bottom: 8px; flex-shrink: 0; }
 .mobile.in-game .mobile-round-card .mobile-small { margin-top: 4px; }
+.mobile.in-game .mobile-round-card > .grow { min-width: 0; flex-basis: 0; }
+.mobile-waiting-room-title { max-width: 100%; min-width: 0; margin: 0 0 4px; padding: 0; font-size: 18px; -unity-font-style: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mobile-room-info-actions { flex-shrink: 0; margin-left: 8px; align-items: stretch; }
+.app.mobile .mobile-room-info-actions .mobile-code-copy { margin: 0; }
+.app.mobile .mobile-room-info-actions .waiting-room-topics { height: 44px; min-height: 44px; min-width: 88px; margin: 4px 0 0; padding: 4px 8px; font-size: 12px; }
 .mobile.in-game .mobile-code-copy { width: 108px; flex-shrink: 0; padding: 8px; font-size: 14px; }
 .mobile.in-game .secret-bar { margin-bottom: 8px; padding: 10px 12px; min-height: 72px; border-radius: 12px; border-width: 1px; border-color: #DED5EA; background-color: #EEE8F5; flex-shrink: 0; }
 .mobile.in-game .topic { font-size: 12px; color: #817A87; margin: 0 0 4px; }
@@ -493,6 +498,7 @@
 .mobile.in-game .button.player-profile-button { position: absolute; top: 0; right: 0; width: 44px; min-width: 44px; height: 44px; min-height: 44px; margin: 0; padding: 10px; border-width: 0; background-color: transparent; align-items: center; justify-content: center; color: #78679E; }
 .mobile.in-game .player-profile-button .draw-ui-icon { width: 20px; height: 20px; }
 .mobile.in-game .mobile-waiting .player { padding-top: 44px; }
+.mobile.in-game .mobile-waiting .player.player-empty, .mobile.in-game .mobile-playing .player.player-empty { padding: 8px; align-items: center; justify-content: center; background-color: #F7F3EA; border-color: #E3DDD4; }
 .mobile.in-game .player.preview-player { border-width: 2px; border-color: #537F70; background-color: #EDF5EF; }
 .mobile.in-game .mobile-playing .player-host-badge { top: 4px; left: 4px; width: 32px; max-width: 32px; height: 16px; margin: 0; padding: 1px 2px; font-size: 10px; -unity-text-align: middle-center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .mobile.in-game .mobile-playing .player-drawing-order { top: 24px; left: 4px; right: auto; }
@@ -513,6 +519,8 @@
 .app.mobile .workshop-preview-word { padding: 8px 12px; font-size: 16px; }
 .app.mobile-landscape .workshop-preview-overlay { align-items: center; justify-content: center; }
 .app.mobile-landscape .modal.workshop-preview-popup { width: 640px; max-width: 94%; height: 90%; padding: 12px 16px; border-radius: 16px; }
+.app.mobile .room-entry .room-topic-summary .room-topics-open { height: 44px; min-height: 44px; }
+.app.mobile .modal.room-topics-popup { width: 94%; max-width: 94%; height: 440px; max-height: 90%; align-self: center; padding: 16px; border-radius: 16px; background-color: #FFFFFF; }
 .app.mobile-landscape .workshop-preview-popup .utility-popup-header { min-height: 40px; height: 40px; margin-bottom: 8px; }
 .app.mobile-landscape .workshop-preview-popup .utility-popup-close { min-height: 44px; height: 44px; margin-top: 8px; }
 .mobile.in-game .mobile-playing .player > .player-identity { flex-direction: column; align-items: center; justify-content: flex-end; }

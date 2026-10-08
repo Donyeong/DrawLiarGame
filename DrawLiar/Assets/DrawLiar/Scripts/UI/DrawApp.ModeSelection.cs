@@ -33,6 +33,7 @@ namespace DrawLiar
             BindRoomModeTooltip(_roomLiarMode);
             BindRoomModeTooltip(_roomDrawingMode);
             topic = Text(context, topicTitle, "topic");
+            topic.name = "room-topic-title";
         }
 
         private void BindRoomModeTooltip(Label badge)
