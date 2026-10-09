@@ -4,6 +4,7 @@ import json
 import hashlib
 import os
 import pathlib
+import subprocess
 import sys
 import tarfile
 import tempfile
@@ -249,6 +250,68 @@ class DeploymentTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, 'all 또는 admin'):
                 deploy.main()
             run.assert_not_called()
+
+    def test_full_rollout_checks_readonly_game_state_before_stopping_and_resets_overrides(self):
+        self.full_rollout_gate('0\n')
+
+    def test_full_rollout_active_game_invalid_state_and_query_failure_preserve_live_apps(self):
+        for state in ('1\n', 'invalid', '-1', '0\n1', '', subprocess.CalledProcessError(1, ['docker', 'exec']), OSError('query failed')):
+            with self.subTest(state=type(state).__name__ if isinstance(state, Exception) else state):
+                self.full_rollout_gate(state, rejected=True)
+
+    def full_rollout_gate(self, state, rejected=False):
+        with tempfile.TemporaryDirectory() as directory:
+            root = pathlib.Path(directory)
+            base, releases, templates = root/'base', root/'releases', root/'templates'
+            base.mkdir(); templates.mkdir()
+            (base/'compose.yaml').write_text('old-compose'); (templates/'compose.yaml').write_text('new-compose')
+            (base/'.env').write_text('protected-environment')
+            for name, image in (('current-image','old-core'), ('current-admin-image','old-admin'), ('current-dedicated-image','old-dedicated')):
+                (base/name).write_text(image+'\n')
+            entries = []
+            for app in deploy.APP_SERVICES:
+                entries += [('Apps/'+app+'/'+name,b'app') for name in ('DrawLiar.'+app+'.dll','DrawLiar.'+app+'.deps.json','DrawLiar.'+app+'.runtimeconfig.json','DrawLiar.Shared.dll')]
+            entries += [('Apps/AdminServer/wwwroot/'+name,b'asset') for name in ('index.html','console.js','console.css')]
+            payload = self.package(root,entries).read_bytes()
+            release = 'release-20261009000000-1234abcd'
+            image = 'drawliar-app:'+release
+            real_open = open
+            events = []
+            def open_lock(path,*args,**kwargs):
+                return io.StringIO() if path=='/var/lock/drawliar-deploy.lock' else real_open(path,*args,**kwargs)
+            def upload(incoming,archive,owner,checksum): archive.write_bytes(payload)
+            def run_result(*args,**kwargs):
+                if args[:2] == ('docker','build'):
+                    events.append('build'); return types.SimpleNamespace(stdout='')
+                self.assertEqual(args[:10], ('docker','exec','drawliar-dev-db-1','psql','-U','drawliar','-d','drawliar','-qAt','-v'))
+                self.assertIn('ON_ERROR_STOP=1',args)
+                self.assertIn('BEGIN READ ONLY;',args[-1])
+                self.assertEqual(kwargs, {'capture_output':True,'text':True})
+                events.append('query')
+                if isinstance(state,Exception): raise state
+                return types.SimpleNamespace(stdout=state)
+            def compose_result(path,current_image,*args,**kwargs):
+                events.append(args[0])
+                if args[:2] == ('exec','-T'): kwargs['stdout'].write(b'private-backup')
+                return types.SimpleNamespace(stdout=json.dumps([{'Service':service,'Health':'healthy'} for service in ('db','main','game','dedicated','admin')]))
+            with mock.patch.object(deploy,'BASE',base), mock.patch.object(deploy,'RELEASES',releases), mock.patch.object(deploy,'TEMPLATES',templates), mock.patch.object(sys,'argv',['deploy.py',release,'0'*64,'all']), mock.patch.object(os,'geteuid',return_value=0,create=True), mock.patch.object(deploy.fcntl,'flock',create=True), mock.patch.object(deploy.fcntl,'LOCK_EX',1,create=True), mock.patch.object(deploy.fcntl,'LOCK_NB',2,create=True), mock.patch.object(deploy.pwd,'getpwnam',return_value=types.SimpleNamespace(pw_uid=1),create=True), mock.patch('builtins.open',side_effect=open_lock), mock.patch.object(deploy,'require_templates'), mock.patch.object(deploy,'copy_upload',side_effect=upload), mock.patch.object(deploy,'run',side_effect=run_result), mock.patch.object(deploy.subprocess,'run',return_value=types.SimpleNamespace(returncode=0)), mock.patch.object(deploy,'compose',side_effect=compose_result) as compose, mock.patch.object(pathlib.Path,'unlink') as unlink:
+                if rejected:
+                    with self.assertRaises(RuntimeError): deploy.main()
+                    compose.assert_not_called(); unlink.assert_not_called()
+                    self.assertFalse((base/'backups').exists())
+                    self.assertEqual((base/'compose.yaml').read_text(),'old-compose')
+                    for name, old in (('current-image','old-core'),('current-admin-image','old-admin'),('current-dedicated-image','old-dedicated')):
+                        self.assertEqual((base/name).read_text(),old+'\n')
+                else:
+                    deploy.main()
+                    self.assertEqual(events[:3],['build','query','stop'])
+                    self.assertEqual(compose.call_args_list[0].args[2:],('stop','dedicated','game','admin','main'))
+                    self.assertEqual((base/'backups'/release/'drawliar.sql').read_bytes(),b'private-backup')
+                    self.assertEqual(compose.call_args_list[2].kwargs,{'dedicated_image':image})
+                    for name in ('current-image','current-admin-image','current-dedicated-image'):
+                        self.assertEqual((base/name).read_text(),image+'\n')
+                    unlink.assert_called_once()
+                self.assertEqual((base/'.env').read_text(),'protected-environment')
 
     @unittest.skipUnless(hasattr(os, 'O_NOFOLLOW'), 'Linux 파일 디스크립터 검사')
     def test_upload_checks_symlink_owner_and_checksum(self):

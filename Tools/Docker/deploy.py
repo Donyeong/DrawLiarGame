@@ -121,6 +121,22 @@ def deploy_dedicated(current, image, previous_image, previous_admin_image, previ
         raise
     (BASE/'current-dedicated-image').write_text(image+'\n')
 
+def require_no_active_games():
+    sql = '''BEGIN READ ONLY;
+SELECT count(*) FROM "Room" r JOIN "DedicatedNode" d ON d."NodeId"=r."NodeId"
+WHERE r."IsInProgress" AND d."HeartbeatAt">now()-interval '30 seconds'
+  AND r."UpdatedAt">now()-interval '90 seconds' AND r."PlayerCount"+r."SpectatorCount">0;
+COMMIT;'''
+    try:
+        count = run('docker', 'exec', 'drawliar-dev-db-1', 'psql', '-U', 'drawliar', '-d', 'drawliar',
+                    '-qAt', '-v', 'ON_ERROR_STOP=1', '-c', sql, capture_output=True, text=True).stdout.strip()
+    except (subprocess.CalledProcessError, OSError):
+        raise RuntimeError('진행 중인 경기 상태 조회에 실패했습니다. 기존 앱은 유지됩니다.') from None
+    if not re.fullmatch(r'[0-9]+', count):
+        raise RuntimeError('진행 중인 경기 상태를 확인할 수 없습니다. 기존 앱은 유지됩니다.')
+    if int(count) != 0:
+        raise RuntimeError('진행 중인 경기가 있습니다. 경기 종료 후 다시 배포하세요.')
+
 def main():
     if os.geteuid() != 0 or len(sys.argv) not in (3, 4):
         raise RuntimeError('root 배포 helper 인자가 필요합니다.')
@@ -178,6 +194,7 @@ def main():
         previous_image = image_state.read_text().strip() if image_state.exists() else image
         previous_admin_image = admin_state.read_text().strip() if admin_state.exists() else previous_image
         if current.exists():
+            require_no_active_games()
             compose(TEMPLATES/'compose.yaml', previous_image, 'stop','dedicated','game','admin','main', admin_image=previous_admin_image)
             backup = BASE/'backups'/release
             backup.mkdir(parents=True, mode=0o700)
