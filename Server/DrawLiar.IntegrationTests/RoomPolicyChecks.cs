@@ -197,7 +197,7 @@ internal static partial class Integration
             && status.Settings.Mode == (int)DrawingMode.Individual && status.Settings.Victory == (int)VictoryMode.TargetScore
             && status.Settings.LiarCount == 7 && status.Settings.RoundCount == 7 && status.Settings.TargetScore == 25
             && status.Settings.RoleSeconds == 7 && status.Settings.DrawSeconds == 35 && status.Settings.DiscussionSeconds == 60
-            && status.Settings.RebuttalSeconds == 0 && status.Settings.VoteSeconds == 25 && status.Settings.RevealSeconds == 8
+            && status.Settings.RebuttalSeconds == 0 && status.Settings.VoteSeconds == 25 && status.Settings.RevealSeconds == GameRules.MIN_REVEAL_SECONDS
             && status.Settings.GuessSeconds == 25 && status.Settings.ResultSeconds == 12
             && status.Settings.Topics.SequenceEqual(requested.Topics), "허용한 모든 설정은 heartbeat 상태에 반영되어야 합니다.");
         Check(notifications == before + 1, "방장 설정 변경은 공개 목록용 heartbeat를 즉시 요청해야 합니다.");
@@ -233,7 +233,7 @@ internal static partial class Integration
         Check(status.Settings.RoomName == "정규화" && status.Settings.Mode == 0 && status.Settings.Victory == 0
             && status.Settings.LiarCount == 7 && status.Settings.RoundCount == 1 && status.Settings.TargetScore == 1
             && status.Settings.RoleSeconds == 3 && status.Settings.DrawSeconds == 5 && status.Settings.DiscussionSeconds == 5
-            && status.Settings.RebuttalSeconds == 0 && status.Settings.VoteSeconds == 5 && status.Settings.RevealSeconds == 3
+            && status.Settings.RebuttalSeconds == 0 && status.Settings.VoteSeconds == 5 && status.Settings.RevealSeconds == GameRules.MIN_REVEAL_SECONDS
             && status.Settings.GuessSeconds == 5 && status.Settings.ResultSeconds == 5
             && status.Settings.Topics.Order().SequenceEqual(new[] { "과일", "동물", "방주제" }.Order()),
             "이름·모드·승리조건·인원·모든 시간은 안전한 범위로 정규화하고 null 주제는 알려진 이름만 사용해야 합니다.");

@@ -155,7 +155,7 @@ namespace DrawLiar
         public int DiscussionSeconds = 45;
         public int RebuttalSeconds = 20;
         public int VoteSeconds = 20;
-        public int RevealSeconds = 5;
+        public int RevealSeconds = 12;
         public int GuessSeconds = 20;
         public int ResultSeconds = 10;
         public string[] Topics = Array.Empty<string>();

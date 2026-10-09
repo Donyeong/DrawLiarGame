@@ -14,9 +14,19 @@ namespace DrawLiar
         public const int MAX_CANVAS_STROKES = 12000;
         public const int MAX_ROUND_STROKES = MAX_CANVAS_STROKES * MAX_PLAYERS;
         public const float JUDGMENT_COIN_TOSS_SECONDS = 3f;
+        public const int MIN_REVEAL_SECONDS = 12;
+        public const int MAX_REVEAL_SECONDS = 30;
+        public const float EXTRA_LIAR_REVEAL_SECONDS = 1.6f;
         public const string TieRule = "최다 득표 동률은 무작위로 결정 · 첫 찬반 동수는 부결, 이후 동전";
 
         public static int MinimumPlayers(LiarMode mode) => MIN_START_PLAYERS;
+
+        public static float RevealDuration(int configuredSeconds, int revealedLiarCount)
+        {
+            int liarCount = Math.Max(0, Math.Min(MAX_PLAYERS - 1, revealedLiarCount));
+            float minimum = MIN_REVEAL_SECONDS + Math.Max(0, liarCount - 1) * EXTRA_LIAR_REVEAL_SECONDS;
+            return Math.Min(MAX_REVEAL_SECONDS, Math.Max(configuredSeconds, minimum));
+        }
 
         public static string CleanText(string value, int maxLength, string fallback = "")
         {

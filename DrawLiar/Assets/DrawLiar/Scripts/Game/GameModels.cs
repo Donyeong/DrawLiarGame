@@ -25,7 +25,7 @@ namespace DrawLiar
         public int DiscussionSeconds = 45;
         public int RebuttalSeconds = 20;
         public int VoteSeconds = 20;
-        public int RevealSeconds = 5;
+        public int RevealSeconds = GameRules.MIN_REVEAL_SECONDS;
         public int GuessSeconds = 20;
         public int ResultSeconds = 10;
         public string[] Topics;
@@ -52,7 +52,7 @@ namespace DrawLiar
             DiscussionSeconds = Clamp(DiscussionSeconds, 5, 300);
             RebuttalSeconds = Clamp(RebuttalSeconds, 0, 180);
             VoteSeconds = Clamp(VoteSeconds, 5, 120);
-            RevealSeconds = Clamp(RevealSeconds, 3, 30);
+            RevealSeconds = Clamp(RevealSeconds, GameRules.MIN_REVEAL_SECONDS, GameRules.MAX_REVEAL_SECONDS);
             GuessSeconds = Clamp(GuessSeconds, 5, 120);
             ResultSeconds = Clamp(ResultSeconds, 5, 60);
             if (!Enum.IsDefined(typeof(DrawingMode), Mode)) Mode = DrawingMode.Relay;

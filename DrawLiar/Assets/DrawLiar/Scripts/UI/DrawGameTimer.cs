@@ -65,7 +65,7 @@ namespace DrawLiar
                 case GamePhase.Discussion: seconds = settings.DiscussionSeconds; break;
                 case GamePhase.Rebuttal: seconds = settings.RebuttalSeconds > 0 ? settings.RebuttalSeconds : settings.VoteSeconds; break;
                 case GamePhase.Voting: seconds = settings.VoteSeconds; break;
-                case GamePhase.LiarReveal: seconds = settings.RevealSeconds; break;
+                case GamePhase.LiarReveal: return GameRules.RevealDuration(settings.RevealSeconds, snapshot.RevealedLiarCount);
                 case GamePhase.Guessing: seconds = settings.GuessSeconds; break;
                 case GamePhase.RoundResults: seconds = settings.ResultSeconds; break;
                 default: seconds = 0; break;

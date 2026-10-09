@@ -559,7 +559,7 @@ namespace DrawLiar
 
         private void RevealLiars(double now)
         {
-            SetPhase(GamePhase.LiarReveal, Settings.RevealSeconds, now);
+            SetPhase(GamePhase.LiarReveal, GameRules.RevealDuration(Settings.RevealSeconds, players.Values.Count(player => player.Liar)), now);
         }
 
         private void ScoreRound(double now)

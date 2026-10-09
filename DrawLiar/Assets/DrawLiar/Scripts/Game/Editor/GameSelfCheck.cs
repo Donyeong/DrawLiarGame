@@ -34,6 +34,7 @@ namespace DrawLiar.Editor
             VerifyMutableNomination();
             VerifyJudgmentCoinToss();
             VerifyGuessResults();
+            VerifyRevealTimeline();
 #if UNITY_EDITOR
             UnityEngine.Debug.Log("DrawLiar game self-check PASS: 게임 모드, 승리 조건, 지목·찬반 합의, 점수, 비밀 상태, 재접속, 관전자, 타이머 검증");
 #else
@@ -51,9 +52,64 @@ namespace DrawLiar.Editor
             Topics = new[] { new TopicData { Name = "과일", Words = new[] { "사과" } } }
         };
 
+        private static void VerifyRevealTimeline()
+        {
+            var settings = new RoomSettings { RevealSeconds = 3 };
+            settings.Validate();
+            Check(settings.RevealSeconds == 12 && new RoomSettings().RevealSeconds == 12,
+                "공개 시간의 기본값과 이전 짧은 설정은 연출을 위한 12초를 보장해야 합니다.");
+            settings.RevealSeconds = 100; settings.Validate();
+            Check(settings.RevealSeconds == 30 && GameRules.RevealDuration(30, 7) == 30,
+                "긴 공개 시간 설정은 유지하되 30초 상한을 넘지 않아야 합니다.");
+            Check(GameRules.RevealDuration(3, 0) == 12 && GameRules.RevealDuration(3, 1) == 12
+                && Math.Abs(GameRules.RevealDuration(12, 7) - 21.6f) < .001f
+                && GameRules.RevealDuration(12, int.MaxValue) == GameRules.RevealDuration(12, 7),
+                "공개 시간은 이름 길이나 표시 가능 여부와 무관하게 실제 라이어 수로 결정해야 합니다.");
+            foreach (int count in new[] { 1, 7 })
+            {
+                var game = new GameSession(new RoomSettings
+                {
+                    LiarCount = count, RoundCount = 1, RoleSeconds = 3, DrawSeconds = 5,
+                    DiscussionSeconds = 5, RevealSeconds = 3, GuessSeconds = 17
+                }, Data(), 19);
+                for (int id = 0; id < 8; id++) Check(game.Join(id, new string('가', 15) + id, 0, 0), "공개 시간 검증 참가자가 입장해야 합니다.");
+                Check(game.Join(99, "관전자", 0, 0, spectatorOnly: true) && game.Start(0), "공개 시간 검증 경기를 시작해야 합니다.");
+                var privateState = game.Snapshot(99, 0, 0);
+                Check(privateState.Word == "" && privateState.RevealedLiarCount == -1
+                    && privateState.Players.All(player => !player.IsLiar), "연출 시간을 위한 역할 정보를 공개 전에 보내면 안 됩니다.");
+                game.Tick(3);
+                while (game.Phase == GamePhase.Drawing) game.EndTurn(game.ArtistId, 3);
+                game.Tick(8);
+                var reveal = game.Snapshot(99, 0, 8);
+                float duration = GameRules.RevealDuration(reveal.Settings.RevealSeconds, reveal.RevealedLiarCount);
+                Check(game.Phase == GamePhase.LiarReveal && Math.Abs(reveal.RemainingSeconds - duration) < .001f
+                    && reveal.RevealedLiarCount == count && reveal.Word == "",
+                    "서버 공개 마감과 클라이언트가 계산하는 전체 연출 시간은 같아야 합니다.");
+                int liar = reveal.Players.First(player => player.IsLiar).Id;
+                game.Disconnect(liar, 9, reserveSeat: false);
+                var missing = game.Snapshot(99, 0, 9);
+                Check(!missing.Players.Any(player => player.Id == liar) && missing.RevealedLiarCount == count
+                    && GameRules.RevealDuration(missing.Settings.RevealSeconds, missing.RevealedLiarCount) == duration,
+                    "퇴장으로 이름이 누락되어도 공개 연출의 총시간을 줄이면 안 됩니다.");
+                Check(game.Join(liar, "복귀", 0, 0), "공개 중 기존 역할로 재접속할 수 있어야 합니다.");
+                var resumed = game.Snapshot(liar, 0, 11);
+                Check(resumed.LocalIsLiar && resumed.Word == ""
+                    && Math.Abs(duration - resumed.RemainingSeconds - 3) < .001f,
+                    "재접속은 비밀 단어를 숨긴 채 이미 흐른 공개 시간을 복원해야 합니다.");
+                double end = 8d + duration;
+                game.Tick(end - .001);
+                Check(game.Phase == GamePhase.LiarReveal && !game.Guess(liar, "사과", end - .001),
+                    "공개 연출이 끝나기 전에 정답 추측 시간이 시작되면 안 됩니다.");
+                game.Tick(end);
+                Check(game.Phase == GamePhase.Guessing && game.Snapshot(liar, 0, end).RemainingSeconds == 17
+                    && game.Snapshot(liar, 0, end).Word == "" && game.Snapshot(99, 0, end).Word == "",
+                    "연출 이후 라이어는 손실 없는 추측 시간을 받고 관전자와 함께 정답을 계속 숨겨야 합니다.");
+            }
+        }
+
         private static void VerifyGuessResults()
         {
-            GameSession Prepare(int liarCount)
+            GameSession Prepare(int liarCount, out double now)
             {
                 var game = new GameSession(new RoomSettings { LiarCount = liarCount, RoundCount = 1, ResultSeconds = 5 }, Data(), 73);
                 for (int id = 1; id <= 4; id++) Check(game.Join(id, "P" + id, 0, 0), "추측 검증 참가자가 입장해야 합니다.");
@@ -61,29 +117,30 @@ namespace DrawLiar.Editor
                 game.Tick(6);
                 while (game.Phase == GamePhase.Drawing) game.EndTurn(game.ArtistId, 6);
                 game.Tick(51);
-                game.Tick(56);
+                now = 51d + game.Snapshot(1, 1, 51).RemainingSeconds;
+                game.Tick(now);
                 Check(game.Phase == GamePhase.Guessing, "지목 없는 라운드는 라이어 추측으로 진행해야 합니다.");
                 return game;
             }
-            void Hidden(GameSession game)
+            void Hidden(GameSession game, double now)
             {
                 foreach (int viewer in new[] { 1, 2, 3, 4, 9 })
-                    Check(game.Snapshot(viewer, 1, 56).Players.All(player => player.Guess == "" && player.GuessOutcome == GuessOutcome.Hidden),
+                    Check(game.Snapshot(viewer, 1, now).Players.All(player => player.Guess == "" && player.GuessOutcome == GuessOutcome.Hidden),
                         "모든 라이어의 추측이 끝나기 전에는 누구에게도 답과 판정을 공개하면 안 됩니다.");
             }
-            var game = Prepare(2);
-            int[] liars = game.Snapshot(1, 1, 56).Players.Where(player => player.IsLiar).Select(player => player.Id).ToArray();
-            int citizen = game.Snapshot(1, 1, 56).Players.First(player => !player.IsLiar && !player.IsSpectator).Id;
-            Hidden(game);
-            Check(!game.Guess(citizen, "사과", 56) && !game.Guess(9, "사과", 56), "시민과 관전자는 추측을 제출할 수 없습니다.");
-            Check(!game.Guess(liars[1], "<>\0", 56), "정제 후 빈 입력은 제출 처리하지 않아야 합니다.");
-            Check(game.Guess(liars[0], " 사 과 ", 56.1) && !game.Guess(liars[0], "바나나", 56.2), "라이어는 한 번만 제출해야 합니다.");
-            Hidden(game);
+            var game = Prepare(2, out double now);
+            int[] liars = game.Snapshot(1, 1, now).Players.Where(player => player.IsLiar).Select(player => player.Id).ToArray();
+            int citizen = game.Snapshot(1, 1, now).Players.First(player => !player.IsLiar && !player.IsSpectator).Id;
+            Hidden(game, now);
+            Check(!game.Guess(citizen, "사과", now) && !game.Guess(9, "사과", now), "시민과 관전자는 추측을 제출할 수 없습니다.");
+            Check(!game.Guess(liars[1], "<>\0", now), "정제 후 빈 입력은 제출 처리하지 않아야 합니다.");
+            Check(game.Guess(liars[0], " 사 과 ", now + .1) && !game.Guess(liars[0], "바나나", now + .2), "라이어는 한 번만 제출해야 합니다.");
+            Hidden(game, now + .2);
             string incorrect = new string('나', 60);
-            Check(game.Guess(liars[1], "<" + incorrect + ">", 57) && game.Phase == GamePhase.RoundResults, "모두 제출하면 즉시 결과로 넘어가야 합니다.");
+            Check(game.Guess(liars[1], "<" + incorrect + ">", now + 1) && game.Phase == GamePhase.RoundResults, "모두 제출하면 즉시 결과로 넘어가야 합니다.");
             foreach (int viewer in new[] { 1, 2, 3, 4, 9 })
             {
-                var result = game.Snapshot(viewer, 1, 57);
+                var result = game.Snapshot(viewer, 1, now + 1);
                 var correct = result.Players.Single(player => player.Id == liars[0]);
                 var wrong = result.Players.Single(player => player.Id == liars[1]);
                 Check(correct.Guess == "사 과" && correct.GuessOutcome == GuessOutcome.Correct && correct.Score == 5,
@@ -92,23 +149,24 @@ namespace DrawLiar.Editor
                     "오답은 정제한 40자 답변과 기존 점수로 모두에게 공개해야 합니다.");
                 Check(result.Players.Where(player => !player.IsLiar).All(player => player.GuessOutcome == GuessOutcome.Hidden), "시민·관전자의 판정은 숨겨야 합니다.");
             }
-            game.Tick(62);
-            Check(game.Phase == GamePhase.MatchResults && game.Snapshot(9, 1, 62).Players.Single(player => player.Id == liars[0]).GuessOutcome == GuessOutcome.Correct,
+            game.Tick(now + 6);
+            Check(game.Phase == GamePhase.MatchResults && game.Snapshot(9, 1, now + 6).Players.Single(player => player.Id == liars[0]).GuessOutcome == GuessOutcome.Correct,
                 "최종 결과에서도 마지막 라운드의 판정을 유지해야 합니다.");
             game.ReturnToLobby();
-            Hidden(game);
-            var timeout = Prepare(2);
-            liars = timeout.Snapshot(1, 1, 56).Players.Where(player => player.IsLiar).Select(player => player.Id).ToArray();
-            Check(timeout.Guess(liars[0], "사과", 56.1), "시간 초과 검증의 첫 라이어가 제출해야 합니다.");
-            Hidden(timeout);
-            Check(!timeout.Guess(liars[1], "사과", 76) && timeout.Phase == GamePhase.RoundResults, "마감 시각의 제출은 거부하고 결과로 넘어가야 합니다.");
-            Check(!timeout.Guess(liars[1], "사과", 77), "늦은 제출은 이미 공개한 결과를 바꾸면 안 됩니다.");
+            Hidden(game, now + 6);
+            var timeout = Prepare(2, out double timeoutNow);
+            liars = timeout.Snapshot(1, 1, timeoutNow).Players.Where(player => player.IsLiar).Select(player => player.Id).ToArray();
+            Check(timeout.Guess(liars[0], "사과", timeoutNow + .1), "시간 초과 검증의 첫 라이어가 제출해야 합니다.");
+            Hidden(timeout, timeoutNow + .1);
+            double deadline = timeoutNow + timeout.Settings.GuessSeconds;
+            Check(!timeout.Guess(liars[1], "사과", deadline) && timeout.Phase == GamePhase.RoundResults, "마감 시각의 제출은 거부하고 결과로 넘어가야 합니다.");
+            Check(!timeout.Guess(liars[1], "사과", deadline + 1), "늦은 제출은 이미 공개한 결과를 바꾸면 안 됩니다.");
             foreach (int viewer in new[] { 1, 2, 3, 4, 9 })
-                Check(timeout.Snapshot(viewer, 1, 76).Players.Single(player => player.Id == liars[1]).GuessOutcome == GuessOutcome.Unanswered,
+                Check(timeout.Snapshot(viewer, 1, deadline).Players.Single(player => player.Id == liars[1]).GuessOutcome == GuessOutcome.Unanswered,
                     "미제출 판정도 모든 참가자와 관전자에게 동일하게 공개해야 합니다.");
-            var single = Prepare(1);
-            int liar = single.Snapshot(1, 1, 56).Players.Single(player => player.IsLiar).Id;
-            Check(single.Guess(liar, "바나나", 56) && single.Snapshot(9, 1, 56).Players.Single(player => player.Id == liar).GuessOutcome == GuessOutcome.Incorrect,
+            var single = Prepare(1, out double singleNow);
+            int liar = single.Snapshot(1, 1, singleNow).Players.Single(player => player.IsLiar).Id;
+            Check(single.Guess(liar, "바나나", singleNow) && single.Snapshot(9, 1, singleNow).Players.Single(player => player.Id == liar).GuessOutcome == GuessOutcome.Incorrect,
                 "라이어 한 명의 제출도 즉시 전체 결과로 공개해야 합니다.");
         }
 
@@ -260,7 +318,7 @@ namespace DrawLiar.Editor
                 Check(game.Snapshot(0, 0, now).Players.All(player => !player.IsLiar), "Rebuttal keeps identities private.");
                 Check(game.Judge(0, 1, true, now), "시간 제한 검증을 위해 찬성 우세의 일부 찬반을 제출해야 합니다.");
                 Advance(GamePhase.Rebuttal, 6);
-                Advance(GamePhase.LiarReveal, 3);
+                Advance(GamePhase.LiarReveal, GameRules.MIN_REVEAL_SECONDS);
                 Advance(GamePhase.Guessing, 11);
                 Advance(GamePhase.RoundResults, 5);
             }

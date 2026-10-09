@@ -2141,7 +2141,7 @@ namespace DrawLiar
             Int(panel,"자유 토론",settings.DiscussionSeconds,5,300,v=>settings.DiscussionSeconds=v);
             settings.RebuttalSeconds=Mathf.Clamp(settings.RebuttalSeconds>0?settings.RebuttalSeconds:settings.VoteSeconds,5,180);
             Int(panel,"반론 · 찬반",settings.RebuttalSeconds,5,180,v=>settings.RebuttalSeconds=v);
-            Int(panel,"라이어 공개",settings.RevealSeconds,3,30,v=>settings.RevealSeconds=v);
+            Int(panel,"라이어 공개",settings.RevealSeconds,GameRules.MIN_REVEAL_SECONDS,GameRules.MAX_REVEAL_SECONDS,v=>settings.RevealSeconds=v);
             Int(panel,"정답 추측",settings.GuessSeconds,5,120,v=>settings.GuessSeconds=v);
             Int(panel,"라운드 결과",settings.ResultSeconds,5,60,v=>settings.ResultSeconds=v);
             Text(panel,"단위: 초","rules");
