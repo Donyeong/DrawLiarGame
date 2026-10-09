@@ -277,6 +277,13 @@
 .app.mobile .round-result-popup .title { margin-bottom: 12px; }
 .app.mobile .round-reveal-card { padding: 12px; }
 .app.mobile .round-reveal-statement { font-size: 21px; }
+.app.mobile .reveal-verdict-card { min-height: 172px; }
+.app.mobile .reveal-verdict-part-0 { font-size: 21px; }
+.app.mobile .reveal-verdict-part-1 { font-size: 24px; }
+.app.mobile .reveal-verdict-part-2 { font-size: 28px; }
+.app.mobile .reveal-identity-card .round-reveal-statement { font-size: 24px; }
+.app.mobile-landscape .reveal-verdict-card { min-height: 140px; }
+.app.mobile-landscape .reveal-verdict-part { margin: 2px 0; }
 .app.mobile .round-answer-card .round-reveal-statement { font-size: 24px; }
 .app.mobile .round-result-score-identity { margin-right: 8px; }
 .app.mobile .round-result-player-name, .app.mobile .round-result-content .player-score { font-size: 14px; }

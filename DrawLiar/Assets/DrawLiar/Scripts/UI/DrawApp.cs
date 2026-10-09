@@ -135,6 +135,7 @@ namespace DrawLiar
         }
         private void OnDisable()
         {
+            ResetTextPresentation();
             ClearJudgmentCoinToss();
             HideModeTooltip();
             CloseRoomTopicWorkshop(false);
@@ -260,6 +261,7 @@ namespace DrawLiar
 
         private void Home()
         {
+            ResetTextPresentation();
             ClearJudgmentCoinToss();
             _pcRoomChat=null;_pcChatExpanded=false;_chatFocusVersion++;
             if(lobbyScreen!=LobbyScreen.Topics||!lobby.IsAuthenticated||_workshopAccountId!=lobby.Profile?.AccountId)EndTopicWorkshopPage();else ClearTopicWorkshopView();
@@ -1195,6 +1197,7 @@ namespace DrawLiar
 
         private void Room()
         {
+            ClearTextPresentationView();
             ClearJudgmentCoinToss();
             ClearShopCartView();
             _pcRoomChat=null;_pcChatExpanded=false;_chatFocusVersion++;
@@ -1318,6 +1321,7 @@ namespace DrawLiar
                     _pcChatExpanded;
                 root.focusController?.focusedElement?.Blur();
                 var popup=_utilityPopupScreen;
+                ClearTextPresentationView();
                 var oldOverlay=overlay;CloseModal();oldOverlay?.RemoveFromHierarchy();
                 _webRenderedMode=IsMobile;
                 if(inRoom&&network.State!=null)
@@ -1649,7 +1653,8 @@ namespace DrawLiar
             topic.tooltip=waiting?state.Settings.RoomName:state.Topic;
             word.style.display=role.style.display=waiting?DisplayStyle.None:DisplayStyle.Flex;
             _roomSecretIdentity.style.display=waiting?DisplayStyle.None:DisplayStyle.Flex;
-            SetText(role,waiting?"":!state.LocalIsSpectator&&HasHiddenMismatchRole(state)?"비공개":LocalRoleName(state));
+            SetText(role,waiting?"":!state.LocalIsSpectator&&(HasHiddenMismatchRole(state)
+                ||state.Settings.LiarMode==LiarMode.Mismatch&&HideLiarIdentity(state))?"비공개":LocalRoleName(state));
             if(waiting)SetRawText(word,"");
             else if(string.IsNullOrEmpty(state.Word))SetText(word,"비공개");
             else SetRawText(word,secretHidden?"•••":state.Word);
@@ -1666,6 +1671,8 @@ namespace DrawLiar
             if(!inRoom)Room();
             RefreshDrawingInteractions(state);
             bool phaseChanged=previousPhase!=state.Phase;
+            UpdateGameTimers(state);
+            PrepareTextPresentation(state);
             if(phaseChanged||_ballotVersion!=state.BallotVersion)
             {selectedPlayerId=-1;_hasSelectedPlayer=false;voteSubmitted=_judgmentSubmitted=false;contextKey="";_ballotVersion=state.BallotVersion;}
             if(_hasSelectedPlayer&&!IsNoLiarSelected(state)&&!state.Players.Any(p=>p.Id==selectedPlayerId&&p.IsConnected&&!p.IsSpectator))
@@ -1679,7 +1686,6 @@ namespace DrawLiar
             SetText(roundCaption,state.Phase==GamePhase.Lobby?"대기실":"라운드");
             RefreshSecret(state);
             RefreshWaitingRoomTopics(state);
-            UpdateGameTimers(state);
             SetText(phaseTitle,IsMobile&&state.Phase==GamePhase.Drawing?"그림 차례":PhaseName(state));
             if(IsMobile&&_mobileRoundInfo!=null)
             {
@@ -1748,6 +1754,7 @@ namespace DrawLiar
                 if(resumedDiscussion)Toast(state.Summary);
             }
             RefreshJudgmentPanel(state,local);
+            RestoreTextPresentation(state);
             RefreshGuessingInput(state,local);
             if(IsMobile)ArrangeMobileRoom(state);
             RefreshJudgmentCoinToss(state);
@@ -1852,7 +1859,7 @@ namespace DrawLiar
                 SetText(_playerScores[player.Id],"{0}점",player.Score);
                 SetText(label,!player.IsConnected?"연결 끊김":IsNominationPhase(state)?(player.HasVoted?"지목 완료":_hasSelectedPlayer&&player.Id==selectedPlayerId?"선택됨":""):
                     state.Phase==GamePhase.Rebuttal?(state.IsJudgmentCoinToss?"동전 던지기":state.HasAccused&&player.Id==state.AccusedPlayerId?"반론 중":player.HasJudged?"투표 완료":""):
-                    player.IsLiar&&!HasHiddenMismatchRole(state)?"라이어":state.Phase==GamePhase.Drawing?(player.Id==state.ArtistId?"그리는 중":""):"");
+                    player.IsLiar&&!HasHiddenMismatchRole(state)&&!HideLiarIdentity(state)?"라이어":state.Phase==GamePhase.Drawing?(player.Id==state.ArtistId?"그리는 중":""):"");
                 label.style.display=string.IsNullOrEmpty(label.text)?DisplayStyle.None:DisplayStyle.Flex;
             }
         }
@@ -1944,7 +1951,8 @@ namespace DrawLiar
         }
         private static bool HasHiddenMismatchRole(RoomSnapshot state)=>state.Settings.LiarMode==LiarMode.Mismatch
             &&state.Phase>=GamePhase.RoleReveal&&state.Phase<=GamePhase.Voting;
-        private static string LocalRoleName(RoomSnapshot state)=>state.LocalIsSpectator?"관전":HasHiddenMismatchRole(state)?"제시어":state.LocalIsLiar?"라이어":"시민";
+        private string LocalRoleName(RoomSnapshot state)=>state.LocalIsSpectator?"관전":HasHiddenMismatchRole(state)
+            ||state.Settings.LiarMode==LiarMode.Mismatch&&HideLiarIdentity(state)?"제시어":state.LocalIsLiar?"라이어":"시민";
         private static string RoleInstructions(RoomSnapshot state)
         {
             if(state.LocalIsSpectator)return "그림과 토론을 지켜보며 누가 라이어인지 추측해 보세요.";
@@ -1961,16 +1969,20 @@ namespace DrawLiar
         }
         private void RoleInformation(RoomSnapshot state,bool showWord)
         {
-            var modal=Modal(LocalRoleName(state));
+            var modal=Modal("");
+            BeginTextPresentation(state,state.Phase==GamePhase.RoleReveal);
+            PresentationText(modal,L.Text(LocalRoleName(state)),"title role-reveal-title","role-reveal-title",.15f,.075f);
             modal.AddToClassList("room-role-details");
             var identity=Box(modal,"role-information-identity");
             var avatar=new AvatarElement(avatarColor,accessory);avatar.AddToClassList("avatar-preview");identity.Add(avatar);
             var details=Box(identity,"role-information-details");
             Text(details,"주제 · {0}","subtitle",state.Topic);
-            if(showWord&&!string.IsNullOrEmpty(state.Word))Text(details,"제시어 · {0}","section-title",state.Word);
+            if(showWord&&!string.IsNullOrEmpty(state.Word))PresentationText(details,L.Format("제시어 · {0}",state.Word),"section-title","role-reveal-word",.3f,.035f);
             if(state.Phase>=GamePhase.RoleReveal&&state.Phase<=GamePhase.Voting)
                 Text(modal,RoleInstructions(state),"room-role-instructions").name="room-role-instructions";
             Button(modal,"확인",CloseModal,"primary").name="room-role-confirm";
+            Enter(identity,300,10,120);
+            RefreshTextPresentation();
         }
         private void Options()
         {
@@ -2300,6 +2312,7 @@ namespace DrawLiar
         {
             var state=network.State;if(state==null||!inRoom)return;
             UpdateGameTimers(state);
+            RefreshTextPresentation();
             RefreshJudgmentCoinToss(state);
             RefreshDrawingInteractions(state);
             RefreshPlayerStates(state);RefreshContext(state);RefreshSpeeches();
@@ -2357,6 +2370,7 @@ namespace DrawLiar
         }
         private void CloseModal()
         {
+            CloseTextPresentation();
             ClearRoomTopicsPopup();
             CloseRoomTopicWorkshop(false);
             ClearGuessingPopup();
@@ -2417,6 +2431,7 @@ namespace DrawLiar
                 }
             });
             root.Query<Image>(className:"brand-logo").ForEach(logo=>logo.image=L.LoadLogo());
+            RebuildTextPresentationLanguage();
             if(inRoom&&network.State!=null)RefreshState(network.State);
             lastServiceStatus=lobby.Status;if(serviceNotice!=null)SetRawText(serviceNotice,lastServiceStatus);
             RefreshLobbyChat();
@@ -2429,6 +2444,7 @@ namespace DrawLiar
         }
         private void OnDestroy()
         {
+            ResetTextPresentation();
             ClearJudgmentCoinToss();
             HideModeTooltip();
             ClearDrawingPreview();

@@ -10692,6 +10692,159 @@
         "वोट देने के लिए पात्र चुनें।",
         "اختر شخصية للتصويت."
       ]
+    },
+    {
+      "Key": "{0}은|라이어가|맞았습니다.",
+      "Values": [
+        "{0}은|라이어가|맞았습니다.",
+        "{0}|was|the liar.",
+        "{0}|的身份|确实是说谎者。",
+        "{0}|的身分|確實是說謊者。",
+        "{0}は|ライアー|でした。",
+        "{0}|resultó|ser el mentiroso.",
+        "{0}|na verdade,|era o mentiroso.",
+        "{0},|au final,|était le menteur.",
+        "{0}|war|der Lügner.",
+        "{0}|ternyata|adalah pembohong.",
+        "{0}|का किरदार|झूठा था।",
+        "{0}|في هذه الجولة،|كان الكاذب."
+      ]
+    },
+    {
+      "Key": "{0}는|라이어가|맞았습니다.",
+      "Values": [
+        "{0}는|라이어가|맞았습니다.",
+        "{0}|was|the liar.",
+        "{0}|的身份|确实是说谎者。",
+        "{0}|的身分|確實是說謊者。",
+        "{0}は|ライアー|でした。",
+        "{0}|resultó|ser el mentiroso.",
+        "{0}|na verdade,|era o mentiroso.",
+        "{0},|au final,|était le menteur.",
+        "{0}|war|der Lügner.",
+        "{0}|ternyata|adalah pembohong.",
+        "{0}|का किरदार|झूठा था।",
+        "{0}|في هذه الجولة،|كان الكاذب."
+      ]
+    },
+    {
+      "Key": "{0}은|라이어가|아니었습니다.",
+      "Values": [
+        "{0}은|라이어가|아니었습니다.",
+        "{0}|was|not the liar.",
+        "{0}|的身份|不是说谎者。",
+        "{0}|的身分|不是說謊者。",
+        "{0}は|ライアー|ではありませんでした。",
+        "{0}|resultó|no ser el mentiroso.",
+        "{0}|na verdade,|não era o mentiroso.",
+        "{0},|au final,|n'était pas le menteur.",
+        "{0}|war|nicht der Lügner.",
+        "{0}|ternyata|bukan pembohong.",
+        "{0}|का किरदार|झूठा नहीं था।",
+        "{0}|في هذه الجولة،|لم يكن الكاذب."
+      ]
+    },
+    {
+      "Key": "{0}는|라이어가|아니었습니다.",
+      "Values": [
+        "{0}는|라이어가|아니었습니다.",
+        "{0}|was|not the liar.",
+        "{0}|的身份|不是说谎者。",
+        "{0}|的身分|不是說謊者。",
+        "{0}は|ライアー|ではありませんでした。",
+        "{0}|resultó|no ser el mentiroso.",
+        "{0}|na verdade,|não era o mentiroso.",
+        "{0},|au final,|n'était pas le menteur.",
+        "{0}|war|nicht der Lügner.",
+        "{0}|ternyata|bukan pembohong.",
+        "{0}|का किरदार|झूठा नहीं था।",
+        "{0}|في هذه الجولة،|لم يكن الكاذب."
+      ]
+    },
+    {
+      "Key": "라이어는|이번 라운드에|없었습니다.",
+      "Values": [
+        "라이어는|이번 라운드에|없었습니다.",
+        "This round|had|no liar.",
+        "这轮游戏|中|没有说谎者。",
+        "這輪遊戲|中|沒有說謊者。",
+        "このラウンドに|ライアーは|いませんでした。",
+        "En esta ronda|se confirmó que|no había ningún mentiroso.",
+        "Nesta rodada,|a verdade é que|não havia mentiroso.",
+        "Cette manche,|au final,|ne comptait aucun menteur.",
+        "In dieser Runde|gab es|keinen Lügner.",
+        "Pada ronde ini|ternyata|tidak ada pembohong.",
+        "इस दौर में|झूठा खिलाड़ी|नहीं था।",
+        "في هذه الجولة،|تبيّن أنه|لم يكن هناك كاذب."
+      ]
+    },
+    {
+      "Key": "라이어는|이번 라운드에|있었습니다.",
+      "Values": [
+        "라이어는|이번 라운드에|있었습니다.",
+        "This round|had|a liar.",
+        "这轮游戏|中|有说谎者。",
+        "這輪遊戲|中|有說謊者。",
+        "このラウンドに|ライアーが|いました。",
+        "En esta ronda|se confirmó que|había un mentiroso.",
+        "Nesta rodada,|a verdade é que|havia um mentiroso.",
+        "Cette manche,|au final,|comptait un menteur.",
+        "In dieser Runde|gab es|einen Lügner.",
+        "Pada ronde ini|ternyata|ada pembohong.",
+        "इस दौर में|झूठा खिलाड़ी|मौजूद था।",
+        "في هذه الجولة،|تبيّن أنه|كان هناك كاذب."
+      ]
+    },
+    {
+      "Key": "지목 결과",
+      "Values": [
+        "지목 결과",
+        "Accusation result",
+        "指认结果",
+        "指認結果",
+        "指名結果",
+        "Resultado de la acusación",
+        "Resultado da acusação",
+        "Résultat de l'accusation",
+        "Ergebnis der Beschuldigung",
+        "Hasil tuduhan",
+        "आरोप का परिणाम",
+        "نتيجة الاتهام"
+      ]
+    },
+    {
+      "Key": "라이어의 정체",
+      "Values": [
+        "라이어의 정체",
+        "The liar's identity",
+        "说谎者的身份",
+        "說謊者的身分",
+        "ライアーの正体",
+        "Identidad del mentiroso",
+        "Identidade do mentiroso",
+        "Identité du menteur",
+        "Identität des Lügners",
+        "Identitas pembohong",
+        "झूठे खिलाड़ी की पहचान",
+        "هوية الكاذب"
+      ]
+    },
+    {
+      "Key": "라이어는 {0}입니다.",
+      "Values": [
+        "라이어는 {0}입니다.",
+        "{0} is the liar.",
+        "说谎者是{0}。",
+        "說謊者是{0}。",
+        "ライアーは{0}です。",
+        "{0} es el mentiroso.",
+        "{0} é o mentiroso.",
+        "{0} est le menteur.",
+        "{0} ist der Lügner.",
+        "Pembohongnya adalah {0}.",
+        "झूठा खिलाड़ी {0} है।",
+        "الكاذب هو {0}."
+      ]
     }
   ]
 }

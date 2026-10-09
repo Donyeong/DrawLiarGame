@@ -12424,6 +12424,184 @@ MonoBehaviour:
       - "\u0627\u062E\u062A\u0631 \u0634\u062E\u0635\u064A\u0629 \u0644\u0644\u062A\u0635\u0648\u064A\u062A."
       Flags: 000000000000000000000000
       Languages_Touch: []
+    - Term: UI/ezB97J2AfOudvOydtOyWtOqwgHzrp57slZjsirXri4jri6Qu
+      TermType: 0
+      Description: "{0}\uC740|\uB77C\uC774\uC5B4\uAC00|\uB9DE\uC558\uC2B5\uB2C8\uB2E4."
+      Languages:
+      - "{0}\uC740|\uB77C\uC774\uC5B4\uAC00|\uB9DE\uC558\uC2B5\uB2C8\uB2E4."
+      - '{0}|was|the liar.'
+      - "{0}|\u7684\u8EAB\u4EFD|\u786E\u5B9E\u662F\u8BF4\u8C0E\u8005\u3002"
+      - "{0}|\u7684\u8EAB\u5206|\u78BA\u5BE6\u662F\u8AAA\u8B0A\u8005\u3002"
+      - "{0}\u306F|\u30E9\u30A4\u30A2\u30FC|\u3067\u3057\u305F\u3002"
+      - "{0}|result\xF3|ser el mentiroso."
+      - '{0}|na verdade,|era o mentiroso.'
+      - "{0},|au final,|\xE9tait le menteur."
+      - "{0}|war|der L\xFCgner."
+      - '{0}|ternyata|adalah pembohong.'
+      - "{0}|\u0915\u093E \u0915\u093F\u0930\u0926\u093E\u0930|\u091D\u0942\u0920\u093E
+        \u0925\u093E\u0964"
+      - "{0}|\u0641\u064A \u0647\u0630\u0647 \u0627\u0644\u062C\u0648\u0644\u0629\u060C|\u0643\u0627\u0646
+        \u0627\u0644\u0643\u0627\u0630\u0628."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/ezB964qUfOudvOydtOyWtOqwgHzrp57slZjsirXri4jri6Qu
+      TermType: 0
+      Description: "{0}\uB294|\uB77C\uC774\uC5B4\uAC00|\uB9DE\uC558\uC2B5\uB2C8\uB2E4."
+      Languages:
+      - "{0}\uB294|\uB77C\uC774\uC5B4\uAC00|\uB9DE\uC558\uC2B5\uB2C8\uB2E4."
+      - '{0}|was|the liar.'
+      - "{0}|\u7684\u8EAB\u4EFD|\u786E\u5B9E\u662F\u8BF4\u8C0E\u8005\u3002"
+      - "{0}|\u7684\u8EAB\u5206|\u78BA\u5BE6\u662F\u8AAA\u8B0A\u8005\u3002"
+      - "{0}\u306F|\u30E9\u30A4\u30A2\u30FC|\u3067\u3057\u305F\u3002"
+      - "{0}|result\xF3|ser el mentiroso."
+      - '{0}|na verdade,|era o mentiroso.'
+      - "{0},|au final,|\xE9tait le menteur."
+      - "{0}|war|der L\xFCgner."
+      - '{0}|ternyata|adalah pembohong.'
+      - "{0}|\u0915\u093E \u0915\u093F\u0930\u0926\u093E\u0930|\u091D\u0942\u0920\u093E
+        \u0925\u093E\u0964"
+      - "{0}|\u0641\u064A \u0647\u0630\u0647 \u0627\u0644\u062C\u0648\u0644\u0629\u060C|\u0643\u0627\u0646
+        \u0627\u0644\u0643\u0627\u0630\u0628."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/ezB97J2AfOudvOydtOyWtOqwgHzslYTri4jsl4jsirXri4jri6Qu
+      TermType: 0
+      Description: "{0}\uC740|\uB77C\uC774\uC5B4\uAC00|\uC544\uB2C8\uC5C8\uC2B5\uB2C8\uB2E4."
+      Languages:
+      - "{0}\uC740|\uB77C\uC774\uC5B4\uAC00|\uC544\uB2C8\uC5C8\uC2B5\uB2C8\uB2E4."
+      - '{0}|was|not the liar.'
+      - "{0}|\u7684\u8EAB\u4EFD|\u4E0D\u662F\u8BF4\u8C0E\u8005\u3002"
+      - "{0}|\u7684\u8EAB\u5206|\u4E0D\u662F\u8AAA\u8B0A\u8005\u3002"
+      - "{0}\u306F|\u30E9\u30A4\u30A2\u30FC|\u3067\u306F\u3042\u308A\u307E\u305B\u3093\u3067\u3057\u305F\u3002"
+      - "{0}|result\xF3|no ser el mentiroso."
+      - "{0}|na verdade,|n\xE3o era o mentiroso."
+      - "{0},|au final,|n'\xE9tait pas le menteur."
+      - "{0}|war|nicht der L\xFCgner."
+      - '{0}|ternyata|bukan pembohong.'
+      - "{0}|\u0915\u093E \u0915\u093F\u0930\u0926\u093E\u0930|\u091D\u0942\u0920\u093E
+        \u0928\u0939\u0940\u0902 \u0925\u093E\u0964"
+      - "{0}|\u0641\u064A \u0647\u0630\u0647 \u0627\u0644\u062C\u0648\u0644\u0629\u060C|\u0644\u0645
+        \u064A\u0643\u0646 \u0627\u0644\u0643\u0627\u0630\u0628."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/ezB964qUfOudvOydtOyWtOqwgHzslYTri4jsl4jsirXri4jri6Qu
+      TermType: 0
+      Description: "{0}\uB294|\uB77C\uC774\uC5B4\uAC00|\uC544\uB2C8\uC5C8\uC2B5\uB2C8\uB2E4."
+      Languages:
+      - "{0}\uB294|\uB77C\uC774\uC5B4\uAC00|\uC544\uB2C8\uC5C8\uC2B5\uB2C8\uB2E4."
+      - '{0}|was|not the liar.'
+      - "{0}|\u7684\u8EAB\u4EFD|\u4E0D\u662F\u8BF4\u8C0E\u8005\u3002"
+      - "{0}|\u7684\u8EAB\u5206|\u4E0D\u662F\u8AAA\u8B0A\u8005\u3002"
+      - "{0}\u306F|\u30E9\u30A4\u30A2\u30FC|\u3067\u306F\u3042\u308A\u307E\u305B\u3093\u3067\u3057\u305F\u3002"
+      - "{0}|result\xF3|no ser el mentiroso."
+      - "{0}|na verdade,|n\xE3o era o mentiroso."
+      - "{0},|au final,|n'\xE9tait pas le menteur."
+      - "{0}|war|nicht der L\xFCgner."
+      - '{0}|ternyata|bukan pembohong.'
+      - "{0}|\u0915\u093E \u0915\u093F\u0930\u0926\u093E\u0930|\u091D\u0942\u0920\u093E
+        \u0928\u0939\u0940\u0902 \u0925\u093E\u0964"
+      - "{0}|\u0641\u064A \u0647\u0630\u0647 \u0627\u0644\u062C\u0648\u0644\u0629\u060C|\u0644\u0645
+        \u064A\u0643\u0646 \u0627\u0644\u0643\u0627\u0630\u0628."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/65287J207Ja064qUfOydtOuyiCDrnbzsmrTrk5zsl5B87JeG7JeI7Iq164uI64ukLg
+      TermType: 0
+      Description: "\uB77C\uC774\uC5B4\uB294|\uC774\uBC88 \uB77C\uC6B4\uB4DC\uC5D0|\uC5C6\uC5C8\uC2B5\uB2C8\uB2E4."
+      Languages:
+      - "\uB77C\uC774\uC5B4\uB294|\uC774\uBC88 \uB77C\uC6B4\uB4DC\uC5D0|\uC5C6\uC5C8\uC2B5\uB2C8\uB2E4."
+      - This round|had|no liar.
+      - "\u8FD9\u8F6E\u6E38\u620F|\u4E2D|\u6CA1\u6709\u8BF4\u8C0E\u8005\u3002"
+      - "\u9019\u8F2A\u904A\u6232|\u4E2D|\u6C92\u6709\u8AAA\u8B0A\u8005\u3002"
+      - "\u3053\u306E\u30E9\u30A6\u30F3\u30C9\u306B|\u30E9\u30A4\u30A2\u30FC\u306F|\u3044\u307E\u305B\u3093\u3067\u3057\u305F\u3002"
+      - "En esta ronda|se confirm\xF3 que|no hab\xEDa ning\xFAn mentiroso."
+      - "Nesta rodada,|a verdade \xE9 que|n\xE3o havia mentiroso."
+      - Cette manche,|au final,|ne comptait aucun menteur.
+      - "In dieser Runde|gab es|keinen L\xFCgner."
+      - Pada ronde ini|ternyata|tidak ada pembohong.
+      - "\u0907\u0938 \u0926\u094C\u0930 \u092E\u0947\u0902|\u091D\u0942\u0920\u093E
+        \u0916\u093F\u0932\u093E\u0921\u093C\u0940|\u0928\u0939\u0940\u0902 \u0925\u093E\u0964"
+      - "\u0641\u064A \u0647\u0630\u0647 \u0627\u0644\u062C\u0648\u0644\u0629\u060C|\u062A\u0628\u064A\u0651\u0646
+        \u0623\u0646\u0647|\u0644\u0645 \u064A\u0643\u0646 \u0647\u0646\u0627\u0643
+        \u0643\u0627\u0630\u0628."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/65287J207Ja064qUfOydtOuyiCDrnbzsmrTrk5zsl5B87J6I7JeI7Iq164uI64ukLg
+      TermType: 0
+      Description: "\uB77C\uC774\uC5B4\uB294|\uC774\uBC88 \uB77C\uC6B4\uB4DC\uC5D0|\uC788\uC5C8\uC2B5\uB2C8\uB2E4."
+      Languages:
+      - "\uB77C\uC774\uC5B4\uB294|\uC774\uBC88 \uB77C\uC6B4\uB4DC\uC5D0|\uC788\uC5C8\uC2B5\uB2C8\uB2E4."
+      - This round|had|a liar.
+      - "\u8FD9\u8F6E\u6E38\u620F|\u4E2D|\u6709\u8BF4\u8C0E\u8005\u3002"
+      - "\u9019\u8F2A\u904A\u6232|\u4E2D|\u6709\u8AAA\u8B0A\u8005\u3002"
+      - "\u3053\u306E\u30E9\u30A6\u30F3\u30C9\u306B|\u30E9\u30A4\u30A2\u30FC\u304C|\u3044\u307E\u3057\u305F\u3002"
+      - "En esta ronda|se confirm\xF3 que|hab\xEDa un mentiroso."
+      - "Nesta rodada,|a verdade \xE9 que|havia um mentiroso."
+      - Cette manche,|au final,|comptait un menteur.
+      - "In dieser Runde|gab es|einen L\xFCgner."
+      - Pada ronde ini|ternyata|ada pembohong.
+      - "\u0907\u0938 \u0926\u094C\u0930 \u092E\u0947\u0902|\u091D\u0942\u0920\u093E
+        \u0916\u093F\u0932\u093E\u0921\u093C\u0940|\u092E\u094C\u091C\u0942\u0926
+        \u0925\u093E\u0964"
+      - "\u0641\u064A \u0647\u0630\u0647 \u0627\u0644\u062C\u0648\u0644\u0629\u060C|\u062A\u0628\u064A\u0651\u0646
+        \u0623\u0646\u0647|\u0643\u0627\u0646 \u0647\u0646\u0627\u0643 \u0643\u0627\u0630\u0628."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7KeA66qpIOqysOqzvA
+      TermType: 0
+      Description: "\uC9C0\uBAA9 \uACB0\uACFC"
+      Languages:
+      - "\uC9C0\uBAA9 \uACB0\uACFC"
+      - Accusation result
+      - "\u6307\u8BA4\u7ED3\u679C"
+      - "\u6307\u8A8D\u7D50\u679C"
+      - "\u6307\u540D\u7D50\u679C"
+      - "Resultado de la acusaci\xF3n"
+      - "Resultado da acusa\xE7\xE3o"
+      - "R\xE9sultat de l'accusation"
+      - Ergebnis der Beschuldigung
+      - Hasil tuduhan
+      - "\u0906\u0930\u094B\u092A \u0915\u093E \u092A\u0930\u093F\u0923\u093E\u092E"
+      - "\u0646\u062A\u064A\u062C\u0629 \u0627\u0644\u0627\u062A\u0647\u0627\u0645"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/65287J207Ja07J2YIOygleyytA
+      TermType: 0
+      Description: "\uB77C\uC774\uC5B4\uC758 \uC815\uCCB4"
+      Languages:
+      - "\uB77C\uC774\uC5B4\uC758 \uC815\uCCB4"
+      - The liar's identity
+      - "\u8BF4\u8C0E\u8005\u7684\u8EAB\u4EFD"
+      - "\u8AAA\u8B0A\u8005\u7684\u8EAB\u5206"
+      - "\u30E9\u30A4\u30A2\u30FC\u306E\u6B63\u4F53"
+      - Identidad del mentiroso
+      - Identidade do mentiroso
+      - "Identit\xE9 du menteur"
+      - "Identit\xE4t des L\xFCgners"
+      - Identitas pembohong
+      - "\u091D\u0942\u0920\u0947 \u0916\u093F\u0932\u093E\u0921\u093C\u0940 \u0915\u0940
+        \u092A\u0939\u091A\u093E\u0928"
+      - "\u0647\u0648\u064A\u0629 \u0627\u0644\u0643\u0627\u0630\u0628"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/65287J207Ja064qUIHswfeyeheuLiOuLpC4
+      TermType: 0
+      Description: "\uB77C\uC774\uC5B4\uB294 {0}\uC785\uB2C8\uB2E4."
+      Languages:
+      - "\uB77C\uC774\uC5B4\uB294 {0}\uC785\uB2C8\uB2E4."
+      - '{0} is the liar.'
+      - "\u8BF4\u8C0E\u8005\u662F{0}\u3002"
+      - "\u8AAA\u8B0A\u8005\u662F{0}\u3002"
+      - "\u30E9\u30A4\u30A2\u30FC\u306F{0}\u3067\u3059\u3002"
+      - '{0} es el mentiroso.'
+      - "{0} \xE9 o mentiroso."
+      - '{0} est le menteur.'
+      - "{0} ist der L\xFCgner."
+      - Pembohongnya adalah {0}.
+      - "\u091D\u0942\u0920\u093E \u0916\u093F\u0932\u093E\u0921\u093C\u0940 {0}
+        \u0939\u0948\u0964"
+      - "\u0627\u0644\u0643\u0627\u0630\u0628 \u0647\u0648 {0}."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
     CaseInsensitiveTerms: 0
     OnMissingTranslation: 0
     mTerm_AppName:
