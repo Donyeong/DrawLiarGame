@@ -231,7 +231,7 @@ internal static partial class Integration
         using var json = JsonDocument.Parse(JsonSerializer.Serialize(profile, Json));
         void CheckFields(JsonElement element, params string[] allowed) => Check(element.EnumerateObject().Select(field => field.Name).Order()
             .SequenceEqual(allowed.Order()), "공개 프로필 JSON은 명시된 공개 필드만 반환해야 합니다.");
-        CheckFields(json.RootElement, "AccountId", "DisplayName", "AvatarColor", "Accessory", "JoinedAt", "Friendship", "Stats", "RecentMatches");
+        CheckFields(json.RootElement, "AccountId", "DisplayName", "AvatarColor", "Accessory", "Level", "ShowSubscriberBadge", "JoinedAt", "Friendship", "Stats", "RecentMatches");
         CheckFields(json.RootElement.GetProperty("Stats"), "MatchesPlayed", "MatchesWon", "TotalScore", "BestScore", "RoundsPlayed",
             "CitizenRounds", "LiarRounds", "CorrectVotes", "CorrectGuesses");
         foreach (var match in json.RootElement.GetProperty("RecentMatches").EnumerateArray())

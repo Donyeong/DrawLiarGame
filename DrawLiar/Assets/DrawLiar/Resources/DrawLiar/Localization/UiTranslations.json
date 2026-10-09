@@ -4965,6 +4965,23 @@
       ]
     },
     {
+      "Key": "세트",
+      "Values": [
+        "세트",
+        "Sets",
+        "套装",
+        "套裝",
+        "セット",
+        "Conjuntos",
+        "Conjuntos",
+        "Ensembles",
+        "Sets",
+        "Set",
+        "सेट",
+        "أطقم"
+      ]
+    },
+    {
       "Key": "머리",
       "Values": [
         "머리",
@@ -10011,6 +10028,652 @@
         "Mendapat {0} XP",
         "{0} अनुभव प्राप्त",
         "الخبرة المكتسبة {0}"
+      ]
+    },
+    {
+      "Key": "{0} 보석",
+      "Values": [
+        "{0} 보석",
+        "{0} gems",
+        "{0} 宝石",
+        "{0} 寶石",
+        "{0} ジェム",
+        "{0} gemas",
+        "{0} gemas",
+        "{0} gemmes",
+        "{0} Edelsteine",
+        "{0} permata",
+        "{0} रत्न",
+        "{0} جواهر"
+      ]
+    },
+    {
+      "Key": "구매 복원",
+      "Values": [
+        "구매 복원",
+        "Restore purchases",
+        "恢复购买",
+        "恢復購買",
+        "購入を復元",
+        "Restaurar compras",
+        "Restaurar compras",
+        "Restaurer les achats",
+        "Käufe wiederherstellen",
+        "Pulihkan pembelian",
+        "खरीदारी बहाल करें",
+        "استعادة المشتريات"
+      ]
+    },
+    {
+      "Key": "코스튬",
+      "Values": [
+        "코스튬",
+        "Costumes",
+        "装扮",
+        "裝扮",
+        "コスチューム",
+        "Disfraces",
+        "Trajes",
+        "Costumes",
+        "Kostüme",
+        "Kostum",
+        "पोशाकें",
+        "الأزياء"
+      ]
+    },
+    {
+      "Key": "보석",
+      "Values": [
+        "보석",
+        "Gems",
+        "宝石",
+        "寶石",
+        "ジェム",
+        "Gemas",
+        "Gemas",
+        "Gemmes",
+        "Edelsteine",
+        "Permata",
+        "रत्न",
+        "الجواهر"
+      ]
+    },
+    {
+      "Key": "구독",
+      "Values": [
+        "구독",
+        "Subscription",
+        "订阅",
+        "訂閱",
+        "サブスクリプション",
+        "Suscripción",
+        "Assinatura",
+        "Abonnement",
+        "Abonnement",
+        "Langganan",
+        "सदस्यता",
+        "الاشتراك"
+      ]
+    },
+    {
+      "Key": "보석 충전",
+      "Values": [
+        "보석 충전",
+        "Buy gems",
+        "购买宝石",
+        "購買寶石",
+        "ジェム購入",
+        "Comprar gemas",
+        "Comprar gemas",
+        "Acheter des gemmes",
+        "Edelsteine kaufen",
+        "Beli permata",
+        "रत्न खरीदें",
+        "شراء الجواهر"
+      ]
+    },
+    {
+      "Key": "화가 세트 구독",
+      "Values": [
+        "화가 세트 구독",
+        "Painter set subscription",
+        "画家套装订阅",
+        "畫家套裝訂閱",
+        "画家セットのサブスクリプション",
+        "Suscripción al conjunto de pintor",
+        "Assinatura do kit de pintor",
+        "Abonnement au kit de peintre",
+        "Malerset-Abonnement",
+        "Langganan set pelukis",
+        "चित्रकार सेट सदस्यता",
+        "اشتراك طقم الرسام"
+      ]
+    },
+    {
+      "Key": "보석 {0}개",
+      "Values": [
+        "보석 {0}개",
+        "{0} gems",
+        "{0} 颗宝石",
+        "{0} 顆寶石",
+        "ジェム {0}個",
+        "{0} gemas",
+        "{0} gemas",
+        "{0} gemmes",
+        "{0} Edelsteine",
+        "{0} permata",
+        "{0} रत्न",
+        "{0} جواهر"
+      ]
+    },
+    {
+      "Key": "보석 잔액으로 구독 상품을 구매할 수 있어요.",
+      "Values": [
+        "보석 잔액으로 구독 상품을 구매할 수 있어요.",
+        "You can use your gems to buy subscriptions.",
+        "你可以使用宝石余额购买订阅。",
+        "你可以使用寶石餘額購買訂閱。",
+        "所持ジェムでサブスクリプションを購入できます。",
+        "Puedes usar tus gemas para comprar suscripciones.",
+        "Você pode usar suas gemas para comprar assinaturas.",
+        "Vous pouvez utiliser vos gemmes pour acheter des abonnements.",
+        "Du kannst mit deinen Edelsteinen Abonnements kaufen.",
+        "Kamu bisa menggunakan permata untuk membeli langganan.",
+        "आप अपने रत्नों से सदस्यता खरीद सकते हैं।",
+        "يمكنك استخدام رصيد الجواهر لشراء الاشتراكات."
+      ]
+    },
+    {
+      "Key": "구독 기간 {0}일",
+      "Values": [
+        "구독 기간 {0}일",
+        "Subscription duration: {0} days",
+        "订阅期限：{0}天",
+        "訂閱期限：{0}天",
+        "サブスクリプション期間：{0}日",
+        "Duración de la suscripción: {0} días",
+        "Duração da assinatura: {0} dias",
+        "Durée de l’abonnement : {0} jours",
+        "Abonnementdauer: {0} Tage",
+        "Durasi langganan: {0} hari",
+        "सदस्यता अवधि: {0} दिन",
+        "مدة الاشتراك: {0} يوم"
+      ]
+    },
+    {
+      "Key": "프로필에 구독자 뱃지를 표시할 수 있어요.",
+      "Values": [
+        "프로필에 구독자 뱃지를 표시할 수 있어요.",
+        "You can display a subscriber badge on your profile.",
+        "你可以在个人资料中显示订阅者徽章。",
+        "你可以在個人資料中顯示訂閱者徽章。",
+        "プロフィールにサブスク会員バッジを表示できます。",
+        "Puedes mostrar una insignia de suscriptor en tu perfil.",
+        "Você pode exibir um selo de assinante no seu perfil.",
+        "Vous pouvez afficher un badge d’abonné sur votre profil.",
+        "Du kannst ein Abonnentenabzeichen in deinem Profil anzeigen.",
+        "Kamu bisa menampilkan lencana pelanggan di profil.",
+        "आप अपनी प्रोफ़ाइल पर सदस्यता बैज दिखा सकते हैं।",
+        "يمكنك عرض شارة المشترك في ملفك الشخصي."
+      ]
+    },
+    {
+      "Key": "구독 중 구매하면 남은 기간에 {0}일이 추가됩니다.",
+      "Values": [
+        "구독 중 구매하면 남은 기간에 {0}일이 추가됩니다.",
+        "Buying while subscribed adds {0} days to your remaining time.",
+        "订阅有效期间购买会在剩余期限上增加{0}天。",
+        "訂閱有效期間購買會在剩餘期限上增加{0}天。",
+        "サブスクリプション中に購入すると残りの期間に{0}日追加されます。",
+        "Si compras con una suscripción activa, se añaden {0} días al tiempo restante.",
+        "Comprar com uma assinatura ativa adiciona {0} dias ao período restante.",
+        "Acheter pendant un abonnement actif ajoute {0} jours à la durée restante.",
+        "Ein Kauf bei aktivem Abonnement verlängert die Restlaufzeit um {0} Tage.",
+        "Pembelian saat langganan aktif menambahkan {0} hari ke sisa waktu.",
+        "सदस्यता सक्रिय होने पर खरीदने से बची अवधि में {0} दिन जुड़ेंगे।",
+        "الشراء أثناء الاشتراك يضيف {0} يوم إلى المدة المتبقية."
+      ]
+    },
+    {
+      "Key": "기간 연장",
+      "Values": [
+        "기간 연장",
+        "Extend subscription",
+        "延长订阅",
+        "延長訂閱",
+        "期間を延長",
+        "Ampliar suscripción",
+        "Estender assinatura",
+        "Prolonger l’abonnement",
+        "Abonnement verlängern",
+        "Perpanjang langganan",
+        "सदस्यता बढ़ाएँ",
+        "تمديد الاشتراك"
+      ]
+    },
+    {
+      "Key": "보석이 부족합니다.",
+      "Values": [
+        "보석이 부족합니다.",
+        "Not enough gems.",
+        "宝石不足。",
+        "寶石不足。",
+        "ジェムが足りません。",
+        "No tienes suficientes gemas.",
+        "Você não tem gemas suficientes.",
+        "Vous n’avez pas assez de gemmes.",
+        "Du hast nicht genug Edelsteine.",
+        "Permata tidak cukup.",
+        "पर्याप्त रत्न नहीं हैं।",
+        "ليس لديك ما يكفي من الجواهر."
+      ]
+    },
+    {
+      "Key": "{0} 보석으로 {1}일 구독을 구매할까요?",
+      "Values": [
+        "{0} 보석으로 {1}일 구독을 구매할까요?",
+        "Buy a {1}-day subscription for {0} gems?",
+        "要使用{0}颗宝石购买{1}天的订阅吗？",
+        "要使用{0}顆寶石購買{1}天的訂閱嗎？",
+        "{0}ジェムで{1}日間のサブスクリプションを購入しますか？",
+        "¿Comprar una suscripción de {1} días por {0} gemas?",
+        "Comprar uma assinatura de {1} dias por {0} gemas?",
+        "Acheter un abonnement de {1} jours pour {0} gemmes ?",
+        "Ein Abonnement für {1} Tage mit {0} Edelsteinen kaufen?",
+        "Beli langganan {1} hari dengan {0} permata?",
+        "{0} रत्नों से {1} दिन की सदस्यता खरीदें?",
+        "هل تريد شراء اشتراك لمدة {1} يوم مقابل {0} جواهر؟"
+      ]
+    },
+    {
+      "Key": "보석 {0}개를 구매할까요?",
+      "Values": [
+        "보석 {0}개를 구매할까요?",
+        "Buy {0} gems?",
+        "要购买{0}颗宝石吗？",
+        "要購買{0}顆寶石嗎？",
+        "ジェムを{0}個購入しますか？",
+        "¿Comprar {0} gemas?",
+        "Comprar {0} gemas?",
+        "Acheter {0} gemmes ?",
+        "{0} Edelsteine kaufen?",
+        "Beli {0} permata?",
+        "{0} रत्न खरीदें?",
+        "هل تريد شراء {0} جواهر؟"
+      ]
+    },
+    {
+      "Key": "프로필에 구독자 뱃지 표시",
+      "Values": [
+        "프로필에 구독자 뱃지 표시",
+        "Show subscriber badge on profile",
+        "在个人资料中显示订阅者徽章",
+        "在個人資料中顯示訂閱者徽章",
+        "プロフィールにサブスク会員バッジを表示",
+        "Mostrar insignia de suscriptor en el perfil",
+        "Exibir selo de assinante no perfil",
+        "Afficher le badge d’abonné sur le profil",
+        "Abonnentenabzeichen im Profil anzeigen",
+        "Tampilkan lencana pelanggan di profil",
+        "प्रोफ़ाइल पर सदस्यता बैज दिखाएँ",
+        "عرض شارة المشترك في الملف الشخصي"
+      ]
+    },
+    {
+      "Key": "구독 상품 보기",
+      "Values": [
+        "구독 상품 보기",
+        "View subscriptions",
+        "查看订阅商品",
+        "查看訂閱商品",
+        "サブスクリプション商品を見る",
+        "Ver suscripciones",
+        "Ver assinaturas",
+        "Voir les abonnements",
+        "Abonnements ansehen",
+        "Lihat langganan",
+        "सदस्यताएँ देखें",
+        "عرض الاشتراكات"
+      ]
+    },
+    {
+      "Key": "구독 중",
+      "Values": [
+        "구독 중",
+        "Subscribed",
+        "订阅中",
+        "訂閱中",
+        "サブスクリプション利用中",
+        "Suscripción activa",
+        "Assinatura ativa",
+        "Abonnement actif",
+        "Abonnement aktiv",
+        "Langganan aktif",
+        "सदस्यता सक्रिय",
+        "الاشتراك نشط"
+      ]
+    },
+    {
+      "Key": "구독 없음",
+      "Values": [
+        "구독 없음",
+        "No subscription",
+        "未订阅",
+        "未訂閱",
+        "サブスクリプション未加入",
+        "Sin suscripción",
+        "Sem assinatura",
+        "Aucun abonnement",
+        "Kein Abonnement",
+        "Tidak berlangganan",
+        "कोई सदस्यता नहीं",
+        "لا يوجد اشتراك"
+      ]
+    },
+    {
+      "Key": "만료: {0}",
+      "Values": [
+        "만료: {0}",
+        "Expires: {0}",
+        "到期：{0}",
+        "到期：{0}",
+        "有効期限：{0}",
+        "Vence: {0}",
+        "Expira em: {0}",
+        "Expiration : {0}",
+        "Läuft ab: {0}",
+        "Berakhir: {0}",
+        "समाप्ति: {0}",
+        "ينتهي: {0}"
+      ]
+    },
+    {
+      "Key": "남은 기간: {0}일",
+      "Values": [
+        "남은 기간: {0}일",
+        "Time remaining: {0} days",
+        "剩余期限：{0}天",
+        "剩餘期限：{0}天",
+        "残りの期間：{0}日",
+        "Tiempo restante: {0} días",
+        "Tempo restante: {0} dias",
+        "Durée restante : {0} jours",
+        "Restlaufzeit: {0} Tage",
+        "Sisa waktu: {0} hari",
+        "शेष अवधि: {0} दिन",
+        "المدة المتبقية: {0} يوم"
+      ]
+    },
+    {
+      "Key": "화가 세트 구독자",
+      "Values": [
+        "화가 세트 구독자",
+        "Painter set subscriber",
+        "画家套装订阅者",
+        "畫家套裝訂閱者",
+        "画家セットのサブスク会員",
+        "Suscriptor del conjunto de pintor",
+        "Assinante do kit de pintor",
+        "Abonné au kit de peintre",
+        "Malerset-Abonnent",
+        "Pelanggan set pelukis",
+        "चित्रकार सेट सदस्य",
+        "مشترك طقم الرسام"
+      ]
+    },
+    {
+      "Key": "팔레트",
+      "Values": [
+        "팔레트",
+        "Palette",
+        "调色板",
+        "調色盤",
+        "パレット",
+        "Paleta",
+        "Paleta",
+        "Palette",
+        "Palette",
+        "Palet",
+        "रंग पैलेट",
+        "لوحة الألوان"
+      ]
+    },
+    {
+      "Key": "더 많은 색상",
+      "Values": [
+        "더 많은 색상",
+        "More colors",
+        "更多颜色",
+        "更多顏色",
+        "その他の色",
+        "Más colores",
+        "Mais cores",
+        "Plus de couleurs",
+        "Mehr Farben",
+        "Lebih banyak warna",
+        "और रंग",
+        "المزيد من الألوان"
+      ]
+    },
+    {
+      "Key": "필압 끄기",
+      "Values": [
+        "필압 끄기",
+        "Disable pen pressure",
+        "关闭压感",
+        "關閉壓感",
+        "筆圧をオフ",
+        "Desactivar presión del lápiz",
+        "Desativar pressão da caneta",
+        "Désactiver la pression du stylet",
+        "Stiftdruck ausschalten",
+        "Nonaktifkan tekanan pena",
+        "पेन दबाव बंद करें",
+        "تعطيل ضغط القلم"
+      ]
+    },
+    {
+      "Key": "필압 켜기",
+      "Values": [
+        "필압 켜기",
+        "Enable pen pressure",
+        "开启压感",
+        "開啟壓感",
+        "筆圧をオン",
+        "Activar presión del lápiz",
+        "Ativar pressão da caneta",
+        "Activer la pression du stylet",
+        "Stiftdruck einschalten",
+        "Aktifkan tekanan pena",
+        "पेन दबाव चालू करें",
+        "تفعيل ضغط القلم"
+      ]
+    },
+    {
+      "Key": "필압을 지원하는 펜의 누르는 세기에 따라 선 굵기가 달라집니다.",
+      "Values": [
+        "필압을 지원하는 펜의 누르는 세기에 따라 선 굵기가 달라집니다.",
+        "Line thickness changes with pressure when using a pressure-sensitive pen.",
+        "使用支持压感的笔时，线条粗细会随按压力度变化。",
+        "使用支援壓感的筆時，線條粗細會隨按壓力道變化。",
+        "筆圧に対応したペンでは、押す強さに応じて線の太さが変わります。",
+        "El grosor del trazo cambia según la presión de un lápiz compatible.",
+        "A espessura do traço varia conforme a pressão de uma caneta compatível.",
+        "L’épaisseur du trait varie selon la pression d’un stylet compatible.",
+        "Bei einem druckempfindlichen Stift ändert sich die Strichstärke mit dem Druck.",
+        "Ketebalan garis berubah sesuai tekanan pena yang mendukung sensitivitas tekanan.",
+        "दबाव-संवेदी पेन में दबाने की ताकत के अनुसार रेखा की मोटाई बदलती है।",
+        "يتغير سمك الخط حسب قوة الضغط عند استخدام قلم يدعم حساسية الضغط."
+      ]
+    },
+    {
+      "Key": "현재 결제를 이용할 수 없습니다.",
+      "Values": [
+        "현재 결제를 이용할 수 없습니다.",
+        "Payments are currently unavailable.",
+        "目前无法进行付款。",
+        "目前無法進行付款。",
+        "現在、決済を利用できません。",
+        "Los pagos no están disponibles ahora.",
+        "Os pagamentos estão indisponíveis no momento.",
+        "Les paiements sont indisponibles pour le moment.",
+        "Zahlungen sind derzeit nicht verfügbar.",
+        "Pembayaran saat ini tidak tersedia.",
+        "फ़िलहाल भुगतान उपलब्ध नहीं है।",
+        "المدفوعات غير متاحة حاليًا."
+      ]
+    },
+    {
+      "Key": "상품 정보가 변경되었습니다. 상점을 새로고침해 주세요.",
+      "Values": [
+        "상품 정보가 변경되었습니다. 상점을 새로고침해 주세요.",
+        "Product details have changed. Please refresh the shop.",
+        "商品信息已更改，请刷新商店。",
+        "商品資訊已變更，請重新整理商店。",
+        "商品情報が変更されました。ショップを更新してください。",
+        "La información del producto ha cambiado. Actualiza la tienda.",
+        "As informações do produto mudaram. Atualize a loja.",
+        "Les informations du produit ont changé. Actualisez la boutique.",
+        "Die Produktinformationen haben sich geändert. Bitte aktualisiere den Shop.",
+        "Informasi produk telah berubah. Perbarui toko.",
+        "उत्पाद की जानकारी बदल गई है। कृपया दुकान रीफ़्रेश करें।",
+        "تغيرت معلومات المنتج. يرجى تحديث المتجر."
+      ]
+    },
+    {
+      "Key": "구독을 구매했습니다.",
+      "Values": [
+        "구독을 구매했습니다.",
+        "Subscription purchased.",
+        "订阅购买成功。",
+        "訂閱購買成功。",
+        "サブスクリプションを購入しました。",
+        "Suscripción comprada.",
+        "Assinatura comprada.",
+        "Abonnement acheté.",
+        "Abonnement gekauft.",
+        "Langganan berhasil dibeli.",
+        "सदस्यता खरीद ली गई।",
+        "تم شراء الاشتراك."
+      ]
+    },
+    {
+      "Key": "결제가 확인되었습니다.",
+      "Values": [
+        "결제가 확인되었습니다.",
+        "Payment confirmed.",
+        "付款已确认。",
+        "付款已確認。",
+        "決済が確認されました。",
+        "Pago confirmado.",
+        "Pagamento confirmado.",
+        "Paiement confirmé.",
+        "Zahlung bestätigt.",
+        "Pembayaran dikonfirmasi.",
+        "भुगतान की पुष्टि हो गई।",
+        "تم تأكيد الدفع."
+      ]
+    },
+    {
+      "Key": "결제 확인을 기다리고 있습니다.",
+      "Values": [
+        "결제 확인을 기다리고 있습니다.",
+        "Waiting for payment confirmation.",
+        "正在等待付款确认。",
+        "正在等待付款確認。",
+        "決済の確認を待っています。",
+        "Esperando la confirmación del pago.",
+        "Aguardando a confirmação do pagamento.",
+        "En attente de confirmation du paiement.",
+        "Zahlungsbestätigung wird erwartet.",
+        "Menunggu konfirmasi pembayaran.",
+        "भुगतान की पुष्टि का इंतज़ार है।",
+        "في انتظار تأكيد الدفع."
+      ]
+    },
+    {
+      "Key": "구매 내역을 확인했습니다.",
+      "Values": [
+        "구매 내역을 확인했습니다.",
+        "Purchase history checked.",
+        "购买记录已确认。",
+        "購買紀錄已確認。",
+        "購入履歴を確認しました。",
+        "Historial de compras comprobado.",
+        "Histórico de compras verificado.",
+        "Historique des achats vérifié.",
+        "Kaufverlauf geprüft.",
+        "Riwayat pembelian telah diperiksa.",
+        "खरीदारी का इतिहास जाँच लिया गया।",
+        "تم التحقق من سجل المشتريات."
+      ]
+    },
+    {
+      "Key": "구독자 뱃지를 저장했습니다.",
+      "Values": [
+        "구독자 뱃지를 저장했습니다.",
+        "Subscriber badge preference saved.",
+        "订阅者徽章设置已保存。",
+        "訂閱者徽章設定已儲存。",
+        "サブスク会員バッジの設定を保存しました。",
+        "Preferencia de insignia de suscriptor guardada.",
+        "Preferência do selo de assinante salva.",
+        "Préférence du badge d’abonné enregistrée.",
+        "Einstellung für das Abonnentenabzeichen gespeichert.",
+        "Pengaturan lencana pelanggan disimpan.",
+        "सदस्यता बैज की सेटिंग सहेजी गई।",
+        "تم حفظ إعداد شارة المشترك."
+      ]
+    },
+    {
+      "Key": "결제 정보를 확인할 수 없습니다.",
+      "Values": [
+        "결제 정보를 확인할 수 없습니다.",
+        "Unable to verify payment information.",
+        "无法验证付款信息。",
+        "無法驗證付款資訊。",
+        "決済情報を確認できません。",
+        "No se puede verificar la información del pago.",
+        "Não foi possível verificar as informações do pagamento.",
+        "Impossible de vérifier les informations de paiement.",
+        "Die Zahlungsinformationen konnten nicht überprüft werden.",
+        "Informasi pembayaran tidak dapat diverifikasi.",
+        "भुगतान की जानकारी सत्यापित नहीं की जा सकी।",
+        "تعذر التحقق من معلومات الدفع."
+      ]
+    },
+    {
+      "Key": "보유할 수 있는 보석 한도에 도달했습니다.",
+      "Values": [
+        "보유할 수 있는 보석 한도에 도달했습니다.",
+        "You have reached the gem balance limit.",
+        "已达到宝石持有上限。",
+        "已達到寶石持有上限。",
+        "所持ジェムの上限に達しました。",
+        "Has alcanzado el límite de gemas que puedes tener.",
+        "Você atingiu o limite de gemas que pode ter.",
+        "Vous avez atteint la limite de gemmes autorisée.",
+        "Du hast die maximale Anzahl an Edelsteinen erreicht.",
+        "Kamu telah mencapai batas saldo permata.",
+        "आप रत्नों की अधिकतम सीमा तक पहुँच गए हैं।",
+        "لقد وصلت إلى الحد الأقصى لرصيد الجواهر."
+      ]
+    },
+    {
+      "Key": "구독 중에만 사용할 수 있습니다.",
+      "Values": [
+        "구독 중에만 사용할 수 있습니다.",
+        "Available only with an active subscription.",
+        "仅限订阅有效期间使用。",
+        "僅限訂閱有效期間使用。",
+        "有効なサブスクリプションがある場合のみ利用できます。",
+        "Solo disponible con una suscripción activa.",
+        "Disponível apenas com uma assinatura ativa.",
+        "Disponible uniquement avec un abonnement actif.",
+        "Nur mit aktivem Abonnement verfügbar.",
+        "Hanya tersedia dengan langganan aktif.",
+        "केवल सक्रिय सदस्यता के साथ उपलब्ध है।",
+        "متاح فقط مع اشتراك نشط."
       ]
     },
     {

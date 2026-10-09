@@ -62,6 +62,7 @@ namespace DrawLiar
         private VisualElement friendList;
         private VisualElement shopList;
         private readonly Dictionary<AvatarPartSlot,long> _shopPreviewParts=new Dictionary<AvatarPartSlot,long>();
+        private const int SHOP_SET_FILTER=-2;
         private int _shopPartFilter=-1;
         private AvatarPartSlot _customizePartSlot=AvatarPartSlot.Head;
         private Label _shopPreviewStatus;
@@ -124,6 +125,7 @@ namespace DrawLiar
             AttachRoomPasswordEvents();
             AttachTopicWorkshopEvents();
             AttachMatchRewardEvents();
+            AttachCommerceEvents();
 #if UNITY_WEBGL && !UNITY_EDITOR
             if(root!=null)_browserTextInput=new DrawBrowserTextInput(root,ChatShortcutTarget,OpenChatShortcut);
 #endif
@@ -219,6 +221,7 @@ namespace DrawLiar
             root.schedule.Execute(Tick).Every(100);
             root.schedule.Execute(RefreshRoomsInBackground).Every(1000);
             root.schedule.Execute(RefreshSocialControls).Every(1000);
+            root.schedule.Execute(RefreshCommerceControls).Every(1000);
 #if UNITY_WEBGL && !UNITY_EDITOR
             if(lobby.HasPendingRoomInvite)Run(async()=>
             {
@@ -297,7 +300,7 @@ namespace DrawLiar
             else
             {
                 avatarStage=Box(character,"character-stage");UpdateLobbyAvatar(avatarColor,accessory);
-                LeveledName(character,nickname,OwnLevel,"character-name","character-name",lobby.Profile?.AccountId);
+                LeveledName(character,nickname,OwnLevel,"character-name","character-name",lobby.Profile?.AccountId,OwnSubscriberBadge);
                 var customize=Button(character,"꾸미기",()=>Navigate(LobbyScreen.Customize),"customize-button");
                 if(lobbyScreen==LobbyScreen.Customize)customize.style.visibility=UnityEngine.UIElements.Visibility.Hidden;
             }
@@ -369,7 +372,7 @@ namespace DrawLiar
             var page=Box(content,"mobile-lobby");var profile=Box(page,"mobile-lobby-profile row");
             avatarStage=Box(profile,"mobile-lobby-avatar");UpdateLobbyAvatar(avatarColor,accessory);
             BindProfileTarget(avatarStage,lobby.Profile?.AccountId);
-            var identity=Box(profile,"mobile-lobby-identity grow");LeveledName(identity,nickname,OwnLevel,"mobile-lobby-name","mobile-lobby-name",lobby.Profile?.AccountId);
+            var identity=Box(profile,"mobile-lobby-identity grow");LeveledName(identity,nickname,OwnLevel,"mobile-lobby-name","mobile-lobby-name",lobby.Profile?.AccountId,OwnSubscriberBadge);
             Text(identity,lobby.Profile?.HasGoogleAccount==true?"Google":"게스트","mobile-account-state");
             Button(identity,"꾸미기",()=>Navigate(LobbyScreen.Customize),"secondary mobile-customize");
             LobbyRoomActions(page,"mobile-lobby-actions row");
@@ -394,7 +397,7 @@ namespace DrawLiar
             var profile=Box(sidebar,"pc-lobby-card pc-lobby-profile");
             avatarStage=Box(profile,"pc-lobby-avatar");UpdateLobbyAvatar(avatarColor,accessory);
             BindProfileTarget(avatarStage,lobby.Profile?.AccountId);
-            LeveledName(profile,nickname,OwnLevel,"pc-lobby-name","pc-lobby-name",lobby.Profile?.AccountId);Text(profile,lobby.Profile?.HasGoogleAccount==true?"Google":"게스트","pc-lobby-account");
+            LeveledName(profile,nickname,OwnLevel,"pc-lobby-name","pc-lobby-name",lobby.Profile?.AccountId,OwnSubscriberBadge);Text(profile,lobby.Profile?.HasGoogleAccount==true?"Google":"게스트","pc-lobby-account");
             Button(profile,"꾸미기",()=>Navigate(LobbyScreen.Customize),"secondary pc-lobby-customize");
             var services=Box(sidebar,"pc-lobby-card pc-lobby-services");
             Button(services,"상점",()=>{Navigate(LobbyScreen.Shop);Run(lobby.RefreshShopAsync);},"secondary");
@@ -616,7 +619,7 @@ namespace DrawLiar
         {
             var hero=Box(content,"mobile-profile-hero row");
             avatarStage=Box(hero,"mobile-profile-preview");UpdateLobbyAvatar(avatarColor,accessory);
-            var detail=Box(hero,"grow");LeveledName(detail,nickname,OwnLevel,"mobile-card-title","mobile-profile-name",lobby.Profile?.AccountId);
+            var detail=Box(hero,"grow");LeveledName(detail,nickname,OwnLevel,"mobile-card-title","mobile-profile-name",lobby.Profile?.AccountId,OwnSubscriberBadge);
         }
 
         private void MobileNavigation()
@@ -695,8 +698,9 @@ namespace DrawLiar
         private void AccountForm(VisualElement panel)
         {
             if(lobby.Profile==null)return;
-            LeveledName(panel,lobby.Profile.DisplayName,OwnLevel,"section-title","account-name",lobby.Profile.AccountId);
+            LeveledName(panel,lobby.Profile.DisplayName,OwnLevel,"section-title","account-name",lobby.Profile.AccountId,OwnSubscriberBadge);
             AccountExperience(panel);
+            SubscriberSettings(panel);
             Text(panel,lobby.Profile.HasGoogleAccount?"Google 연동 계정":lobby.Profile.IsGuest?"게스트 계정":"기존 계정","muted");
             Text(panel,"계정 ID: {0}","rules",lobby.Profile.AccountId);
             Button(panel,"계정 ID 복사",()=>Run(async()=>{await DrawClipboard.CopyAsync(lobby.Profile.AccountId);Toast("계정 ID를 복사했습니다.");}),"secondary");
@@ -751,6 +755,7 @@ namespace DrawLiar
 
         private void ShopPage()
         {
+            _commerceCatalogue=null;
             if(_shopPreviewAccountId!=lobby.Profile?.AccountId){ClearShopPreview();_shopPreviewAccountId=lobby.Profile?.AccountId;}
             if(_shopPartFilter>=0&&!AvatarParts.Slots.Contains((AvatarPartSlot)_shopPartFilter))_shopPartFilter=-1;
             foreach(var slot in _shopPreviewParts.Keys.Where(slot=>!AvatarParts.Slots.Contains(slot)).ToArray())RemoveShopPreviewPart(slot);
@@ -759,14 +764,20 @@ namespace DrawLiar
             var header=Box(page,"row shop-header");
             Button(header,"로비",()=>Navigate(LobbyScreen.Main),"secondary shop-back",DrawSound.UiCancel).name="shop-back";
             Text(header,"상점","shop-title grow");
-            Text(header,"{0} 코인","shop-coins",lobby.Profile?.Coins??0);
             Button(header,"친구",()=>Navigate(LobbyScreen.Friends),"secondary shop-friends").name="shop-friends";
             if(IsMobile)IconButton(header,"설정",DrawUIIcon.Kind.Settings,()=>Navigate(LobbyScreen.Options),"shop-settings");
             else Button(header,"설정",()=>Navigate(LobbyScreen.Options),"secondary shop-settings").name="shop-settings";
+            ShopCommerceNavigation(page);
+            if(_shopSection!=ShopSection.Cosmetics)
+            {
+                CommerceCataloguePage(page);
+                if(IsMobile)MobileNavigation();
+                DrawUIMotion.Stagger(page,28,220,8);return;
+            }
             var workspace=Box(page,"row shop-workspace grow");
             var preview=Box(workspace,"shop-panel shop-preview-panel");preview.name="shop-preview-panel";
             var hero=Box(preview,"shop-preview-hero");
-            var profileName=LeveledName(hero,nickname,OwnLevel,"shop-profile-name","shop-profile-name",lobby.Profile?.AccountId);
+            var profileName=LeveledName(hero,nickname,OwnLevel,"shop-profile-name","shop-profile-name",lobby.Profile?.AccountId,OwnSubscriberBadge);
             avatarStage=Box(hero,"shop-preview-stage");avatarStage.name="shop-preview-stage";UpdateLobbyAvatar(avatarColor,CurrentShopPreview());
             var previewControls=Box(hero,"shop-preview-controls");
             if(IsMobile)previewControls.Add(profileName.parent);
@@ -833,7 +844,7 @@ namespace DrawLiar
             var serverProducts=(lobby.Shop.Products??Array.Empty<ShopProduct>()).Where(item=>item!=null).ToArray();
             int displayed=0;
             var products=AvatarParts.CreateShopProducts().Select(product=>serverProducts.FirstOrDefault(item=>item.Id==product.Id&&item.Accessory==product.Accessory)??product)
-                .Where(item=>_shopPartFilter<0||AvatarParts.Get(item.Accessory,(AvatarPartSlot)_shopPartFilter)!=0)
+                .Where(MatchesShopFilter)
                 .OrderBy(item=>AvatarParts.IsOwned(ownedAccessories,item.Accessory));
             foreach(var product in products)
             {
@@ -864,6 +875,13 @@ namespace DrawLiar
             var viewport=shopList.GetFirstAncestorOfType<ScrollView>()?.contentViewport;
             if(viewport!=null)SizeShopGrid(shopList,viewport.contentRect.width);
             UpdateShopPreview();
+        }
+
+        private bool MatchesShopFilter(ShopProduct product)
+        {
+            if(_shopPartFilter==-1)return true;
+            bool set=AvatarParts.Slots.Count(slot=>AvatarParts.Get(product.Accessory,slot)!=0)>1;
+            return _shopPartFilter==SHOP_SET_FILTER?set:!set&&AvatarParts.Get(product.Accessory,(AvatarPartSlot)_shopPartFilter)!=0;
         }
 
         private void PreviewShopProduct(ShopProduct product)
@@ -1227,47 +1245,6 @@ namespace DrawLiar
             network.ReplayCanvas();foreach(var stroke in pendingStrokes)surface.Apply(stroke);pendingStrokes.Clear();
         }
 
-        private void CreateDrawingTools(VisualElement context)
-        {
-            drawingTools=Box(context,"tools");
-            var toolRow=Box(drawingTools,"tool-row");Button(toolRow,"펜",()=>surface.Eraser=false,"secondary tool-selected");
-            _clearOwnButton=Button(toolRow,"내 선 지우기",ClearOwnDrawing,"secondary clear-own-drawing");_clearOwnButton.name="clear-own-drawing";
-            if(IsMobile)Button(toolRow,"굵기",BrushOptions,"secondary mobile-last");
-            var palette=Box(drawingTools,"palette");
-            var colors=new[]{new Color32(40,43,39,255),new Color32(225,127,103,255),new Color32(228,182,107,255),new Color32(246,241,230,255),DrawingSurface.PaperColor,
-                new Color32(83,110,130,255),new Color32(166,171,159,255),new Color32(35,124,98,255),new Color32(157,147,219,255)};
-            var swatches=new List<Button>();
-            foreach(var color in colors)
-            {
-                Button swatch=null;swatch=Button(palette,"",()=>{surface.BrushColor=color;surface.Eraser=false;foreach(var item in swatches)item.RemoveFromClassList("selected");swatch.AddToClassList("selected");},"swatch");
-                if(IsMobile){swatch.style.backgroundColor=Color.clear;var dot=Box(swatch,"mobile-swatch-dot");dot.pickingMode=PickingMode.Ignore;dot.style.backgroundColor=(Color)color;}
-                else swatch.style.backgroundColor=(Color)color;
-                SetTooltip(swatch,"색상 {0}",swatches.Count+1);swatch.EnableInClassList("palette-row-end",swatches.Count%4==3);swatches.Add(swatch);
-                if(color.Equals(DrawingSurface.PaperColor))
-                {swatch.name="white-brush";swatch.AddToClassList("white-brush");SetTooltip(swatch,"흰색");swatch.Q<VisualElement>(className:"mobile-swatch-dot")?.AddToClassList("white-brush-dot");}
-            }
-            swatches[0].AddToClassList("selected");
-            Text(drawingTools,"굵기","secret-label");var sizes=Box(drawingTools,"brush-sizes");var sizeButtons=new List<Button>();
-            foreach(var width in new[]{5,11,24})
-            {
-                Button choice=null;choice=Button(sizes,"●",()=>{surface.BrushSize=width/1200f;foreach(var item in sizeButtons)item.RemoveFromClassList("selected");choice.AddToClassList("selected");},"brush-size-option secondary");
-                choice.userData=width/1200f;SetTooltip(choice,"굵기 {0}",width);choice.style.fontSize=width==5?8:width==11?12:18;
-                choice.EnableInClassList("selected",width==11);sizeButtons.Add(choice);
-            }
-            surface.BrushSize=11/1200f;
-        }
-
-        private void BrushOptions()
-        {
-            var modal=Modal("붓 굵기");
-            foreach(var width in new[]{5,11,24})
-            {
-                int size=width;var button=Button(modal,(size==5?"가는 선":size==11?"보통 선":"굵은 선"),()=>{surface.BrushSize=size/1200f;CloseModal();},"secondary");
-                button.EnableInClassList("tool-selected",Mathf.Approximately(surface.BrushSize,size/1200f));
-            }
-            Button(modal,"닫기",CloseModal,"secondary");
-        }
-
         private void MobileRoom()
         {
             _mobileLayout.Refresh();
@@ -1351,7 +1328,7 @@ namespace DrawLiar
                     int selected=selectedPlayerId,ballot=_ballotVersion;bool hasSelected=_hasSelectedPlayer,hidden=secretHidden,submitted=voteSubmitted,judged=_judgmentSubmitted;
                     Room();
                     selectedPlayerId=selected;_hasSelectedPlayer=hasSelected;_ballotVersion=ballot;secretHidden=hidden;voteSubmitted=submitted;_judgmentSubmitted=judged;
-                    if(surface!=null&&brushColor.HasValue){surface.BrushColor=brushColor.Value;surface.BrushSize=brushSize.Value;surface.Eraser=eraser.Value;}
+                    if(surface!=null&&brushColor.HasValue){surface.BrushColor=brushColor.Value;surface.BrushSize=brushSize.Value;surface.Eraser=eraser.Value;RefreshBrushControls();}
                     if(chatLines!=null)foreach(var line in chatLines)chatHistory.Add(line);
                     if(chatInput!=null)chatInput.SetValueWithoutNotify(chatDraft);
                     RefreshState(network.State);
@@ -2154,7 +2131,7 @@ namespace DrawLiar
                 },"secondary part-tab");
                 button.name="part-filter-"+name;button.EnableInClassList("part-selected",selected==index);buttons[index]=button;
             }
-            if(all)AddTab(-1,"전체","all");
+            if(all){AddTab(-1,"전체","all");AddTab(SHOP_SET_FILTER,"세트","sets");}
             foreach(var slot in AvatarParts.Slots)AddTab((int)slot,AvatarParts.Name(slot),slot.ToString().ToLowerInvariant());
         }
         private static void TimeFields(VisualElement panel,RoomSettings settings)
@@ -2338,6 +2315,7 @@ namespace DrawLiar
         private void RefreshServiceStatus()
         {
             RefreshPublicProfileActions();
+            RefreshCommerceControls();
             var save=root.Q<Button>("customize-save");if(save!=null)save.SetEnabled(save.userData is bool canSave&&canSave&&!lobby.IsBusy);
             shopList?.Query<Button>().ForEach(button=>{if(lobby.IsBusy)button.SetEnabled(false);});
             RefreshShopCart();
@@ -2356,7 +2334,7 @@ namespace DrawLiar
             if(runningAction||lobby.IsBusy){Toast("연결을 처리하고 있어요. 잠시 기다려 주세요.");return;}
             runningAction=true;
             try{await action();}catch(OperationCanceledException){}catch(Exception ex){DrawAudio.Instance?.Play(DrawSound.UiError);Toast(ex.Message);Debug.LogWarning(ex.Message);}
-            finally{runningAction=false;RefreshSocialControls();}
+            finally{runningAction=false;RefreshSocialControls();RefreshCommerceControls();}
         }
         private VisualElement Modal(string title,bool mobileScroll=true)
         {
@@ -2444,6 +2422,7 @@ namespace DrawLiar
             RefreshLobbyChat();
             RefreshShopCart();
             OnTopicWorkshopLanguageChanged();
+            RefreshCommerceView();
             DrawLocalizedTypography.Apply(root);
             if(_profileOverlay!=null)BeginPublicProfileLoad();
             shopList?.schedule.Execute(()=>shopList?.Query<VisualElement>(className:"shop-entry").ForEach(card=>SizeShopActions(card,card.Q<VisualElement>(className:"shop-actions")))).StartingIn(1);
@@ -2460,6 +2439,7 @@ namespace DrawLiar
             DetachSocialEvents();
             DetachRoomPasswordEvents();
             DetachTopicWorkshopEvents();EndTopicWorkshopPage();DetachMatchRewardEvents();
+            DetachCommerceEvents();
             ClearRoomPasswordSecrets();
             if(network!=null){network.StateChanged-=RefreshState;network.Kicked-=OnRoomKicked;network.ChatReceived-=OnChat;network.AuthorDrawingChanged-=OnAuthorDrawingChanged;}
             if(lobby!=null){lobby.Changed-=RefreshServiceStatus;lobby.ProfileChanged-=OnProfileChanged;lobby.LobbyChatChanged-=RefreshLobbyChat;lobby.LobbyChatNotice-=Toast;}

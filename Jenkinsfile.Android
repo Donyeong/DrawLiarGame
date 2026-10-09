@@ -10,12 +10,12 @@ pipeline {
     triggers { cron('TZ=Asia/Seoul\n0 1 * * *') }
     parameters {
         choice(name: 'BUILD_FORMAT', choices: ['APK', 'AAB'], description: 'APK는 Firebase 테스트 배포, AAB는 Google Play 제출용 파일 생성')
-        choice(name: 'SIGNING_PROFILE', choices: ['TEST', 'PLAY_UPLOAD'], description: 'TEST는 기존 테스트 키, PLAY_UPLOAD는 Google Play 제출용 업로드 키 (AAB·일반 빌드만 허용)')
+        choice(name: 'SIGNING_PROFILE', choices: ['PLAY_UPLOAD', 'TEST'], description: 'PLAY_UPLOAD는 Firebase APK와 Google Play AAB용 출시 서명, TEST는 기존 테스트 키')
         string(name: 'BUNDLE_VERSION', defaultValue: '0.1.0', description: 'Android 표시 버전')
         booleanParam(name: 'DEVELOPMENT_BUILD', defaultValue: false, description: 'Unity Development Build')
         booleanParam(name: 'UPLOAD_FIREBASE', defaultValue: true, description: 'APK를 DrawLiar Firebase 앱에 업로드하고 테스터 그룹에 배포')
         booleanParam(name: 'UPLOAD_GOOGLE_PLAY', defaultValue: false, description: 'AAB를 Google Play 내부 테스트 트랙에 초안으로 업로드 (첫 AAB 수동 업로드 및 게시자 자격 증명 설정 후 사용)')
-        booleanParam(name: 'NOTIFY_DISCORD', defaultValue: true, description: '지정한 DrawLiar Discord 채널에 빌드 결과 전송')
+        booleanParam(name: 'NOTIFY_DISCORD', defaultValue: false, description: '지정한 DrawLiar Discord 채널에 빌드 결과 전송')
     }
     environment {
         DRAWLIAR_SOURCE_REPOSITORY = 'C:\\DrawLiar'
@@ -25,7 +25,8 @@ pipeline {
         TMP = 'C:\\DrawLiarJenkinsCache\\Temp'
         GRADLE_USER_HOME = 'C:\\DrawLiarJenkinsCache\\Gradle'
         DRAWLIAR_UNITY_PATH = 'C:\\Program Files\\Unity\\Hub\\Editor\\6000.3.20f1\\Editor\\Unity.exe'
-        FIREBASE_APP_ID = '1:560556107495:android:0f486de5f877beb877e442'
+        FIREBASE_PROJECT_NUMBER = '560556107495'
+        FIREBASE_PACKAGE_NAME = 'com.rascallab.liargame'
         FIREBASE_GROUPS = 'drawliar-testers'
     }
     stages {
@@ -45,8 +46,11 @@ pipeline {
                     currentBuild.description = ''
                     if (!(params.BUILD_FORMAT in ['APK', 'AAB'])) { error('Android 빌드 형식은 APK 또는 AAB여야 합니다.') }
                     if (!(params.SIGNING_PROFILE in ['TEST', 'PLAY_UPLOAD'])) { error('Android 서명 프로필은 TEST 또는 PLAY_UPLOAD여야 합니다.') }
-                    if (params.SIGNING_PROFILE == 'PLAY_UPLOAD' && (params.BUILD_FORMAT != 'AAB' || params.DEVELOPMENT_BUILD)) {
-                        error('PLAY_UPLOAD 서명은 AAB 일반 빌드에서만 사용할 수 있습니다.')
+                    if (params.SIGNING_PROFILE == 'PLAY_UPLOAD' && params.DEVELOPMENT_BUILD) {
+                        error('PLAY_UPLOAD 서명은 일반 빌드에서만 사용할 수 있습니다.')
+                    }
+                    if (params.UPLOAD_FIREBASE && params.BUILD_FORMAT == 'APK' && params.SIGNING_PROFILE != 'PLAY_UPLOAD') {
+                        error('Firebase 자동 배포에는 PLAY_UPLOAD 출시 서명이 필요합니다.')
                     }
                     if (params.UPLOAD_GOOGLE_PLAY && (params.BUILD_FORMAT != 'AAB' || params.SIGNING_PROFILE != 'PLAY_UPLOAD' || params.DEVELOPMENT_BUILD)) {
                         error('Google Play 업로드에는 AAB, PLAY_UPLOAD 서명, DEVELOPMENT_BUILD=false가 필요합니다.')
@@ -67,6 +71,61 @@ pipeline {
                         $source = Get-Content -Raw -LiteralPath 'Build/Logs/AndroidSource.json' | ConvertFrom-Json
                         if ($source.UncommittedChanges) { Write-Output ($source.Revision + ' (local changes)') }
                         else { Write-Output $source.Revision }
+                    ''').trim()
+                }
+            }
+        }
+        stage('Prepare Firebase App') {
+            when { expression { params.UPLOAD_FIREBASE && params.BUILD_FORMAT == 'APK' } }
+            steps {
+                withCredentials([
+                    file(credentialsId: 'drawliar-firebase-app-distribution', variable: 'GOOGLE_APPLICATION_CREDENTIALS'),
+                    file(credentialsId: 'drawliar-android-upload-keystore', variable: 'DRAWLIAR_KEYSTORE_FILE'),
+                    string(credentialsId: 'drawliar-android-upload-keystore-password', variable: 'DRAWLIAR_KEYSTORE_PASS'),
+                    string(credentialsId: 'drawliar-android-upload-key-password', variable: 'DRAWLIAR_KEY_ALIAS_PASS'),
+                    string(credentialsId: 'drawliar-android-upload-key-alias', variable: 'DRAWLIAR_KEY_ALIAS')
+                ]) {
+                    withEnv(["FIREBASE_APP_RESULT=${env.WORKSPACE}\\Build\\Logs\\FirebaseApp.json"]) {
+                        powershell '''
+                            $ErrorActionPreference = 'Stop'
+                            & './Tools/Jenkins/Verify-AndroidUploadKey.ps1' -UnityPath $env:DRAWLIAR_UNITY_PATH
+                            $keytool = Join-Path (Split-Path -Parent $env:DRAWLIAR_UNITY_PATH) 'Data/PlaybackEngines/AndroidPlayer/OpenJDK/bin/keytool.exe'
+                            $previousErrorPreference = $ErrorActionPreference
+                            try {
+                                $ErrorActionPreference = 'Continue'
+                                $certificateText = @(& $keytool -exportcert -rfc -keystore $env:DRAWLIAR_KEYSTORE_FILE '-storepass:env' DRAWLIAR_KEYSTORE_PASS -alias $env:DRAWLIAR_KEY_ALIAS 2>$null) -join "`n"
+                                $certificateExitCode = $LASTEXITCODE
+                            }
+                            finally { $ErrorActionPreference = $previousErrorPreference }
+                            if ($certificateExitCode -ne 0) { throw 'Firebase 서명 인증서를 읽을 수 없습니다.' }
+                            $certificateMatch = [regex]::Match($certificateText, '-----BEGIN CERTIFICATE-----\\s*([A-Za-z0-9+/=\\s]+?)\\s*-----END CERTIFICATE-----')
+                            if (!$certificateMatch.Success) { throw 'Firebase 서명 인증서 형식이 잘못되었습니다.' }
+                            $certificateBytes = [Convert]::FromBase64String(($certificateMatch.Groups[1].Value -replace '\\s', ''))
+                            $sha1 = [Security.Cryptography.SHA1]::Create()
+                            $sha256 = [Security.Cryptography.SHA256]::Create()
+                            try {
+                                $env:FIREBASE_CERTIFICATE_SHA1 = [BitConverter]::ToString($sha1.ComputeHash($certificateBytes)).Replace('-', '')
+                                $env:FIREBASE_CERTIFICATE_SHA256 = [BitConverter]::ToString($sha256.ComputeHash($certificateBytes)).Replace('-', '')
+                            }
+                            finally { $sha1.Dispose(); $sha256.Dispose() }
+                            & 'C:/Program Files/nodejs/npm.cmd' ci --prefix './Tools/Firebase' --no-audit --no-fund
+                            if ($LASTEXITCODE -ne 0) { throw 'Firebase dependencies installation failed.' }
+                            & 'C:/Program Files/nodejs/node.exe' './Tools/Firebase/ensure-android-app.cjs'
+                            if ($LASTEXITCODE -ne 0) { throw 'Firebase 앱·서명 설정에 실패했습니다.' }
+                        '''
+                    }
+                }
+                script {
+                    env.FIREBASE_APP_ID = powershell(returnStdout: true, script: '''
+                        $ErrorActionPreference = 'Stop'
+                        $app = Get-Content -Raw -LiteralPath 'Build/Logs/FirebaseApp.json' | ConvertFrom-Json
+                        if (!$app.Success -or $app.PackageName -ne $env:FIREBASE_PACKAGE_NAME -or
+                            [string]$app.ProjectNumber -ne $env:FIREBASE_PROJECT_NUMBER -or
+                            $app.AppId -notmatch ('^1:' + $env:FIREBASE_PROJECT_NUMBER + ':android:[a-f0-9]+$') -or
+                            !$app.Sha1Registered -or !$app.Sha256Registered) {
+                            throw 'Firebase 앱·서명 설정이 이번 빌드와 일치하지 않습니다.'
+                        }
+                        Write-Output $app.AppId
                     ''').trim()
                 }
             }
@@ -124,7 +183,7 @@ pipeline {
                                 }
                                 & './Tools/Jenkins/Build-Android.ps1' -UnityPath $env:DRAWLIAR_UNITY_PATH -ProjectPath "$env:WORKSPACE/DrawLiar" -BuildFormat $env:BUILD_FORMAT -BundleVersion $env:BUNDLE_VERSION -BuildNumber ([int]$env:DRAWLIAR_VERSION_CODE) -Development ([bool]::Parse($env:DRAWLIAR_DEVELOPMENT_BUILD)) | Out-Null
                                 if ($env:DRAWLIAR_SIGNING_PROFILE -eq 'PLAY_UPLOAD') {
-                                    & './Tools/Jenkins/Verify-AndroidUploadKey.ps1' -UnityPath $env:DRAWLIAR_UNITY_PATH -ArtifactPath "$env:WORKSPACE/Build/Android/DrawLiar.aab"
+                                    & './Tools/Jenkins/Verify-AndroidUploadKey.ps1' -UnityPath $env:DRAWLIAR_UNITY_PATH -ArtifactPath "$env:WORKSPACE/Build/Android/DrawLiar.$($env:BUILD_FORMAT.ToLowerInvariant())"
                                 }
                             '''
                         }
@@ -144,8 +203,6 @@ pipeline {
                     withEnv(["UPLOAD_RESULT=${env.WORKSPACE}\\Build\\Logs\\FirebaseUploadResult.json", "DOWNLOAD_RESULT=${env.WORKSPACE}\\.jenkins-private\\FirebaseDownload.json", "BUILD_FILE=${env.WORKSPACE}\\Build\\Android\\DrawLiar.${env.BUILD_FORMAT.toLowerCase()}", 'FIREBASE_UPLOAD_ONLY=false', 'FIREBASE_ALLOW_TESTER_EMAIL=true']) {
                         powershell '''
                             $ErrorActionPreference = 'Stop'
-                            & 'C:/Program Files/nodejs/npm.cmd' ci --prefix './Tools/Firebase' --no-audit --no-fund
-                            if ($LASTEXITCODE -ne 0) { throw 'Firebase dependencies installation failed.' }
                             & 'C:/Program Files/nodejs/node.exe' './Tools/Firebase/distribute.cjs'
                             if ($LASTEXITCODE -ne 0) { throw 'DrawLiar Firebase upload failed.' }
                         '''
@@ -229,7 +286,7 @@ pipeline {
                     }
                 }
                 if (env.DRAWLIAR_SOURCE_READY == 'true') {
-                    archiveArtifacts artifacts: 'Build/Logs/AndroidBuildResult.json,Build/Logs/AndroidSource.json,Build/Logs/FirebaseUploadResult.json,Build/Logs/GooglePlayPlan.json,Build/Logs/GooglePlayUploadResult.json,Build/Logs/AndroidBuild.log', allowEmptyArchive: true
+                    archiveArtifacts artifacts: 'Build/Logs/AndroidBuildResult.json,Build/Logs/AndroidSource.json,Build/Logs/FirebaseApp.json,Build/Logs/FirebaseUploadResult.json,Build/Logs/GooglePlayPlan.json,Build/Logs/GooglePlayUploadResult.json,Build/Logs/AndroidBuild.log', allowEmptyArchive: true
                 }
                 if (params.NOTIFY_DISCORD && fileExists('Tools/Jenkins/Notify-AndroidBuild.ps1')) {
                     catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {

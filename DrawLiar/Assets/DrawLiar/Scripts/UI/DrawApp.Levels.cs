@@ -25,11 +25,17 @@ namespace DrawLiar
             return label;
         }
 
-        private static Label LeveledName(VisualElement parent, string name, int level, string classes, string locator, string accountId = null)
+        private static Label LeveledName(VisualElement parent, string name, int level, string classes, string locator, string accountId = null, bool subscriber = false)
         {
             var label = RawText(parent, name, classes);
             label.name = locator;
-            return AddLevelBadge(label, level, locator, accountId);
+            AddLevelBadge(label, level, locator, accountId);
+            if (subscriber)
+            {
+                var badge = new DrawSubscriberBadge { name = "subscriber-badge-" + locator, userData = accountId };
+                label.parent.Add(badge); SetTooltip(badge, "화가 세트 구독자");
+            }
+            return label;
         }
 
         private static void RefreshNameLevel(Label label, PlayerView player)

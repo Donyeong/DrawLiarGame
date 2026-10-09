@@ -15,6 +15,8 @@ namespace DrawLiar
         private int capturedPointer=-1;
         private Vector2 last;
         private float lastSend;
+        private bool _pressurePointer;
+        private float _lastBrushSize;
         private Texture2D _previewTexture;
         private Color32[] _previewPixels;
         private IReadOnlyList<DrawStroke> _previewStrokes;
@@ -26,6 +28,7 @@ namespace DrawLiar
         public Color32 BrushColor = new Color32(40,43,39,255);
         public float BrushSize = .009f;
         public bool Eraser;
+        public bool PressureEnabled = DrawBrushSettings.PressureEnabled;
         public bool HasAuthorPreview => _previewAuthorId.HasValue;
         public static float AspectRatio => Width/(float)Height;
 
@@ -94,31 +97,34 @@ namespace DrawLiar
         {
             var point=this.WorldToLocal(e.position);
             if(drawing || HasAuthorPreview || e.button!=0 || !network.CanDraw || !contentRect.Contains(point))return;
-            drawing=true;capturedPointer=e.pointerId;last=Normalize(point);this.CapturePointer(e.pointerId);Emit(last);e.StopPropagation();
+            drawing=true;capturedPointer=e.pointerId;last=Normalize(point);_pressurePointer=e.pointerType=="pen";
+            _lastBrushSize=DrawBrushSettings.ResolveSize(BrushSize,PressureEnabled,_pressurePointer,e.pressure,Eraser);
+            this.CapturePointer(e.pointerId);Emit(last,e.pressure);e.StopPropagation();
         }
         private void Move(PointerMoveEvent e)
         {
             if(!drawing || e.pointerId!=capturedPointer)return;
             e.StopPropagation();
             if(Time.unscaledTime-lastSend<.025f)return;
-            Emit(Normalize(this.WorldToLocal(e.position)));
+            Emit(Normalize(this.WorldToLocal(e.position)),e.pressure);
         }
         private void Up(PointerUpEvent e)
         {
             if(e.pointerId!=capturedPointer)return;
-            if(drawing)Emit(Normalize(this.WorldToLocal(e.position)));StopDrawing();e.StopPropagation();
+            if(drawing)Emit(Normalize(this.WorldToLocal(e.position)),0,false);StopDrawing();e.StopPropagation();
         }
         private void StopDrawing()
         {
-            drawing=false;var pointer=capturedPointer;capturedPointer=-1;
+            drawing=false;_pressurePointer=false;var pointer=capturedPointer;capturedPointer=-1;
             if(pointer>=0&&this.HasPointerCapture(pointer))this.ReleasePointer(pointer);
         }
         public void CancelDrawing() => StopDrawing();
-        private void Emit(Vector2 point)
+        private void Emit(Vector2 point,float pressure,bool samplePressure=true)
         {
             if(!network.CanDraw||HasAuthorPreview) { StopDrawing();return; }
-            var stroke=new DrawStroke { X1=last.x,Y1=last.y,X2=point.x,Y2=point.y,Size=BrushSize,R=BrushColor.r,G=BrushColor.g,B=BrushColor.b,Eraser=Eraser,CanvasVersion=network.CanvasVersion };
-            network.SendStroke(stroke);last=point;lastSend=Time.unscaledTime;
+            float size=samplePressure?DrawBrushSettings.ResolveSize(BrushSize,PressureEnabled,_pressurePointer,pressure,Eraser):_lastBrushSize;
+            var stroke=new DrawStroke { X1=last.x,Y1=last.y,X2=point.x,Y2=point.y,StartSize=_lastBrushSize,Size=size,R=BrushColor.r,G=BrushColor.g,B=BrushColor.b,Eraser=Eraser,CanvasVersion=network.CanvasVersion };
+            network.SendStroke(stroke);last=point;_lastBrushSize=size;lastSend=Time.unscaledTime;
         }
         public void Apply(DrawStroke stroke)
         {
@@ -131,12 +137,16 @@ namespace DrawLiar
         {
             var a=new Vector2(stroke.X1*Width,(1-stroke.Y1)*Height);
             var b=new Vector2(stroke.X2*Width,(1-stroke.Y2)*Height);
-            var radius=Mathf.Clamp(stroke.Size*Width*.5f,1,48)+expansion;
-            var count=Mathf.Max(1,Mathf.CeilToInt(Vector2.Distance(a,b)/Mathf.Max(1,radius*.4f)));
+            float startSize=stroke.StartSize>0?stroke.StartSize:stroke.Size;
+            float startRadius=Mathf.Clamp(startSize*Width*.5f,1,48)+expansion;
+            float endRadius=Mathf.Clamp(stroke.Size*Width*.5f,1,48)+expansion;
+            var count=Mathf.Max(1,Mathf.CeilToInt(Vector2.Distance(a,b)/Mathf.Max(1,Mathf.Min(startRadius,endRadius)*.4f)));
             var color=expansion>0?new Color32(120,103,158,255):stroke.Eraser?PaperColor:new Color32(stroke.R,stroke.G,stroke.B,255);
             for(var step=0;step<=count;step++)
             {
-                var point=Vector2.Lerp(a,b,step/(float)count);
+                float progress=step/(float)count;
+                var point=Vector2.Lerp(a,b,progress);
+                float radius=Mathf.Lerp(startRadius,endRadius,progress);
                 var x0=Mathf.Max(0,Mathf.FloorToInt(point.x-radius-1));var x1=Mathf.Min(Width-1,Mathf.CeilToInt(point.x+radius+1));
                 var y0=Mathf.Max(0,Mathf.FloorToInt(point.y-radius-1));var y1=Mathf.Min(Height-1,Mathf.CeilToInt(point.y+radius+1));
                 for(var y=y0;y<=y1;y++)for(var x=x0;x<=x1;x++)

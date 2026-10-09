@@ -872,4 +872,31 @@
 .judgment-coin-result.judgment-coin-approved { color: #336F53; }
 .judgment-coin-result.judgment-coin-rejected { color: #9D493D; }
 .judgment-coin-visual { width: 220px; height: 200px; flex-shrink: 0; align-self: center; }
+.draw-subscriber-badge { width: 24px; min-width: 24px; max-width: 24px; height: 24px; min-height: 24px; max-height: 24px; flex-shrink: 0; }
+.level-name-row .draw-subscriber-badge { margin-left: 6px; }
+.commerce-wallet { min-height: 44px; flex-shrink: 0; align-items: center; flex-wrap: wrap; margin-bottom: 12px; }
+.shop-gems { min-width: 120px; height: 40px; flex-shrink: 0; margin-right: 8px; padding: 8px; border-radius: 12px; background-color: #EDE5FA; color: #615383; font-size: 16px; -unity-text-align: middle-center; white-space: nowrap; }
+.app .commerce-wallet .commerce-restore { margin-left: auto; }
+.commerce-tabs { flex-shrink: 0; min-height: 48px; margin-bottom: 16px; }
+.app .commerce-tabs .commerce-tab { min-width: 116px; margin-right: 8px; }
+.app .commerce-tabs .commerce-selected { background-color: #F5B553; }
+.commerce-catalog { width: 100%; max-width: 1160px; min-height: 0; align-self: center; }
+.commerce-heading { flex-shrink: 0; align-items: center; margin-bottom: 12px; }
+.commerce-content { width: 100%; min-width: 0; }
+.commerce-grid { flex-wrap: wrap; min-width: 0; align-items: stretch; }
+.commerce-product { flex-grow: 0; flex-shrink: 0; min-height: 260px; margin-bottom: 16px; padding: 24px; border-width: 1px; border-color: #E7DDC7; border-radius: 14px; background-color: #FFF9ED; }
+.commerce-product .commerce-product-symbol { width: 56px; min-width: 56px; max-width: 56px; height: 56px; min-height: 56px; max-height: 56px; margin-bottom: 12px; flex-shrink: 0; }
+.commerce-product-name { margin: 0 0 12px; font-size: 22px; -unity-font-style: bold; white-space: normal; }
+.commerce-description { margin: 0 0 8px; font-size: 15px; white-space: normal; color: #736957; }
+.commerce-price { margin-top: auto; margin-bottom: 12px; font-size: 17px; white-space: normal; color: #615383; }
+.commerce-insufficient { margin: 8px 0 0; color: #984951; }
+.commerce-confirm-description { margin-bottom: 16px; font-size: 18px; white-space: normal; }
+.commerce-confirm-actions { margin-top: 12px; }
+.commerce-confirm-actions .secondary { margin-right: 8px; }
+.subscriber-settings { flex-shrink: 0; margin-bottom: 16px; padding: 16px; border-width: 1px; border-color: #D8CCE8; border-radius: 14px; background-color: #F4EFFB; }
+.subscriber-heading { align-items: center; margin-bottom: 8px; }
+.subscriber-title { margin: 0; font-size: 18px; -unity-font-style: bold; }
+.subscriber-status { margin: 0; padding: 4px 8px; border-radius: 10px; background-color: #FFFFFF; font-size: 14px; }
+.subscriber-expiry, .subscriber-remaining { margin-bottom: 6px; font-size: 14px; white-space: normal; }
+.subscriber-settings .field { white-space: normal; margin: 10px 0; }
 .create-topic-error { margin: 0 0 8px; color: #984951; }

@@ -7,8 +7,16 @@ ServerRuntime.Configure(builder);
 string adminKey = builder.Configuration["Admin:Key"] ?? "";
 if (adminKey.Length < 32) throw new InvalidOperationException("Admin:Key는 32자 이상이어야 합니다.");
 var app = builder.Build();
-await ServerRuntime.InitializeAsync(app);
+await ServerRuntime.InitializeAsync(app, initializeDatabase: false);
 var database = app.Services.GetRequiredService<ServerDatabase>();
+app.Use(async (context, next) =>
+{
+    context.Response.Headers.CacheControl = "no-store";
+    context.Response.Headers.ContentSecurityPolicy = "default-src 'self'; connect-src 'self'; script-src 'self'; style-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'";
+    context.Response.Headers.XContentTypeOptions = "nosniff";
+    context.Response.Headers["Referrer-Policy"] = "no-referrer";
+    await next(context);
+});
 app.UseDefaultFiles();
 app.UseStaticFiles();
 app.Use(async (context, next) =>

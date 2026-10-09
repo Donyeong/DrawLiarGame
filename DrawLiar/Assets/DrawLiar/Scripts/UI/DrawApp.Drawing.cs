@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -14,6 +15,107 @@ namespace DrawLiar
         private int _drawingPreviewRound=-1, _drawingPreviewArtist=-1, _drawingPreviewVersion=-1, _drawingPreviewEpoch=-1;
         private GamePhase _drawingPreviewPhase;
         private DrawingMode _drawingPreviewMode;
+        private readonly List<Button> _brushSwatches = new List<Button>();
+        private Button _paletteButton, _pressureButton;
+
+        private void CreateDrawingTools(VisualElement context)
+        {
+            drawingTools=Box(context,"tools");
+            _brushSwatches.Clear();_pressureButton=null;
+            var toolRow=Box(drawingTools,"tool-row");
+            Button(toolRow,"펜",()=>{surface.Eraser=false;RefreshBrushControls();},"secondary tool-selected");
+            _clearOwnButton=Button(toolRow,"내 선 지우기",ClearOwnDrawing,"secondary clear-own-drawing");_clearOwnButton.name="clear-own-drawing";
+            if(IsMobile)Button(toolRow,"굵기",BrushOptions,"secondary");
+            var palette=Box(drawingTools,"palette");palette.name="drawing-palette";
+            for(int index=0;index<DrawBrushSettings.BASE_COLOR_COUNT;index++)
+            {
+                Color32 color=DrawBrushSettings.Palette[index];
+                var swatch=Button(palette,"",()=>SelectBrushColor(color),"swatch");
+                swatch.userData=color;swatch.name="brush-color-"+index;
+                if(IsMobile){swatch.style.backgroundColor=Color.clear;var dot=Box(swatch,"mobile-swatch-dot");dot.pickingMode=PickingMode.Ignore;dot.style.backgroundColor=(Color)color;}
+                else swatch.style.backgroundColor=(Color)color;
+                SetTooltip(swatch,"색상 {0}",index+1);swatch.EnableInClassList("palette-row-end",index%4==3);_brushSwatches.Add(swatch);
+                if(color.Equals(DrawingSurface.PaperColor))
+                {swatch.name="white-brush";swatch.AddToClassList("white-brush");SetTooltip(swatch,"흰색");swatch.Q<VisualElement>(className:"mobile-swatch-dot")?.AddToClassList("white-brush-dot");}
+            }
+            _paletteButton=Button(IsMobile?toolRow:drawingTools,"팔레트",BrushPalette,IsMobile?"secondary mobile-last":"secondary");
+            _paletteButton.name="brush-palette-open";SetTooltip(_paletteButton,"더 많은 색상");
+            if(!IsMobile){_paletteButton.style.minWidth=86;_paletteButton.style.marginRight=10;}
+            Text(drawingTools,"굵기","secret-label");var sizes=Box(drawingTools,"brush-sizes");
+            foreach(var width in new[]{5,11,24})
+            {
+                int size=width;
+                var choice=Button(sizes,"●",()=>{surface.BrushSize=size/1200f;RefreshBrushControls();},"brush-size-option secondary");
+                choice.userData=width/1200f;SetTooltip(choice,"굵기 {0}",width);choice.style.fontSize=width==5?8:width==11?12:18;
+            }
+            surface.BrushSize=11/1200f;
+            if(!IsMobile){_pressureButton=CreatePressureToggle(drawingTools);_pressureButton.style.minWidth=94;_pressureButton.style.marginLeft=10;}
+            RefreshBrushControls();
+        }
+
+        private void SelectBrushColor(Color32 color)
+        {
+            if(surface==null)return;
+            surface.BrushColor=color;surface.Eraser=false;RefreshBrushControls();
+        }
+
+        private void RefreshBrushControls()
+        {
+            if(surface==null)return;
+            foreach(var swatch in _brushSwatches)
+                swatch.EnableInClassList("selected",!surface.Eraser&&swatch.userData is Color32 color&&color.Equals(surface.BrushColor));
+            _paletteButton?.EnableInClassList("tool-selected",!surface.Eraser&&!DrawBrushSettings.Palette.Take(DrawBrushSettings.BASE_COLOR_COUNT).Contains(surface.BrushColor));
+            if(drawingTools!=null)foreach(var choice in drawingTools.Query<Button>(className:"brush-size-option").ToList())
+                choice.EnableInClassList("selected",choice.userData is float size&&Mathf.Approximately(size,surface.BrushSize));
+            if(_pressureButton!=null)SetText(_pressureButton,surface.PressureEnabled?"필압 끄기":"필압 켜기");
+        }
+
+        private Button CreatePressureToggle(VisualElement parent)
+        {
+            Button button=null;
+            button=Button(parent,surface.PressureEnabled?"필압 끄기":"필압 켜기",()=>
+            {
+                surface.CancelDrawing();surface.PressureEnabled=!surface.PressureEnabled;
+                DrawBrushSettings.SetPressureEnabled(surface.PressureEnabled);
+                SetText(button,surface.PressureEnabled?"필압 끄기":"필압 켜기");
+                button.EnableInClassList("tool-selected",surface.PressureEnabled);RefreshBrushControls();
+            },"secondary");
+            button.name="brush-pressure-toggle";button.EnableInClassList("tool-selected",surface.PressureEnabled);
+            SetTooltip(button,"필압을 지원하는 펜의 누르는 세기에 따라 선 굵기가 달라집니다.");
+            return button;
+        }
+
+        private void BrushPalette()
+        {
+            var modal=Modal("팔레트");modal.name="brush-palette-popup";
+            var grid=Box(modal,"brush-expanded-palette");grid.name="brush-expanded-palette";
+            grid.style.flexDirection=FlexDirection.Row;grid.style.flexWrap=Wrap.Wrap;grid.style.justifyContent=Justify.Center;
+            for(int index=0;index<DrawBrushSettings.Palette.Count;index++)
+            {
+                Color32 color=DrawBrushSettings.Palette[index];
+                var swatch=Button(grid,"",()=>{SelectBrushColor(color);CloseModal();},"swatch");
+                swatch.name="brush-expanded-color-"+index;swatch.userData=color;
+                swatch.style.width=44;swatch.style.minWidth=44;swatch.style.height=44;swatch.style.minHeight=44;swatch.style.flexShrink=0;
+                swatch.style.marginLeft=4;swatch.style.marginRight=4;swatch.style.marginTop=4;swatch.style.marginBottom=4;
+                swatch.style.borderTopLeftRadius=22;swatch.style.borderTopRightRadius=22;swatch.style.borderBottomLeftRadius=22;swatch.style.borderBottomRightRadius=22;
+                swatch.style.backgroundColor=(Color)color;
+                SetTooltip(swatch,color.Equals(DrawingSurface.PaperColor)?"흰색":"색상 {0}",index+1);
+                swatch.EnableInClassList("selected",!surface.Eraser&&color.Equals(surface.BrushColor));
+            }
+            Button(modal,"닫기",CloseModal,"secondary");
+        }
+
+        private void BrushOptions()
+        {
+            var modal=Modal("붓 굵기");
+            foreach(var width in new[]{5,11,24})
+            {
+                int size=width;var button=Button(modal,(size==5?"가는 선":size==11?"보통 선":"굵은 선"),()=>{surface.BrushSize=size/1200f;RefreshBrushControls();CloseModal();},"secondary");
+                button.EnableInClassList("tool-selected",Mathf.Approximately(surface.BrushSize,size/1200f));
+            }
+            CreatePressureToggle(modal);
+            Button(modal,"닫기",CloseModal,"secondary");
+        }
 
         private void CreateDrawingPreviewName(VisualElement frame)
         {

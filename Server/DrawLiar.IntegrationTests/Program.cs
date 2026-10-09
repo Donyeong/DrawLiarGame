@@ -20,6 +20,17 @@ internal static partial class Integration
 
     public static async Task RunAsync(string[] args)
     {
+        if (args.Contains("--commerce-only"))
+        {
+            await VerifyCommerceAsync();
+            return;
+        }
+        if (args.Contains("--commerce-database-only"))
+        {
+            await VerifyCommerceAsync();
+            await VerifyCommerceDatabaseAsync();
+            return;
+        }
         if (args.Contains("--account-level-only") || args.Contains("--account-level-http-only"))
         {
             VerifyAccountLevelRules();

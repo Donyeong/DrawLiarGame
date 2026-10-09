@@ -10,18 +10,33 @@ foreach ($Name in @('DRAWLIAR_KEYSTORE_FILE', 'DRAWLIAR_KEYSTORE_PASS', 'DRAWLIA
         throw "Play 제출용 서명 자격 증명이 필요합니다: $Name"
     }
 }
-$Keytool = Join-Path (Split-Path -Parent $UnityPath) 'Data/PlaybackEngines/AndroidPlayer/OpenJDK/bin/keytool.exe'
+$AndroidPlayer = Join-Path (Split-Path -Parent $UnityPath) 'Data/PlaybackEngines/AndroidPlayer'
+$Keytool = Join-Path $AndroidPlayer 'OpenJDK/bin/keytool.exe'
 if (!(Test-Path -LiteralPath $Keytool -PathType Leaf)) { throw 'Unity Android JDK의 keytool을 찾을 수 없습니다.' }
 if (!(Test-Path -LiteralPath $env:DRAWLIAR_KEYSTORE_FILE -PathType Leaf)) { throw 'Play 제출용 키 저장소 파일을 찾을 수 없습니다.' }
 $VerifyArtifact = $PSBoundParameters.ContainsKey('ArtifactPath')
 if ($VerifyArtifact) {
-    if ([string]::IsNullOrWhiteSpace($ArtifactPath) -or [IO.Path]::GetExtension($ArtifactPath) -ine '.aab') {
-        throw 'Play 제출용 서명 검사는 AAB 파일만 허용합니다.'
+    if ([string]::IsNullOrWhiteSpace($ArtifactPath) -or [IO.Path]::GetExtension($ArtifactPath) -notin @('.apk', '.aab')) {
+        throw '배포용 서명 검사는 APK 또는 AAB 파일만 허용합니다.'
     }
-    if (!(Test-Path -LiteralPath $ArtifactPath -PathType Leaf)) { throw '서명을 검사할 AAB 파일을 찾을 수 없습니다.' }
+    if (!(Test-Path -LiteralPath $ArtifactPath -PathType Leaf)) { throw '서명을 검사할 Android 파일을 찾을 수 없습니다.' }
     $ArtifactPath = (Resolve-Path -LiteralPath $ArtifactPath).Path
-    $Jarsigner = Join-Path (Split-Path -Parent $Keytool) 'jarsigner.exe'
-    if (!(Test-Path -LiteralPath $Jarsigner -PathType Leaf)) { throw 'Unity Android JDK의 jarsigner를 찾을 수 없습니다.' }
+    $ArtifactFormat = [IO.Path]::GetExtension($ArtifactPath).Substring(1).ToUpperInvariant()
+    if ($ArtifactFormat -eq 'AAB') {
+        $Jarsigner = Join-Path (Split-Path -Parent $Keytool) 'jarsigner.exe'
+        if (!(Test-Path -LiteralPath $Jarsigner -PathType Leaf)) { throw 'Unity Android JDK의 jarsigner를 찾을 수 없습니다.' }
+    }
+    else {
+        $Java = Join-Path $AndroidPlayer 'OpenJDK/bin/java.exe'
+        if (!(Test-Path -LiteralPath $Java -PathType Leaf)) { throw 'Unity Android JDK의 Java를 찾을 수 없습니다.' }
+        $Apksigner = Get-ChildItem -LiteralPath (Join-Path $AndroidPlayer 'SDK/build-tools') -Directory |
+            Where-Object { $_.Name -match '^\d+\.\d+\.\d+$' } |
+            Sort-Object { [Version]$_.Name } -Descending |
+            ForEach-Object { Join-Path $_.FullName 'lib/apksigner.jar' } |
+            Where-Object { Test-Path -LiteralPath $_ -PathType Leaf } |
+            Select-Object -First 1
+        if (!$Apksigner) { throw 'Unity Android SDK의 apksigner를 찾을 수 없습니다.' }
+    }
 }
 
 $Certificate = $null
@@ -49,6 +64,13 @@ try {
     }
     Write-Output 'Play 제출용 업로드 키 확인 완료'
     if ($VerifyArtifact) {
+        $Sha256 = [Security.Cryptography.SHA256]::Create()
+        try { $CertificateHash = [BitConverter]::ToString($Sha256.ComputeHash($Bytes)) }
+        finally { $Sha256.Dispose() }
+        $Fingerprint = $CertificateHash.Replace('-', ':')
+        $ExpectedHash = $CertificateHash.Replace('-', '')
+    }
+    if ($VerifyArtifact -and $ArtifactFormat -eq 'AAB') {
         $PreviousErrorPreference = $ErrorActionPreference
         try {
             $ErrorActionPreference = 'Continue'
@@ -81,10 +103,29 @@ try {
                 throw 'AAB 서명 인증서가 설정된 Play 업로드 키와 일치하지 않습니다.'
             }
         }
-        $Sha256 = [Security.Cryptography.SHA256]::Create()
-        try { $Fingerprint = [BitConverter]::ToString($Sha256.ComputeHash($Bytes)).Replace('-', ':') }
-        finally { $Sha256.Dispose() }
         Write-Output "Play 제출용 AAB 서명 확인 완료 SHA-256=$Fingerprint"
+    }
+    elseif ($VerifyArtifact) {
+        $PreviousErrorPreference = $ErrorActionPreference
+        try {
+            $ErrorActionPreference = 'Continue'
+            $Verification = @(& $Java '-Duser.language=en' '-Duser.country=US' -jar $Apksigner verify --verbose --print-certs $ArtifactPath 2>&1) -join "`n"
+            $VerificationExitCode = $LASTEXITCODE
+        }
+        finally { $ErrorActionPreference = $PreviousErrorPreference }
+        $SignerCount = [regex]::Match($Verification, '(?m)^Number of signers:\s*(\d+)\s*$')
+        $SignerHashes = [regex]::Matches($Verification, '(?m)^Signer #\d+ certificate SHA-256 digest:\s*([A-Fa-f0-9]{64})\s*$')
+        if ($VerificationExitCode -ne 0 -or $Verification -notmatch '(?m)^Verifies\s*$' -or
+            !$SignerCount.Success -or [int]$SignerCount.Groups[1].Value -lt 1 -or
+            $SignerHashes.Count -ne [int]$SignerCount.Groups[1].Value) {
+            throw 'APK 서명이 없거나 손상되었거나 서명 인증서를 확인할 수 없습니다.'
+        }
+        foreach ($SignerHash in $SignerHashes) {
+            if ($SignerHash.Groups[1].Value -ine $ExpectedHash) {
+                throw 'APK 서명 인증서가 설정된 업로드 키와 일치하지 않습니다.'
+            }
+        }
+        Write-Output "배포용 APK 서명 확인 완료 SHA-256=$Fingerprint"
     }
 }
 finally {

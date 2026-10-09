@@ -24,6 +24,11 @@ namespace DrawLiar
         public int AvatarColor;
         public long Accessory;
         public int Coins;
+        public int PaidGems;
+        public string SubscriptionExpiresAt = "";
+        public bool HasPainterSubscription;
+        public bool ShowSubscriberBadge;
+        public long ServerTimeUnixSeconds;
         public long Experience;
         public int Level = 1;
         public bool IsGuest;
@@ -38,6 +43,7 @@ namespace DrawLiar
         public int AvatarColor;
         public long Accessory;
         public int Level = 1;
+        public bool ShowSubscriberBadge;
         public string JoinedAt = "";
         public string Friendship = "None";
         public ProfileStatsData Stats = new ProfileStatsData();

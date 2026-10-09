@@ -13,6 +13,7 @@ await ServerRuntime.InitializeAsync(app, false);
 app.UseWebSockets(new WebSocketOptions { KeepAliveInterval = TimeSpan.FromSeconds(15), KeepAliveTimeout = TimeSpan.FromSeconds(15) });
 app.MapGet("/health", (MainRegistration registration) => registration.IsReady ? Results.Ok(new { Status = "Ready" }) : Results.StatusCode(503));
 var database = app.Services.GetRequiredService<ServerDatabase>();
+var commerce = new CommerceService(database);
 string nodeId = app.Configuration["GameServer:NodeId"] ?? throw new InvalidOperationException("GameServer:NodeId가 필요합니다.");
 Task<ServerSession> Authenticate(HttpContext context) => database.AuthenticateAsync(ServerRuntime.Bearer(context), "game:" + nodeId);
 var lobbyChat = new LobbyChatHub(async (token, cancellation) =>
@@ -41,6 +42,17 @@ app.MapGet("/api/shop", (Func<HttpContext, Task<ShopResponse>>)(async context =>
 app.MapPost("/api/shop/purchase", async (HttpContext context, PurchaseRequest request) => await database.PurchaseAsync((await Authenticate(context)).AccountId, request));
 app.MapPost("/api/shop/purchase-batch", async (HttpContext context, PurchaseBatchRequest request) =>
     await database.PurchaseBatchAsync((await Authenticate(context)).AccountId, request, context.RequestAborted));
+app.MapGet("/api/commerce", (Func<HttpContext, Task<CommerceCatalogue>>)(async context => { await Authenticate(context); return commerce.Catalogue(); }));
+app.MapPost("/api/commerce/purchase", async (HttpContext context, CommercePurchaseRequest request) =>
+    await database.PurchaseCommerceAsync((await Authenticate(context)).AccountId, request, context.RequestAborted));
+app.MapPost("/api/payments/prepare", async (HttpContext context, CommercePrepareRequest request) =>
+    await commerce.PrepareAsync((await Authenticate(context)).AccountId, request, context.RequestAborted));
+app.MapPost("/api/payments/confirm", async (HttpContext context, CommerceConfirmRequest request) =>
+    await commerce.ConfirmAsync((await Authenticate(context)).AccountId, request, context.RequestAborted));
+app.MapGet("/api/payments/orders", (Func<HttpContext, Task<CommerceOrdersResponse>>)(async context =>
+    await database.CommerceOrdersAsync((await Authenticate(context)).AccountId, context.RequestAborted)));
+app.MapPost("/api/profile/subscriber-badge", async (HttpContext context, SubscriberBadgeRequest request) =>
+    await database.SetSubscriberBadgeAsync((await Authenticate(context)).AccountId, request.ShowBadge, context.RequestAborted));
 app.MapGet("/api/topic-workshop", async (HttpContext context, string? language, bool? mine, int? offset, int? limit, string? search, string? sort) =>
     await database.ListWorkshopTopicsAsync((await Authenticate(context)).AccountId, language, mine ?? false, offset ?? 0, limit ?? 20, context.RequestAborted, search, sort));
 app.MapPost("/api/topic-workshop", async (HttpContext context, TopicWorkshopPublishRequest request) =>

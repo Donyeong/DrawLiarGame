@@ -584,3 +584,13 @@
 .app.mobile-landscape .judgment-coin-result { font-size: 18px; min-height: 24px; margin-top: 2px; }
 .app.mobile-landscape .judgment-coin-visual { width: 130px; height: 110px; }
 .mobile-landscape.in-game .mobile-playing .canvas-frame { width: 100%; margin-right: 0; }
+.app.mobile .commerce-wallet { margin-bottom: 10px; }
+.app.mobile .commerce-wallet .shop-coins, .app.mobile .commerce-wallet .shop-gems { width: auto; min-width: 88px; height: 36px; margin-right: 6px; padding: 6px; font-size: 14px; }
+.app.mobile .commerce-wallet .commerce-restore { height: 36px; min-height: 36px; padding: 4px 8px; font-size: 13px; }
+.app.mobile .commerce-tabs { margin-bottom: 12px; }
+.app.mobile .commerce-tabs .commerce-tab { flex-grow: 1; flex-basis: 0; min-width: 0; font-size: 15px; padding: 6px; }
+.app.mobile .commerce-product { padding: 16px; min-height: 240px; }
+.app.mobile .commerce-product-name { font-size: 20px; }
+.app.mobile .commerce-description { font-size: 14px; }
+.app.mobile .subscriber-settings { padding: 12px; }
+.app.mobile .subscriber-title { font-size: 16px; }

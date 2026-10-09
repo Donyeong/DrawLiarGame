@@ -176,7 +176,8 @@ public sealed partial class ServerDatabase : IDisposable
         const string sql = """
             SELECT a."DisplayName",a."AvatarColor",a."Accessory",a."Coins",
                 a."GuestId" IS NOT NULL AND NOT EXISTS (SELECT 1 FROM "ExternalIdentity" e WHERE e."AccountId"=a."Id"),
-                EXISTS (SELECT 1 FROM "ExternalIdentity" e WHERE e."AccountId"=a."Id" AND e."Provider"='google'),a."Experience"
+                EXISTS (SELECT 1 FROM "ExternalIdentity" e WHERE e."AccountId"=a."Id" AND e."Provider"='google'),a."Experience",
+                a."PaidGems",a."SubscriptionExpiresAt",a."ShowSubscriberBadge"
             FROM "Account" a WHERE a."Id"=$1 AND NOT a."IsBanned"
             """;
         await using (var command = Command(connection, transaction, sql, id))
@@ -187,8 +188,12 @@ public sealed partial class ServerDatabase : IDisposable
             {
                 AccountId = id.ToString(), DisplayName = reader.GetString(0), AvatarColor = reader.GetInt32(1),
                 Accessory = AvatarParts.Sanitize(reader.GetInt64(2)), Coins = reader.GetInt32(3), IsGuest = reader.GetBoolean(4), HasGoogleAccount = reader.GetBoolean(5),
-                Experience = reader.GetInt64(6), Level = AccountLevelRules.GetLevel(reader.GetInt64(6))
+                Experience = reader.GetInt64(6), Level = AccountLevelRules.GetLevel(reader.GetInt64(6)), PaidGems = reader.GetInt32(7),
+                SubscriptionExpiresAt = reader.IsDBNull(8) ? "" : ServerRuntime.Timestamp(reader.GetFieldValue<DateTimeOffset>(8)),
+                ShowSubscriberBadge = reader.GetBoolean(9), ServerTimeUnixSeconds = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
             };
+            profile.HasPainterSubscription = CommerceRules.IsPainterSubscriber(profile, DateTimeOffset.UtcNow);
+            profile.ShowSubscriberBadge &= profile.HasPainterSubscription;
         }
         profile.OwnedAccessories = await ReadOwnedAccessories(connection, transaction, id);
         return profile;

@@ -156,6 +156,7 @@ namespace DrawLiar
     public struct DrawStroke
     {
         public float X1, Y1, X2, Y2, Size;
+        public float StartSize;
         public byte R, G, B;
         public bool Eraser;
         public int CanvasVersion;

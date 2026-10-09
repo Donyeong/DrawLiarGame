@@ -68,7 +68,8 @@ namespace DrawLiar
         public static bool ValidStroke(DrawStroke stroke, int version)
         {
             return stroke.CanvasVersion == version && InRange(stroke.X1, 0, 1) && InRange(stroke.Y1, 0, 1)
-                && InRange(stroke.X2, 0, 1) && InRange(stroke.Y2, 0, 1) && InRange(stroke.Size, .001f, .08f);
+                && InRange(stroke.X2, 0, 1) && InRange(stroke.Y2, 0, 1) && InRange(stroke.Size, .001f, .08f)
+                && (stroke.StartSize == 0 || InRange(stroke.StartSize, .001f, .08f));
         }
 
         private static bool InRange(float value, float min, float max) => value >= min && value <= max;

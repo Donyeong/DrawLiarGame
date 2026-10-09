@@ -180,7 +180,8 @@ namespace DrawLiar
             avatar.AddToClassList("public-profile-avatar");
             hero.Add(avatar);
             var identity = Box(hero, "grow public-profile-identity");
-            LeveledName(identity, profile.DisplayName, profile.Level, "public-profile-name", "public-profile-name", profile.AccountId);
+            LeveledName(identity, profile.DisplayName, profile.Level, "public-profile-name", "public-profile-name", profile.AccountId,
+                profile.AccountId == lobby.Profile?.AccountId ? OwnSubscriberBadge : profile.ShowSubscriberBadge);
             var joined = Box(identity, "row public-profile-joined");
             Text(joined, "가입일", "public-profile-label");
             RawText(joined, PublicProfileDate(profile.JoinedAt), "public-profile-label");

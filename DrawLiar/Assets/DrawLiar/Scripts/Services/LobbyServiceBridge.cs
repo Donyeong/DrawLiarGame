@@ -261,6 +261,7 @@ namespace DrawLiar
             _mainSession = login.SessionToken;
             _gameServerUrl = gameServerUrl.TrimEnd('/');
             _gameSession = session.SessionToken;
+            ResetCommerce();
             ResetSocial();
             SetProfile(session.Profile);
             StartLobbyChat();
@@ -418,7 +419,11 @@ namespace DrawLiar
 
         public Task RefreshShopAsync() => RunAsync(async () =>
         {
-            RequireLogin(); Shop = await SendGameAsync<ShopResponse>("/api/shop", "GET"); SetStatus("상점을 갱신했습니다.");
+            RequireLogin(); Shop = await SendGameAsync<ShopResponse>("/api/shop", "GET");
+            try { await RefreshCommerceCoreAsync(); }
+            catch (OperationCanceledException) { throw; }
+            catch (Exception) { ResetCommerce(false); }
+            SetStatus("상점을 갱신했습니다.");
         });
 
         public Task PurchaseAsync(string productId) => RunAsync(async () =>
@@ -530,6 +535,7 @@ namespace DrawLiar
         public Task LogoutAsync() => RunAsync(async () =>
         {
             _loggingOut = true;
+            ResetCommerce();
             ++_socialRevision;
             StopLobbyChat(true);
             try
@@ -561,12 +567,13 @@ namespace DrawLiar
         }
         private void SetProfile(ProfileData profile)
         {
-            if (profile == null || string.IsNullOrEmpty(profile.AccountId) || string.IsNullOrEmpty(profile.DisplayName) || profile.Experience < 0)
+            if (profile == null || string.IsNullOrEmpty(profile.AccountId) || string.IsNullOrEmpty(profile.DisplayName) || profile.Experience < 0 || profile.PaidGems < 0)
                 throw new InvalidOperationException("서버 프로필 응답을 확인할 수 없습니다.");
             if (Profile?.AccountId == profile.AccountId) profile.Experience = Math.Max(Profile.Experience, profile.Experience);
             profile.Level = AccountLevelRules.GetLevel(profile.Experience);
-            if (Profile?.AccountId != profile.AccountId) { ResetTopicWorkshop(); ResetMatchRewards(); }
+            if (Profile?.AccountId != profile.AccountId) { ResetTopicWorkshop(); ResetMatchRewards(); ResetCommerce(); }
             Profile = profile;
+            CaptureCommerceClock(profile.ServerTimeUnixSeconds);
             ++_rewardProfileRevision;
             ProfileChanged?.Invoke();
         }
@@ -658,6 +665,20 @@ namespace DrawLiar
                 case "InvalidRoomPasswordFormat": return "비밀번호는 4~32자로 입력하세요.";
                 case "RoomConfigurationChanged": return "방 설정이 변경되었습니다. 다시 시도하세요.";
                 case "InsufficientCoins": return "코인이 부족합니다.";
+                case "InsufficientPaidGems": return "보석이 부족합니다.";
+                case "PaymentUnavailable":
+                case "PaymentProviderUnavailable": return "현재 결제를 이용할 수 없습니다.";
+                case "ProductChanged": return "상품 정보가 변경되었습니다. 상점을 새로고침해 주세요.";
+                case "PaymentReviewRequired":
+                case "PaymentOrderLimit": return "결제 확인을 기다리고 있습니다.";
+                case "PaidGemLimit": return "보유할 수 있는 보석 한도에 도달했습니다.";
+                case "InvalidPayment":
+                case "PaymentTransactionAlreadyClaimed":
+                case "InvalidPaymentProof":
+                case "PaymentOrderNotFound":
+                case "InvalidPaymentOrder":
+                case "InvalidCommerceProduct": return "결제 정보를 확인할 수 없습니다.";
+                case "SubscriptionRequired": return "구독 중에만 사용할 수 있습니다.";
                 case "InvalidPurchaseBatch":
                 case "OperationConflict": return "구매할 아이템을 다시 확인해 주세요.";
                 case "ProductUnavailable": return "현재 구매할 수 없는 아이템이 있어요.";
@@ -691,6 +712,7 @@ namespace DrawLiar
 
         private void OnDestroy()
         {
+            DisposeCommerce();
             _googleCancellation?.Cancel();
             _socialCancellation.Cancel();
             _socialCancellation.Dispose();

@@ -65,9 +65,9 @@ public static class ServerRuntime
         if (clusterKey.Length < 32) throw new InvalidOperationException("Cluster:Key는 32자 이상이어야 합니다.");
     }
 
-    public static async Task InitializeAsync(WebApplication app, bool mapHealth = true)
+    public static async Task InitializeAsync(WebApplication app, bool mapHealth = true, bool initializeDatabase = true)
     {
-        await app.Services.GetRequiredService<ServerDatabase>().InitializeAsync();
+        if (initializeDatabase) await app.Services.GetRequiredService<ServerDatabase>().InitializeAsync();
         app.UseForwardedHeaders();
         app.Use(async (context, next) =>
         {

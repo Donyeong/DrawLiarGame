@@ -1,6 +1,6 @@
 {
   "name": "drawliar-firebase-distribution",
   "private": true,
-  "scripts": { "test": "node --test distribute.test.cjs" },
+  "scripts": { "test": "node --test distribute.test.cjs ensure-android-app.test.cjs" },
   "dependencies": { "google-auth-library": "10.9.0" }
 }
