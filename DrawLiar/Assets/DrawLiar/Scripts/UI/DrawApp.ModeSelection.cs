@@ -19,6 +19,7 @@ namespace DrawLiar
         private const string INDIVIDUAL_MODE_DESCRIPTION = "각자 캔버스에 차례로 그립니다. 토론 때 참가자의 그림을 비교하세요.";
 
         private Label _roomLiarMode, _roomDrawingMode;
+        private VisualElement _roomSecretIdentity;
         private VisualElement _modeTooltipTarget;
         private Label _modeTooltip;
 
@@ -34,6 +35,25 @@ namespace DrawLiar
             BindRoomModeTooltip(_roomDrawingMode);
             topic = Text(context, topicTitle, "topic");
             topic.name = "room-topic-title";
+        }
+
+        private void CreateRoomSecretIdentity(VisualElement parent, string classes)
+        {
+            _roomSecretIdentity = Box(parent, classes);
+            _roomSecretIdentity.name = "room-secret-identity";
+            var roleInfo = Box(_roomSecretIdentity, "room-secret-role row");
+            Text(roleInfo, "당신의 직업", "room-secret-label").name = "room-role-label";
+            role = Text(roleInfo, "", "role");
+            role.name = "room-role-value";
+            var wordInfo = Box(_roomSecretIdentity, "room-secret-word row");
+            Text(wordInfo, "제시어", "room-secret-label").name = "room-word-label";
+            word = Text(wordInfo, "", "word grow");
+            word.name = "room-word-value";
+            secretToggle = Button(_roomSecretIdentity, "숨기기", () =>
+            {
+                secretHidden = !secretHidden;
+                RefreshSecret(network.State);
+            }, "secret-toggle");
         }
 
         private void BindRoomModeTooltip(Label badge)
@@ -229,7 +249,7 @@ namespace DrawLiar
             if (!CanSelectNoLiar(state)) return;
             selectedPlayerId = GameRules.NO_LIAR_TARGET;
             _hasSelectedPlayer = true;
-            RefreshState(state);
+            SubmitVote();
         }
     }
 }

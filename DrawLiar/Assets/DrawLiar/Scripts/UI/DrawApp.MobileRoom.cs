@@ -55,6 +55,8 @@ namespace DrawLiar
             if (!IsMobile || _mobileWorkspace == null) return;
             bool waiting = state == null || state.Phase == GamePhase.Lobby;
             bool portrait = _mobileLayout.IsPortrait;
+            bool landscapeNomination = !waiting && !portrait && IsNominationPhase(state);
+            _judgmentPanel.EnableInClassList("landscape-nomination-panel", landscapeNomination);
             _mobileRoomStack.EnableInClassList("mobile-waiting", waiting);
             _mobileRoomStack.EnableInClassList("mobile-playing", !waiting);
             _mobileRoomStack.EnableInClassList("mobile-compact", !portrait || _mobileLayout.AvailableSize.y < 830);
@@ -85,12 +87,25 @@ namespace DrawLiar
                 if (_mobileRoster.parent != rosterParent) rosterParent.Insert(0, _mobileRoster);
                 var actionParent = portrait ? _mobileWorkspace : _mobilePlaySide;
                 if (_mobileActions.parent != actionParent) actionParent.Add(_mobileActions);
-                var judgmentParent = portrait ? _mobileActions : _mobilePlayStage;
+                var judgmentParent = portrait ? _mobileActions : landscapeNomination
+                    ? _mobileActions.Q<VisualElement>(className: "mobile-action-row") : _mobilePlayStage;
                 if (_judgmentPanel.parent != judgmentParent)
                 {
-                    if (portrait) judgmentParent.Insert(0, _judgmentPanel);
+                    if (portrait || landscapeNomination) judgmentParent.Insert(0, _judgmentPanel);
                     else judgmentParent.Add(_judgmentPanel);
                 }
+                var current = _judgmentPanel.Q<Label>("nomination-current");
+                if (current != null)
+                {
+                    var currentRow = current.parent.ClassListContains("level-name-row") ? current.parent : current;
+                    var summary = _judgmentPanel.Q<VisualElement>(className: "nomination-summary");
+                    var actions = _judgmentPanel.Q<VisualElement>(className: "nomination-actions");
+                    var currentParent = landscapeNomination ? summary : actions;
+                    if (currentRow.parent != currentParent) currentParent.Insert(0, currentRow);
+                    currentRow.style.display = landscapeNomination && voteSubmitted ? DisplayStyle.None : DisplayStyle.Flex;
+                }
+                var guidance = _judgmentPanel.Q<Label>("nomination-guidance");
+                if (guidance != null) guidance.style.display = landscapeNomination && current != null && !voteSubmitted ? DisplayStyle.None : DisplayStyle.Flex;
             }
             RefreshMobileRoomGeometry();
         }

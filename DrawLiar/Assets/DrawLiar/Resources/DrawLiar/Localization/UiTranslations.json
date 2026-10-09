@@ -1140,6 +1140,23 @@
       ]
     },
     {
+      "Key": "당신의 직업",
+      "Values": [
+        "당신의 직업",
+        "Your role",
+        "你的身份",
+        "你的身分",
+        "あなたの役職",
+        "Tu rol",
+        "Seu papel",
+        "Votre rôle",
+        "Deine Rolle",
+        "Peranmu",
+        "आपकी भूमिका",
+        "دورك"
+      ]
+    },
+    {
       "Key": "대기 중",
       "Values": [
         "대기 중",
@@ -9470,40 +9487,6 @@
       ]
     },
     {
-      "Key": "시간이 끝나기 전까지 투표를 바꿀 수 있어요.",
-      "Values": [
-        "시간이 끝나기 전까지 투표를 바꿀 수 있어요.",
-        "You can change your vote until time runs out.",
-        "时间结束前可以更改投票。",
-        "時間結束前可以更改投票。",
-        "時間が終わるまでは投票先を変更できます。",
-        "Puedes cambiar tu voto hasta que se acabe el tiempo.",
-        "Você pode mudar seu voto até o tempo acabar.",
-        "Vous pouvez changer votre vote jusqu’à la fin du temps imparti.",
-        "Du kannst deine Stimme ändern, bis die Zeit abläuft.",
-        "Kamu bisa mengubah suara sebelum waktu habis.",
-        "समय खत्म होने तक आप अपना वोट बदल सकते हैं।",
-        "يمكنك تغيير تصويتك قبل انتهاء الوقت."
-      ]
-    },
-    {
-      "Key": "투표 바꾸기",
-      "Values": [
-        "투표 바꾸기",
-        "Change Vote",
-        "更改投票",
-        "更改投票",
-        "投票を変更",
-        "Cambiar voto",
-        "Mudar voto",
-        "Changer le vote",
-        "Stimme ändern",
-        "Ubah suara",
-        "वोट बदलें",
-        "تغيير التصويت"
-      ]
-    },
-    {
       "Key": "현재 투표 · {0}",
       "Values": [
         "현재 투표 · {0}",
@@ -10028,6 +10011,23 @@
         "Mendapat {0} XP",
         "{0} अनुभव प्राप्त",
         "الخبرة المكتسبة {0}"
+      ]
+    },
+    {
+      "Key": "캐릭터를 눌러 투표하세요.",
+      "Values": [
+        "캐릭터를 눌러 투표하세요.",
+        "Select a character to vote.",
+        "点击角色投票。",
+        "點擊角色投票。",
+        "キャラクターを選んで投票してください。",
+        "Pulsa un personaje para votar.",
+        "Toque em um personagem para votar.",
+        "Sélectionnez un personnage pour voter.",
+        "Wähle einen Charakter zum Abstimmen.",
+        "Pilih karakter untuk memberikan suara.",
+        "वोट देने के लिए पात्र चुनें।",
+        "اختر شخصية للتصويت."
       ]
     }
   ]

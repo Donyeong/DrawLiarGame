@@ -113,12 +113,10 @@ internal static partial class Integration
     {
         foreach (int id in game.Snapshot(1, 1, now).Players.Where(player => player.IsConnected && !player.IsSpectator).Select(player => player.Id))
             Check(game.Vote(id, GameRules.NO_LIAR_TARGET, now), "참가자는 라이어 없음에 지목 투표할 수 있어야 합니다.");
-        Check(game.Phase == GamePhase.Discussion, "없음 지목도 전원 제출 후 마감까지 변경할 수 있어야 합니다.");
-        AdvanceProfilePhase(game, ref now);
         var snapshot = game.Snapshot(1, 1, now);
         Check(snapshot.Phase == GamePhase.Rebuttal && snapshot.HasAccused && snapshot.AccusedPlayerId == GameRules.NO_LIAR_TARGET
             && snapshot.JudgmentVoterCount == snapshot.Players.Count(player => player.IsConnected && !player.IsSpectator)
-            && snapshot.RevealedLiarCount == -1, "없음 지목은 실제 역할을 숨긴 채 전원 찬반으로 넘어가야 합니다.");
+            && snapshot.RevealedLiarCount == -1, "없음 지목은 전원 제출 시 실제 역할을 숨긴 채 바로 전원 찬반으로 넘어가야 합니다.");
         return now;
     }
 
@@ -134,8 +132,7 @@ internal static partial class Integration
         Check(game.Vote(2, -1, now), "두 번째 없음 지목을 제출해야 합니다.");
         Check(game.Vote(3, -1, now) && game.Phase == GamePhase.Discussion && game.Vote(4, -1, now),
             "네 참가자의 없음 지목을 모두 제출할 수 있어야 합니다.");
-        Check(game.Phase == GamePhase.Discussion, "전원 없음 지목 후에도 토론 마감까지 기다려야 합니다.");
-        AdvanceProfilePhase(game, ref now);
+        Check(game.Phase == GamePhase.Rebuttal, "전원 없음 지목 후에는 바로 찬반으로 진행해야 합니다.");
         Check(!game.Judge(99, -1, true, now) && !game.Judge(1, 2, true, now), "관전자·다른 대상 찬반은 거부해야 합니다.");
         Check(game.Judge(1, -1, true, now) && !game.Judge(1, -1, false, now), "찬반도 한 번만 제출해야 합니다.");
         Check(game.Judge(2, -1, false, now) && game.Judge(3, -1, true, now) && game.Phase == GamePhase.Rebuttal,
@@ -189,7 +186,6 @@ internal static partial class Integration
         Check(game.Judge(citizens[1], liar, false, now) && game.Phase == GamePhase.Discussion,
             "사람 지목도 첫 1대1 찬반 동률이면 부결해야 합니다.");
         foreach (int id in Enumerable.Range(1, 3)) Check(game.Vote(id, id == liar ? citizen : liar, now), "같은 라운드에서 라이어를 다시 지목해야 합니다.");
-        AdvanceProfilePhase(game, ref now);
         foreach (int id in citizens) Check(game.Judge(id, liar, true, now), "동률 이후 찬성 우세는 지연 없이 가결해야 합니다.");
         Check(game.Phase == GamePhase.LiarReveal && !game.Snapshot(citizen, 1, now).IsJudgmentCoinToss,
             "찬성 우세는 앞 동률 횟수와 무관하게 가결해야 합니다.");
@@ -290,16 +286,14 @@ internal static partial class Integration
             room.Receive(peers[3], new GameplayEnvelope { Type = "request", Kind = "vote", Target = -1, BallotVersion = nominationVersion }, now += .1);
             room.Receive(peers[0], new GameplayEnvelope { Type = "request", Kind = "vote", Target = -1, BallotVersion = nominationVersion - 1 }, now += .1);
             for (int index = 0; index < 3; index++) room.Receive(peers[index], new GameplayEnvelope { Type = "request", Kind = "vote", Target = -1, BallotVersion = nominationVersion }, now += .1);
-            await WaitAsync(() => sockets.All(socket => socket.LastState is { Phase: GamePhase.Discussion } state
+            await WaitAsync(() => sockets.All(socket => socket.LastState is { Phase: GamePhase.Rebuttal } state
                 && state.Players.Count(player => player.HasVoted && !player.IsSpectator) == 3), 3);
             Check(sockets.Take(3).All(socket => socket.LastState!.LocalVoteTargetId == -1
                 && socket.LastState!.Players.Single(player => player.Id == socket.LastState!.LocalPlayerId).HasVoted)
                 && sockets[3].LastState!.LocalVoteTargetId == -1 && sockets[3].LastState!.LocalIsSpectator,
                 "없음 target -1은 본인 HasVoted와 함께 전달하고 관전자에게 개인 표를 공개하면 안 됩니다.");
-            room.Tick(now += sockets[0].LastState!.RemainingSeconds + .01);
-            await WaitAsync(() => sockets.All(socket => socket.LastState?.Phase == GamePhase.Rebuttal), 3);
             Check(sockets.All(socket => socket.LastState is { HasAccused: true, AccusedPlayerId: -1, JudgmentVoterCount: 3, RevealedLiarCount: -1 }),
-                "실제 DS JSON은 -1 없음 표적과 전원 찬반 수를 전달해야 합니다.");
+                "실제 DS JSON은 마지막 유효 지목 직후 -1 없음 표적과 전원 찬반 수를 전달해야 합니다.");
             int judgmentVersion = sockets[0].LastState!.BallotVersion;
             for (int index = 0; index < 3; index++) room.Receive(peers[index], new GameplayEnvelope
             { Type = "request", Kind = "judge", Target = -1, BallotVersion = judgmentVersion, Approve = true }, now += .1);

@@ -9,7 +9,7 @@ docker compose version >/dev/null
 getent passwd kona-deploy >/dev/null
 install -d -m 0755 /srv/drawliar /srv/drawliar/dev /srv/drawliar/dev/secrets /opt/drawliar/releases
 install -d -m 0755 -o root -g root /opt/drawliar/deploy
-for template in Dockerfile Dockerfile.postgres postgres-entrypoint.sh compose.yaml; do
+for template in Dockerfile Dockerfile.admin Dockerfile.dedicated Dockerfile.postgres postgres-entrypoint.sh compose.yaml; do
   install -m 0644 -o root -g root "$(dirname "$0")/$template" "/opt/drawliar/deploy/$template"
 done
 install -d -m 0700 -o kona-deploy -g kona-deploy /srv/drawliar/incoming

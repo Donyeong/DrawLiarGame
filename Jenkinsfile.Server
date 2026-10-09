@@ -6,10 +6,38 @@ pipeline {
         string(name: 'SSH_CREDENTIAL_ID', defaultValue: 'konasurvival-ubuntu-ssh', description: '기존 Jenkins 배포 SSH 인증')
         string(name: 'KNOWN_HOSTS_CREDENTIAL_ID', defaultValue: 'konasurvival-ubuntu-known-hosts', description: '검증한 SSH 호스트 키')
         booleanParam(name: 'DEPLOY_TO_VM', defaultValue: true, description: 'DrawLiar 서버 배포')
+        booleanParam(name: 'ADMIN_ONLY', defaultValue: false, description: '관리자 서버만 빌드·배포. 게임 서버와 DB는 유지')
+        booleanParam(name: 'DEDICATED_ONLY', defaultValue: false, description: '데디케이티드만 배포. 메인·게임·관리자·DB는 유지')
+        string(name: 'SOURCE_COMMIT', defaultValue: '', description: '게임 서버 빌드에 사용할 확정된 전체 Git 커밋 SHA')
+        string(name: 'PROTOCOL_BASE_COMMIT', defaultValue: '', description: '단독 데디케이티드 배포 시 현재 core의 전체 소스 커밋 SHA')
     }
     stages {
+        stage('Validate Deployment Scope') {
+            steps {
+                script {
+                    if (!(params.ADMIN_ONLY instanceof Boolean) || !(params.DEDICATED_ONLY instanceof Boolean)) {
+                        error('ADMIN_ONLY와 DEDICATED_ONLY 매개변수를 등록한 뒤 다시 실행하세요. 배포 범위를 확인할 수 없습니다.')
+                    }
+                    if (params.ADMIN_ONLY && params.DEDICATED_ONLY) { error('두 단독 배포 범위는 함께 사용할 수 없습니다.') }
+                    if ((!params.ADMIN_ONLY || params.SOURCE_COMMIT) && !(params.SOURCE_COMMIT ==~ /[a-fA-F0-9]{40}/)) { error('게임 서버는 SOURCE_COMMIT 전체 SHA의 Git archive로 빌드해야 합니다.') }
+                    if (params.DEDICATED_ONLY && !(params.PROTOCOL_BASE_COMMIT ==~ /[a-fA-F0-9]{40}/)) { error('현재 core의 PROTOCOL_BASE_COMMIT 전체 SHA가 필요합니다.') }
+                    echo(params.ADMIN_ONLY ? 'DRAWLIAR_DEPLOY_SCOPE=admin (관리자 서버만)' : params.DEDICATED_ONLY ? 'DRAWLIAR_DEPLOY_SCOPE=dedicated (데디케이티드만)' : 'DRAWLIAR_DEPLOY_SCOPE=all (전체 서버)')
+                }
+            }
+        }
         stage('Build Linux Servers') {
-            steps { powershell '& ./Tools/LinuxServer/Build-Servers.ps1 -RepositoryPath $env:WORKSPACE' }
+            steps {
+                withEnv(["DRAWLIAR_ADMIN_ONLY=${params.ADMIN_ONLY}", "DRAWLIAR_DEDICATED_ONLY=${params.DEDICATED_ONLY}", "DRAWLIAR_SOURCE_COMMIT=${params.SOURCE_COMMIT ?: ''}", "DRAWLIAR_PROTOCOL_BASE_COMMIT=${params.PROTOCOL_BASE_COMMIT ?: ''}"]) {
+                    powershell '''
+                        $sourceRoot = $env:WORKSPACE
+                        if ($env:DRAWLIAR_SOURCE_COMMIT) {
+                            $prepared = & ./Tools/Jenkins/Prepare-ServerSource.ps1 -RepositoryPath $env:WORKSPACE -SourceCommit $env:DRAWLIAR_SOURCE_COMMIT -ProtocolBaselineCommit $env:DRAWLIAR_PROTOCOL_BASE_COMMIT -DedicatedOnly:($env:DRAWLIAR_DEDICATED_ONLY -eq 'true') | ConvertFrom-Json
+                            $sourceRoot = $prepared.SourceRoot
+                        }
+                        & ./Tools/LinuxServer/Build-Servers.ps1 -RepositoryPath $env:WORKSPACE -SourceRoot $sourceRoot -AdminOnly:($env:DRAWLIAR_ADMIN_ONLY -eq 'true') -DedicatedOnly:($env:DRAWLIAR_DEDICATED_ONLY -eq 'true')
+                    '''
+                }
+            }
         }
         stage('Deploy DrawLiar') {
             when { expression { params.DEPLOY_TO_VM } }
@@ -18,12 +46,12 @@ pipeline {
                     sshUserPrivateKey(credentialsId: params.SSH_CREDENTIAL_ID, keyFileVariable: 'DRAWLIAR_SSH_KEY', usernameVariable: 'DRAWLIAR_SSH_USER'),
                     file(credentialsId: params.KNOWN_HOSTS_CREDENTIAL_ID, variable: 'DRAWLIAR_KNOWN_HOSTS')
                 ]) {
-                    withEnv(["DRAWLIAR_VM_HOST=${params.VM_HOST ?: '34.158.195.192'}"]) {
-                        powershell '& ./Tools/Jenkins/Deploy-Servers.ps1 -VmHost $env:DRAWLIAR_VM_HOST'
+                    withEnv(["DRAWLIAR_VM_HOST=${params.VM_HOST ?: '34.158.195.192'}", "DRAWLIAR_ADMIN_ONLY=${params.ADMIN_ONLY}", "DRAWLIAR_DEDICATED_ONLY=${params.DEDICATED_ONLY}"]) {
+                        powershell '& ./Tools/Jenkins/Deploy-Servers.ps1 -VmHost $env:DRAWLIAR_VM_HOST -AdminOnly:($env:DRAWLIAR_ADMIN_ONLY -eq \'true\') -DedicatedOnly:($env:DRAWLIAR_DEDICATED_ONLY -eq \'true\')'
                     }
                 }
             }
         }
     }
-    post { always { archiveArtifacts artifacts: 'Build/LinuxServer/**', allowEmptyArchive: true } }
+    post { always { archiveArtifacts artifacts: 'Build/LinuxServer/**,Build/LinuxAdmin/**,Build/LinuxDedicated/**', allowEmptyArchive: true } }
 }

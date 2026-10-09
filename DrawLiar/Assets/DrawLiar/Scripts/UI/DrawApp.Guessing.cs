@@ -7,7 +7,8 @@ namespace DrawLiar
 {
     public sealed partial class DrawApp
     {
-        private VisualElement _judgmentPanel, _guessPopupOverlay;
+        private VisualElement _judgmentPanel, _judgmentPanelHost, _pcNominationHost, _guessPopupOverlay;
+        private int _judgmentPanelIndex;
         private string _judgmentPanelKey = "", _guessScope = "", _guessAccountId, _guessDraft = "";
         private bool _guessSubmitted, _guessPopupAutoOpened;
         private TextField _guessField;
@@ -22,6 +23,9 @@ namespace DrawLiar
 
         private void CreateJudgmentPanel(VisualElement parent)
         {
+            _judgmentPanelHost = parent;
+            _judgmentPanelIndex = parent.childCount;
+            _pcNominationHost = null;
             _judgmentPanel = Box(parent, "judgment-panel");
             _judgmentPanel.name = "judgment-panel";
             _judgmentPanel.style.display = DisplayStyle.None;
@@ -34,6 +38,12 @@ namespace DrawLiar
         {
             if (_judgmentPanel == null) return;
             bool nomination = IsNominationPhase(state);
+            if (!IsMobile && _pcNominationHost != null)
+            {
+                _pcNominationHost.style.display = nomination ? DisplayStyle.Flex : DisplayStyle.None;
+                var host = nomination ? _pcNominationHost : _judgmentPanelHost;
+                if (_judgmentPanel.parent != host) host.Insert(nomination ? 0 : Math.Min(_judgmentPanelIndex, host.childCount), _judgmentPanel);
+            }
             bool visible = nomination || state.Phase == GamePhase.Rebuttal && state.HasAccused;
             _judgmentPanel.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
             _judgmentPanel.EnableInClassList("nomination-panel", nomination);
@@ -72,11 +82,10 @@ namespace DrawLiar
 
         private void RefreshNominationPanel(RoomSnapshot state, PlayerView local)
         {
-            var target = _hasSelectedPlayer ? state.Players.FirstOrDefault(player => player.Id == selectedPlayerId) : null;
             bool noLiarSelected = IsNoLiarSelected(state);
             var votedTarget = local?.HasVoted == true ? state.Players.FirstOrDefault(player => player.Id == state.LocalVoteTargetId) : null;
             bool votedNoLiar = local?.HasVoted == true && state.Settings.LiarMode == LiarMode.Optional && state.LocalVoteTargetId == GameRules.NO_LIAR_TARGET;
-            string key = $"nomination/{state.Phase}/{state.BallotVersion}/{state.Settings.LiarMode}/{state.LocalPlayerId}/{state.LocalIsSpectator}/{local?.IsConnected}/{local?.IsSpectator}/{local?.HasVoted}/{state.LocalVoteTargetId}/{state.RemainingSeconds > 0}/{selectedPlayerId}/{_hasSelectedPlayer}/{target?.Name}/{target?.Level}/{votedTarget?.Name}/{votedTarget?.Level}/{voteSubmitted}/{DrawLocalization.CurrentLanguageCode}";
+            string key = $"nomination/{state.Phase}/{state.BallotVersion}/{state.Settings.LiarMode}/{state.LocalPlayerId}/{state.LocalIsSpectator}/{local?.IsConnected}/{local?.IsSpectator}/{local?.HasVoted}/{state.LocalVoteTargetId}/{state.RemainingSeconds > 0}/{selectedPlayerId}/{_hasSelectedPlayer}/{votedTarget?.Name}/{votedTarget?.Level}/{voteSubmitted}/{DrawLocalization.CurrentLanguageCode}";
             if (key != _judgmentPanelKey)
             {
                 _judgmentPanelKey = key;
@@ -84,35 +93,28 @@ namespace DrawLiar
                 _judgmentCounts = _judgmentProgress = null;
                 bool spectator = state.LocalIsSpectator || local?.IsSpectator == true;
                 string prompt = spectator ? "관전 중" : state.RemainingSeconds <= 0 ? "투표 완료" : voteSubmitted ? "제출 중"
-                    : local?.HasVoted == true ? "시간이 끝나기 전까지 투표를 바꿀 수 있어요."
-                    : state.Settings.LiarMode == LiarMode.Optional ? "의심스러운 사람 또는 ‘라이어 없음’을 선택하세요" : "의심스러운 사람을 지목하세요";
-                Text(_judgmentPanel, prompt, "nomination-prompt").name = "nomination-guidance";
-                if (!spectator && local?.IsConnected == true)
+                    : local?.HasVoted == true ? "투표 완료" : "캐릭터를 눌러 투표하세요.";
+                var summary = Box(_judgmentPanel, "row nomination-summary");
+                Text(summary, prompt, "nomination-prompt grow").name = "nomination-guidance";
+                voteProgress = Text(summary, "", "nomination-progress");
+                voteProgress.name = "nomination-progress";
+                if (!spectator && local?.IsConnected == true && (votedTarget != null || votedNoLiar || state.Settings.LiarMode == LiarMode.Optional))
                 {
+                    var actions = Box(_judgmentPanel, "row nomination-actions");
                     if (votedTarget != null || votedNoLiar)
                     {
-                        var current = Text(_judgmentPanel, "현재 투표 · {0}", "nomination-current", votedNoLiar ? DrawLocalization.Text("라이어 없음") : votedTarget.Name);
+                        var current = Text(actions, "현재 투표 · {0}", "nomination-current grow", votedNoLiar ? DrawLocalization.Text("라이어 없음") : votedTarget.Name);
                         current.name = "nomination-current";
                         if (votedTarget != null) AddLevelBadge(current, votedTarget.Level, "nomination-current", votedTarget.AccountId);
                     }
-                    bool selectionConfirmed = local.HasVoted && _hasSelectedPlayer && selectedPlayerId == state.LocalVoteTargetId;
-                    if (!selectionConfirmed && target != null) LeveledName(_judgmentPanel, target.Name, target.Level, "nomination-target", "nomination-target", target.AccountId);
-                    else if (!selectionConfirmed && noLiarSelected) Text(_judgmentPanel, "라이어 없음", "nomination-target").name = "nomination-target";
-                    VisualElement actions = _judgmentPanel;
                     if (state.Settings.LiarMode == LiarMode.Optional)
                     {
-                        actions = Box(_judgmentPanel, "row nomination-actions");
-                        var none = Button(actions, "라이어 없음", SelectNoLiar, "secondary grow nomination-none");
+                        var none = Button(actions, "라이어 없음", SelectNoLiar, "secondary nomination-none", DrawSound.UiConfirm);
                         none.name = "nomination-no-liar";
                         none.EnableInClassList("create-mode-selected", noLiarSelected);
-                        none.SetEnabled(CanSelectNoLiar(state));
+                        none.SetEnabled(CanSelectNoLiar(state) && !votedNoLiar);
                     }
-                    var submit = Button(actions, voteSubmitted ? "제출 중" : local.HasVoted ? "투표 바꾸기" : "지목하기", SubmitVote, "primary nomination-submit", DrawSound.UiConfirm);
-                    submit.name = "nomination-submit";
-                    submit.SetEnabled(CanSubmitVote(state));
                 }
-                voteProgress = Text(_judgmentPanel, "", "nomination-progress");
-                voteProgress.name = "nomination-progress";
             }
             int voted = state.Players.Count(player => player.HasVoted && !player.IsSpectator && player.IsConnected);
             int total = state.Players.Count(player => !player.IsSpectator && player.IsConnected);

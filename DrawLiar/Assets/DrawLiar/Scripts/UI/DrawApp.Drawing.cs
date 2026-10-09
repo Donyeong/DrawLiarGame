@@ -60,20 +60,6 @@ namespace DrawLiar
             return target!=null&&(target.ClassListContains("player-profile-button")||target.GetFirstAncestorOfType<Button>()?.ClassListContains("player-profile-button")==true);
         }
 
-        private void RefreshAuthorPreviewGuide(RoomSnapshot state)
-        {
-            if(_judgmentPanel==null)return;
-            var guide=_judgmentPanel.Q<Label>("author-preview-guide");
-            if(!IsNominationPhase(state)){guide?.RemoveFromHierarchy();return;}
-            string source=IsMobile?"캐릭터를 터치해 그 사람의 그림을 확인하세요.":"캐릭터에 마우스를 올려 그 사람의 그림을 확인하세요.";
-            if(guide==null)
-            {
-                guide=Text(_judgmentPanel,source,"author-preview-guide");guide.name="author-preview-guide";guide.pickingMode=PickingMode.Ignore;
-                _judgmentPanel.Insert(1,guide);
-            }
-            else SetText(guide,source);
-        }
-
         private void ClearOwnDrawing()
         {
             var state=network.State;

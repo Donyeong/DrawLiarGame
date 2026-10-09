@@ -89,23 +89,20 @@ namespace DrawLiar
 
             if (_kind == Kind.Ballot)
             {
+                painter.fillColor = new Color32(249, 230, 190, 255);
                 painter.BeginPath();
-                painter.MoveTo(Point(.22f, .12f));
-                painter.LineTo(Point(.62f, .12f));
-                painter.LineTo(Point(.78f, .28f));
-                painter.LineTo(Point(.78f, .88f));
-                painter.LineTo(Point(.22f, .88f));
+                painter.MoveTo(Point(.90f, .50f));
+                painter.BezierCurveTo(Point(.90f, .721f), Point(.721f, .90f), Point(.50f, .90f));
+                painter.BezierCurveTo(Point(.279f, .90f), Point(.10f, .721f), Point(.10f, .50f));
+                painter.BezierCurveTo(Point(.10f, .279f), Point(.279f, .10f), Point(.50f, .10f));
+                painter.BezierCurveTo(Point(.721f, .10f), Point(.90f, .279f), Point(.90f, .50f));
                 painter.ClosePath();
+                painter.Fill();
                 painter.Stroke();
                 painter.BeginPath();
-                painter.MoveTo(Point(.62f, .12f));
-                painter.LineTo(Point(.62f, .28f));
-                painter.LineTo(Point(.78f, .28f));
-                painter.Stroke();
-                painter.BeginPath();
-                painter.MoveTo(Point(.33f, .54f));
-                painter.LineTo(Point(.45f, .66f));
-                painter.LineTo(Point(.68f, .40f));
+                painter.MoveTo(Point(.29f, .35f));
+                painter.LineTo(Point(.50f, .68f));
+                painter.LineTo(Point(.71f, .35f));
                 painter.Stroke();
                 return;
             }

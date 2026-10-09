@@ -1289,6 +1289,24 @@ MonoBehaviour:
       - "\u0625\u063A\u0644\u0627\u0642"
       Flags: 000000000000000000000000
       Languages_Touch: []
+    - Term: UI/64u57Iug7J2YIOyngeyXhQ
+      TermType: 0
+      Description: "\uB2F9\uC2E0\uC758 \uC9C1\uC5C5"
+      Languages:
+      - "\uB2F9\uC2E0\uC758 \uC9C1\uC5C5"
+      - Your role
+      - "\u4F60\u7684\u8EAB\u4EFD"
+      - "\u4F60\u7684\u8EAB\u5206"
+      - "\u3042\u306A\u305F\u306E\u5F79\u8077"
+      - Tu rol
+      - Seu papel
+      - "Votre r\xF4le"
+      - Deine Rolle
+      - Peranmu
+      - "\u0906\u092A\u0915\u0940 \u092D\u0942\u092E\u093F\u0915\u093E"
+      - "\u062F\u0648\u0631\u0643"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
     - Term: UI/64yA6riwIOykkQ
       TermType: 0
       Description: "\uB300\uAE30 \uC911"
@@ -10991,47 +11009,6 @@ MonoBehaviour:
         \u0627\u0633\u062A\u0646\u062A\u0627\u062C \u0645\u0646 \u0647\u0648 \u0627\u0644\u0643\u0627\u0630\u0628."
       Flags: 000000000000000000000000
       Languages_Touch: []
-    - Term: UI/7Iuc6rCE7J20IOuBneuCmOq4sCDsoITquYzsp4Ag7Yis7ZGc66W8IOuwlOq_gCDsiJgg7J6I7Ja07JqULg
-      TermType: 0
-      Description: "\uC2DC\uAC04\uC774 \uB05D\uB098\uAE30 \uC804\uAE4C\uC9C0 \uD22C\uD45C\uB97C
-        \uBC14\uAFC0 \uC218 \uC788\uC5B4\uC694."
-      Languages:
-      - "\uC2DC\uAC04\uC774 \uB05D\uB098\uAE30 \uC804\uAE4C\uC9C0 \uD22C\uD45C\uB97C
-        \uBC14\uAFC0 \uC218 \uC788\uC5B4\uC694."
-      - You can change your vote until time runs out.
-      - "\u65F6\u95F4\u7ED3\u675F\u524D\u53EF\u4EE5\u66F4\u6539\u6295\u7968\u3002"
-      - "\u6642\u9593\u7D50\u675F\u524D\u53EF\u4EE5\u66F4\u6539\u6295\u7968\u3002"
-      - "\u6642\u9593\u304C\u7D42\u308F\u308B\u307E\u3067\u306F\u6295\u7968\u5148\u3092\u5909\u66F4\u3067\u304D\u307E\u3059\u3002"
-      - Puedes cambiar tu voto hasta que se acabe el tiempo.
-      - "Voc\xEA pode mudar seu voto at\xE9 o tempo acabar."
-      - "Vous pouvez changer votre vote jusqu\u2019\xE0 la fin du temps imparti."
-      - "Du kannst deine Stimme \xE4ndern, bis die Zeit abl\xE4uft."
-      - Kamu bisa mengubah suara sebelum waktu habis.
-      - "\u0938\u092E\u092F \u0916\u0924\u094D\u092E \u0939\u094B\u0928\u0947 \u0924\u0915
-        \u0906\u092A \u0905\u092A\u0928\u093E \u0935\u094B\u091F \u092C\u0926\u0932
-        \u0938\u0915\u0924\u0947 \u0939\u0948\u0902\u0964"
-      - "\u064A\u0645\u0643\u0646\u0643 \u062A\u063A\u064A\u064A\u0631 \u062A\u0635\u0648\u064A\u062A\u0643
-        \u0642\u0628\u0644 \u0627\u0646\u062A\u0647\u0627\u0621 \u0627\u0644\u0648\u0642\u062A."
-      Flags: 000000000000000000000000
-      Languages_Touch: []
-    - Term: UI/7Yis7ZGcIOuwlOq-uOq4sA
-      TermType: 0
-      Description: "\uD22C\uD45C \uBC14\uAFB8\uAE30"
-      Languages:
-      - "\uD22C\uD45C \uBC14\uAFB8\uAE30"
-      - Change Vote
-      - "\u66F4\u6539\u6295\u7968"
-      - "\u66F4\u6539\u6295\u7968"
-      - "\u6295\u7968\u3092\u5909\u66F4"
-      - Cambiar voto
-      - Mudar voto
-      - Changer le vote
-      - "Stimme \xE4ndern"
-      - Ubah suara
-      - "\u0935\u094B\u091F \u092C\u0926\u0932\u0947\u0902"
-      - "\u062A\u063A\u064A\u064A\u0631 \u0627\u0644\u062A\u0635\u0648\u064A\u062A"
-      Flags: 000000000000000000000000
-      Languages_Touch: []
     - Term: UI/7ZiE7J6sIO2IrO2RnCDCtyB7MH0
       TermType: 0
       Description: "\uD604\uC7AC \uD22C\uD45C \xB7 {0}"
@@ -11657,6 +11634,25 @@ MonoBehaviour:
       - "{0} \u0905\u0928\u0941\u092D\u0935 \u092A\u094D\u0930\u093E\u092A\u094D\u0924"
       - "\u0627\u0644\u062E\u0628\u0631\u0629 \u0627\u0644\u0645\u0643\u062A\u0633\u0628\u0629
         {0}"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7LqQ66at7YSw66W8IOuIjOufrCDtiKztkZztlZjshLjsmpQu
+      TermType: 0
+      Description: "\uCE90\uB9AD\uD130\uB97C \uB20C\uB7EC \uD22C\uD45C\uD558\uC138\uC694."
+      Languages:
+      - "\uCE90\uB9AD\uD130\uB97C \uB20C\uB7EC \uD22C\uD45C\uD558\uC138\uC694."
+      - Select a character to vote.
+      - "\u70B9\u51FB\u89D2\u8272\u6295\u7968\u3002"
+      - "\u9EDE\u64CA\u89D2\u8272\u6295\u7968\u3002"
+      - "\u30AD\u30E3\u30E9\u30AF\u30BF\u30FC\u3092\u9078\u3093\u3067\u6295\u7968\u3057\u3066\u304F\u3060\u3055\u3044\u3002"
+      - Pulsa un personaje para votar.
+      - Toque em um personagem para votar.
+      - "S\xE9lectionnez un personnage pour voter."
+      - "W\xE4hle einen Charakter zum Abstimmen."
+      - Pilih karakter untuk memberikan suara.
+      - "\u0935\u094B\u091F \u0926\u0947\u0928\u0947 \u0915\u0947 \u0932\u093F\u090F
+        \u092A\u093E\u0924\u094D\u0930 \u091A\u0941\u0928\u0947\u0902\u0964"
+      - "\u0627\u062E\u062A\u0631 \u0634\u062E\u0635\u064A\u0629 \u0644\u0644\u062A\u0635\u0648\u064A\u062A."
       Flags: 000000000000000000000000
       Languages_Touch: []
     CaseInsensitiveTerms: 0

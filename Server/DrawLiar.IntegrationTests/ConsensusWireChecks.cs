@@ -67,29 +67,33 @@ internal static partial class Integration
             Check(sockets[0].LastState!.LocalVoteTargetId == 3
                 && sockets.Skip(1).All(socket => socket.LastState!.LocalVoteTargetId == -1),
                 "재지목은 이전 표를 대체하고 본인에게만 확정된 대상을 전달해야 합니다.");
-            for (int index = 1; index < 4; index++) Send(index, "vote", 1, initialEpoch);
+            for (int index = 1; index < 3; index++) Send(index, "vote", 1, initialEpoch);
             var voting = await State(state => state.Phase == GamePhase.Discussion
-                && state.Players.Count(player => player.IsConnected && !player.IsSpectator && player.HasVoted) == 4);
+                && state.Players.Count(player => player.IsConnected && !player.IsSpectator && player.HasVoted) == 3);
             await WaitAsync(() => sockets.Select((socket, index) => socket.LastState is { } state
-                && state.LocalVoteTargetId == (index == 0 ? 3 : index == 4 ? -1 : 1)).All(value => value), 3);
+                && state.LocalVoteTargetId == (index == 0 ? 3 : index == 3 || index == 4 ? -1 : 1)).All(value => value), 3);
             Check(sockets.All(socket => socket.LastState is { Phase: GamePhase.Discussion } state
                 && state.BallotVersion == initialEpoch && state.RemainingSeconds > 0
-                && state.Players.Single(player => player.Id == 1).VoteCount == 3
+                && state.Players.Single(player => player.Id == 1).VoteCount == 2
                 && state.Players.Single(player => player.Id == 2).VoteCount == 0
                 && state.Players.Single(player => player.Id == 3).VoteCount == 1),
-                "모든 연결은 마지막 표만 집계하고 전원 제출 뒤에도 원래 지목 마감까지 기다려야 합니다.");
+                "모든 연결은 마지막 표만 집계하고 유효 지목을 하지 않은 참가자가 있으면 토론을 유지해야 합니다.");
             double deadline = now + voting.RemainingSeconds;
             Send(0, "vote", 3, initialEpoch);
-            room.Tick(now = deadline - .1);
-            await State(state => state.Phase == GamePhase.Discussion && state.RemainingSeconds < .2f);
-            Send(0, "vote", 2, initialEpoch);
+            Send(3, "vote", 1, initialEpoch);
             var rebuttal = await State(state => state.Phase == GamePhase.Rebuttal);
             int judgmentEpoch = rebuttal.BallotVersion;
             Check(rebuttal.HasAccused && rebuttal.AccusedPlayerId == 1 && judgmentEpoch > initialEpoch
                 && rebuttal.JudgmentVoterCount == 3 && rebuttal.JudgmentVotesCast == 0
                 && rebuttal.LocalVoteTargetId == 3
+                && now < deadline && rebuttal.RemainingSeconds == 6
                 && rebuttal.Players.All(player => !player.IsLiar && !player.IsCaught && player.Score == 0 && player.RoundPoints == 0),
-                "마감 뒤 재지목은 거부하고 마지막 유효 표로 비밀 유지 반론과 새 버전을 열어야 합니다.");
+                "마지막 유효표를 받으면 원래 마감 전이라도 비밀 유지 반론과 새 버전을 즉시 열어야 합니다.");
+            await WaitAsync(() => sockets.All(socket => socket.LastState is { Phase: GamePhase.Rebuttal } state
+                && state.AccusedPlayerId == 1 && state.BallotVersion == judgmentEpoch), 3);
+            Send(0, "vote", 2, initialEpoch);
+            Check(sockets[0].LastState!.LocalVoteTargetId == 3 && sockets[0].LastState!.AccusedPlayerId == 1,
+                "자동 확정 이후의 지목 변경은 기존 후보와 제출한 표를 바꾸면 안 됩니다.");
             Send(1, "judge", 1, initialEpoch, false);
             Send(1, "judge", 2, judgmentEpoch, false);
             Send(0, "judge", 1, judgmentEpoch, true);
@@ -115,9 +119,6 @@ internal static partial class Integration
                 "늦게 도착한 앞 지목·찬반 패킷은 새 토론을 바꾸면 안 됩니다.");
             Send(0, "vote", 2, reset.BallotVersion);
             for (int index = 1; index < 4; index++) Send(index, "vote", 1, reset.BallotVersion);
-            voting = await State(state => state.Phase == GamePhase.Discussion
-                && state.Players.Count(player => player.IsConnected && !player.IsSpectator && player.HasVoted) == 4);
-            room.Tick(now += voting.RemainingSeconds + .01);
             var second = await State(state => state.Phase == GamePhase.Rebuttal && state.BallotVersion > reset.BallotVersion);
             Send(1, "judge", 1, judgmentEpoch, true);
             Check(sockets[0].LastState!.JudgmentVotesCast == 0, "같은 후보라도 지난 찬반 버전의 표를 새 판정에 재사용하면 안 됩니다.");
@@ -129,7 +130,7 @@ internal static partial class Integration
             await WaitAsync(() => sockets.Skip(1).All(socket => socket.LastState?.HostPlayerId == 2), 3);
             Check(sockets.Skip(1).Count(socket => socket.LastState?.IsHost == true) == 1,
                 "방장 이전 후 모든 참가자·관전자는 같은 방장 ID를 받아야 합니다.");
-            Report("JSON 재지목·개인 확정 대상·마감 유지/늦은 패킷·찬반 동결·부결 리셋·비밀 점수·후보 이탈·방장 ID 동기화 검증");
+            Report("JSON 재지목·개인 확정 대상·전원 제출 즉시 진행·늦은 패킷·찬반 동결·부결 리셋·비밀 점수·후보 이탈·방장 ID 동기화 검증");
         }
         finally { foreach (var connection in connections) await connection.DisposeAsync(); }
     }

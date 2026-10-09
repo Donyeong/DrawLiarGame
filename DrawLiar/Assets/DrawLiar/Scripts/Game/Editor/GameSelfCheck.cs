@@ -314,9 +314,7 @@ namespace DrawLiar.Editor
             game.Vote(citizens[2], liars[0], now);
             game.Vote(liars[0], citizens[0], now);
             game.Vote(liars[1], citizens[0], now);
-            Check(game.Phase == GamePhase.Discussion, "전원이 지목해도 제한 시간까지 토론을 유지해야 합니다.");
-            now = TickDeadline(game, now);
-            Check(game.Phase == GamePhase.Rebuttal && game.Snapshot(0, 0, now).AccusedPlayerId == liars[0], "지목 마감 뒤 최다표 한 명의 반론으로 진행해야 합니다.");
+            Check(game.Phase == GamePhase.Rebuttal && game.Snapshot(0, 0, now).AccusedPlayerId == liars[0], "전원이 지목하면 최다표 한 명의 반론으로 바로 진행해야 합니다.");
             Check(!game.Judge(5, liars[0], true, now) && !game.Judge(liars[0], liars[0], true, now), "관전자와 후보는 찬반에 참가할 수 없습니다.");
             ApproveAll(game, now);
             Check(game.Phase == GamePhase.LiarReveal, "찬반 가결 뒤 라이어를 공개해야 합니다.");
@@ -407,7 +405,7 @@ namespace DrawLiar.Editor
             Check(game.Vote(0, int.MinValue, 100) && game.Vote(0, -1, 100), "음수 ID를 지목한 표도 제한 시간 내 변경할 수 있어야 합니다.");
             Check(game.Vote(int.MinValue, -1, 100), "Minimum signed ID can vote.");
             Check(game.Vote(-1, int.MinValue, 100), "Negative liar can vote for a negative citizen.");
-            double nominationEnd = TickDeadline(game, 100);
+            double nominationEnd = 100;
             Check(game.Phase == GamePhase.Rebuttal && game.Snapshot(0, 0, nominationEnd).HasAccused
                 && game.Snapshot(0, 0, nominationEnd).AccusedPlayerId == -1, "-1 ID도 존재하는 반론 후보로 구분해야 합니다.");
             ApproveAll(game, nominationEnd);
@@ -486,7 +484,6 @@ namespace DrawLiar.Editor
             while (game.Phase == GamePhase.Drawing) game.EndTurn(game.ArtistId, now);
             foreach (int citizen in citizens) game.Vote(citizen, liar, now);
             game.Vote(liar, citizens[0], now);
-            now = TickDeadline(game, now);
             ApproveAll(game, now);
             game.Tick(now += 500);
             game.Guess(liar, "우리 단어", now);
@@ -533,10 +530,8 @@ namespace DrawLiar.Editor
             int[] ids = game.Snapshot(0, 0, now).Players.Where(player => player.IsConnected && !player.IsSpectator).Select(player => player.Id).ToArray();
             foreach (int id in ids)
                 Check(game.Vote(id, id == accused ? ids.First(other => other != accused) : accused, now), "현재 토론의 지목을 제출해야 합니다.");
-            Check(game.Phase == GamePhase.Discussion, "전원이 지목해도 제한 시간까지 변경할 수 있어야 합니다.");
-            now = TickDeadline(game, now);
             Check(game.Phase == GamePhase.Rebuttal && game.Snapshot(0, 0, now).HasAccused
-                && game.Snapshot(0, 0, now).AccusedPlayerId == accused, "지목 마감에는 최다표 한 명의 반론으로 진행해야 합니다.");
+                && game.Snapshot(0, 0, now).AccusedPlayerId == accused, "전원 제출 시 최다표 한 명의 반론으로 바로 진행해야 합니다.");
             return now;
         }
 
@@ -586,9 +581,7 @@ namespace DrawLiar.Editor
                 "유효 지목마다 대상의 실시간 집계를 늘려야 합니다.");
             Counts((2, 4));
             int ballot = game.BallotVersion;
-            Check(game.Vote(2, 0, now) && game.Phase == GamePhase.Discussion, "마지막 지목 뒤에도 제한 시간까지 토론을 유지해야 합니다.");
-            Counts((2, 4), (0, 1));
-            now = TickDeadline(game, now);
+            Check(game.Vote(2, 0, now) && game.Phase == GamePhase.Rebuttal, "마지막 지목을 제출하면 후보의 반론으로 바로 진행해야 합니다.");
             Counts();
             foreach (int voter in new[] { 0, 1, 3, 4 })
                 Check(game.Judge(voter, 2, false, now), "새 지목 투표를 열기 위해 반대해야 합니다.");
@@ -663,32 +656,29 @@ namespace DrawLiar.Editor
                 && !game.Vote(99, 2, 103) && game.Snapshot(0, 0, 103).LocalVoteTargetId == 2,
                 "자기 자신·관전자·없는 참가자 지목과 관전자 제출은 기존 선택을 바꾸면 안 됩니다.");
             Check(game.Vote(1, 2, 104) && game.Vote(2, 1, 104) && game.Vote(3, 2, 104)
-                && game.Phase == GamePhase.Discussion && !game.Snapshot(0, 0, 104).HasAccused
+                && game.Phase == GamePhase.Rebuttal && game.Snapshot(0, 0, 104).AccusedPlayerId == 2
+                && changes == 5 && game.CanvasVersion == initial[0].CanvasVersion && game.DrawingEpoch == initial[0].DrawingEpoch
                 && game.Snapshot(0, 0, 104).Players.Where(player => !player.IsSpectator).All(player => player.HasVoted),
-                "전원이 제출해도 지목 시간은 마감까지 열려 있어야 합니다.");
-            Check(game.Vote(0, 3, deadline - .001), "전원 제출 뒤에도 마감 직전까지 지목을 바꿀 수 있어야 합니다.");
-            int[] targets = { 3, 2, 1, 2 };
-            int[] counts = { 0, 1, 2, 1 };
+                "마지막 유효 지목은 그림을 유지하며 한 번의 상태 변경으로 반론을 시작해야 합니다.");
+            Check(!game.Vote(0, 3, 104) && !game.Vote(0, 2, 104), "반론으로 넘어간 뒤에는 변경과 같은 표 재전송을 모두 거부해야 합니다.");
+            int[] targets = { 2, 2, 1, 2 };
             foreach (int viewer in new[] { 0, 1, 2, 3, 99 })
             {
-                var state = game.Snapshot(viewer, 0, deadline - .001);
+                var state = game.Snapshot(viewer, 0, 104);
                 Check(state.LocalVoteTargetId == (viewer == 99 ? -1 : targets[viewer])
-                    && state.Players.Where(player => !player.IsSpectator).Select(player => player.VoteCount).SequenceEqual(counts)
+                    && state.Players.All(player => player.VoteCount == 0)
                     && state.Players.All(player => !player.IsLiar && !player.IsCaught),
-                    "각 참가자는 본인 선택과 동일한 최종 집계만 받고 비공개 역할은 받으면 안 됩니다.");
+                    "반론에서는 각 참가자에게 본인 선택만 유지하고 지목 집계·비공개 역할은 숨겨야 합니다.");
                 Check(viewer == 99 ? state.Word == "" : state.Word == initial[viewer].Word && state.LocalIsLiar == initial[viewer].LocalIsLiar,
                     "지목 교체는 본인에게 허용된 제시어·역할 공개 범위를 바꾸면 안 됩니다.");
             }
-            game.Tick(deadline - .001);
-            Check(game.Phase == GamePhase.Discussion, "지목 마감 직전에는 아직 변경 가능한 토론을 유지해야 합니다.");
-            Check(!game.Vote(0, 1, deadline) && game.Phase == GamePhase.Rebuttal
-                && game.Snapshot(0, 0, deadline).AccusedPlayerId == 2 && game.Snapshot(0, 0, deadline).LocalVoteTargetId == 3
-                && !game.Vote(0, 3, deadline), "정확한 마감에는 교체와 같은 선택 재전송을 거부하고 마지막 집계로 후보를 정해야 합니다.");
-            Check(game.Judge(0, 2, false, deadline) && game.Judge(1, 2, false, deadline) && game.Judge(3, 2, false, deadline)
+            Check(game.Snapshot(0, 0, 104).RemainingSeconds == 6 && 104 < deadline,
+                "마지막 지목 시각을 기준으로 새 반론 제한 시간을 시작해야 합니다.");
+            Check(game.Judge(0, 2, false, 104) && game.Judge(1, 2, false, 104) && game.Judge(3, 2, false, 104)
                 && game.Phase == GamePhase.Discussion && game.BallotVersion > ballot
-                && Enumerable.Range(0, 4).All(id => game.Snapshot(id, 0, deadline).LocalVoteTargetId == -1)
-                && game.Snapshot(0, 0, deadline).Players.All(player => !player.HasVoted)
-                && game.Vote(0, 1, deadline + 1), "부결 뒤 재투표는 선택을 초기화하고 새 제한 시간으로 제출을 받아야 합니다.");
+                && Enumerable.Range(0, 4).All(id => game.Snapshot(id, 0, 104).LocalVoteTargetId == -1)
+                && game.Snapshot(0, 0, 104).Players.All(player => !player.HasVoted)
+                && game.Vote(0, 1, 105), "부결 뒤 재투표는 선택을 초기화하고 새 제한 시간으로 제출을 받아야 합니다.");
 
             var optional = new GameSession(new RoomSettings { LiarMode = LiarMode.Optional }, Data(), 122);
             for (int id = 0; id < 4; id++) optional.Join(id, "P" + id, 0, 0);
@@ -711,19 +701,29 @@ namespace DrawLiar.Editor
                 && optional.Snapshot(0, 0, 105).RemainingSeconds == optionalDeadline - 105,
                 "후보 연결이 끊기면 해당 지목만 취소하고 끊긴 후보·무효 선택과 시간 연장을 막아야 합니다.");
             Check(optional.Vote(1, GameRules.NO_LIAR_TARGET, 106) && optional.Vote(3, GameRules.NO_LIAR_TARGET, 107)
-                && optional.Phase == GamePhase.Discussion, "연결된 전원이 라이어 없음을 제출해도 제한 시간을 유지해야 합니다.");
-            optional.Tick(optionalDeadline);
-            Check(optional.Phase == GamePhase.Rebuttal && optional.Snapshot(0, 0, optionalDeadline).HasAccused
-                && optional.Snapshot(0, 0, optionalDeadline).AccusedPlayerId == GameRules.NO_LIAR_TARGET,
-                "마감에는 마지막 라이어 없음 집계로 찬반을 시작해야 합니다.");
+                && optional.Phase == GamePhase.Rebuttal && optional.Snapshot(0, 0, 107).HasAccused
+                && optional.Snapshot(0, 0, 107).AccusedPlayerId == GameRules.NO_LIAR_TARGET,
+                "연결된 전원이 라이어 없음을 제출하면 미연결 참가자를 기다리지 않고 찬반을 시작해야 합니다.");
 
             var disconnected = DiscussionGame(123, 3);
             Check(disconnected.Vote(0, 1, 100) && disconnected.Vote(1, 0, 100), "이탈 후 전원 제출 상태가 될 지목을 준비해야 합니다.");
             disconnected.Disconnect(2, 100);
-            Check(disconnected.Phase == GamePhase.Discussion && disconnected.Snapshot(0, 0, 100).RemainingSeconds == 45,
-                "미제출자 이탈로 남은 전원이 제출 상태가 되어도 투표를 일찍 마감하면 안 됩니다.");
-            TickDeadline(disconnected, 100);
-            Check(disconnected.Phase == GamePhase.Rebuttal, "이탈 후 지목도 원래 마감에만 후보를 판정해야 합니다.");
+            Check(disconnected.Phase == GamePhase.Rebuttal && disconnected.Snapshot(0, 0, 100).RemainingSeconds == 6,
+                "미제출자 이탈 후 남은 전원이 유효표를 제출했으면 반론을 바로 시작해야 합니다.");
+
+            var invalidated = DiscussionGame(124, 3);
+            Check(invalidated.Join(99, "관전자", 0, 0, spectatorOnly: true)
+                && invalidated.Vote(0, 2, 100) && invalidated.Vote(1, 0, 100), "이탈 대상에게 제출한 지목을 준비해야 합니다.");
+            invalidated.Disconnect(2, 101);
+            var waiting = invalidated.Snapshot(0, 0, 101);
+            Check(waiting.Phase == GamePhase.Discussion && !waiting.HasAccused && waiting.LocalVoteTargetId == -1
+                && !waiting.Players.Single(player => player.Id == 0).HasVoted && waiting.RemainingSeconds == 44,
+                "미제출자 이탈로 표적이 무효가 된 표는 먼저 취소하고 유효 지목을 다시 기다려야 합니다.");
+            Check(!invalidated.Vote(0, 2, 102) && !invalidated.Vote(0, 99, 102) && !invalidated.Vote(0, 0, 102)
+                && !invalidated.Vote(99, 1, 102) && invalidated.Phase == GamePhase.Discussion,
+                "마지막 참가자의 잘못된 대상·자기 지목과 관전자 투표는 조기 확정을 일으키면 안 됩니다.");
+            Check(invalidated.Vote(0, 1, 103) && invalidated.Phase == GamePhase.Rebuttal,
+                "무효 표를 유효 지목으로 다시 제출하면 연결된 참가자만으로 즉시 반론을 시작해야 합니다.");
         }
 
         private static void VerifyConsensusVoting()
@@ -737,7 +737,7 @@ namespace DrawLiar.Editor
                     Check(tie.Vote(0, 1, 100) && tie.Vote(1, 0, 100) && tie.Vote(2, 3, 100), "동률 지목을 준비해야 합니다.");
                     Check(tie.Phase == GamePhase.Discussion, "전원 제출 전에는 토론을 유지해야 합니다.");
                     Check(tie.Vote(3, 2, 100), "마지막 지목을 제출해야 합니다.");
-                    double nominationEnd = TickDeadline(tie, 100);
+                    double nominationEnd = 100;
                     var state = tie.Snapshot(0, 0, nominationEnd);
                     Check(tie.Phase == GamePhase.Rebuttal && state.HasAccused && state.AccusedPlayerId >= 0 && state.AccusedPlayerId < 4
                         && state.Players.All(player => !player.IsCaught && !player.IsLiar && player.RoundPoints == 0 && player.Score == 0),

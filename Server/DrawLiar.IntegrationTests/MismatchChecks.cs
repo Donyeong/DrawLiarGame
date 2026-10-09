@@ -129,9 +129,7 @@ internal static partial class Integration
         void Nominate()
         {
             foreach (int id in words.Keys) Check(game.Vote(id, id == minority ? words.Keys.First(other => other != minority) : minority, now), "자신을 제외한 참가자를 지목할 수 있어야 합니다.");
-            Check(game.Phase == GamePhase.Discussion, "전원이 지목해도 토론 마감까지 표를 변경할 수 있어야 합니다.");
-            AdvanceProfilePhase(game, ref now);
-            Check(game.Phase == GamePhase.Rebuttal && game.Snapshot(1, 1, now).AccusedPlayerId == minority, "모든 지목 뒤 소수 단어 참가자가 반론해야 합니다.");
+            Check(game.Phase == GamePhase.Rebuttal && game.Snapshot(1, 1, now).AccusedPlayerId == minority, "모든 지목 직후 소수 단어 참가자의 반론으로 진행해야 합니다.");
             VerifyMismatchSecret(game, words, common, alternate, now);
         }
         Nominate(); int previousBallot = game.BallotVersion;

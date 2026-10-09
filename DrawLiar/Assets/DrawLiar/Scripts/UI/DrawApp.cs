@@ -1204,8 +1204,7 @@ namespace DrawLiar
             if(numeralFont!=null){timer.style.unityFontDefinition=FontDefinition.FromFont(numeralFont);roomBadge.style.unityFontDefinition=FontDefinition.FromFont(numeralFont);}
             var workspace=Box(shell,"workspace pc-game-workspace");workspace.name="pc-game-workspace";
             var secret=_pcRoomSecret=Box(workspace,"secret-bar pc-secret-bar");secret.name="pc-secret-bar";CreateRoomSecretContext(secret,"게임 대기");
-            role=Text(secret,"","role");word=Text(secret,"","word grow");
-            secretToggle=Button(secret,"숨기기",()=>{secretHidden=!secretHidden;RefreshSecret(network.State);},"secret-toggle");
+            CreateRoomSecretIdentity(secret,"room-secret-identity row");
             _waitingRoomTopics=Button(secret,"",OpenWaitingRoomTopics,"secondary waiting-room-topics");_waitingRoomTopics.name="waiting-room-topics";
             _spectatorCount=Text(secret,"","spectator-count");
             var stage=Box(workspace,"pc-canvas-stage");stage.name="pc-canvas-stage";
@@ -1220,6 +1219,7 @@ namespace DrawLiar
             var controls=Box(workspace,"pc-game-controls");controls.name="pc-game-controls";CreateDrawingTools(controls);CreateJudgmentPanel(controls);
             var footer=Box(controls,"pc-room-footer row");footer.name="pc-room-footer";
             var chatDock=Box(footer,"pc-chat-dock");chatDock.name="pc-chat-dock";CreatePcRoomChat(chatDock);
+            _pcNominationHost=Box(footer,"pc-nomination-host grow");_pcNominationHost.name="pc-nomination-host";_pcNominationHost.style.display=DisplayStyle.None;
             var judgment=Box(footer,"pc-phase-controls row grow");contextInfo=Box(judgment,"context-info");phaseActions=Box(judgment,"phase-actions grow");
             _pcRightPlayers=Box(stage,"pc-player-rail pc-player-right");_pcRightPlayers.name="pc-player-right";
             _pcRightPlayers.RegisterCallback<GeometryChangedEvent>(_=>RefreshPcRoomGeometry(frame));
@@ -1287,7 +1287,7 @@ namespace DrawLiar
             _waitingRoomTopics=Button(roomActions,"",OpenWaitingRoomTopics,"secondary waiting-room-topics");_waitingRoomTopics.name="waiting-room-topics";
             _mobileRoomCode.languageDirection=LanguageDirection.LTR;
             _mobileSecret=Box(_mobileRoomStack,"secret-bar mobile-secret");CreateRoomSecretContext(_mobileSecret,"");
-            var identity=Box(_mobileSecret,"mobile-role-line row");role=Text(identity,"","role");word=Text(identity,"","word grow");secretToggle=Button(identity,"숨기기",()=>{secretHidden=!secretHidden;RefreshSecret(network.State);},"secret-toggle");
+            CreateRoomSecretIdentity(_mobileSecret,"room-secret-identity mobile-role-line row");
             BindMobileSecretDetails();
             _mobileWorkspace=Box(_mobileRoomStack,"mobile-workspace");_mobilePlayStage=Box(_mobileWorkspace,"mobile-play-stage");
             _mobileCanvas=Box(_mobilePlayStage,"canvas-frame");_mobilePlaySide=Box(_mobileWorkspace,"mobile-play-side");
@@ -1671,7 +1671,8 @@ namespace DrawLiar
             if(waiting)SetRawText(topic,state.Settings.RoomName);else if(IsMobile)SetText(topic,"주제 · {0}",state.Topic);else SetRawText(topic,state.Topic);
             topic.tooltip=waiting?state.Settings.RoomName:state.Topic;
             word.style.display=role.style.display=waiting?DisplayStyle.None:DisplayStyle.Flex;
-            SetText(role,state.Phase==GamePhase.Lobby?"":LocalRoleName(state));
+            _roomSecretIdentity.style.display=waiting?DisplayStyle.None:DisplayStyle.Flex;
+            SetText(role,waiting?"":!state.LocalIsSpectator&&HasHiddenMismatchRole(state)?"비공개":LocalRoleName(state));
             if(waiting)SetRawText(word,"");
             else if(string.IsNullOrEmpty(state.Word))SetText(word,"비공개");
             else SetRawText(word,secretHidden?"•••":state.Word);
@@ -1770,7 +1771,6 @@ namespace DrawLiar
                 if(resumedDiscussion)Toast(state.Summary);
             }
             RefreshJudgmentPanel(state,local);
-            RefreshAuthorPreviewGuide(state);
             RefreshGuessingInput(state,local);
             if(IsMobile)ArrangeMobileRoom(state);
             RefreshJudgmentCoinToss(state);
@@ -1830,7 +1830,7 @@ namespace DrawLiar
                     if(IsNominationPhase(current))
                     {
                         if(!CanSelectVote(current,player))return;
-                        DrawAudio.Instance?.Play(DrawSound.UiClick);selectedPlayerId=player.Id;_hasSelectedPlayer=true;RefreshState(current);
+                        DrawAudio.Instance?.Play(DrawSound.UiClick);selectedPlayerId=player.Id;_hasSelectedPlayer=true;SubmitVote();
                     }
                 }
                 card.RegisterCallback<ClickEvent>(e=>{if(e.button==0&&!IsPlayerProfileTarget(e))Activate();});
@@ -1904,7 +1904,7 @@ namespace DrawLiar
         private void SubmitVote()
         {
             var state=network.State;
-            if(!CanSubmitVote(state))return;
+            if(!CanSubmitVote(state)){if(state!=null)RefreshState(state);return;}
             int version=++_voteSubmissionVersion;
             string scope=VoteSubmissionScope(state);
             voteSubmitted=true;network.Vote(selectedPlayerId);RefreshState(network.State);

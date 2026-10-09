@@ -26,8 +26,7 @@
 .level-name-guess-result-name { min-width: 0; }
 .level-name-room-moderation-name { flex-basis: 0; min-width: 0; margin-right: 8px; }
 .level-name-accused-name { max-width: 90%; margin-top: 8px; }
-.level-name-nomination-target { max-width: 100%; margin-bottom: 12px; align-self: center; }
-.level-name-nomination-current { max-width: 100%; margin-bottom: 6px; align-self: center; }
+.level-name-nomination-current { max-width: 100%; min-width: 0; margin: 0; align-self: center; }
 .level-name-drawing-preview-name { position: absolute; top: 8px; left: 8px; padding: 5px 10px; border-radius: 8px; border-width: 1px; border-color: #DED5EA; background-color: #FFFFFF; }
 .app .level-name-drawing-preview-name .leveled-name { border-width: 0; background-color: rgba(0, 0, 0, 0); }
 .level-name-workshop-creator { flex-basis: 0; min-width: 0; }
@@ -363,18 +362,22 @@
 .pc-game .active-player .player-status, .pc-game .selected-player .player-status { color: #78679E; }
 .player.disconnected-player { opacity: .55; }
 .pc-game .player.preview-player { border-width: 2px; border-color: #537F70; background-color: #EDF5EF; }
-.author-preview-guide { width: 100%; font-size: 13px; color: #817A87; -unity-text-align: middle-center; white-space: normal; margin: 0 0 8px; }
 .player-host-badge { position: absolute; top: 6px; left: 8px; padding: 2px 6px; border-radius: 6px; background-color: #F9E6BE; color: #736957; font-size: 10px; }
 .player-vote-stack { display: none; position: absolute; top: 2px; left: 8px; right: 8px; height: 14px; flex-direction: row; align-items: center; justify-content: center; }
 .nomination-player .player-vote-stack.has-votes { display: flex; }
-.player-vote-stack .vote-token { width: 14px; min-width: 0; height: 14px; min-height: 0; flex-shrink: 1; margin: 0 1px; color: #645797; background-color: #F9E6BE; border-radius: 3px; }
+.player-vote-stack .vote-token { width: 14px; min-width: 0; height: 14px; min-height: 0; flex-shrink: 1; margin: 0 1px; color: #645797; background-color: transparent; }
 .nomination-player .player-drawing-order, .pc-game .nomination-player .player-host-badge { visibility: hidden; }
 .pc-game .pc-secret-bar { width: 100%; height: auto; min-height: 52px; flex-direction: row; align-items: center; margin-bottom: 8px; padding: 6px 12px; border-width: 1px; border-color: #DED5EA; border-radius: 12px; background-color: #EEE8F5; }
 .pc-game .pc-secret-bar .topic { min-width: 0; flex-shrink: 1; margin: 0 12px 0 0; font-size: 16px; white-space: normal; overflow: visible; text-overflow: clip; }
-.pc-game .pc-secret-bar .role { min-width: 0; max-width: 18%; flex-shrink: 1; margin: 0 12px 0 0; padding: 0; border-width: 0; font-size: 14px; color: #78679E; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.pc-game .pc-secret-bar .word { flex-basis: 0; min-width: 0; margin: 0; font-size: 24px; color: #34304B; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pc-game .pc-secret-bar .role { flex-grow: 1; flex-basis: 0; flex-shrink: 1; min-width: 0; max-width: none; height: 32px; margin: 0; padding: 0; border-width: 0; font-size: 20px; -unity-text-auto-size: best-fit 12px 20px; -unity-font-style: bold; color: #645797; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pc-game .pc-secret-bar .word { flex-basis: 0; flex-shrink: 1; min-width: 0; height: 32px; margin: 0; font-size: 24px; -unity-text-auto-size: best-fit 12px 24px; color: #34304B; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pc-game .pc-secret-bar .secret-toggle { min-width: 64px; height: 32px; min-height: 32px; margin-left: 8px; font-size: 12px; color: #78679E; }
 .room-secret-context { flex-direction: row; align-items: center; flex-grow: 1; flex-basis: 0; flex-shrink: 1; min-width: 0; max-width: 55%; margin-right: 12px; }
+.room-secret-identity { flex-grow: 2; flex-basis: 0; flex-shrink: 1; min-width: 0; }
+.room-secret-role, .room-secret-word { height: 36px; min-width: 0; flex-basis: 0; padding: 0 10px; border-radius: 8px; background-color: #FAF8FC; }
+.room-secret-role { flex-grow: 1; margin-right: 12px; }
+.room-secret-word { flex-grow: 2; }
+.room-secret-label { flex-shrink: 0; margin-right: 8px; font-size: 12px; color: #817A87; -unity-font-style: normal; white-space: nowrap; }
 .pc-game .pc-secret-bar.waiting-room-info .room-secret-context { max-width: 100%; }
 .pc-game .pc-secret-bar.waiting-room-info .room-secret-context .topic { font-size: 16px; height: 22px; -unity-font-style: bold; }
 .pc-game .pc-secret-bar .waiting-room-topics { flex-shrink: 0; min-width: 88px; height: 32px; min-height: 32px; margin: 0; padding: 4px 8px; font-size: 12px; }
@@ -386,6 +389,8 @@
 .pc-game .drawing-surface { border-width: 2px; border-color: #34304B; }
 .pc-game .pc-game-controls { width: 100%; flex-shrink: 0; margin-top: 8px; }
 .pc-game .pc-room-footer { min-height: 112px; align-items: center; }
+.pc-game .pc-nomination-host { min-width: 0; flex-basis: 0; align-self: center; }
+.pc-game .pc-nomination-host .judgment-panel { max-width: none; margin: 0; }
 .pc-game .pc-chat-dock { position: relative; width: 28%; min-width: 300px; max-width: 360px; min-height: 112px; flex-shrink: 0; align-self: stretch; margin-right: 16px; }
 .pc-game .pc-room-footer .pc-phase-controls { min-width: 0; min-height: 112px; flex-basis: 0; }
 .pc-game .pc-room-footer .context-info { flex-shrink: 1; max-width: 30%; }
@@ -464,16 +469,16 @@
 .app .judgment-panel .judgment-actions .judgment-approve:hover { background-color: #FFC975; }
 .app .judgment-panel .judgment-actions .judgment-reject:hover { background-color: #FFFFFF; }
 .judgment-state { margin-top: 8px; color: #645797; font-size: 14px; -unity-text-align: middle-center; }
-.nomination-panel { padding: 16px; align-items: center; }
+.nomination-panel { padding: 8px 12px; align-items: stretch; }
 .nomination-prompt { max-width: 100%; margin: 0 0 12px; padding: 0; font-size: 26px; color: #34304B; -unity-font-style: bold; -unity-text-align: middle-center; white-space: normal; }
-.nomination-target { max-width: 100%; margin: 0 0 12px; color: #645797; font-size: 20px; -unity-font-style: bold; -unity-text-align: middle-center; white-space: normal; }
-.nomination-current { max-width: 100%; margin: 0 0 6px; color: #645797; font-size: 14px; -unity-text-align: middle-center; white-space: normal; }
-.app .nomination-panel .nomination-submit { width: 360px; max-width: 100%; height: 56px; min-height: 56px; margin: 0; padding: 8px 16px; font-size: 20px; border-radius: 12px; }
-.nomination-actions { width: 680px; max-width: 100%; align-items: stretch; }
-.app .nomination-actions .button { width: auto; flex-basis: 0; flex-grow: 1; min-width: 0; min-height: 56px; margin: 0; font-size: 20px; white-space: normal; }
-.app .nomination-actions .nomination-none { margin-right: 12px; }
+.nomination-summary { width: 100%; min-width: 0; flex-shrink: 0; }
+.nomination-panel .nomination-prompt { min-width: 0; flex-basis: 0; margin: 0; font-size: 16px; -unity-text-align: middle-left; }
+.nomination-current { max-width: 100%; min-width: 0; margin: 0; color: #645797; font-size: 14px; -unity-text-align: middle-left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nomination-actions { width: 100%; min-width: 0; flex-shrink: 0; align-items: center; margin-top: 4px; }
+.nomination-actions .grow { flex-basis: 0; min-width: 0; }
+.app .nomination-actions .nomination-none { width: auto; flex-shrink: 0; min-width: 104px; height: 44px; min-height: 44px; margin: 0 0 0 8px; padding: 6px 10px; font-size: 14px; white-space: nowrap; }
 .app .nomination-none.create-mode-selected { background-color: #E9E4F3; border-color: #78679E; }
-.nomination-progress { margin-top: 8px; font-size: 13px; color: #817A87; -unity-text-align: middle-center; }
+.nomination-progress { flex-shrink: 0; margin: 0 0 0 12px; padding: 0; font-size: 13px; color: #817A87; -unity-text-align: middle-right; }
 .pc-phase-controls.phase-controls-empty { display: none; }
 .app .guess-popup-overlay { justify-content: center; align-items: center; }
 .app .modal.utility-popup.guess-popup { width: 540px; max-width: 92%; height: auto; max-height: 90%; padding: 24px; border-radius: 16px; }

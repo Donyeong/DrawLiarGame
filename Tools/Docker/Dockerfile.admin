@@ -1,0 +1,6 @@
+ARG DRAWLIAR_BASE_IMAGE
+FROM ${DRAWLIAR_BASE_IMAGE}
+USER root
+RUN rm -rf /apps/AdminServer
+COPY Apps/AdminServer /apps/AdminServer
+USER app

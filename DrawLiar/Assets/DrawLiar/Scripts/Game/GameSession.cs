@@ -135,6 +135,7 @@ namespace DrawLiar
                 else if (Phase == GamePhase.Discussion)
                 {
                     foreach (var voter in players.Values.Where(voter => voter.Vote == id)) voter.Vote = null;
+                    if (AllNominationsSubmitted()) ResolveNomination(now);
                 }
                 else if (Phase == GamePhase.Rebuttal)
                 {
@@ -259,7 +260,8 @@ namespace DrawLiar
             var player = players[id];
             if (player.Vote == target) return true;
             player.Vote = target;
-            Changed?.Invoke();
+            if (AllNominationsSubmitted()) ResolveNomination(now);
+            else Changed?.Invoke();
             return true;
         }
 
@@ -372,6 +374,7 @@ namespace DrawLiar
         private IEnumerable<Participant> ActivePlayers() => players.Values.Where(player => player.Connected && !player.Spectator);
         private IEnumerable<Participant> JudgmentVoters() => ActivePlayers().Where(player => IsNoLiarTarget(_accusedPlayerId) || player.Id != _accusedPlayerId);
         private bool HasValidVote(Participant player) => player.Vote.HasValue && IsNominationTarget(player.Vote.Value);
+        private bool AllNominationsSubmitted() => ActivePlayers().Any() && ActivePlayers().All(HasValidVote);
         private bool IsNoLiarTarget(int id) => Settings.LiarMode == LiarMode.Optional && id == GameRules.NO_LIAR_TARGET;
         private bool IsNominationTarget(int id) => IsNoLiarTarget(id) || IsActive(id);
         private void AssignSeats()

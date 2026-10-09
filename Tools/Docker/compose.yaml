@@ -67,6 +67,7 @@ services:
       GameServer__NodeId: game-1
   dedicated:
     <<: *app
+    image: ${DRAWLIAR_DEDICATED_IMAGE:-${DRAWLIAR_IMAGE:-drawliar-app:current}}
     working_dir: /apps/DedicatedServer
     command: ["dotnet", "DrawLiar.DedicatedServer.dll"]
     mem_limit: 512m
@@ -80,6 +81,7 @@ services:
     ports: ["19070:19070"]
   admin:
     <<: *app
+    image: ${DRAWLIAR_ADMIN_IMAGE:-${DRAWLIAR_IMAGE:-drawliar-app:current}}
     working_dir: /apps/AdminServer
     command: ["dotnet", "DrawLiar.AdminServer.dll"]
     environment:
