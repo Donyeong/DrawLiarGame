@@ -12,7 +12,7 @@
 - 창작마당 한도와 지원 언어는 `TopicWorkshopPolicy.json`을 클라이언트·서버가 공유한다. 게시물 소유권과 계정별 한도는 서버에서 검증하고, 다운로드 시 동명인 기존 로컬 주제를 덮어쓰지 않는다.
 - 경기 코인·경험치는 서버가 완료 라운드 참가·점수로 계산하고, 전적 기록과 함께 원자적으로 한 번만 지급한다. 경험치는 코인 잔액·구매와 독립적으로 누적하고 레벨은 공유 `AccountLevelRules`로 계산한다. 클라이언트는 확정된 지급 내역만 표시한다.
 - 배포는 Ubuntu 24.04 x64의 `drawliar-dev` Compose와 `DrawLiar-Server` Jenkins 작업을 사용한다. 같은 머신의 Kona 서비스·DB·배포 경로를 변경하지 않는다. DB 볼륨과 `/srv/drawliar/dev/.env`, 인증서를 배포물에 포함하거나 삭제하지 않는다.
-- 운영툴 단독 갱신은 `ADMIN_ONLY`로 수행하고 다른 앱의 Shared DLL을 교체하지 않는다. AdminServer는 DB 마이그레이션을 실행하지 않으며, 공개 관리자 경로는 기존 인증서를 검증하는 HTTPS 프록시를 사용한다.
+- 운영툴 단독 갱신은 `ADMIN_ONLY`로 수행하고 다른 앱의 Shared DLL을 교체하지 않는다. 공개 관리자 경로는 기존 인증서를 검증하는 HTTPS 프록시를 사용한다.
 - 게임 판정 단독 갱신은 `DEDICATED_ONLY`와 확정 커밋 archive를 사용하고, 현재 core와 Shared·DB·계약·정책이 동일한지 검증한다.
 - 개발 인증·HTTP/WS는 명시적으로 허용한 로컬 개발 환경에만 사용한다. 공개 연결은 HTTPS/WSS로 유지하며 비밀 키·토큰·비밀번호를 로그에 남기지 않는다.
 - Android CI는 로컬 작업 트리를 별도 작업 폴더에 복사한다. 이를 원격 커밋 빌드로 취급하지 않는다. 서명 키·웹후크는 Jenkins Credentials로 전달하고, Firebase의 임시 APK/AAB 다운로드 링크는 Discord 전송 뒤 삭제하며 로그·보관 산출물에 넣지 않는다. Firebase AAB 배포에는 동일 패키지의 Google Play 앱 연결과 게시 상태가 필요하다.
