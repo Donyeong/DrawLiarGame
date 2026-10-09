@@ -1,0 +1,19 @@
+{
+    "name": "Febucci.TextAnimator.Demo.CurvesAndPlaybacks.Runtime",
+    "rootNamespace": "",
+    "references": [
+        "Febucci.TextAnimatorForUnity.Runtime",
+        "Unity.TextMeshPro"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [
+        "Febucci.TextAnimatorCore.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

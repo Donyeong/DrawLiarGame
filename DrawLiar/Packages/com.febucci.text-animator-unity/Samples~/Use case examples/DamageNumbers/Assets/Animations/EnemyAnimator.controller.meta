@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 2b9718798fa8e344a8e5edfbee76d3b7
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 341308
+  packageName: Text Animator for Unity | UI Toolkit and Text Mesh Pro
+  packageVersion: 3.20.1
+  assetPath: Packages/com.febucci.text-animator-unity/Samples~/Use case examples/DamageNumbers/Assets/Animations/EnemyAnimator.controller
+  uploadId: 997180

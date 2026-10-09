@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: f5887a0d32344ae7910c10ea6080082d
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 341308
+  packageName: Text Animator for Unity | UI Toolkit and Text Mesh Pro
+  packageVersion: 3.20.1
+  assetPath: Packages/com.febucci.text-animator-unity/Samples~/Quick Start/Curves
+    and Playbacks/Prefabs/Canvas Examples TMPro.prefab
+  uploadId: 997180

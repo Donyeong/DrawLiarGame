@@ -1,0 +1,31 @@
+{
+  "author": {
+    "name": "Febucci",
+    "url": "https://www.febucci.com"
+  },
+  "changelogUrl": "https://docs.febucci.com/text-animator-unity/other/changelog",
+  "description": "Bring your dialogues to life in a few and simple steps with Text Animator for Unity, working in UI Toolkit (Unity 6.3+) and TextMeshPro. Includes a powerful typewriter, many effects and much more.",
+  "displayName": "Text Animator for Unity by Febucci",
+  "documentationUrl": "https://docs.febucci.com/text-animator-unity",
+  "licensesUrl": "https://www.textanimatorforgames.com/legal/eula",
+  "name": "com.febucci.text-animator-unity",
+  "samples": [
+    {
+      "description": "The essentials to get started with Text Animator for Unity",
+      "displayName": "Quick Start",
+      "path": "Samples~/Quick Start"
+    },
+    {
+      "description": "An example of how to setup typewriter sounds",
+      "displayName": "Typewriter Sounds Example",
+      "path": "Samples~/Typewriter Sounds"
+    },
+    {
+      "description": "Extra scenes showcasing Text Animator effects",
+      "displayName": "Use case examples",
+      "path": "Samples~/Use case examples"
+    }
+  ],
+  "unity": "2022.3",
+  "version": "3.20.1"
+}

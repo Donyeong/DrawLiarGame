@@ -1,0 +1,9 @@
+fileFormatVersion: 2
+guid: 7d9709e4240944f39d6e6b6235d5fe32
+AssetOrigin:
+  serializedVersion: 1
+  productId: 341308
+  packageName: Text Animator for Unity | UI Toolkit and Text Mesh Pro
+  packageVersion: 3.20.1
+  assetPath: Packages/com.febucci.text-animator-unity/Samples~/Use case examples/DamageNumbers/Scripts/CameraShake.cs
+  uploadId: 997180

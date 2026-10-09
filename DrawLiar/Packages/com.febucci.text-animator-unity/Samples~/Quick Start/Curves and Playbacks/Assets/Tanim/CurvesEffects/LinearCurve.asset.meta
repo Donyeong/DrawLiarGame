@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 627f0e08cf7d8724785c5e830571318a
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 341308
+  packageName: Text Animator for Unity | UI Toolkit and Text Mesh Pro
+  packageVersion: 3.20.1
+  assetPath: Packages/com.febucci.text-animator-unity/Samples~/Quick Start/Curves
+    and Playbacks/Assets/Tanim/CurvesEffects/LinearCurve.asset
+  uploadId: 997180

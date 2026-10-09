@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: abc73c1b52151c0469b58c90ecee0d15
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 341308
+  packageName: Text Animator for Unity | UI Toolkit and Text Mesh Pro
+  packageVersion: 3.20.1
+  assetPath: Packages/com.febucci.text-animator-unity/Samples~/Quick Start/Curves
+    and Playbacks/Assets/Tanim/CurvesEffects/StepCurve.asset
+  uploadId: 997180

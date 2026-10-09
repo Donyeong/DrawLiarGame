@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: ca723ed99548455db776cac0276c94d6
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 341308
+  packageName: Text Animator for Unity | UI Toolkit and Text Mesh Pro
+  packageVersion: 3.20.1
+  assetPath: Packages/com.febucci.text-animator-unity/Samples~/Quick Start/Curves
+    and Playbacks/Assets/Fonts/OFL.txt
+  uploadId: 997180

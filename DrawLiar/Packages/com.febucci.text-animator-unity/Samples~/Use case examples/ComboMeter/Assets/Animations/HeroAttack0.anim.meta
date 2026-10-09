@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: fea0319bb0c60aa4c92f930bf52a69f9
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 341308
+  packageName: Text Animator for Unity | UI Toolkit and Text Mesh Pro
+  packageVersion: 3.20.1
+  assetPath: Packages/com.febucci.text-animator-unity/Samples~/Use case examples/ComboMeter/Assets/Animations/HeroAttack0.anim
+  uploadId: 997180

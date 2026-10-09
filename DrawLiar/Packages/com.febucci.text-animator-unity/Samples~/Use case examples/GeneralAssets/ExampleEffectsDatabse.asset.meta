@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: a739416f4cb99884eafae09c59849fdc
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 341308
+  packageName: Text Animator for Unity | UI Toolkit and Text Mesh Pro
+  packageVersion: 3.20.1
+  assetPath: Packages/com.febucci.text-animator-unity/Samples~/Use case examples/GeneralAssets/ExampleEffectsDatabse.asset
+  uploadId: 997180

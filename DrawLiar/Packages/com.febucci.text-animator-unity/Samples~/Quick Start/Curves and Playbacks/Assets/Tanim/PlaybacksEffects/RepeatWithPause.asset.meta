@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 667e3cedd2db84a49941f0c6fe32519d
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 341308
+  packageName: Text Animator for Unity | UI Toolkit and Text Mesh Pro
+  packageVersion: 3.20.1
+  assetPath: Packages/com.febucci.text-animator-unity/Samples~/Quick Start/Curves
+    and Playbacks/Assets/Tanim/PlaybacksEffects/RepeatWithPause.asset
+  uploadId: 997180

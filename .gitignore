@@ -22,7 +22,6 @@
 /DrawLiar/Assets/Plugins/Demigiant.meta
 /DrawLiar/Assets/I2/
 /DrawLiar/Assets/I2.meta
-/DrawLiar/Packages/com.febucci.text-animator-unity/
 
 
 # ReferenceFiles
@@ -123,6 +122,9 @@ crashlytics-build.properties
 *.unitypackage.meta
 *.csproj.meta
 *.sln.meta
+
+!/DrawLiar/Packages/com.febucci.text-animator-unity/Data~/BuiltIn.unitypackage
+!/DrawLiar/Packages/com.febucci.text-animator-unity/Data~/BuiltIn.unitypackage.meta
 
 # Unity가 자동 생성하는 사본. 실제로 쓰는 설정은 Assets/Settings 아래에 있다.
 /DrawLiar/Assets/UniversalRenderPipelineGlobalSettings.asset

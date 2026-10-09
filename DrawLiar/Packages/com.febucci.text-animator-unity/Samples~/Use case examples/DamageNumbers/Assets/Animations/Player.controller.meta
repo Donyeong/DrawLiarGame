@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 3418e7c90fd66f0458da88dbfc8b16ab
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 341308
+  packageName: Text Animator for Unity | UI Toolkit and Text Mesh Pro
+  packageVersion: 3.20.1
+  assetPath: Packages/com.febucci.text-animator-unity/Samples~/Use case examples/DamageNumbers/Assets/Animations/Player.controller
+  uploadId: 997180

@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 1a7475f7850ad6f4aa02e07059b7f1e7
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 341308
+  packageName: Text Animator for Unity | UI Toolkit and Text Mesh Pro
+  packageVersion: 3.20.1
+  assetPath: Packages/com.febucci.text-animator-unity/Samples~/Use case examples/DamageNumbers/Prefabs/DmgLabel.prefab
+  uploadId: 997180

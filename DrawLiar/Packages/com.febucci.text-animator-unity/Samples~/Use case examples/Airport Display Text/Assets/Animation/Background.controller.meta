@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 5f7d0c122a43f5f47941773c6d8f1c59
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 341308
+  packageName: Text Animator for Unity | UI Toolkit and Text Mesh Pro
+  packageVersion: 3.20.1
+  assetPath: Packages/com.febucci.text-animator-unity/Samples~/Use case examples/Airport
+    Display Text/Assets/Animation/Background.controller
+  uploadId: 997180

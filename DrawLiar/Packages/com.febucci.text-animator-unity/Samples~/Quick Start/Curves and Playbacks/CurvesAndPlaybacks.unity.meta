@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 4ee110380beaef442b8b3ab4ff02d3e4
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 341308
+  packageName: Text Animator for Unity | UI Toolkit and Text Mesh Pro
+  packageVersion: 3.20.1
+  assetPath: Packages/com.febucci.text-animator-unity/Samples~/Quick Start/Curves
+    and Playbacks/CurvesAndPlaybacks.unity
+  uploadId: 997180

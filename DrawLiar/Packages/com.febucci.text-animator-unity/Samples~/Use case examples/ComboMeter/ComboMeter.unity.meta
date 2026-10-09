@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 2e78eade4c2f46b44a1fd9d681c1c1f9
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 341308
+  packageName: Text Animator for Unity | UI Toolkit and Text Mesh Pro
+  packageVersion: 3.20.1
+  assetPath: Packages/com.febucci.text-animator-unity/Samples~/Use case examples/ComboMeter/ComboMeter.unity
+  uploadId: 997180

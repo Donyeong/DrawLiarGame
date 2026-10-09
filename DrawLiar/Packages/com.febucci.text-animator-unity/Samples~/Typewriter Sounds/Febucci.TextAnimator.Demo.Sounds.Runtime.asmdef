@@ -1,0 +1,27 @@
+{
+    "name": "Febucci.TextAnimator.Demo.Sounds.Runtime",
+    "rootNamespace": "",
+    "references": [
+        "Febucci.TextAnimatorForUnity.Runtime",
+        "Febucci.Attributes.Runtime"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [
+        "Febucci.TextAnimatorCore.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "TANIM_AUDIO_PRESENT"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.unity.modules.audio",
+            "expression": "1.0.0",
+            "define": "TANIM_AUDIO_PRESENT"
+        }
+    ],
+    "noEngineReferences": false
+}

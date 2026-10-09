@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 3c3ac2f003121014684a6760b4b1c404
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 341308
+  packageName: Text Animator for Unity | UI Toolkit and Text Mesh Pro
+  packageVersion: 3.20.1
+  assetPath: Packages/com.febucci.text-animator-unity/Samples~/Use case examples/DamageNumbers/DamageNumbers.unity
+  uploadId: 997180
