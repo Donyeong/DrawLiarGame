@@ -346,7 +346,13 @@
 .mobile.keyboard-open .lobby-chat-modal .lobby-chat-composer { margin-top: 4px; }
 .app.mobile.keyboard-open .lobby-chat-modal .lobby-chat-composer, .app.mobile.keyboard-open .lobby-chat-modal .lobby-chat-input, .app.mobile.keyboard-open .lobby-chat-modal .lobby-chat-send, .app.mobile.keyboard-open .lobby-chat-modal .lobby-chat-close { height: 44px; min-height: 44px; }
 .mobile.in-game .mobile-waiting .mobile-workspace { flex-direction: column; }
+.mobile.in-game .mobile-waiting .mobile-play-stage { width: 100%; min-height: 0; flex-grow: 0; flex-shrink: 0; }
+.mobile.in-game .mobile-waiting .mobile-play-side { min-width: 0; min-height: 0; }
 .mobile.in-game .mobile-waiting .mobile-controls-scroll { width: 100%; flex-grow: 1; flex-basis: 0; min-height: 0; }
+.mobile.in-game .mobile-waiting .tool-row { margin-bottom: 4px; }
+.mobile.in-game .mobile-waiting .tool-row .button { height: 44px; min-height: 44px; padding: 2px 6px; font-size: 14px; margin-right: 6px; }
+.mobile.in-game .mobile-waiting .palette { width: 100%; height: auto; min-height: 40px; flex-wrap: wrap; margin-bottom: 4px; }
+.mobile.in-game .mobile-waiting .palette .swatch { width: 36px; height: 40px; min-width: 36px; min-height: 40px; margin: 0 2px 4px 0; padding: 0; }
 .mobile.in-game .mobile-waiting .mobile-roster-scroll { height: auto; min-height: 0; }
 .mobile.in-game .mobile-waiting .players-strip { width: 100%; max-width: 402px; height: auto; min-height: 0; flex-direction: row; flex-wrap: wrap; }
 .mobile.in-game .mobile-waiting .player, .mobile.in-game .mobile-waiting .crowded .player { width: 96px; height: 144px; min-height: 0; margin: 0 6px 6px 0; padding: 44px 4px 4px; border-radius: 12px; }
@@ -364,9 +370,18 @@
 .mobile.in-game .mobile-waiting .phase-actions .button { margin-bottom: 8px; }
 .mobile.in-game .mobile-waiting .chat-open { width: 100%; }
 .mobile-landscape.in-game .mobile-waiting .mobile-round-card { display: flex; }
+.mobile-landscape.in-game .mobile-waiting .mobile-room-info-actions { flex-direction: row; align-items: center; }
+.app.mobile-landscape .mobile-waiting .mobile-room-info-actions .waiting-room-topics { margin: 0 0 0 6px; }
 .mobile-landscape.in-game .mobile-waiting .mobile-workspace { flex-direction: row; align-items: stretch; }
-.mobile-landscape.in-game .mobile-waiting .mobile-controls-scroll { width: auto; flex-grow: 1; flex-basis: 0; margin-right: 12px; }
-.mobile-landscape.in-game .mobile-waiting .mobile-bottom-actions { width: 200px; padding-top: 26px; }
+.mobile-landscape.in-game .mobile-waiting .mobile-play-stage { width: auto; flex-grow: 3; flex-basis: 0; flex-shrink: 1; margin-right: 8px; }
+.mobile-landscape.in-game .mobile-waiting .mobile-play-side { width: auto; flex-grow: 2; flex-basis: 0; }
+.mobile-landscape.in-game .mobile-waiting .mobile-controls-scroll { width: 100%; flex-grow: 1; flex-shrink: 1; flex-basis: 0; margin: 0; }
+.mobile-landscape.in-game .mobile-waiting .mobile-bottom-actions { width: 100%; padding-top: 4px; }
+.app.mobile.mobile-landscape .mobile-waiting .mobile-action-row { flex-direction: row; align-items: center; }
+.mobile-landscape.in-game .mobile-waiting .phase-actions { flex-grow: 1; flex-basis: 0; min-width: 0; margin-right: 6px; }
+.mobile-landscape.in-game .mobile-waiting .phase-actions .button { min-height: 44px; height: 44px; font-size: 14px; margin: 0 0 4px; }
+.mobile-landscape.in-game .mobile-waiting .phase-actions .muted { font-size: 12px; }
+.mobile-landscape.in-game .mobile-waiting .chat-open { width: 104px; height: 44px; min-height: 44px; padding: 4px; font-size: 14px; }
 .mobile .draw-button-scale { scale: 1 1; translate: 0 0; transition-property: background-color, border-color, scale, opacity; transition-duration: .10s; }
 .mobile .draw-button-scale.draw-pressed { scale: 0.94 0.94; transition-duration: .08s; }
 .mobile .draw-button-scale.draw-released { scale: 1.03 1.03; transition-duration: .07s; }
@@ -476,7 +491,7 @@
 .app.mobile-landscape #create-room-name { flex-basis: 0; }
 .app.mobile-landscape #create-privacy { width: 240px; margin-left: 16px; }
 .mobile.in-game .mobile-live-round { font-size: 12px; color: #817A87; margin: 0; }
-.mobile.in-game .mobile-waiting .mobile-action-row { flex-direction: column; }
+.mobile.in-game .mobile-waiting .mobile-action-row { width: 100%; min-width: 0; flex-shrink: 0; flex-direction: column; }
 .mobile.in-game .mobile-playing { padding: 8px 12px; }
 .mobile.in-game .mobile-playing .room-hud { height: 44px; min-height: 44px; margin-bottom: 4px; }
 .mobile.in-game .mobile-playing .phase-bar { height: 44px; min-height: 44px; flex-direction: column; align-items: flex-start; justify-content: center; }
@@ -543,8 +558,8 @@
 .mobile.in-game .mobile-playing .player .player-score { height: 12px; }
 .mobile.in-game .mobile-playing .mobile-play-stage { flex-grow: 1; flex-basis: 0; min-height: 0; width: 100%; }
 .mobile.in-game .mobile-playing .mobile-play-side { display: none; }
-.mobile.in-game .mobile-playing .canvas-frame { width: 100%; height: auto; min-height: 0; flex-grow: 1; flex-basis: 0; flex-shrink: 1; margin: 0 0 6px; align-items: center; justify-content: center; overflow: hidden; background-color: #F7F3EA; border-width: 0; border-radius: 0; }
-.mobile.in-game .mobile-playing .drawing-surface { flex-grow: 0; flex-shrink: 0; border-width: 1px; border-color: #E3DDD4; }
+.mobile.in-game .mobile-playing .canvas-frame, .mobile.in-game .mobile-waiting .canvas-frame { width: 100%; height: auto; min-height: 0; flex-grow: 1; flex-basis: 0; flex-shrink: 1; margin: 0 0 6px; align-items: center; justify-content: center; overflow: hidden; background-color: #F7F3EA; border-width: 0; border-radius: 0; }
+.mobile.in-game .mobile-playing .drawing-surface, .mobile.in-game .mobile-waiting .drawing-surface { flex-grow: 0; flex-shrink: 0; border-width: 1px; border-color: #E3DDD4; }
 .mobile.in-game .mobile-playing .mobile-controls { flex-shrink: 0; padding: 0; }
 .mobile.in-game .mobile-playing .mobile-controls > * { margin-bottom: 0; }
 .mobile.in-game .mobile-playing .tools { margin-bottom: 4px; }

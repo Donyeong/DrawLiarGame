@@ -35,7 +35,7 @@ namespace DrawLiar
         {
             if (State == null || State.DrawingEpoch != _drawingEpoch || State.Round != _drawingRound
                 || !_authorDrawings.TryGetValue(playerId, out var drawing)
-                || State.Settings.Mode == DrawingMode.Relay && drawing.Version != _canvasVersion)
+                || (State.Phase == GamePhase.Lobby || State.Settings.Mode == DrawingMode.Relay) && drawing.Version != _canvasVersion)
                 return Array.Empty<DrawStroke>();
             return drawing.View;
         }

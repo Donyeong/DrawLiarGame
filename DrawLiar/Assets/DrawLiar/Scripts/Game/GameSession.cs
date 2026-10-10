@@ -70,6 +70,7 @@ namespace DrawLiar
         public bool Contains(int id) => players.TryGetValue(id, out var player) && player.Connected;
         public bool HasParticipant(int id) => players.ContainsKey(id);
         public bool IsSpectator(int id) => players.TryGetValue(id, out var player) && player.Spectator;
+        public bool CanDraw(int id) => IsActive(id) && (Phase == GamePhase.Lobby || Phase == GamePhase.Drawing && ArtistId == id);
         public bool HoldsPlayerSeat(int id) => players.TryGetValue(id, out var player) && !player.Spectator && (player.Connected || player.SeatReserved);
         public bool HoldsSpectatorSeat(int id) => players.TryGetValue(id, out var player) && player.Spectator && (player.Connected || player.SeatReserved);
 

@@ -182,6 +182,7 @@ def main():
             previous_admin_image = admin_state.read_text().strip() if admin_state.exists() else previous_image
             previous_dedicated_image = dedicated_state.read_text().strip() if dedicated_state.exists() else previous_image
             run('docker', 'build', '-f', str(TEMPLATES/'Dockerfile.dedicated'), '--build-arg', 'DRAWLIAR_BASE_IMAGE='+previous_image, '-t', image, str(context))
+            require_no_active_games()
             shutil.copyfile(TEMPLATES/'compose.yaml', current)
             deploy_dedicated(current, image, previous_image, previous_admin_image, previous_dedicated_image)
             incoming.unlink()

@@ -62,8 +62,8 @@ namespace DrawLiar
             _mobileRoomStack.EnableInClassList("mobile-compact", !portrait || _mobileLayout.AvailableSize.y < 830);
             _mobileRoundCard.style.display = waiting ? DisplayStyle.Flex : DisplayStyle.None;
             _mobileLiveRound.style.display = waiting ? DisplayStyle.None : DisplayStyle.Flex;
-            _mobilePlayStage.style.display = waiting ? DisplayStyle.None : DisplayStyle.Flex;
-            _mobilePlaySide.style.display = waiting || portrait ? DisplayStyle.None : DisplayStyle.Flex;
+            _mobilePlayStage.style.display = DisplayStyle.Flex;
+            _mobilePlaySide.style.display = portrait ? DisplayStyle.None : DisplayStyle.Flex;
             _mobileRoomScroll.style.display = waiting ? DisplayStyle.Flex : DisplayStyle.None;
             _mobileRosterScroll.style.display = waiting ? DisplayStyle.Flex : DisplayStyle.None;
             if (!waiting && !portrait)
@@ -77,7 +77,9 @@ namespace DrawLiar
                 if (_mobileRoster.parent != _mobileControls) _mobileControls.Add(_mobileRoster);
                 if (playerStrip.parent != _mobileRosterScroll.contentContainer) _mobileRosterScroll.Add(playerStrip);
                 if (_judgmentPanel.parent != _mobileActions) _mobileActions.Insert(0, _judgmentPanel);
-                if (_mobileActions.parent != _mobileWorkspace) _mobileWorkspace.Add(_mobileActions);
+                var sideParent = portrait ? _mobileWorkspace : _mobilePlaySide;
+                if (_mobileRoomScroll.parent != sideParent) sideParent.Add(_mobileRoomScroll);
+                if (_mobileActions.parent != sideParent) sideParent.Add(_mobileActions);
             }
             else
             {
@@ -113,7 +115,16 @@ namespace DrawLiar
         private void RefreshMobileRoomGeometry()
         {
             if (!IsMobile || _mobileWorkspace == null || playerStrip?.panel == null) return;
-            if (_mobileRoomStack.ClassListContains("mobile-waiting")) { SizeMobileWaitingPlayers(); return; }
+            if (_mobileRoomStack.ClassListContains("mobile-waiting"))
+            {
+                SizeMobileWaitingPlayers();
+                _mobilePlayStage.style.height = _mobileLayout.IsPortrait
+                    ? new StyleLength(Mathf.Min(_mobileWorkspace.contentRect.width / DrawingSurface.AspectRatio, _mobileLayout.AvailableSize.y * .36f))
+                    : new StyleLength(StyleKeyword.Null);
+                SizeMobileCanvas();
+                return;
+            }
+            _mobilePlayStage.style.height = StyleKeyword.Null;
             float width = _mobileRoster.contentRect.width;
             if (width > 0)
             {

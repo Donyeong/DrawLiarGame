@@ -1692,7 +1692,7 @@ namespace DrawLiar
                 bool waiting=state.Phase==GamePhase.Lobby;
                 _mobileRoomStack.EnableInClassList("mobile-waiting",waiting);
                 _mobileRoomStack.EnableInClassList("mobile-playing",!waiting);
-                _mobileCanvas.style.display=waiting?DisplayStyle.None:DisplayStyle.Flex;
+                _mobileCanvas.style.display=DisplayStyle.Flex;
                 _mobileSecret.style.display=waiting?DisplayStyle.None:DisplayStyle.Flex;
                 var rosterMode=ScrollViewMode.Vertical;
                 if(_mobileRosterScroll.mode!=rosterMode)

@@ -152,8 +152,7 @@ internal sealed partial class DedicatedRoom
             {
                 _session.Tick(now);
                 if (_dirty) BroadcastSnapshotsLocked(now);
-                if (_session.Phase != GamePhase.Drawing || _session.ArtistId != connection.PlayerId
-                    || !GameRules.ValidStroke(envelope.Stroke, _session.CanvasVersion)) return;
+                if (!_session.CanDraw(connection.PlayerId) || !GameRules.ValidStroke(envelope.Stroke, _session.CanvasVersion)) return;
                 if (_canvas.Count >= GameRules.MAX_CANVAS_STROKES || _drawingHistory.Count >= GameRules.MAX_ROUND_STROKES)
                 {
                     NoticeLocked(connection, "이 캔버스에 더 이상 선을 추가할 수 없어요. 차례를 마쳐 주세요.");
@@ -289,7 +288,8 @@ internal sealed partial class DedicatedRoom
 
     private void RemoveUnusedPlayerIdsLocked()
     {
-        foreach (var pair in _playerIds.Where(pair => !_session.HasParticipant(pair.Value)).ToArray())
+        var lobbyAuthors = _session.Phase == GamePhase.Lobby ? _canvas.Select(stroke => stroke.AuthorPlayerId).ToHashSet() : null;
+        foreach (var pair in _playerIds.Where(pair => !_session.HasParticipant(pair.Value) && lobbyAuthors?.Contains(pair.Value) != true).ToArray())
             _playerIds.Remove(pair.Key);
     }
 

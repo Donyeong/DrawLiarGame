@@ -20,8 +20,8 @@ internal sealed partial class DedicatedRoom
     private bool ClearOwnLocked(GameConnection connection, GameplayEnvelope envelope, double now)
     {
         _session.Tick(now);
-        if (_session.Phase != GamePhase.Drawing || _session.ArtistId != connection.PlayerId
-            || envelope.Version != _session.CanvasVersion || envelope.Round != _session.Round || envelope.DrawingEpoch != _drawingEpoch
+        if (!_session.CanDraw(connection.PlayerId) || envelope.Version != _session.CanvasVersion
+            || envelope.Round != _session.Round || envelope.DrawingEpoch != _drawingEpoch
             || envelope.Target != 0 && envelope.Target != connection.PlayerId) return false;
         int removed = _canvas.RemoveAll(stroke => stroke.AuthorPlayerId == connection.PlayerId);
         if (removed == 0) return true;

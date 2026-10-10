@@ -167,8 +167,9 @@ class DeploymentTests(unittest.TestCase):
                 return io.StringIO() if path=='/var/lock/drawliar-deploy.lock' else real_open(path,*args,**kwargs)
             def upload(incoming,archive,owner,checksum): archive.write_bytes(payload)
             def compose_result(path,image,*args,**kwargs): return types.SimpleNamespace(stdout=json.dumps([{'Service':'dedicated','Health':'healthy'}]))
-            with mock.patch.object(deploy,'BASE',base), mock.patch.object(deploy,'RELEASES',releases), mock.patch.object(deploy,'TEMPLATES',templates), mock.patch.object(sys,'argv',['deploy.py',release,'0'*64,'dedicated']), mock.patch.object(os,'geteuid',return_value=0,create=True), mock.patch.object(deploy.fcntl,'flock',create=True), mock.patch.object(deploy.fcntl,'LOCK_EX',1,create=True), mock.patch.object(deploy.fcntl,'LOCK_NB',2,create=True), mock.patch.object(deploy.pwd,'getpwnam',return_value=types.SimpleNamespace(pw_uid=1),create=True), mock.patch('builtins.open',side_effect=open_lock), mock.patch.object(deploy,'require_templates'), mock.patch.object(deploy,'copy_upload',side_effect=upload), mock.patch.object(deploy,'run') as run, mock.patch.object(deploy,'compose',side_effect=compose_result) as compose, mock.patch.object(pathlib.Path,'unlink') as unlink:
+            with mock.patch.object(deploy,'BASE',base), mock.patch.object(deploy,'RELEASES',releases), mock.patch.object(deploy,'TEMPLATES',templates), mock.patch.object(sys,'argv',['deploy.py',release,'0'*64,'dedicated']), mock.patch.object(os,'geteuid',return_value=0,create=True), mock.patch.object(deploy.fcntl,'flock',create=True), mock.patch.object(deploy.fcntl,'LOCK_EX',1,create=True), mock.patch.object(deploy.fcntl,'LOCK_NB',2,create=True), mock.patch.object(deploy.pwd,'getpwnam',return_value=types.SimpleNamespace(pw_uid=1),create=True), mock.patch('builtins.open',side_effect=open_lock), mock.patch.object(deploy,'require_templates'), mock.patch.object(deploy,'require_no_active_games') as gate, mock.patch.object(deploy,'copy_upload',side_effect=upload), mock.patch.object(deploy,'run') as run, mock.patch.object(deploy,'compose',side_effect=compose_result) as compose, mock.patch.object(pathlib.Path,'unlink') as unlink:
                 deploy.main()
+                gate.assert_called_once_with()
                 run.assert_called_once_with('docker','build','-f',str(templates/'Dockerfile.dedicated'),'--build-arg','DRAWLIAR_BASE_IMAGE=live-core','-t','drawliar-app:'+release,str(releases/release/'context'))
                 self.assertEqual(compose.call_args_list,[
                     mock.call(base/'compose.yaml','live-core','up','-d','--no-deps','dedicated',admin_image='live-admin',dedicated_image='drawliar-app:'+release),
@@ -254,12 +255,18 @@ class DeploymentTests(unittest.TestCase):
     def test_full_rollout_checks_readonly_game_state_before_stopping_and_resets_overrides(self):
         self.full_rollout_gate('0\n')
 
+    def test_dedicated_rollout_checks_readonly_game_state_before_up_and_preserves_core(self):
+        self.full_rollout_gate('0\n', mode='dedicated')
+
+    def test_dedicated_rollout_active_game_preserves_live_apps_config_and_markers(self):
+        self.full_rollout_gate('1\n', rejected=True, mode='dedicated')
+
     def test_full_rollout_active_game_invalid_state_and_query_failure_preserve_live_apps(self):
         for state in ('1\n', 'invalid', '-1', '0\n1', '', subprocess.CalledProcessError(1, ['docker', 'exec']), OSError('query failed')):
             with self.subTest(state=type(state).__name__ if isinstance(state, Exception) else state):
                 self.full_rollout_gate(state, rejected=True)
 
-    def full_rollout_gate(self, state, rejected=False):
+    def full_rollout_gate(self, state, rejected=False, mode='all'):
         with tempfile.TemporaryDirectory() as directory:
             root = pathlib.Path(directory)
             base, releases, templates = root/'base', root/'releases', root/'templates'
@@ -269,9 +276,10 @@ class DeploymentTests(unittest.TestCase):
             for name, image in (('current-image','old-core'), ('current-admin-image','old-admin'), ('current-dedicated-image','old-dedicated')):
                 (base/name).write_text(image+'\n')
             entries = []
-            for app in deploy.APP_SERVICES:
+            for app in (('DedicatedServer',) if mode == 'dedicated' else deploy.APP_SERVICES):
                 entries += [('Apps/'+app+'/'+name,b'app') for name in ('DrawLiar.'+app+'.dll','DrawLiar.'+app+'.deps.json','DrawLiar.'+app+'.runtimeconfig.json','DrawLiar.Shared.dll')]
-            entries += [('Apps/AdminServer/wwwroot/'+name,b'asset') for name in ('index.html','console.js','console.css')]
+            if mode == 'all':
+                entries += [('Apps/AdminServer/wwwroot/'+name,b'asset') for name in ('index.html','console.js','console.css')]
             payload = self.package(root,entries).read_bytes()
             release = 'release-20261009000000-1234abcd'
             image = 'drawliar-app:'+release
@@ -294,7 +302,7 @@ class DeploymentTests(unittest.TestCase):
                 events.append(args[0])
                 if args[:2] == ('exec','-T'): kwargs['stdout'].write(b'private-backup')
                 return types.SimpleNamespace(stdout=json.dumps([{'Service':service,'Health':'healthy'} for service in ('db','main','game','dedicated','admin')]))
-            with mock.patch.object(deploy,'BASE',base), mock.patch.object(deploy,'RELEASES',releases), mock.patch.object(deploy,'TEMPLATES',templates), mock.patch.object(sys,'argv',['deploy.py',release,'0'*64,'all']), mock.patch.object(os,'geteuid',return_value=0,create=True), mock.patch.object(deploy.fcntl,'flock',create=True), mock.patch.object(deploy.fcntl,'LOCK_EX',1,create=True), mock.patch.object(deploy.fcntl,'LOCK_NB',2,create=True), mock.patch.object(deploy.pwd,'getpwnam',return_value=types.SimpleNamespace(pw_uid=1),create=True), mock.patch('builtins.open',side_effect=open_lock), mock.patch.object(deploy,'require_templates'), mock.patch.object(deploy,'copy_upload',side_effect=upload), mock.patch.object(deploy,'run',side_effect=run_result), mock.patch.object(deploy.subprocess,'run',return_value=types.SimpleNamespace(returncode=0)), mock.patch.object(deploy,'compose',side_effect=compose_result) as compose, mock.patch.object(pathlib.Path,'unlink') as unlink:
+            with mock.patch.object(deploy,'BASE',base), mock.patch.object(deploy,'RELEASES',releases), mock.patch.object(deploy,'TEMPLATES',templates), mock.patch.object(sys,'argv',['deploy.py',release,'0'*64,mode]), mock.patch.object(os,'geteuid',return_value=0,create=True), mock.patch.object(deploy.fcntl,'flock',create=True), mock.patch.object(deploy.fcntl,'LOCK_EX',1,create=True), mock.patch.object(deploy.fcntl,'LOCK_NB',2,create=True), mock.patch.object(deploy.pwd,'getpwnam',return_value=types.SimpleNamespace(pw_uid=1),create=True), mock.patch('builtins.open',side_effect=open_lock), mock.patch.object(deploy,'require_templates'), mock.patch.object(deploy,'copy_upload',side_effect=upload), mock.patch.object(deploy,'run',side_effect=run_result), mock.patch.object(deploy.subprocess,'run',return_value=types.SimpleNamespace(returncode=0)), mock.patch.object(deploy,'compose',side_effect=compose_result) as compose, mock.patch.object(pathlib.Path,'unlink') as unlink:
                 if rejected:
                     with self.assertRaises(RuntimeError): deploy.main()
                     compose.assert_not_called(); unlink.assert_not_called()
@@ -304,12 +312,21 @@ class DeploymentTests(unittest.TestCase):
                         self.assertEqual((base/name).read_text(),old+'\n')
                 else:
                     deploy.main()
-                    self.assertEqual(events[:3],['build','query','stop'])
-                    self.assertEqual(compose.call_args_list[0].args[2:],('stop','dedicated','game','admin','main'))
-                    self.assertEqual((base/'backups'/release/'drawliar.sql').read_bytes(),b'private-backup')
-                    self.assertEqual(compose.call_args_list[2].kwargs,{'dedicated_image':image})
-                    for name in ('current-image','current-admin-image','current-dedicated-image'):
-                        self.assertEqual((base/name).read_text(),image+'\n')
+                    if mode == 'all':
+                        self.assertEqual(events[:3],['build','query','stop'])
+                        self.assertEqual(compose.call_args_list[0].args[2:],('stop','dedicated','game','admin','main'))
+                        self.assertEqual((base/'backups'/release/'drawliar.sql').read_bytes(),b'private-backup')
+                        self.assertEqual(compose.call_args_list[2].kwargs,{'dedicated_image':image})
+                        for name in ('current-image','current-admin-image','current-dedicated-image'):
+                            self.assertEqual((base/name).read_text(),image+'\n')
+                    else:
+                        self.assertEqual(events[:3],['build','query','up'])
+                        self.assertEqual(compose.call_args_list[0].args[2:],('up','-d','--no-deps','dedicated'))
+                        self.assertEqual(compose.call_args_list[0].kwargs,{'admin_image':'old-admin','dedicated_image':image})
+                        self.assertFalse((base/'backups').exists())
+                        self.assertEqual((base/'current-image').read_text(),'old-core\n')
+                        self.assertEqual((base/'current-admin-image').read_text(),'old-admin\n')
+                        self.assertEqual((base/'current-dedicated-image').read_text(),image+'\n')
                     unlink.assert_called_once()
                 self.assertEqual((base/'.env').read_text(),'protected-environment')
 

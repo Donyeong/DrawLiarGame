@@ -10,10 +10,104 @@ internal static partial class Integration
 {
     private static async Task VerifyDrawingHistoryAsync()
     {
+        await VerifyLobbyDrawingAsync(DrawingMode.Relay);
+        await VerifyLobbyDrawingAsync(DrawingMode.Individual);
         await VerifyRelayDrawingAsync();
         await VerifyIndividualDrawingAsync();
         await VerifyDrawingBatchAsync();
-        Report("서버 작가 지정·흰색 브러시·자기 선 삭제·개인 그림 조회·재접속·epoch 정리·64KiB 배치 검증");
+        Report("대기실 공동 낙서·시작 초기화·서버 작가 지정·자기 선 삭제·개인 그림 조회·재접속·epoch 정리·64KiB 배치 검증");
+    }
+
+    private static async Task VerifyLobbyDrawingAsync(DrawingMode mode)
+    {
+        await using var fixture = new DrawingFixture(mode);
+        await fixture.FlushAsync();
+        int host = fixture.Host.PlayerId;
+        int second = fixture.State.Players.First(player => !player.IsSpectator && player.Id != host).Id;
+        int third = fixture.State.Players.First(player => !player.IsSpectator && player.Id != host && player.Id != second).Id;
+        int version = fixture.State.CanvasVersion, epoch = fixture.State.DrawingEpoch;
+        Check(fixture.State.Phase == GamePhase.Lobby && fixture.State.Round == 0 && fixture.State.DrawingOrder.Length == 0,
+            "대기실 낙서는 경기의 라운드와 그리기 순서를 만들면 안 됩니다.");
+        fixture.Paint(fixture.Host, spoofAuthor: second);
+        fixture.Paint(fixture.Connection(second), eraser: true, spoofAuthor: host);
+        fixture.Paint(fixture.Connection(third));
+        await fixture.FlushAsync();
+        var strokes = fixture.Socket(host).Frames.Where(frame => frame.Type == "stroke").Select(frame => frame.Stroke).ToArray();
+        Check(strokes.Length == 3 && strokes.Select(stroke => stroke.AuthorPlayerId).SequenceEqual(new[] { host, second, third })
+            && strokes.All(stroke => stroke.CanvasVersion == version) && !strokes[1].Eraser && strokes[1].R == 255,
+            "대기실은 방식과 차례에 관계없이 일반 참가자가 같은 종이에 그리고 서버가 실제 작가를 지정해야 합니다.");
+        fixture.Paint(fixture.Observer);
+        fixture.Room.Receive(fixture.Host, new GameplayEnvelope { Type = "stroke", Stroke = DrawingFixture.Stroke(version - 1) }, fixture.Now += .02);
+        await fixture.FlushAsync();
+        Check(fixture.Socket(host).Frames.Count(frame => frame.Type == "stroke") == 3,
+            "대기실에서도 관전자와 오래된 캔버스 버전의 선을 거부해야 합니다.");
+        foreach (var invalid in new[]
+        {
+            new GameplayEnvelope { Type = "request", Kind = "clearOwn", Target = second, Version = version, Round = 0, DrawingEpoch = epoch },
+            new GameplayEnvelope { Type = "request", Kind = "clearOwn", Target = host, Version = version - 1, Round = 0, DrawingEpoch = epoch },
+            new GameplayEnvelope { Type = "request", Kind = "clearOwn", Target = host, Version = version, Round = 1, DrawingEpoch = epoch },
+            new GameplayEnvelope { Type = "request", Kind = "clearOwn", Target = host, Version = version, Round = 0, DrawingEpoch = epoch + 1 }
+        }) fixture.Send(fixture.Host, invalid);
+        fixture.Send(fixture.Observer, fixture.Request("clearOwn", fixture.Observer.PlayerId));
+        await fixture.FlushAsync();
+        Check(fixture.Socket(host).Frames.All(frame => frame.Type != "clearOwn"),
+            "대기실에서 다른 사람의 선과 관전자 삭제, 버전·라운드·epoch 위조를 거부해야 합니다.");
+        fixture.Send(fixture.Host, fixture.Request("clearOwn", host));
+        fixture.Paint(fixture.Connection(second));
+        await fixture.FlushAsync();
+        var late = await fixture.JoinAsync("lobby-late", false);
+        var replay = late.Socket.Frames.Where(frame => frame.Type == "canvas").SelectMany(frame => frame.Strokes).ToArray();
+        Check(replay.Length == 3 && replay.Count(stroke => stroke.AuthorPlayerId == second) == 2
+            && replay.Single(stroke => stroke.AuthorPlayerId != second).AuthorPlayerId == third,
+            "대기실 중도 입장은 개인 그리기 설정에서도 공동 낙서 전체와 삭제 결과를 받아야 합니다.");
+        var oldSecond = fixture.Connection(second);
+        fixture.Room.Disconnect(oldSecond, fixture.Now += .02);
+        await oldSecond.DisposeAsync();
+        var rejoined = await fixture.JoinAsync(oldSecond.AccountId, false);
+        Check(rejoined.Connection.PlayerId == second
+            && rejoined.Socket.Frames.Where(frame => frame.Type == "canvas").SelectMany(frame => frame.Strokes).Count() == 3,
+            "대기실 재접속은 종이에 남아 있는 작가 ID를 복원하고 공동 낙서를 빠짐없이 받아야 합니다.");
+        fixture.Send(rejoined.Connection, fixture.Request("clearOwn", second));
+        await fixture.FlushAsync();
+        Check(rejoined.Socket.Frames.Last(frame => frame.Type == "clearOwn").Target == second,
+            "대기실 재접속 후 이전에 그린 자기 선도 삭제할 수 있어야 합니다.");
+        var remaining = await fixture.JoinAsync("lobby-observer", true);
+        Check(remaining.Socket.Frames.Where(frame => frame.Type == "canvas").SelectMany(frame => frame.Strokes).Single().AuthorPlayerId == third,
+            "자기 선 삭제는 다른 대기실 참가자의 그림을 보존해야 합니다.");
+        string unavailable = fixture.RequestHistory(remaining.Connection, third);
+        await fixture.FlushAsync();
+        Check(remaining.Socket.Frames.Single(frame => frame.RequestId == unavailable).Code == "DrawingUnavailable",
+            "대기실 공동 낙서는 별도 경기 작가 조회 권한을 만들면 안 됩니다.");
+        var departed = fixture.Connection(third);
+        fixture.Room.Disconnect(departed, fixture.Now += .02);
+        await departed.DisposeAsync();
+        await fixture.StartAsync();
+        var canvas = (List<DrawStroke>)typeof(DedicatedRoom).GetField("_canvas", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(fixture.Room)!;
+        var history = (List<DrawStroke>)typeof(DedicatedRoom).GetField("_drawingHistory", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(fixture.Room)!;
+        var authors = (Dictionary<string, int>)typeof(DedicatedRoom).GetField("_playerIds", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(fixture.Room)!;
+        Check(fixture.State.Round == 1 && fixture.State.DrawingEpoch > epoch && fixture.State.CanvasVersion > version
+            && canvas.Count == 0 && history.Count == 0 && !authors.ContainsKey(departed.AccountId),
+            "경기를 시작하면 대기실 종이·그림 기록·퇴장한 작가 보존값을 모두 정리해야 합니다.");
+        int activeArtist = fixture.State.ArtistId;
+        int previous = fixture.Socket(host).Frames.Count(frame => frame.Type == "stroke");
+        fixture.Room.Receive(fixture.Connection(activeArtist), new GameplayEnvelope { Type = "stroke", Stroke = DrawingFixture.Stroke(version) }, fixture.Now += .02);
+        fixture.Paint(fixture.Connection(fixture.State.Players.First(player => !player.IsSpectator && player.Id != activeArtist).Id));
+        await fixture.FlushAsync();
+        Check(fixture.Socket(host).Frames.Count(frame => frame.Type == "stroke") == previous,
+            "경기 시작 뒤에는 대기실 버전의 선과 현재 차례가 아닌 참가자의 그림을 거부해야 합니다.");
+        fixture.Paint(fixture.Connection(activeArtist));
+        for (int index = 0; index < 20 && fixture.Room.Status().IsInProgress; index++) { fixture.Now += 1000; fixture.Room.Tick(fixture.Now); }
+        await fixture.FlushAsync();
+        Check(fixture.State.Phase == GamePhase.MatchResults, "대기실 복귀 검증을 위해 경기를 완료해야 합니다.");
+        fixture.Send(fixture.Host, new GameplayEnvelope { Type = "request", Kind = "lobby" });
+        await fixture.FlushAsync();
+        Check(fixture.State.Phase == GamePhase.Lobby && fixture.State.Round == 0 && canvas.Count == 0 && history.Count == 0,
+            "경기에서 대기실로 돌아오면 이전 경기 그림과 기록 없이 새 공동 종이를 열어야 합니다.");
+        fixture.Paint(fixture.Host);
+        await fixture.FlushAsync();
+        Check(canvas.Count == 1 && canvas[0].AuthorPlayerId == host, "대기실 복귀 후에도 일반 참가자가 즉시 낙서할 수 있어야 합니다.");
+        await fixture.StartAsync();
+        Check(canvas.Count == 0 && history.Count == 0, "다음 경기 시작 때도 대기실 낙서를 다시 비워야 합니다.");
     }
 
     private static async Task VerifyRelayDrawingAsync()

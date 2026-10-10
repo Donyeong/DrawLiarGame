@@ -45,7 +45,9 @@ namespace DrawLiar
         public bool IsConnected => _socket != null && _socket.State == WebSocketState.Open && State != null;
         public int LocalPlayerId => State?.LocalPlayerId ?? -1;
         public int CanvasVersion => _canvasVersion;
-        public bool CanDraw => IsConnected && State.Phase == GamePhase.Drawing && State.ArtistId == LocalPlayerId && !State.LocalIsSpectator;
+        public bool CanDraw => IsConnected && !State.LocalIsSpectator
+            && State.Players.Any(player => player.Id == LocalPlayerId && player.IsConnected && !player.IsSpectator)
+            && (State.Phase == GamePhase.Lobby || State.Phase == GamePhase.Drawing && State.ArtistId == LocalPlayerId);
         public event Action<RoomSnapshot> StateChanged;
         public event Action<DrawStroke> StrokeReceived;
         public event Action CanvasCleared;
