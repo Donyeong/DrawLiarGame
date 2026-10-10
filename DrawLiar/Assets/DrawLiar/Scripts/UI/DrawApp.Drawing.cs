@@ -141,7 +141,7 @@ namespace DrawLiar
             {
                 if(!IsMobile||!_previewAuthorId.HasValue||evt.button!=0||surface?.parent!=frame
                     ||!surface.contentRect.Contains(surface.WorldToLocal(evt.position)))return;
-                ClearDrawingPreview();
+                surface.CancelDrawing();ClearDrawingPreview();
                 if(network.State!=null)RefreshDrawingInteractions(network.State);
                 evt.StopImmediatePropagation();
             },TrickleDown.TrickleDown);

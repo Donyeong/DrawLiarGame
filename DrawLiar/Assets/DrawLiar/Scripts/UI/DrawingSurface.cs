@@ -24,6 +24,7 @@ namespace DrawLiar
         private const int BROWSER_PEN_SAMPLE_SIZE=6;
         private readonly float[] _browserPenSamples=new float[BROWSER_PEN_SAMPLE_COUNT*BROWSER_PEN_SAMPLE_SIZE];
         private bool _browserPenReady;
+        private VisualElement _browserPointerRoot;
 #endif
         private Texture2D _previewTexture;
         private Color32[] _previewPixels;
@@ -53,11 +54,15 @@ namespace DrawLiar
             RegisterCallback<PointerUpEvent>(Up);
             RegisterCallback<PointerCaptureOutEvent>(e=>{if(e.pointerId==capturedPointer){drawing=false;capturedPointer=-1;}});
 #if UNITY_WEBGL && !UNITY_EDITOR
-            RegisterCallback<AttachToPanelEvent>(_=>_browserPenReady=DrawBrowserInterop.DrawBrowserPenInitialize()==1);
+            RegisterCallback<AttachToPanelEvent>(AttachBrowserPen);
 #endif
             schedule.Execute(Upload).Every(16);
             RegisterCallback<DetachFromPanelEvent>(_=>
             {
+#if UNITY_WEBGL && !UNITY_EDITOR
+                _browserPointerRoot?.UnregisterCallback<PointerDownEvent>(GuardBrowserPointerDown,TrickleDown.TrickleDown);
+                _browserPointerRoot=null;
+#endif
                 CancelDrawing();
                 Object.Destroy(texture);
                 if(_previewTexture!=null)Object.Destroy(_previewTexture);
@@ -145,6 +150,11 @@ namespace DrawLiar
             if(_browserPenReady)DrawBrowserInterop.DrawBrowserPenDiscard();
 #endif
         }
+        private void GuardBrowserPointerDown(PointerDownEvent e)
+        {
+            var target=e.target as VisualElement;
+            if(target==null||!ReferenceEquals(target,this)&&!Contains(target))CancelDrawing();
+        }
         private void ProcessBrowserPenSample(int kind,int strokeId,Vector2 panelPoint,float pressure,float sampleTime)
         {
             if(kind==4){StopDrawing();return;}
@@ -178,6 +188,13 @@ namespace DrawLiar
             Emit(Normalize(point),pressure);
         }
 #if UNITY_WEBGL && !UNITY_EDITOR
+        private void AttachBrowserPen(AttachToPanelEvent e)
+        {
+            _browserPointerRoot?.UnregisterCallback<PointerDownEvent>(GuardBrowserPointerDown,TrickleDown.TrickleDown);
+            _browserPenReady=DrawBrowserInterop.DrawBrowserPenInitialize()==1;
+            _browserPointerRoot=_browserPenReady?e.destinationPanel?.visualTree:null;
+            _browserPointerRoot?.RegisterCallback<PointerDownEvent>(GuardBrowserPointerDown,TrickleDown.TrickleDown);
+        }
         private void PollBrowserPen()
         {
             if(!_browserPenReady)return;
