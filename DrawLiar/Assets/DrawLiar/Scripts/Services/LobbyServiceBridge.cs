@@ -429,16 +429,24 @@ namespace DrawLiar
         public Task PurchaseAsync(string productId) => RunAsync(async () =>
         {
             RequireLogin();
-            SetProfile(await SendGameAsync<ProfileData>("/api/shop/purchase", "POST",
-                new PurchaseRequest { ProductId = productId, OperationId = Guid.NewGuid().ToString("N") }));
+            string session = _gameSession, accountId = Profile?.AccountId;
+            var profile = await SendGameAsync<ProfileData>("/api/shop/purchase", "POST",
+                new PurchaseRequest { ProductId = productId, OperationId = Guid.NewGuid().ToString("N") });
+            _lifetime.ThrowIfCancellationRequested();
+            if (_loggingOut || session != _gameSession || accountId != Profile?.AccountId) throw new OperationCanceledException();
+            SetProfile(profile);
             SetStatus("아이템을 구매했습니다.");
         });
 
         public Task PurchaseBatchAsync(string[] productIds) => RunAsync(async () =>
         {
             RequireLogin();
-            SetProfile(await SendGameAsync<ProfileData>("/api/shop/purchase-batch", "POST",
-                new PurchaseBatchRequest { ProductIds = productIds, OperationId = Guid.NewGuid().ToString("N") }));
+            string session = _gameSession, accountId = Profile?.AccountId;
+            var profile = await SendGameAsync<ProfileData>("/api/shop/purchase-batch", "POST",
+                new PurchaseBatchRequest { ProductIds = productIds, OperationId = Guid.NewGuid().ToString("N") });
+            _lifetime.ThrowIfCancellationRequested();
+            if (_loggingOut || session != _gameSession || accountId != Profile?.AccountId) throw new OperationCanceledException();
+            SetProfile(profile);
             SetStatus("아이템을 구매했습니다.");
         });
 

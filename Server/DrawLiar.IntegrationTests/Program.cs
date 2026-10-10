@@ -20,6 +20,11 @@ internal static partial class Integration
 
     public static async Task RunAsync(string[] args)
     {
+        if (args.Contains("--room-creation-only"))
+        {
+            await VerifyRoomCreationAsync();
+            return;
+        }
         if (args.Contains("--commerce-only"))
         {
             await VerifyCommerceAsync();

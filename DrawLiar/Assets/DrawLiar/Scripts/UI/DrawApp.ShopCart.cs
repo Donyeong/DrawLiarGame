@@ -155,6 +155,15 @@ namespace DrawLiar
             _shopCartList.Query<Button>().ForEach(button => button.SetEnabled(!busy));
         }
 
+        private async Task PurchaseShopProductAsync(ShopProduct product)
+        {
+            string accountId = lobby.Profile?.AccountId;
+            var parts = AvatarParts.Slots.Where(slot => AvatarParts.Get(product.Accessory, slot) != 0)
+                .Select(slot => new KeyValuePair<AvatarPartSlot, long>(slot, AvatarParts.Get(product.Accessory, slot))).ToArray();
+            await lobby.PurchaseAsync(product.Id);
+            ShowShopPurchaseEquip(accountId, parts, true);
+        }
+
         private async Task PurchaseShopPreviewAsync()
         {
             var items = ShopPreviewItems();
@@ -169,6 +178,11 @@ namespace DrawLiar
             RefreshShopCart();
             try { await lobby.PurchaseBatchAsync(pending.Select(item => item.Product.Id).ToArray()); }
             finally { _shopBatchPurchasing = false; RefreshShopCart(); }
+            ShowShopPurchaseEquip(accountId, parts, false);
+        }
+
+        private void ShowShopPurchaseEquip(string accountId, KeyValuePair<AvatarPartSlot, long>[] parts, bool individual)
+        {
             if (!isActiveAndEnabled || !lobby.IsAuthenticated || lobby.Profile?.AccountId != accountId || inRoom || lobbyScreen != LobbyScreen.Shop) return;
             var modal = Modal("구매 완료");
             overlay.Q<VisualElement>(className: "modal")?.AddToClassList("shop-purchase-popup");
@@ -180,15 +194,24 @@ namespace DrawLiar
             modal.Add(avatar);
             var actions = Box(modal, "row shop-purchase-actions");
             var prompt = overlay;
-            Button(actions, "나중에", CloseModal, "secondary grow", DrawSound.UiCancel).name = "shop-purchase-later";
-            Button(actions, "장착하기", () => Run(async () =>
+            Button(actions, individual ? "아니오" : "나중에", () =>
             {
-                await EquipShopPreviewAsync(accountId, parts);
                 if (overlay == prompt) CloseModal();
+            }, "secondary grow", DrawSound.UiCancel).name = "shop-purchase-later";
+            Button(actions, individual ? "예" : "장착하기", () => Run(async () =>
+            {
+                if (overlay != prompt) return;
+                actions.SetEnabled(false);
+                try
+                {
+                    await EquipShopPreviewAsync(accountId, parts, individual);
+                    if (overlay == prompt) CloseModal();
+                }
+                finally { if (overlay == prompt) actions.SetEnabled(true); }
             }), "primary grow", DrawSound.UiConfirm).name = "shop-purchase-equip";
         }
 
-        private async Task EquipShopPreviewAsync(string accountId, KeyValuePair<AvatarPartSlot, long>[] parts)
+        private async Task EquipShopPreviewAsync(string accountId, KeyValuePair<AvatarPartSlot, long>[] parts, bool clearEquippedSlots = false)
         {
             var profile = lobby.Profile;
             if (profile == null || profile.AccountId != accountId) return;
@@ -201,7 +224,7 @@ namespace DrawLiar
             await lobby.SaveProfileAsync(profile.DisplayName, profile.AvatarColor, outfit);
             if (lobby.Profile?.AccountId != accountId) return;
             foreach (var part in parts)
-                if (_shopPreviewParts.TryGetValue(part.Key, out var selected) && selected == part.Value) RemoveShopPreviewPart(part.Key);
+                if (clearEquippedSlots || (_shopPreviewParts.TryGetValue(part.Key, out var selected) && selected == part.Value)) RemoveShopPreviewPart(part.Key);
             UpdateShopPreview();
         }
     }

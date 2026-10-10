@@ -12602,6 +12602,42 @@ MonoBehaviour:
       - "\u0627\u0644\u0643\u0627\u0630\u0628 \u0647\u0648 {0}."
       Flags: 000000000000000000000000
       Languages_Touch: []
+    - Term: UI/7JiI
+      TermType: 0
+      Description: "\uC608"
+      Languages:
+      - "\uC608"
+      - Yes
+      - "\u662F"
+      - "\u662F"
+      - "\u306F\u3044"
+      - "S\xED"
+      - Sim
+      - Oui
+      - Ja
+      - Ya
+      - "\u0939\u093E\u0901"
+      - "\u0646\u0639\u0645"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7JWE64uI7Jik
+      TermType: 0
+      Description: "\uC544\uB2C8\uC624"
+      Languages:
+      - "\uC544\uB2C8\uC624"
+      - No
+      - "\u5426"
+      - "\u5426"
+      - "\u3044\u3044\u3048"
+      - No
+      - "N\xE3o"
+      - Non
+      - Nein
+      - Tidak
+      - "\u0928\u0939\u0940\u0902"
+      - "\u0644\u0627"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
     CaseInsensitiveTerms: 0
     OnMissingTranslation: 0
     mTerm_AppName:

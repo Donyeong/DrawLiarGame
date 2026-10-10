@@ -176,7 +176,6 @@ public sealed partial class ServerDatabase
         await using var transaction = await connection.BeginTransactionAsync();
         await RemoveUnoccupiedRooms(connection, transaction);
         await Execute(connection, transaction, "SELECT \"Id\" FROM \"Account\" WHERE \"Id\"=$1 FOR UPDATE", session.AccountId);
-        if (Convert.ToInt64(await Scalar(connection, transaction, "SELECT count(*) FROM \"Room\" WHERE \"OwnerAccountId\"=$1", session.AccountId)) >= 1) throw new ApiException("AlreadyOwnsRoom", 409);
         string nodeId;
         string publicUrl;
         await using (var command = Command(connection, transaction, """

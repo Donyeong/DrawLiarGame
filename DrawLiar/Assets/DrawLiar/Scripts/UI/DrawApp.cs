@@ -864,7 +864,7 @@ namespace DrawLiar
                 bool equipped=owned&&AvatarParts.IsEquipped(lobby.Profile?.Accessory??0,product.Accessory);
                 var apply=Button(actions,owned?(equipped?"장착 중":"장착하기"):"구매",()=>Run(async()=>
                 {
-                    if(!owned){await lobby.PurchaseAsync(product.Id);return;}
+                    if(!owned){await PurchaseShopProductAsync(product);return;}
                     var profile=lobby.Profile;
                     await lobby.SaveProfileAsync(profile.DisplayName,profile.AvatarColor,AvatarParts.Equip(profile.Accessory,product.Accessory));
                     foreach(var slot in AvatarParts.Slots)if(AvatarParts.Get(product.Accessory,slot)!=0)RemoveShopPreviewPart(slot);
