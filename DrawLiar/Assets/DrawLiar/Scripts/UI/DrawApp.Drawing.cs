@@ -40,7 +40,7 @@ namespace DrawLiar
             }
             _paletteButton=Button(IsMobile?toolRow:drawingTools,"팔레트",BrushPalette,IsMobile?"secondary mobile-last":"secondary");
             _paletteButton.name="brush-palette-open";SetTooltip(_paletteButton,"더 많은 색상");
-            if(!IsMobile){_paletteButton.style.minWidth=86;_paletteButton.style.marginRight=10;}
+            _paletteButton.style.display=DisplayStyle.None;
             Text(drawingTools,"굵기","secret-label");var sizes=Box(drawingTools,"brush-sizes");
             foreach(var width in new[]{5,11,24})
             {

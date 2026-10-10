@@ -476,7 +476,10 @@
 .nomination-current { max-width: 100%; min-width: 0; margin: 0; color: #645797; font-size: 14px; -unity-text-align: middle-left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .nomination-actions { width: 100%; min-width: 0; flex-shrink: 0; align-items: center; margin-top: 4px; }
 .nomination-actions .grow { flex-basis: 0; min-width: 0; }
-.app .nomination-actions .nomination-none { width: auto; flex-shrink: 0; min-width: 104px; height: 44px; min-height: 44px; margin: 0 0 0 8px; padding: 6px 10px; font-size: 14px; white-space: nowrap; }
+.app .nomination-actions .nomination-none, .app .nomination-actions .nomination-submit { width: auto; flex-shrink: 0; min-width: 104px; height: 44px; min-height: 44px; margin: 0 0 0 8px; padding: 6px 10px; font-size: 14px; white-space: nowrap; }
+.pc-game .nomination-panel { flex-direction: row; align-items: center; }
+.pc-game .nomination-summary { width: auto; flex-grow: 1; flex-basis: 0; }
+.pc-game .nomination-actions { width: auto; margin-top: 0; }
 .app .nomination-none.create-mode-selected { background-color: #E9E4F3; border-color: #78679E; }
 .nomination-progress { flex-shrink: 0; margin: 0 0 0 12px; padding: 0; font-size: 13px; color: #817A87; -unity-text-align: middle-right; }
 .pc-phase-controls.phase-controls-empty { display: none; }

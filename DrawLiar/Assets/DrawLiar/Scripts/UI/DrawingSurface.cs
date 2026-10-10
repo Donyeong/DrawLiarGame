@@ -17,6 +17,14 @@ namespace DrawLiar
         private float lastSend;
         private bool _pressurePointer;
         private float _lastBrushSize;
+        private int _browserPenStroke;
+        private float _browserSampleTime;
+#if UNITY_WEBGL && !UNITY_EDITOR
+        private const int BROWSER_PEN_SAMPLE_COUNT=128;
+        private const int BROWSER_PEN_SAMPLE_SIZE=6;
+        private readonly float[] _browserPenSamples=new float[BROWSER_PEN_SAMPLE_COUNT*BROWSER_PEN_SAMPLE_SIZE];
+        private bool _browserPenReady;
+#endif
         private Texture2D _previewTexture;
         private Color32[] _previewPixels;
         private IReadOnlyList<DrawStroke> _previewStrokes;
@@ -44,9 +52,13 @@ namespace DrawLiar
             RegisterCallback<PointerMoveEvent>(Move);
             RegisterCallback<PointerUpEvent>(Up);
             RegisterCallback<PointerCaptureOutEvent>(e=>{if(e.pointerId==capturedPointer){drawing=false;capturedPointer=-1;}});
+#if UNITY_WEBGL && !UNITY_EDITOR
+            RegisterCallback<AttachToPanelEvent>(_=>_browserPenReady=DrawBrowserInterop.DrawBrowserPenInitialize()==1);
+#endif
             schedule.Execute(Upload).Every(16);
             RegisterCallback<DetachFromPanelEvent>(_=>
             {
+                CancelDrawing();
                 Object.Destroy(texture);
                 if(_previewTexture!=null)Object.Destroy(_previewTexture);
                 _previewTexture=null;_previewPixels=null;_previewStrokes=null;
@@ -96,6 +108,14 @@ namespace DrawLiar
         private void Down(PointerDownEvent e)
         {
             var point=this.WorldToLocal(e.position);
+#if UNITY_WEBGL && !UNITY_EDITOR
+            if(_browserPenReady)
+            {
+                var bounds=panel?.visualTree.worldBound??default;
+                if(e.pointerType=="pen"||bounds.width>0&&bounds.height>0
+                    &&DrawBrowserInterop.DrawBrowserPenSuppress((e.position.x-bounds.x)/bounds.width,(e.position.y-bounds.y)/bounds.height)==1)return;
+            }
+#endif
             if(drawing || HasAuthorPreview || e.button!=0 || !network.CanDraw || !contentRect.Contains(point))return;
             drawing=true;capturedPointer=e.pointerId;last=Normalize(point);_pressurePointer=e.pointerType=="pen";
             _lastBrushSize=DrawBrushSettings.ResolveSize(BrushSize,PressureEnabled,_pressurePointer,e.pressure,Eraser);
@@ -115,10 +135,64 @@ namespace DrawLiar
         }
         private void StopDrawing()
         {
-            drawing=false;_pressurePointer=false;var pointer=capturedPointer;capturedPointer=-1;
+            drawing=false;_pressurePointer=false;_browserPenStroke=0;var pointer=capturedPointer;capturedPointer=-1;
             if(pointer>=0&&this.HasPointerCapture(pointer))this.ReleasePointer(pointer);
         }
-        public void CancelDrawing() => StopDrawing();
+        public void CancelDrawing()
+        {
+            StopDrawing();
+#if UNITY_WEBGL && !UNITY_EDITOR
+            if(_browserPenReady)DrawBrowserInterop.DrawBrowserPenDiscard();
+#endif
+        }
+        private void ProcessBrowserPenSample(int kind,int strokeId,Vector2 panelPoint,float pressure,float sampleTime)
+        {
+            if(kind==4){StopDrawing();return;}
+            if(strokeId<=0||panel==null||!enabledInHierarchy||!network.CanDraw||HasAuthorPreview){StopDrawing();return;}
+            var point=this.WorldToLocal(panelPoint);
+            if(kind==1)
+            {
+                var target=panel.Pick(panelPoint);
+                if(drawing||!enabledInHierarchy||!contentRect.Contains(point)||target==null
+                    ||!ReferenceEquals(target,this)&&!Contains(target))return;
+                drawing=true;capturedPointer=-1;_browserPenStroke=strokeId;_pressurePointer=true;
+                last=Normalize(point);_browserSampleTime=sampleTime;
+                _lastBrushSize=DrawBrushSettings.ResolveSize(BrushSize,PressureEnabled,true,pressure,Eraser);
+                Emit(last,pressure);
+                return;
+            }
+            if(!drawing||_browserPenStroke!=strokeId)return;
+            if(kind==3)
+            {
+                var target=panel.Pick(panelPoint);
+                if(contentRect.Contains(point)&&target!=null&&(ReferenceEquals(target,this)||Contains(target)))
+                    Emit(Normalize(point),0,false);
+                StopDrawing();
+                return;
+            }
+            if(kind!=2||sampleTime-_browserSampleTime<.025f)return;
+            if(!contentRect.Contains(point))return;
+            var hit=panel.Pick(panelPoint);
+            if(hit==null||!ReferenceEquals(hit,this)&&!Contains(hit)){StopDrawing();return;}
+            _browserSampleTime=sampleTime;
+            Emit(Normalize(point),pressure);
+        }
+#if UNITY_WEBGL && !UNITY_EDITOR
+        private void PollBrowserPen()
+        {
+            if(!_browserPenReady)return;
+            int count=DrawBrowserInterop.DrawBrowserPenRead(_browserPenSamples,BROWSER_PEN_SAMPLE_COUNT);
+            if(count<0){StopDrawing();return;}
+            var bounds=panel?.visualTree.worldBound??default;
+            if(bounds.width<=0||bounds.height<=0)return;
+            for(int index=0;index<count;index++)
+            {
+                int offset=index*BROWSER_PEN_SAMPLE_SIZE;
+                var point=new Vector2(bounds.x+_browserPenSamples[offset+2]*bounds.width,bounds.y+_browserPenSamples[offset+3]*bounds.height);
+                ProcessBrowserPenSample((int)_browserPenSamples[offset],(int)_browserPenSamples[offset+1],point,_browserPenSamples[offset+4],_browserPenSamples[offset+5]);
+            }
+        }
+#endif
         private void Emit(Vector2 point,float pressure,bool samplePressure=true)
         {
             if(!network.CanDraw||HasAuthorPreview) { StopDrawing();return; }
@@ -188,6 +262,9 @@ namespace DrawLiar
 
         private void Upload()
         {
+#if UNITY_WEBGL && !UNITY_EDITOR
+            PollBrowserPen();
+#endif
             if(drawing&&(!network.CanDraw||HasAuthorPreview))StopDrawing();
             bool changed=dirty;
             if(dirty)

@@ -19,6 +19,60 @@ var DrawLiarBrowserLibrary = {
     chatShortcutToken: 0,
     chatShortcutRequest: 0,
     audioInitialized: false,
+    penCanvas: null,
+    penQueue: [],
+    penPointer: null,
+    penStroke: 0,
+    penOverflow: false,
+    penDowns: [],
+    penOtherDown: null,
+    penListeners: null,
+    penNow: function() { return (typeof performance !== 'undefined' ? performance.now() : Date.now()) / 1000; },
+    penPoint: function(event) {
+      var canvas = DrawBrowser.penCanvas;
+      if (!canvas) return null;
+      var rectangle = canvas.getBoundingClientRect();
+      if (!(rectangle.width > 0 && rectangle.height > 0) || !Number.isFinite(event.clientX) || !Number.isFinite(event.clientY)) return null;
+      return [(event.clientX - rectangle.left) / rectangle.width, (event.clientY - rectangle.top) / rectangle.height];
+    },
+    penPush: function(kind, point, pressure) {
+      if (DrawBrowser.penOverflow || !point) return;
+      if (DrawBrowser.penQueue.length >= 128 * 6) {
+        DrawBrowser.penQueue.length = 0;
+        DrawBrowser.penOverflow = true;
+        DrawBrowser.penPointer = null;
+        return;
+      }
+      pressure = Number.isFinite(pressure) ? Math.max(0, Math.min(1, pressure)) : 0;
+      DrawBrowser.penQueue.push(kind, DrawBrowser.penStroke, point[0], point[1], pressure, DrawBrowser.penNow());
+    },
+    penCancel: function() {
+      DrawBrowser.penQueue.length = 0;
+      DrawBrowser.penOverflow = false;
+      DrawBrowser.penPush(4, [0, 0], 0);
+      DrawBrowser.penPointer = null;
+    },
+    penShutdown: function() {
+      var listeners = DrawBrowser.penListeners;
+      if (listeners) {
+        document.removeEventListener('pointerdown', listeners.down, true);
+        document.removeEventListener('pointermove', listeners.move, true);
+        document.removeEventListener('pointerup', listeners.up, true);
+        document.removeEventListener('pointercancel', listeners.cancel, true);
+        document.removeEventListener('visibilitychange', listeners.visibility, true);
+        document.removeEventListener('fullscreenchange', listeners.reset, true);
+        window.removeEventListener('blur', listeners.reset, true);
+        window.removeEventListener('resize', listeners.reset, true);
+        window.removeEventListener('scroll', listeners.reset, true);
+      }
+      DrawBrowser.penCanvas = null;
+      DrawBrowser.penListeners = null;
+      DrawBrowser.penPointer = null;
+      DrawBrowser.penQueue.length = 0;
+      DrawBrowser.penDowns.length = 0;
+      DrawBrowser.penOtherDown = null;
+      DrawBrowser.penOverflow = false;
+    },
     installChatShortcut: function() {
       if (DrawBrowser.inputShortcut || typeof window.addEventListener !== 'function') return;
       DrawBrowser.inputShortcut = function(event) {
@@ -413,6 +467,92 @@ var DrawLiarBrowserLibrary = {
         }
       }
     } catch (_) { }
+  },
+
+  DrawBrowserPenInitialize: function() {
+    if (!window.PointerEvent || !Module.canvas) return 0;
+    if (DrawBrowser.penCanvas === Module.canvas && DrawBrowser.penListeners) return 1;
+    DrawBrowser.penShutdown();
+    DrawBrowser.penCanvas = Module.canvas;
+    var listeners = DrawBrowser.penListeners = {};
+    listeners.down = function(event) {
+      if (event.target !== DrawBrowser.penCanvas) return;
+      if (event.pointerType !== 'pen') {
+        var otherPoint = DrawBrowser.penPoint(event);
+        if (otherPoint) DrawBrowser.penOtherDown = [otherPoint[0], otherPoint[1], DrawBrowser.penNow()];
+        return;
+      }
+      if (event.button !== 0 || event.isPrimary === false) return;
+      if (DrawBrowser.penPointer !== null) return;
+      var point = DrawBrowser.penPoint(event);
+      if (!point) return;
+      DrawBrowser.penPointer = event.pointerId;
+      DrawBrowser.penOtherDown = null;
+      DrawBrowser.penStroke = DrawBrowser.penStroke >= 1048575 ? 1 : DrawBrowser.penStroke + 1;
+      var now = DrawBrowser.penNow();
+      DrawBrowser.penDowns = DrawBrowser.penDowns.filter(function(sample) { return now - sample[2] < .5; });
+      if (DrawBrowser.penDowns.length >= 16) DrawBrowser.penDowns.shift();
+      DrawBrowser.penDowns.push([point[0], point[1], now]);
+      DrawBrowser.penPush(1, point, event.pressure);
+    };
+    listeners.move = function(event) {
+      if (event.pointerType !== 'pen' || event.pointerId !== DrawBrowser.penPointer) return;
+      DrawBrowser.penPush(2, DrawBrowser.penPoint(event), event.pressure);
+    };
+    listeners.up = function(event) {
+      if (event.pointerType !== 'pen' || event.pointerId !== DrawBrowser.penPointer) return;
+      var point = DrawBrowser.penPoint(event);
+      if (!point) { DrawBrowser.penCancel(); return; }
+      DrawBrowser.penPush(3, point, 0);
+      DrawBrowser.penPointer = null;
+    };
+    listeners.cancel = function(event) {
+      if (event.pointerId === DrawBrowser.penPointer) DrawBrowser.penCancel();
+    };
+    listeners.reset = function() { DrawBrowser.penCancel(); };
+    listeners.visibility = function() { if (document.hidden) DrawBrowser.penCancel(); };
+    document.addEventListener('pointerdown', listeners.down, {capture:true, passive:true});
+    document.addEventListener('pointermove', listeners.move, {capture:true, passive:true});
+    document.addEventListener('pointerup', listeners.up, {capture:true, passive:true});
+    document.addEventListener('pointercancel', listeners.cancel, {capture:true, passive:true});
+    document.addEventListener('visibilitychange', listeners.visibility, true);
+    document.addEventListener('fullscreenchange', listeners.reset, true);
+    window.addEventListener('blur', listeners.reset, true);
+    window.addEventListener('resize', listeners.reset, true);
+    window.addEventListener('scroll', listeners.reset, true);
+    if (Module.deinitializers) Module.deinitializers.push(function() { DrawBrowser.penShutdown(); });
+    return 1;
+  },
+  DrawBrowserPenRead: function(pointer, maximumSamples) {
+    if (DrawBrowser.penOverflow) {
+      DrawBrowser.penOverflow = false;
+      DrawBrowser.penQueue.length = 0;
+      return -1;
+    }
+    var count = Math.min(Math.max(0, maximumSamples | 0), 128, DrawBrowser.penQueue.length / 6);
+    if (count === 0) return 0;
+    HEAPF32.set(DrawBrowser.penQueue.splice(0, count * 6), pointer >> 2);
+    return count;
+  },
+  DrawBrowserPenSuppress: function(x, y) {
+    if (DrawBrowser.penPointer !== null) return 1;
+    var now = DrawBrowser.penNow();
+    var canvas = DrawBrowser.penCanvas;
+    if (!canvas) return 0;
+    var rectangle = canvas.getBoundingClientRect();
+    var other = DrawBrowser.penOtherDown;
+    for (var index = DrawBrowser.penDowns.length - 1; index >= 0; index--) {
+      var sample = DrawBrowser.penDowns[index];
+      if (other && other[2] >= sample[2] && Math.abs(other[0] - x) * rectangle.width <= 8
+          && Math.abs(other[1] - y) * rectangle.height <= 8) return 0;
+      if (now - sample[2] <= .5 && Math.abs(sample[0] - x) * rectangle.width <= 8
+          && Math.abs(sample[1] - y) * rectangle.height <= 8) return 1;
+    }
+    return 0;
+  },
+  DrawBrowserPenDiscard: function() {
+    DrawBrowser.penQueue.length = 0;
+    DrawBrowser.penOverflow = false;
   },
 
   DrawBrowserInputActive: function() { return DrawBrowser.input ? DrawBrowser.input.id : 0; },

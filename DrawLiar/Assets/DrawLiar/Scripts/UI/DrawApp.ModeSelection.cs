@@ -249,7 +249,7 @@ namespace DrawLiar
             if (!CanSelectNoLiar(state)) return;
             selectedPlayerId = GameRules.NO_LIAR_TARGET;
             _hasSelectedPlayer = true;
-            SubmitVote();
+            RefreshState(state);
         }
     }
 }

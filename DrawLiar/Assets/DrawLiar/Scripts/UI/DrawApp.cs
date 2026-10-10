@@ -1814,7 +1814,7 @@ namespace DrawLiar
                     if(IsNominationPhase(current))
                     {
                         if(!CanSelectVote(current,player))return;
-                        DrawAudio.Instance?.Play(DrawSound.UiClick);selectedPlayerId=player.Id;_hasSelectedPlayer=true;SubmitVote();
+                        DrawAudio.Instance?.Play(DrawSound.UiClick);selectedPlayerId=player.Id;_hasSelectedPlayer=true;RefreshState(current);
                     }
                 }
                 card.RegisterCallback<ClickEvent>(e=>{if(e.button==0&&!IsPlayerProfileTarget(e))Activate();});

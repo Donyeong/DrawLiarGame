@@ -466,7 +466,7 @@
 .app.mobile .create-modes .button { font-size: 14px; }
 .app.mobile .liar-mode-choices .button { min-height: 56px; margin-right: 8px; padding: 8px 6px; }
 .app.mobile .liar-mode-choices .button.mode-choice-last { margin-right: 0; }
-.app.mobile .nomination-actions .nomination-none { height: 44px; min-height: 44px; font-size: 14px; padding: 6px 8px; margin: 0 0 0 6px; }
+.app.mobile .nomination-actions .nomination-none, .app.mobile .nomination-actions .nomination-submit { height: 44px; min-height: 44px; font-size: 14px; padding: 6px 8px; margin: 0 0 0 6px; }
 .app.mobile .create-section-fields { padding: 12px 10px 0; }
 .app.mobile .create-time-grid .field { margin-right: 2%; }
 .app.mobile .create-footer { padding-top: 12px; }
@@ -579,7 +579,7 @@
 .app.mobile-landscape .mobile-playing .landscape-nomination-panel .nomination-prompt, .app.mobile-landscape .mobile-playing .landscape-nomination-panel .nomination-current { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .app.mobile-landscape .mobile-playing .landscape-nomination-panel .nomination-progress { margin: 0; font-size: 11px; -unity-text-align: middle-left; }
 .app.mobile-landscape .mobile-playing .landscape-nomination-panel .nomination-actions { width: auto; min-width: 0; margin: 0; }
-.app.mobile-landscape .mobile-playing .landscape-nomination-panel .nomination-none { width: 104px; min-width: 104px; max-width: 104px; font-size: 12px; white-space: normal; }
+.app.mobile-landscape .mobile-playing .landscape-nomination-panel .nomination-none, .app.mobile-landscape .mobile-playing .landscape-nomination-panel .nomination-submit { width: 104px; min-width: 104px; max-width: 104px; font-size: 12px; white-space: normal; }
 .app.mobile .judgment-coin-card { width: 380px; max-width: 90%; padding: 18px; border-width: 2px; border-radius: 18px; }
 .app.mobile .judgment-coin-heading { font-size: 24px; }
 .app.mobile .judgment-coin-note { font-size: 14px; }

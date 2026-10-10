@@ -83,9 +83,10 @@ namespace DrawLiar
         private void RefreshNominationPanel(RoomSnapshot state, PlayerView local)
         {
             bool noLiarSelected = IsNoLiarSelected(state);
-            var votedTarget = local?.HasVoted == true ? state.Players.FirstOrDefault(player => player.Id == state.LocalVoteTargetId) : null;
-            bool votedNoLiar = local?.HasVoted == true && state.Settings.LiarMode == LiarMode.Optional && state.LocalVoteTargetId == GameRules.NO_LIAR_TARGET;
-            string key = $"nomination/{state.Phase}/{state.BallotVersion}/{state.Settings.LiarMode}/{state.LocalPlayerId}/{state.LocalIsSpectator}/{local?.IsConnected}/{local?.IsSpectator}/{local?.HasVoted}/{state.LocalVoteTargetId}/{state.RemainingSeconds > 0}/{selectedPlayerId}/{_hasSelectedPlayer}/{votedTarget?.Name}/{votedTarget?.Level}/{voteSubmitted}/{DrawLocalization.CurrentLanguageCode}";
+            var selectedTarget = _hasSelectedPlayer ? state.Players.FirstOrDefault(player => player.Id == selectedPlayerId && player.IsConnected && !player.IsSpectator) : null;
+            bool selected = selectedTarget != null || noLiarSelected;
+            bool recorded = selected && local?.HasVoted == true && state.LocalVoteTargetId == selectedPlayerId;
+            string key = $"nomination/{state.Phase}/{state.BallotVersion}/{state.Settings.LiarMode}/{state.LocalPlayerId}/{state.LocalIsSpectator}/{local?.IsConnected}/{local?.IsSpectator}/{local?.HasVoted}/{state.LocalVoteTargetId}/{state.RemainingSeconds > 0}/{selectedPlayerId}/{_hasSelectedPlayer}/{selectedTarget?.Name}/{selectedTarget?.Level}/{voteSubmitted}/{DrawLocalization.CurrentLanguageCode}";
             if (key != _judgmentPanelKey)
             {
                 _judgmentPanelKey = key;
@@ -93,27 +94,30 @@ namespace DrawLiar
                 _judgmentCounts = _judgmentProgress = null;
                 bool spectator = state.LocalIsSpectator || local?.IsSpectator == true;
                 string prompt = spectator ? "관전 중" : state.RemainingSeconds <= 0 ? "투표 완료" : voteSubmitted ? "제출 중"
-                    : local?.HasVoted == true ? "투표 완료" : "캐릭터를 눌러 투표하세요.";
+                    : recorded ? "투표 완료" : "지목할 플레이어를 선택하세요";
                 var summary = Box(_judgmentPanel, "row nomination-summary");
-                Text(summary, prompt, "nomination-prompt grow").name = "nomination-guidance";
+                if (selected && !spectator && !voteSubmitted)
+                {
+                    var current = Text(summary, recorded ? "현재 투표 · {0}" : "선택 · {0}", "nomination-current grow", noLiarSelected ? DrawLocalization.Text("라이어 없음") : selectedTarget.Name);
+                    current.name = "nomination-current";
+                    if (selectedTarget != null) AddLevelBadge(current, selectedTarget.Level, "nomination-current", selectedTarget.AccountId);
+                }
+                else Text(summary, prompt, "nomination-prompt grow").name = "nomination-guidance";
                 voteProgress = Text(summary, "", "nomination-progress");
                 voteProgress.name = "nomination-progress";
-                if (!spectator && local?.IsConnected == true && (votedTarget != null || votedNoLiar || state.Settings.LiarMode == LiarMode.Optional))
+                if (!spectator && local?.IsConnected == true)
                 {
                     var actions = Box(_judgmentPanel, "row nomination-actions");
-                    if (votedTarget != null || votedNoLiar)
-                    {
-                        var current = Text(actions, "현재 투표 · {0}", "nomination-current grow", votedNoLiar ? DrawLocalization.Text("라이어 없음") : votedTarget.Name);
-                        current.name = "nomination-current";
-                        if (votedTarget != null) AddLevelBadge(current, votedTarget.Level, "nomination-current", votedTarget.AccountId);
-                    }
                     if (state.Settings.LiarMode == LiarMode.Optional)
                     {
                         var none = Button(actions, "라이어 없음", SelectNoLiar, "secondary nomination-none", DrawSound.UiConfirm);
                         none.name = "nomination-no-liar";
                         none.EnableInClassList("create-mode-selected", noLiarSelected);
-                        none.SetEnabled(CanSelectNoLiar(state) && !votedNoLiar);
+                        none.SetEnabled(CanSelectNoLiar(state) && !noLiarSelected);
                     }
+                    var submit = Button(actions, "투표하기", SubmitVote, "primary nomination-submit", DrawSound.UiConfirm);
+                    submit.name = "vote-submit";
+                    submit.SetEnabled(CanSubmitVote(state));
                 }
             }
             int voted = state.Players.Count(player => player.HasVoted && !player.IsSpectator && player.IsConnected);
