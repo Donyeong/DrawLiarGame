@@ -142,20 +142,23 @@ public sealed partial class ServerDatabase : ICommerceRepository
         if (request == null || !Guid.TryParse(request.OperationId, out Guid operationId) || operationId == Guid.Empty)
             throw new ApiException("InvalidOperation");
         var product = CommerceRules.CreateProducts().FirstOrDefault(product => product.Id == request.ProductId
-            && product.Kind == CommerceRules.PAINTER_SUBSCRIPTION) ?? throw new ApiException("ProductUnavailable");
+            && (product.Kind == CommerceRules.PAINTER_SUBSCRIPTION || product.Kind == CommerceRules.COSMETIC))
+            ?? throw new ApiException("ProductUnavailable");
         if (request.ExpectedPricePaidGems != product.PricePaidGems) throw new ApiException("ProductChanged", 409);
         await using var connection = await _source.OpenConnectionAsync(cancellationToken);
         await using var transaction = await connection.BeginTransactionAsync(cancellationToken);
         await LockCommerceAccount(connection, transaction, accountId, cancellationToken);
         bool purchased;
         await using (var receipt = Command(connection, transaction,
-            "SELECT \"ProductId\" FROM \"CommerceLedger\" WHERE \"AccountId\"=$1 AND \"OperationId\"=$2 AND \"Kind\"=$3", accountId, operationId, CommerceRules.PAINTER_SUBSCRIPTION))
+            "SELECT \"ProductId\" FROM \"CommerceLedger\" WHERE \"AccountId\"=$1 AND \"OperationId\"=$2 AND \"Kind\"=$3", accountId, operationId, product.Kind))
         {
             var previous = await receipt.ExecuteScalarAsync(cancellationToken);
             if (previous != null && (string)previous != product.Id) throw new ApiException("OperationConflict", 409);
             purchased = previous != null;
         }
-        if (!purchased)
+        if (!purchased && product.Kind == CommerceRules.COSMETIC)
+            await PurchaseCosmetic(connection, transaction, accountId, operationId, product, cancellationToken);
+        else if (!purchased)
         {
             DateTimeOffset? previousExpiry;
             await using (var expiry = Command(connection, transaction, "SELECT \"SubscriptionExpiresAt\" FROM \"Account\" WHERE \"Id\"=$1", accountId))

@@ -10896,6 +10896,975 @@
         "चयन · {0}",
         "الاختيار · {0}"
       ]
+    },
+    {
+      "Key": "보석 꾸미기",
+      "Values": [
+        "보석 꾸미기",
+        "Gem cosmetics",
+        "宝石装饰",
+        "寶石裝飾",
+        "ジェムで着せ替え",
+        "Cosméticos con gemas",
+        "Cosméticos com gemas",
+        "Décorations avec des gemmes",
+        "Kosmetik mit Edelsteinen",
+        "Kosmetik dengan permata",
+        "रत्नों से सजावट",
+        "زينة بالجواهر"
+      ]
+    },
+    {
+      "Key": "보석으로 꾸미기와 구독 상품을 구매할 수 있어요.",
+      "Values": [
+        "보석으로 꾸미기와 구독 상품을 구매할 수 있어요.",
+        "Use gems to buy cosmetics and subscriptions.",
+        "可使用宝石购买装饰和订阅。",
+        "可使用寶石購買裝飾和訂閱。",
+        "ジェムで装飾やサブスクリプションを購入できます。",
+        "Usa gemas para comprar cosméticos y suscripciones.",
+        "Use gemas para comprar cosméticos e assinaturas.",
+        "Achetez des décorations et des abonnements avec des gemmes.",
+        "Kaufe Kosmetik und Abonnements mit Edelsteinen.",
+        "Gunakan permata untuk membeli kosmetik dan langganan.",
+        "रत्नों से सजावट और सदस्यता खरीदें।",
+        "استخدم الجواهر لشراء الزينة والاشتراكات."
+      ]
+    },
+    {
+      "Key": "한 번 구매하면 계속 사용할 수 있어요.",
+      "Values": [
+        "한 번 구매하면 계속 사용할 수 있어요.",
+        "Buy once and keep it forever.",
+        "购买一次，即可永久使用。",
+        "購買一次，即可永久使用。",
+        "一度購入するとずっと使えます。",
+        "Compra una vez y úsalo para siempre.",
+        "Compre uma vez e use para sempre.",
+        "Achetez une fois, gardez pour toujours.",
+        "Einmal kaufen, dauerhaft behalten.",
+        "Beli sekali, gunakan selamanya.",
+        "एक बार खरीदें और हमेशा इस्तेमाल करें।",
+        "اشترِ مرة واحدة واستخدمها دائمًا."
+      ]
+    },
+    {
+      "Key": "닉네임 효과",
+      "Values": [
+        "닉네임 효과",
+        "Nickname effects",
+        "昵称特效",
+        "暱稱特效",
+        "ニックネーム効果",
+        "Efectos de apodo",
+        "Efeitos de apelido",
+        "Effets de pseudo",
+        "Namenseffekte",
+        "Efek nama panggilan",
+        "उपनाम के प्रभाव",
+        "تأثيرات الاسم"
+      ]
+    },
+    {
+      "Key": "캐릭터 배경",
+      "Values": [
+        "캐릭터 배경",
+        "Character backgrounds",
+        "角色背景",
+        "角色背景",
+        "キャラクター背景",
+        "Fondos de personaje",
+        "Fundos de personagem",
+        "Arrière-plans du personnage",
+        "Charakterhintergründe",
+        "Latar karakter",
+        "किरदार की पृष्ठभूमि",
+        "خلفيات الشخصية"
+      ]
+    },
+    {
+      "Key": "프로필 테두리",
+      "Values": [
+        "프로필 테두리",
+        "Profile frames",
+        "个人资料边框",
+        "個人檔案邊框",
+        "プロフィールフレーム",
+        "Marcos de perfil",
+        "Molduras de perfil",
+        "Cadres de profil",
+        "Profilrahmen",
+        "Bingkai profil",
+        "प्रोफ़ाइल फ़्रेम",
+        "إطارات الملف الشخصي"
+      ]
+    },
+    {
+      "Key": "채팅 말풍선",
+      "Values": [
+        "채팅 말풍선",
+        "Chat bubbles",
+        "聊天气泡",
+        "聊天氣泡",
+        "チャット吹き出し",
+        "Burbujas de chat",
+        "Balões de conversa",
+        "Bulles de discussion",
+        "Chatblasen",
+        "Gelembung obrolan",
+        "चैट बबल",
+        "فقاعات الدردشة"
+      ]
+    },
+    {
+      "Key": "영구 소장 · {0} 보석",
+      "Values": [
+        "영구 소장 · {0} 보석",
+        "Permanent · {0} gems",
+        "永久拥有 · {0} 宝石",
+        "永久擁有 · {0} 寶石",
+        "永久所有 · {0} ジェム",
+        "Permanente · {0} gemas",
+        "Permanente · {0} gemas",
+        "Permanent · {0} gemmes",
+        "Dauerhaft · {0} Edelsteine",
+        "Permanen · {0} permata",
+        "स्थायी · {0} रत्न",
+        "دائمة · {0} جوهرة"
+      ]
+    },
+    {
+      "Key": "함께 그려요!",
+      "Values": [
+        "함께 그려요!",
+        "Let's draw together!",
+        "一起画画吧！",
+        "一起畫畫吧！",
+        "一緒に描こう！",
+        "¡Dibujemos juntos!",
+        "Vamos desenhar juntos!",
+        "Dessinons ensemble !",
+        "Lass uns zusammen zeichnen!",
+        "Ayo menggambar bersama!",
+        "आओ साथ में चित्र बनाएँ!",
+        "لنرسم معًا!"
+      ]
+    },
+    {
+      "Key": "현재 착용 모습",
+      "Values": [
+        "현재 착용 모습",
+        "Current look",
+        "当前装扮",
+        "目前裝扮",
+        "現在の見た目",
+        "Aspecto actual",
+        "Visual atual",
+        "Apparence actuelle",
+        "Aktueller Look",
+        "Tampilan saat ini",
+        "मौजूदा रूप",
+        "المظهر الحالي"
+      ]
+    },
+    {
+      "Key": "착용 모습 보기",
+      "Values": [
+        "착용 모습 보기",
+        "Show current look",
+        "查看当前装扮",
+        "查看目前裝扮",
+        "現在の見た目を見る",
+        "Ver aspecto actual",
+        "Ver visual atual",
+        "Voir l'apparence actuelle",
+        "Aktuellen Look zeigen",
+        "Lihat tampilan saat ini",
+        "मौजूदा रूप देखें",
+        "عرض المظهر الحالي"
+      ]
+    },
+    {
+      "Key": "기본 효과로 변경",
+      "Values": [
+        "기본 효과로 변경",
+        "Use default effect",
+        "使用默认效果",
+        "使用預設效果",
+        "標準の効果に戻す",
+        "Usar efecto predeterminado",
+        "Usar efeito padrão",
+        "Utiliser l'effet par défaut",
+        "Standardeffekt verwenden",
+        "Gunakan efek bawaan",
+        "डिफ़ॉल्ट प्रभाव लगाएँ",
+        "استخدام التأثير الافتراضي"
+      ]
+    },
+    {
+      "Key": "꾸미기 구매",
+      "Values": [
+        "꾸미기 구매",
+        "Buy cosmetic",
+        "购买装饰",
+        "購買裝飾",
+        "装飾を購入",
+        "Comprar cosmético",
+        "Comprar cosmético",
+        "Acheter une décoration",
+        "Kosmetik kaufen",
+        "Beli kosmetik",
+        "सजावट खरीदें",
+        "شراء زينة"
+      ]
+    },
+    {
+      "Key": "{0} 구매 · {1} 보석",
+      "Values": [
+        "{0} 구매 · {1} 보석",
+        "Buy {0} · {1} gems",
+        "购买 {0} · {1} 宝石",
+        "購買 {0} · {1} 寶石",
+        "{0} を購入 · {1} ジェム",
+        "Comprar {0} · {1} gemas",
+        "Comprar {0} · {1} gemas",
+        "Acheter {0} · {1} gemmes",
+        "{0} kaufen · {1} Edelsteine",
+        "Beli {0} · {1} permata",
+        "{0} खरीदें · {1} रत्न",
+        "شراء {0} · {1} جوهرة"
+      ]
+    },
+    {
+      "Key": "구매 후 착용",
+      "Values": [
+        "구매 후 착용",
+        "Buy and equip",
+        "购买并装备",
+        "購買並裝備",
+        "購入して装着",
+        "Comprar y equipar",
+        "Comprar e equipar",
+        "Acheter et équiper",
+        "Kaufen und anlegen",
+        "Beli dan gunakan",
+        "खरीदें और लगाएँ",
+        "شراء وتجهيز"
+      ]
+    },
+    {
+      "Key": "착용",
+      "Values": [
+        "착용",
+        "Equip",
+        "装备",
+        "裝備",
+        "装着",
+        "Equipar",
+        "Equipar",
+        "Équiper",
+        "Anlegen",
+        "Gunakan",
+        "लगाएँ",
+        "تجهيز"
+      ]
+    },
+    {
+      "Key": "꾸미기를 저장했습니다.",
+      "Values": [
+        "꾸미기를 저장했습니다.",
+        "Cosmetics saved.",
+        "已保存装饰。",
+        "已儲存裝飾。",
+        "装飾を保存しました。",
+        "Cosméticos guardados.",
+        "Cosméticos salvos.",
+        "Décorations enregistrées.",
+        "Kosmetik gespeichert.",
+        "Kosmetik disimpan.",
+        "सजावट सहेज दी गई।",
+        "تم حفظ الزينة."
+      ]
+    },
+    {
+      "Key": "프리즘 잉크",
+      "Values": [
+        "프리즘 잉크",
+        "Prism ink",
+        "棱镜墨水",
+        "稜鏡墨水",
+        "プリズムインク",
+        "Tinta prisma",
+        "Tinta prisma",
+        "Encre prismatique",
+        "Prismentinte",
+        "Tinta prisma",
+        "प्रिज़्म स्याही",
+        "حبر المنشور"
+      ]
+    },
+    {
+      "Key": "황금 서명",
+      "Values": [
+        "황금 서명",
+        "Golden signature",
+        "黄金签名",
+        "黃金簽名",
+        "黄金のサイン",
+        "Firma dorada",
+        "Assinatura dourada",
+        "Signature dorée",
+        "Goldene Signatur",
+        "Tanda tangan emas",
+        "सुनहरा हस्ताक्षर",
+        "توقيع ذهبي"
+      ]
+    },
+    {
+      "Key": "민트 잉크",
+      "Values": [
+        "민트 잉크",
+        "Mint ink",
+        "薄荷墨水",
+        "薄荷墨水",
+        "ミントインク",
+        "Tinta menta",
+        "Tinta menta",
+        "Encre menthe",
+        "Minztinte",
+        "Tinta mint",
+        "मिंट स्याही",
+        "حبر النعناع"
+      ]
+    },
+    {
+      "Key": "네온 사인",
+      "Values": [
+        "네온 사인",
+        "Neon sign",
+        "霓虹招牌",
+        "霓虹招牌",
+        "ネオンサイン",
+        "Letrero neón",
+        "Letreiro neon",
+        "Enseigne néon",
+        "Neonschrift",
+        "Papan neon",
+        "नियॉन संकेत",
+        "لافتة نيون"
+      ]
+    },
+    {
+      "Key": "노을 잉크",
+      "Values": [
+        "노을 잉크",
+        "Sunset ink",
+        "晚霞墨水",
+        "晚霞墨水",
+        "夕焼けインク",
+        "Tinta atardecer",
+        "Tinta pôr do sol",
+        "Encre crépuscule",
+        "Sonnenuntergangstinte",
+        "Tinta senja",
+        "साँझ की स्याही",
+        "حبر الغروب"
+      ]
+    },
+    {
+      "Key": "오로라 정원",
+      "Values": [
+        "오로라 정원",
+        "Aurora garden",
+        "极光花园",
+        "極光花園",
+        "オーロラガーデン",
+        "Jardín de auroras",
+        "Jardim de auroras",
+        "Jardin d'aurores",
+        "Auroragarten",
+        "Taman aurora",
+        "ऑरोरा उद्यान",
+        "حديقة الشفق"
+      ]
+    },
+    {
+      "Key": "별빛 밤하늘",
+      "Values": [
+        "별빛 밤하늘",
+        "Starlit sky",
+        "星光夜空",
+        "星光夜空",
+        "星空の夜",
+        "Cielo estrellado",
+        "Céu estrelado",
+        "Ciel étoilé",
+        "Sternenhimmel",
+        "Langit berbintang",
+        "तारों भरा आकाश",
+        "سماء مرصعة بالنجوم"
+      ]
+    },
+    {
+      "Key": "벚꽃 편지",
+      "Values": [
+        "벚꽃 편지",
+        "Cherry blossom letter",
+        "樱花信笺",
+        "櫻花信箋",
+        "桜の手紙",
+        "Carta de cerezos",
+        "Carta de cerejeiras",
+        "Lettre de cerisier",
+        "Kirschblütenbrief",
+        "Surat sakura",
+        "चेरी फूल का पत्र",
+        "رسالة أزهار الكرز"
+      ]
+    },
+    {
+      "Key": "푸른 파도",
+      "Values": [
+        "푸른 파도",
+        "Blue waves",
+        "蓝色波浪",
+        "藍色波浪",
+        "青い波",
+        "Olas azules",
+        "Ondas azuis",
+        "Vagues bleues",
+        "Blaue Wellen",
+        "Ombak biru",
+        "नीली लहरें",
+        "أمواج زرقاء"
+      ]
+    },
+    {
+      "Key": "노을 하늘",
+      "Values": [
+        "노을 하늘",
+        "Sunset sky",
+        "晚霞天空",
+        "晚霞天空",
+        "夕焼け空",
+        "Cielo al atardecer",
+        "Céu do pôr do sol",
+        "Ciel du crépuscule",
+        "Abendhimmel",
+        "Langit senja",
+        "साँझ का आकाश",
+        "سماء الغروب"
+      ]
+    },
+    {
+      "Key": "월계수 테두리",
+      "Values": [
+        "월계수 테두리",
+        "Laurel frame",
+        "月桂边框",
+        "月桂邊框",
+        "月桂樹フレーム",
+        "Marco de laurel",
+        "Moldura de louros",
+        "Cadre de laurier",
+        "Lorbeerrahmen",
+        "Bingkai laurel",
+        "लॉरेल फ़्रेम",
+        "إطار الغار"
+      ]
+    },
+    {
+      "Key": "크리스탈 테두리",
+      "Values": [
+        "크리스탈 테두리",
+        "Crystal frame",
+        "水晶边框",
+        "水晶邊框",
+        "クリスタルフレーム",
+        "Marco de cristal",
+        "Moldura de cristal",
+        "Cadre de cristal",
+        "Kristallrahmen",
+        "Bingkai kristal",
+        "क्रिस्टल फ़्रेम",
+        "إطار بلوري"
+      ]
+    },
+    {
+      "Key": "네온 테두리",
+      "Values": [
+        "네온 테두리",
+        "Neon frame",
+        "霓虹边框",
+        "霓虹邊框",
+        "ネオンフレーム",
+        "Marco neón",
+        "Moldura neon",
+        "Cadre néon",
+        "Neonrahmen",
+        "Bingkai neon",
+        "नियॉन फ़्रेम",
+        "إطار نيون"
+      ]
+    },
+    {
+      "Key": "리본 테두리",
+      "Values": [
+        "리본 테두리",
+        "Ribbon frame",
+        "丝带边框",
+        "緞帶邊框",
+        "リボンフレーム",
+        "Marco de lazo",
+        "Moldura de laço",
+        "Cadre de ruban",
+        "Schleifenrahmen",
+        "Bingkai pita",
+        "रिबन फ़्रेम",
+        "إطار شريطي"
+      ]
+    },
+    {
+      "Key": "별자리 테두리",
+      "Values": [
+        "별자리 테두리",
+        "Constellation frame",
+        "星座边框",
+        "星座邊框",
+        "星座フレーム",
+        "Marco de constelación",
+        "Moldura de constelação",
+        "Cadre de constellation",
+        "Sternbildrahmen",
+        "Bingkai rasi bintang",
+        "तारामंडल फ़्रेम",
+        "إطار كوكبة"
+      ]
+    },
+    {
+      "Key": "구름 말풍선",
+      "Values": [
+        "구름 말풍선",
+        "Cloud bubble",
+        "云朵气泡",
+        "雲朵氣泡",
+        "雲の吹き出し",
+        "Burbuja de nube",
+        "Balão de nuvem",
+        "Bulle de nuage",
+        "Wolkenblase",
+        "Gelembung awan",
+        "बादल बबल",
+        "فقاعة سحاب"
+      ]
+    },
+    {
+      "Key": "메모지 말풍선",
+      "Values": [
+        "메모지 말풍선",
+        "Sticky note bubble",
+        "便签气泡",
+        "便條氣泡",
+        "メモの吹き出し",
+        "Burbuja de nota",
+        "Balão de recado",
+        "Bulle de pense-bête",
+        "Notizzettelblase",
+        "Gelembung catatan",
+        "नोट बबल",
+        "فقاعة ملاحظات"
+      ]
+    },
+    {
+      "Key": "네온 말풍선",
+      "Values": [
+        "네온 말풍선",
+        "Neon bubble",
+        "霓虹气泡",
+        "霓虹氣泡",
+        "ネオンの吹き出し",
+        "Burbuja neón",
+        "Balão neon",
+        "Bulle néon",
+        "Neonblase",
+        "Gelembung neon",
+        "नियॉन बबल",
+        "فقاعة نيون"
+      ]
+    },
+    {
+      "Key": "픽셀 말풍선",
+      "Values": [
+        "픽셀 말풍선",
+        "Pixel bubble",
+        "像素气泡",
+        "像素氣泡",
+        "ピクセルの吹き出し",
+        "Burbuja de píxeles",
+        "Balão de pixels",
+        "Bulle pixelisée",
+        "Pixelblase",
+        "Gelembung piksel",
+        "पिक्सेल बबल",
+        "فقاعة بكسل"
+      ]
+    },
+    {
+      "Key": "꽃잎 말풍선",
+      "Values": [
+        "꽃잎 말풍선",
+        "Petal bubble",
+        "花瓣气泡",
+        "花瓣氣泡",
+        "花びらの吹き出し",
+        "Burbuja de pétalos",
+        "Balão de pétalas",
+        "Bulle de pétales",
+        "Blütenblattblase",
+        "Gelembung kelopak",
+        "पंखुड़ी बबल",
+        "فقاعة بتلات"
+      ]
+    },
+    {
+      "Key": "무지개빛으로 닉네임을 물들여요.",
+      "Values": [
+        "무지개빛으로 닉네임을 물들여요.",
+        "Color your nickname with rainbow hues.",
+        "用彩虹色点亮昵称。",
+        "用彩虹色點亮暱稱。",
+        "ニックネームを虹色に彩ります。",
+        "Colorea tu apodo con tonos de arcoíris.",
+        "Dê ao seu apelido tons de arco-íris.",
+        "Colorez votre pseudo aux couleurs de l'arc-en-ciel.",
+        "Färbe deinen Namen in Regenbogenfarben.",
+        "Warnai nama panggilan dengan warna pelangi.",
+        "उपनाम को इंद्रधनुषी रंगों से सजाएँ।",
+        "لوّن اسمك بألوان قوس قزح."
+      ]
+    },
+    {
+      "Key": "따뜻한 황금빛으로 닉네임을 꾸며요.",
+      "Values": [
+        "따뜻한 황금빛으로 닉네임을 꾸며요.",
+        "Decorate your nickname with warm golden hues.",
+        "用温暖金色装饰昵称。",
+        "用溫暖金色裝飾暱稱。",
+        "ニックネームを暖かな金色で飾ります。",
+        "Decora tu apodo con cálidos tonos dorados.",
+        "Decore seu apelido com tons dourados.",
+        "Décorez votre pseudo de teintes dorées chaleureuses.",
+        "Schmücke deinen Namen mit warmem Gold.",
+        "Hiasi nama panggilan dengan warna emas hangat.",
+        "उपनाम को सुनहरे रंग से सजाएँ।",
+        "زيّن اسمك بدرجات ذهبية دافئة."
+      ]
+    },
+    {
+      "Key": "산뜻한 민트빛으로 닉네임을 꾸며요.",
+      "Values": [
+        "산뜻한 민트빛으로 닉네임을 꾸며요.",
+        "Decorate your nickname with fresh mint hues.",
+        "用清新薄荷色装饰昵称。",
+        "用清新薄荷色裝飾暱稱。",
+        "ニックネームを爽やかなミント色で飾ります。",
+        "Decora tu apodo con frescos tonos menta.",
+        "Decore seu apelido com tons frescos de menta.",
+        "Décorez votre pseudo de teintes menthe fraîches.",
+        "Schmücke deinen Namen mit frischem Mint.",
+        "Hiasi nama panggilan dengan warna mint segar.",
+        "उपनाम को ताज़े मिंट रंग से सजाएँ।",
+        "زيّن اسمك بدرجات النعناع المنعشة."
+      ]
+    },
+    {
+      "Key": "선명한 네온빛으로 닉네임을 꾸며요.",
+      "Values": [
+        "선명한 네온빛으로 닉네임을 꾸며요.",
+        "Decorate your nickname with vivid neon hues.",
+        "用鲜艳霓虹色装饰昵称。",
+        "用鮮豔霓虹色裝飾暱稱。",
+        "ニックネームを鮮やかなネオン色で飾ります。",
+        "Decora tu apodo con vivos tonos neón.",
+        "Decore seu apelido com tons vivos de neon.",
+        "Décorez votre pseudo de teintes néon vives.",
+        "Schmücke deinen Namen mit leuchtendem Neon.",
+        "Hiasi nama panggilan dengan warna neon cerah.",
+        "उपनाम को चमकीले नियॉन रंग से सजाएँ।",
+        "زيّن اسمك بدرجات نيون زاهية."
+      ]
+    },
+    {
+      "Key": "분홍빛 노을 색으로 닉네임을 꾸며요.",
+      "Values": [
+        "분홍빛 노을 색으로 닉네임을 꾸며요.",
+        "Decorate your nickname with pink sunset hues.",
+        "用粉色晚霞装饰昵称。",
+        "用粉色晚霞裝飾暱稱。",
+        "ニックネームをピンクの夕焼け色で飾ります。",
+        "Decora tu apodo con tonos de un atardecer rosa.",
+        "Decore seu apelido com tons rosados do pôr do sol.",
+        "Décorez votre pseudo de teintes roses du crépuscule.",
+        "Schmücke deinen Namen mit rosa Abendfarben.",
+        "Hiasi nama panggilan dengan warna senja merah muda.",
+        "उपनाम को गुलाबी साँझ के रंग से सजाएँ।",
+        "زيّن اسمك بدرجات الغروب الوردية."
+      ]
+    },
+    {
+      "Key": "캐릭터 뒤로 오로라빛이 펼쳐져요.",
+      "Values": [
+        "캐릭터 뒤로 오로라빛이 펼쳐져요.",
+        "Aurora colors spread behind your character.",
+        "让极光在角色身后铺展。",
+        "讓極光在角色身後鋪展。",
+        "キャラクターの後ろにオーロラが広がります。",
+        "Colores de aurora detrás de tu personaje.",
+        "Cores de aurora atrás do seu personagem.",
+        "Des couleurs d'aurore derrière votre personnage.",
+        "Aurorafarben hinter deinem Charakter.",
+        "Warna aurora terbentang di belakang karakter.",
+        "किरदार के पीछे ऑरोरा के रंग फैलते हैं।",
+        "تنتشر ألوان الشفق خلف شخصيتك."
+      ]
+    },
+    {
+      "Key": "캐릭터 뒤로 작은 별들이 빛나요.",
+      "Values": [
+        "캐릭터 뒤로 작은 별들이 빛나요.",
+        "Little stars shine behind your character.",
+        "让小星星在角色身后闪耀。",
+        "讓小星星在角色身後閃耀。",
+        "キャラクターの後ろで小さな星が輝きます。",
+        "Pequeñas estrellas brillan detrás de tu personaje.",
+        "Pequenas estrelas brilham atrás do seu personagem.",
+        "De petites étoiles brillent derrière votre personnage.",
+        "Kleine Sterne leuchten hinter deinem Charakter.",
+        "Bintang kecil bersinar di belakang karakter.",
+        "किरदार के पीछे छोटे तारे चमकते हैं।",
+        "تلمع نجوم صغيرة خلف شخصيتك."
+      ]
+    },
+    {
+      "Key": "캐릭터 뒤를 분홍 꽃잎으로 꾸며요.",
+      "Values": [
+        "캐릭터 뒤를 분홍 꽃잎으로 꾸며요.",
+        "Decorate your character's background with pink petals.",
+        "用粉色花瓣装饰角色背景。",
+        "用粉色花瓣裝飾角色背景。",
+        "キャラクターの背景をピンクの花びらで飾ります。",
+        "Decora el fondo de tu personaje con pétalos rosas.",
+        "Decore o fundo do personagem com pétalas rosas.",
+        "Décorez le fond du personnage de pétales roses.",
+        "Schmücke den Hintergrund mit rosa Blütenblättern.",
+        "Hiasi latar karakter dengan kelopak merah muda.",
+        "किरदार की पृष्ठभूमि को गुलाबी पंखुड़ियों से सजाएँ।",
+        "زيّن خلفية شخصيتك ببتلات وردية."
+      ]
+    },
+    {
+      "Key": "캐릭터 뒤로 푸른 물결이 펼쳐져요.",
+      "Values": [
+        "캐릭터 뒤로 푸른 물결이 펼쳐져요.",
+        "Blue waves spread behind your character.",
+        "让蓝色波浪在角色身后铺展。",
+        "讓藍色波浪在角色身後鋪展。",
+        "キャラクターの後ろに青い波が広がります。",
+        "Olas azules detrás de tu personaje.",
+        "Ondas azuis atrás do seu personagem.",
+        "Des vagues bleues derrière votre personnage.",
+        "Blaue Wellen hinter deinem Charakter.",
+        "Ombak biru terbentang di belakang karakter.",
+        "किरदार के पीछे नीली लहरें फैलती हैं।",
+        "تمتد أمواج زرقاء خلف شخصيتك."
+      ]
+    },
+    {
+      "Key": "캐릭터 뒤를 따뜻한 노을로 꾸며요.",
+      "Values": [
+        "캐릭터 뒤를 따뜻한 노을로 꾸며요.",
+        "Decorate your character's background with a warm sunset.",
+        "用温暖晚霞装饰角色背景。",
+        "用溫暖晚霞裝飾角色背景。",
+        "キャラクターの背景を暖かな夕焼けで飾ります。",
+        "Decora el fondo con un cálido atardecer.",
+        "Decore o fundo com um pôr do sol acolhedor.",
+        "Décorez le fond d'un crépuscule chaleureux.",
+        "Schmücke den Hintergrund mit warmem Abendlicht.",
+        "Hiasi latar karakter dengan senja hangat.",
+        "किरदार की पृष्ठभूमि को साँझ के रंगों से सजाएँ।",
+        "زيّن خلفية شخصيتك بغروب دافئ."
+      ]
+    },
+    {
+      "Key": "캐릭터를 월계수 잎으로 감싸요.",
+      "Values": [
+        "캐릭터를 월계수 잎으로 감싸요.",
+        "Surround your character with laurel leaves.",
+        "用月桂叶环绕角色。",
+        "用月桂葉環繞角色。",
+        "キャラクターを月桂樹の葉で囲みます。",
+        "Rodea tu personaje con hojas de laurel.",
+        "Envolva seu personagem com folhas de louro.",
+        "Entourez votre personnage de feuilles de laurier.",
+        "Umrahme deinen Charakter mit Lorbeerblättern.",
+        "Kelilingi karakter dengan daun laurel.",
+        "किरदार को लॉरेल की पत्तियों से घेरें।",
+        "أحط شخصيتك بأوراق الغار."
+      ]
+    },
+    {
+      "Key": "캐릭터를 반짝이는 보석으로 감싸요.",
+      "Values": [
+        "캐릭터를 반짝이는 보석으로 감싸요.",
+        "Surround your character with sparkling gems.",
+        "用闪耀宝石环绕角色。",
+        "用閃耀寶石環繞角色。",
+        "キャラクターを輝く宝石で囲みます。",
+        "Rodea tu personaje con gemas brillantes.",
+        "Envolva seu personagem com gemas brilhantes.",
+        "Entourez votre personnage de gemmes étincelantes.",
+        "Umrahme deinen Charakter mit funkelnden Edelsteinen.",
+        "Kelilingi karakter dengan permata berkilau.",
+        "किरदार को चमकते रत्नों से घेरें।",
+        "أحط شخصيتك بجواهر متلألئة."
+      ]
+    },
+    {
+      "Key": "캐릭터를 선명한 네온 선으로 감싸요.",
+      "Values": [
+        "캐릭터를 선명한 네온 선으로 감싸요.",
+        "Surround your character with vivid neon lines.",
+        "用鲜艳霓虹线条环绕角色。",
+        "用鮮豔霓虹線條環繞角色。",
+        "キャラクターを鮮やかなネオンの線で囲みます。",
+        "Rodea tu personaje con líneas neón vivas.",
+        "Envolva seu personagem com linhas neon vivas.",
+        "Entourez votre personnage de lignes néon vives.",
+        "Umrahme deinen Charakter mit leuchtenden Neonlinien.",
+        "Kelilingi karakter dengan garis neon cerah.",
+        "किरदार को चमकीली नियॉन रेखाओं से घेरें।",
+        "أحط شخصيتك بخطوط نيون زاهية."
+      ]
+    },
+    {
+      "Key": "캐릭터를 사랑스러운 리본으로 감싸요.",
+      "Values": [
+        "캐릭터를 사랑스러운 리본으로 감싸요.",
+        "Surround your character with lovely ribbons.",
+        "用可爱丝带环绕角色。",
+        "用可愛緞帶環繞角色。",
+        "キャラクターをかわいいリボンで囲みます。",
+        "Rodea tu personaje con bonitos lazos.",
+        "Envolva seu personagem com lindos laços.",
+        "Entourez votre personnage de jolis rubans.",
+        "Umrahme deinen Charakter mit hübschen Schleifen.",
+        "Kelilingi karakter dengan pita cantik.",
+        "किरदार को सुंदर रिबन से घेरें।",
+        "أحط شخصيتك بشرائط جميلة."
+      ]
+    },
+    {
+      "Key": "캐릭터를 작은 별자리로 감싸요.",
+      "Values": [
+        "캐릭터를 작은 별자리로 감싸요.",
+        "Surround your character with tiny constellations.",
+        "用小星座环绕角色。",
+        "用小星座環繞角色。",
+        "キャラクターを小さな星座で囲みます。",
+        "Rodea tu personaje con pequeñas constelaciones.",
+        "Envolva seu personagem com pequenas constelações.",
+        "Entourez votre personnage de petites constellations.",
+        "Umrahme deinen Charakter mit kleinen Sternbildern.",
+        "Kelilingi karakter dengan rasi bintang kecil.",
+        "किरदार को छोटे तारामंडलों से घेरें।",
+        "أحط شخصيتك بكوكبات صغيرة."
+      ]
+    },
+    {
+      "Key": "채팅을 포근한 구름 모양으로 꾸며요.",
+      "Values": [
+        "채팅을 포근한 구름 모양으로 꾸며요.",
+        "Decorate your chat with soft cloud shapes.",
+        "用柔软云朵装饰聊天。",
+        "用柔軟雲朵裝飾聊天。",
+        "チャットをふんわりした雲の形で飾ります。",
+        "Decora tu chat con suaves formas de nube.",
+        "Decore o chat com formas suaves de nuvens.",
+        "Décorez vos messages de formes de nuages doux.",
+        "Schmücke deinen Chat mit weichen Wolkenformen.",
+        "Hiasi obrolan dengan bentuk awan lembut.",
+        "चैट को मुलायम बादलों के आकार से सजाएँ।",
+        "زيّن الدردشة بأشكال سحب ناعمة."
+      ]
+    },
+    {
+      "Key": "채팅을 노란 메모지로 꾸며요.",
+      "Values": [
+        "채팅을 노란 메모지로 꾸며요.",
+        "Decorate your chat with yellow sticky notes.",
+        "用黄色便签装饰聊天。",
+        "用黃色便條裝飾聊天。",
+        "チャットを黄色いメモで飾ります。",
+        "Decora tu chat con notas amarillas.",
+        "Decore o chat com notas adesivas amarelas.",
+        "Décorez vos messages de pense-bêtes jaunes.",
+        "Schmücke deinen Chat mit gelben Notizzetteln.",
+        "Hiasi obrolan dengan catatan kuning.",
+        "चैट को पीले नोट से सजाएँ।",
+        "زيّن الدردشة بملاحظات صفراء."
+      ]
+    },
+    {
+      "Key": "채팅을 선명한 네온 색으로 꾸며요.",
+      "Values": [
+        "채팅을 선명한 네온 색으로 꾸며요.",
+        "Decorate your chat with vivid neon colors.",
+        "用鲜艳霓虹色装饰聊天。",
+        "用鮮豔霓虹色裝飾聊天。",
+        "チャットを鮮やかなネオン色で飾ります。",
+        "Decora tu chat con vivos colores neón.",
+        "Decore o chat com cores vivas de neon.",
+        "Décorez vos messages de couleurs néon vives.",
+        "Schmücke deinen Chat mit leuchtenden Neonfarben.",
+        "Hiasi obrolan dengan warna neon cerah.",
+        "चैट को चमकीले नियॉन रंगों से सजाएँ।",
+        "زيّن الدردشة بألوان نيون زاهية."
+      ]
+    },
+    {
+      "Key": "채팅을 귀여운 픽셀 모양으로 꾸며요.",
+      "Values": [
+        "채팅을 귀여운 픽셀 모양으로 꾸며요.",
+        "Decorate your chat with cute pixel shapes.",
+        "用可爱像素形状装饰聊天。",
+        "用可愛像素形狀裝飾聊天。",
+        "チャットをかわいいピクセル形で飾ります。",
+        "Decora tu chat con bonitas formas de píxeles.",
+        "Decore o chat com formas fofas de pixels.",
+        "Décorez vos messages de jolis motifs pixelisés.",
+        "Schmücke deinen Chat mit niedlichen Pixelformen.",
+        "Hiasi obrolan dengan bentuk piksel lucu.",
+        "चैट को प्यारे पिक्सेल आकार से सजाएँ।",
+        "زيّن الدردشة بأشكال بكسل لطيفة."
+      ]
+    },
+    {
+      "Key": "채팅을 부드러운 꽃잎 색으로 꾸며요.",
+      "Values": [
+        "채팅을 부드러운 꽃잎 색으로 꾸며요.",
+        "Decorate your chat with soft petal colors.",
+        "用柔和花瓣色装饰聊天。",
+        "用柔和花瓣色裝飾聊天。",
+        "チャットをやわらかな花びらの色で飾ります。",
+        "Decora tu chat con suaves colores de pétalos.",
+        "Decore o chat com cores suaves de pétalas.",
+        "Décorez vos messages de douces couleurs de pétales.",
+        "Schmücke deinen Chat mit sanften Blütenfarben.",
+        "Hiasi obrolan dengan warna kelopak lembut.",
+        "चैट को पंखुड़ियों के हल्के रंगों से सजाएँ।",
+        "زيّن الدردشة بألوان بتلات ناعمة."
+      ]
     }
   ]
 }

@@ -12656,6 +12656,1122 @@ MonoBehaviour:
       - "\u0627\u0644\u0627\u062E\u062A\u064A\u0627\u0631 \xB7 {0}"
       Flags: 000000000000000000000000
       Languages_Touch: []
+    - Term: UI/67O07ISdIOq-uOuvuOq4sA
+      TermType: 0
+      Description: "\uBCF4\uC11D \uAFB8\uBBF8\uAE30"
+      Languages:
+      - "\uBCF4\uC11D \uAFB8\uBBF8\uAE30"
+      - Gem cosmetics
+      - "\u5B9D\u77F3\u88C5\u9970"
+      - "\u5BF6\u77F3\u88DD\u98FE"
+      - "\u30B8\u30A7\u30E0\u3067\u7740\u305B\u66FF\u3048"
+      - "Cosm\xE9ticos con gemas"
+      - "Cosm\xE9ticos com gemas"
+      - "D\xE9corations avec des gemmes"
+      - Kosmetik mit Edelsteinen
+      - Kosmetik dengan permata
+      - "\u0930\u0924\u094D\u0928\u094B\u0902 \u0938\u0947 \u0938\u091C\u093E\u0935\u091F"
+      - "\u0632\u064A\u0646\u0629 \u0628\u0627\u0644\u062C\u0648\u0627\u0647\u0631"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/67O07ISd7Jy866GcIOq-uOuvuOq4sOyZgCDqtazrj4Ug7IOB7ZKI7J2EIOq1rOunpO2VoCDsiJgg7J6I7Ja07JqULg
+      TermType: 0
+      Description: "\uBCF4\uC11D\uC73C\uB85C \uAFB8\uBBF8\uAE30\uC640 \uAD6C\uB3C5
+        \uC0C1\uD488\uC744 \uAD6C\uB9E4\uD560 \uC218 \uC788\uC5B4\uC694."
+      Languages:
+      - "\uBCF4\uC11D\uC73C\uB85C \uAFB8\uBBF8\uAE30\uC640 \uAD6C\uB3C5 \uC0C1\uD488\uC744
+        \uAD6C\uB9E4\uD560 \uC218 \uC788\uC5B4\uC694."
+      - Use gems to buy cosmetics and subscriptions.
+      - "\u53EF\u4F7F\u7528\u5B9D\u77F3\u8D2D\u4E70\u88C5\u9970\u548C\u8BA2\u9605\u3002"
+      - "\u53EF\u4F7F\u7528\u5BF6\u77F3\u8CFC\u8CB7\u88DD\u98FE\u548C\u8A02\u95B1\u3002"
+      - "\u30B8\u30A7\u30E0\u3067\u88C5\u98FE\u3084\u30B5\u30D6\u30B9\u30AF\u30EA\u30D7\u30B7\u30E7\u30F3\u3092\u8CFC\u5165\u3067\u304D\u307E\u3059\u3002"
+      - "Usa gemas para comprar cosm\xE9ticos y suscripciones."
+      - "Use gemas para comprar cosm\xE9ticos e assinaturas."
+      - "Achetez des d\xE9corations et des abonnements avec des gemmes."
+      - Kaufe Kosmetik und Abonnements mit Edelsteinen.
+      - Gunakan permata untuk membeli kosmetik dan langganan.
+      - "\u0930\u0924\u094D\u0928\u094B\u0902 \u0938\u0947 \u0938\u091C\u093E\u0935\u091F
+        \u0914\u0930 \u0938\u0926\u0938\u094D\u092F\u0924\u093E \u0916\u0930\u0940\u0926\u0947\u0902\u0964"
+      - "\u0627\u0633\u062A\u062E\u062F\u0645 \u0627\u0644\u062C\u0648\u0627\u0647\u0631
+        \u0644\u0634\u0631\u0627\u0621 \u0627\u0644\u0632\u064A\u0646\u0629 \u0648\u0627\u0644\u0627\u0634\u062A\u0631\u0627\u0643\u0627\u062A."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7ZWcIOuyiCDqtazrp6TtlZjrqbQg6rOE7IaNIOyCrOyaqe2VoCDsiJgg7J6I7Ja07JqULg
+      TermType: 0
+      Description: "\uD55C \uBC88 \uAD6C\uB9E4\uD558\uBA74 \uACC4\uC18D \uC0AC\uC6A9\uD560
+        \uC218 \uC788\uC5B4\uC694."
+      Languages:
+      - "\uD55C \uBC88 \uAD6C\uB9E4\uD558\uBA74 \uACC4\uC18D \uC0AC\uC6A9\uD560 \uC218
+        \uC788\uC5B4\uC694."
+      - Buy once and keep it forever.
+      - "\u8D2D\u4E70\u4E00\u6B21\uFF0C\u5373\u53EF\u6C38\u4E45\u4F7F\u7528\u3002"
+      - "\u8CFC\u8CB7\u4E00\u6B21\uFF0C\u5373\u53EF\u6C38\u4E45\u4F7F\u7528\u3002"
+      - "\u4E00\u5EA6\u8CFC\u5165\u3059\u308B\u3068\u305A\u3063\u3068\u4F7F\u3048\u307E\u3059\u3002"
+      - "Compra una vez y \xFAsalo para siempre."
+      - Compre uma vez e use para sempre.
+      - Achetez une fois, gardez pour toujours.
+      - Einmal kaufen, dauerhaft behalten.
+      - Beli sekali, gunakan selamanya.
+      - "\u090F\u0915 \u092C\u093E\u0930 \u0916\u0930\u0940\u0926\u0947\u0902 \u0914\u0930
+        \u0939\u092E\u0947\u0936\u093E \u0907\u0938\u094D\u0924\u0947\u092E\u093E\u0932
+        \u0915\u0930\u0947\u0902\u0964"
+      - "\u0627\u0634\u062A\u0631\u0650 \u0645\u0631\u0629 \u0648\u0627\u062D\u062F\u0629
+        \u0648\u0627\u0633\u062A\u062E\u062F\u0645\u0647\u0627 \u062F\u0627\u0626\u0645\u064B\u0627."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/64uJ64Sk7J6EIO2aqOqzvA
+      TermType: 0
+      Description: "\uB2C9\uB124\uC784 \uD6A8\uACFC"
+      Languages:
+      - "\uB2C9\uB124\uC784 \uD6A8\uACFC"
+      - Nickname effects
+      - "\u6635\u79F0\u7279\u6548"
+      - "\u66B1\u7A31\u7279\u6548"
+      - "\u30CB\u30C3\u30AF\u30CD\u30FC\u30E0\u52B9\u679C"
+      - Efectos de apodo
+      - Efeitos de apelido
+      - Effets de pseudo
+      - Namenseffekte
+      - Efek nama panggilan
+      - "\u0909\u092A\u0928\u093E\u092E \u0915\u0947 \u092A\u094D\u0930\u092D\u093E\u0935"
+      - "\u062A\u0623\u062B\u064A\u0631\u0627\u062A \u0627\u0644\u0627\u0633\u0645"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7LqQ66at7YSwIOuwsOqyvQ
+      TermType: 0
+      Description: "\uCE90\uB9AD\uD130 \uBC30\uACBD"
+      Languages:
+      - "\uCE90\uB9AD\uD130 \uBC30\uACBD"
+      - Character backgrounds
+      - "\u89D2\u8272\u80CC\u666F"
+      - "\u89D2\u8272\u80CC\u666F"
+      - "\u30AD\u30E3\u30E9\u30AF\u30BF\u30FC\u80CC\u666F"
+      - Fondos de personaje
+      - Fundos de personagem
+      - "Arri\xE8re-plans du personnage"
+      - "Charakterhintergr\xFCnde"
+      - Latar karakter
+      - "\u0915\u093F\u0930\u0926\u093E\u0930 \u0915\u0940 \u092A\u0943\u0937\u094D\u0920\u092D\u0942\u092E\u093F"
+      - "\u062E\u0644\u0641\u064A\u0627\u062A \u0627\u0644\u0634\u062E\u0635\u064A\u0629"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7ZSE66Gc7ZWEIO2FjOuRkOumrA
+      TermType: 0
+      Description: "\uD504\uB85C\uD544 \uD14C\uB450\uB9AC"
+      Languages:
+      - "\uD504\uB85C\uD544 \uD14C\uB450\uB9AC"
+      - Profile frames
+      - "\u4E2A\u4EBA\u8D44\u6599\u8FB9\u6846"
+      - "\u500B\u4EBA\u6A94\u6848\u908A\u6846"
+      - "\u30D7\u30ED\u30D5\u30A3\u30FC\u30EB\u30D5\u30EC\u30FC\u30E0"
+      - Marcos de perfil
+      - Molduras de perfil
+      - Cadres de profil
+      - Profilrahmen
+      - Bingkai profil
+      - "\u092A\u094D\u0930\u094B\u092B\u093C\u093E\u0907\u0932 \u092B\u093C\u094D\u0930\u0947\u092E"
+      - "\u0625\u0637\u0627\u0631\u0627\u062A \u0627\u0644\u0645\u0644\u0641 \u0627\u0644\u0634\u062E\u0635\u064A"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7LGE7YyFIOunkO2SjeyEoA
+      TermType: 0
+      Description: "\uCC44\uD305 \uB9D0\uD48D\uC120"
+      Languages:
+      - "\uCC44\uD305 \uB9D0\uD48D\uC120"
+      - Chat bubbles
+      - "\u804A\u5929\u6C14\u6CE1"
+      - "\u804A\u5929\u6C23\u6CE1"
+      - "\u30C1\u30E3\u30C3\u30C8\u5439\u304D\u51FA\u3057"
+      - Burbujas de chat
+      - "Bal\xF5es de conversa"
+      - Bulles de discussion
+      - Chatblasen
+      - Gelembung obrolan
+      - "\u091A\u0948\u091F \u092C\u092C\u0932"
+      - "\u0641\u0642\u0627\u0639\u0627\u062A \u0627\u0644\u062F\u0631\u062F\u0634\u0629"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7JiB6rWsIOyGjOyepSDCtyB7MH0g67O07ISd
+      TermType: 0
+      Description: "\uC601\uAD6C \uC18C\uC7A5 \xB7 {0} \uBCF4\uC11D"
+      Languages:
+      - "\uC601\uAD6C \uC18C\uC7A5 \xB7 {0} \uBCF4\uC11D"
+      - "Permanent \xB7 {0} gems"
+      - "\u6C38\u4E45\u62E5\u6709 \xB7 {0} \u5B9D\u77F3"
+      - "\u6C38\u4E45\u64C1\u6709 \xB7 {0} \u5BF6\u77F3"
+      - "\u6C38\u4E45\u6240\u6709 \xB7 {0} \u30B8\u30A7\u30E0"
+      - "Permanente \xB7 {0} gemas"
+      - "Permanente \xB7 {0} gemas"
+      - "Permanent \xB7 {0} gemmes"
+      - "Dauerhaft \xB7 {0} Edelsteine"
+      - "Permanen \xB7 {0} permata"
+      - "\u0938\u094D\u0925\u093E\u092F\u0940 \xB7 {0} \u0930\u0924\u094D\u0928"
+      - "\u062F\u0627\u0626\u0645\u0629 \xB7 {0} \u062C\u0648\u0647\u0631\u0629"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7ZWo6ruYIOq3uOugpOyalCE
+      TermType: 0
+      Description: "\uD568\uAED8 \uADF8\uB824\uC694!"
+      Languages:
+      - "\uD568\uAED8 \uADF8\uB824\uC694!"
+      - Let's draw together!
+      - "\u4E00\u8D77\u753B\u753B\u5427\uFF01"
+      - "\u4E00\u8D77\u756B\u756B\u5427\uFF01"
+      - "\u4E00\u7DD2\u306B\u63CF\u3053\u3046\uFF01"
+      - "\xA1Dibujemos juntos!"
+      - Vamos desenhar juntos!
+      - Dessinons ensemble !
+      - Lass uns zusammen zeichnen!
+      - Ayo menggambar bersama!
+      - "\u0906\u0913 \u0938\u093E\u0925 \u092E\u0947\u0902 \u091A\u093F\u0924\u094D\u0930
+        \u092C\u0928\u093E\u090F\u0901!"
+      - "\u0644\u0646\u0631\u0633\u0645 \u0645\u0639\u064B\u0627!"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7ZiE7J6sIOywqeyaqSDrqqjsirU
+      TermType: 0
+      Description: "\uD604\uC7AC \uCC29\uC6A9 \uBAA8\uC2B5"
+      Languages:
+      - "\uD604\uC7AC \uCC29\uC6A9 \uBAA8\uC2B5"
+      - Current look
+      - "\u5F53\u524D\u88C5\u626E"
+      - "\u76EE\u524D\u88DD\u626E"
+      - "\u73FE\u5728\u306E\u898B\u305F\u76EE"
+      - Aspecto actual
+      - Visual atual
+      - Apparence actuelle
+      - Aktueller Look
+      - Tampilan saat ini
+      - "\u092E\u094C\u091C\u0942\u0926\u093E \u0930\u0942\u092A"
+      - "\u0627\u0644\u0645\u0638\u0647\u0631 \u0627\u0644\u062D\u0627\u0644\u064A"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7LCp7JqpIOuqqOyKtSDrs7TquLA
+      TermType: 0
+      Description: "\uCC29\uC6A9 \uBAA8\uC2B5 \uBCF4\uAE30"
+      Languages:
+      - "\uCC29\uC6A9 \uBAA8\uC2B5 \uBCF4\uAE30"
+      - Show current look
+      - "\u67E5\u770B\u5F53\u524D\u88C5\u626E"
+      - "\u67E5\u770B\u76EE\u524D\u88DD\u626E"
+      - "\u73FE\u5728\u306E\u898B\u305F\u76EE\u3092\u898B\u308B"
+      - Ver aspecto actual
+      - Ver visual atual
+      - Voir l'apparence actuelle
+      - Aktuellen Look zeigen
+      - Lihat tampilan saat ini
+      - "\u092E\u094C\u091C\u0942\u0926\u093E \u0930\u0942\u092A \u0926\u0947\u0916\u0947\u0902"
+      - "\u0639\u0631\u0636 \u0627\u0644\u0645\u0638\u0647\u0631 \u0627\u0644\u062D\u0627\u0644\u064A"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/6riw67O4IO2aqOqzvOuhnCDrs4Dqsr0
+      TermType: 0
+      Description: "\uAE30\uBCF8 \uD6A8\uACFC\uB85C \uBCC0\uACBD"
+      Languages:
+      - "\uAE30\uBCF8 \uD6A8\uACFC\uB85C \uBCC0\uACBD"
+      - Use default effect
+      - "\u4F7F\u7528\u9ED8\u8BA4\u6548\u679C"
+      - "\u4F7F\u7528\u9810\u8A2D\u6548\u679C"
+      - "\u6A19\u6E96\u306E\u52B9\u679C\u306B\u623B\u3059"
+      - Usar efecto predeterminado
+      - "Usar efeito padr\xE3o"
+      - "Utiliser l'effet par d\xE9faut"
+      - Standardeffekt verwenden
+      - Gunakan efek bawaan
+      - "\u0921\u093F\u092B\u093C\u0949\u0932\u094D\u091F \u092A\u094D\u0930\u092D\u093E\u0935
+        \u0932\u0917\u093E\u090F\u0901"
+      - "\u0627\u0633\u062A\u062E\u062F\u0627\u0645 \u0627\u0644\u062A\u0623\u062B\u064A\u0631
+        \u0627\u0644\u0627\u0641\u062A\u0631\u0627\u0636\u064A"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/6r6466-46riwIOq1rOunpA
+      TermType: 0
+      Description: "\uAFB8\uBBF8\uAE30 \uAD6C\uB9E4"
+      Languages:
+      - "\uAFB8\uBBF8\uAE30 \uAD6C\uB9E4"
+      - Buy cosmetic
+      - "\u8D2D\u4E70\u88C5\u9970"
+      - "\u8CFC\u8CB7\u88DD\u98FE"
+      - "\u88C5\u98FE\u3092\u8CFC\u5165"
+      - "Comprar cosm\xE9tico"
+      - "Comprar cosm\xE9tico"
+      - "Acheter une d\xE9coration"
+      - Kosmetik kaufen
+      - Beli kosmetik
+      - "\u0938\u091C\u093E\u0935\u091F \u0916\u0930\u0940\u0926\u0947\u0902"
+      - "\u0634\u0631\u0627\u0621 \u0632\u064A\u0646\u0629"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/ezB9IOq1rOunpCDCtyB7MX0g67O07ISd
+      TermType: 0
+      Description: "{0} \uAD6C\uB9E4 \xB7 {1} \uBCF4\uC11D"
+      Languages:
+      - "{0} \uAD6C\uB9E4 \xB7 {1} \uBCF4\uC11D"
+      - "Buy {0} \xB7 {1} gems"
+      - "\u8D2D\u4E70 {0} \xB7 {1} \u5B9D\u77F3"
+      - "\u8CFC\u8CB7 {0} \xB7 {1} \u5BF6\u77F3"
+      - "{0} \u3092\u8CFC\u5165 \xB7 {1} \u30B8\u30A7\u30E0"
+      - "Comprar {0} \xB7 {1} gemas"
+      - "Comprar {0} \xB7 {1} gemas"
+      - "Acheter {0} \xB7 {1} gemmes"
+      - "{0} kaufen \xB7 {1} Edelsteine"
+      - "Beli {0} \xB7 {1} permata"
+      - "{0} \u0916\u0930\u0940\u0926\u0947\u0902 \xB7 {1} \u0930\u0924\u094D\u0928"
+      - "\u0634\u0631\u0627\u0621 {0} \xB7 {1} \u062C\u0648\u0647\u0631\u0629"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/6rWs66ekIO2bhCDssKnsmqk
+      TermType: 0
+      Description: "\uAD6C\uB9E4 \uD6C4 \uCC29\uC6A9"
+      Languages:
+      - "\uAD6C\uB9E4 \uD6C4 \uCC29\uC6A9"
+      - Buy and equip
+      - "\u8D2D\u4E70\u5E76\u88C5\u5907"
+      - "\u8CFC\u8CB7\u4E26\u88DD\u5099"
+      - "\u8CFC\u5165\u3057\u3066\u88C5\u7740"
+      - Comprar y equipar
+      - Comprar e equipar
+      - "Acheter et \xE9quiper"
+      - Kaufen und anlegen
+      - Beli dan gunakan
+      - "\u0916\u0930\u0940\u0926\u0947\u0902 \u0914\u0930 \u0932\u0917\u093E\u090F\u0901"
+      - "\u0634\u0631\u0627\u0621 \u0648\u062A\u062C\u0647\u064A\u0632"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7LCp7Jqp
+      TermType: 0
+      Description: "\uCC29\uC6A9"
+      Languages:
+      - "\uCC29\uC6A9"
+      - Equip
+      - "\u88C5\u5907"
+      - "\u88DD\u5099"
+      - "\u88C5\u7740"
+      - Equipar
+      - Equipar
+      - "\xC9quiper"
+      - Anlegen
+      - Gunakan
+      - "\u0932\u0917\u093E\u090F\u0901"
+      - "\u062A\u062C\u0647\u064A\u0632"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/6r6466-46riw66W8IOyggOyepe2WiOyKteuLiOuLpC4
+      TermType: 0
+      Description: "\uAFB8\uBBF8\uAE30\uB97C \uC800\uC7A5\uD588\uC2B5\uB2C8\uB2E4."
+      Languages:
+      - "\uAFB8\uBBF8\uAE30\uB97C \uC800\uC7A5\uD588\uC2B5\uB2C8\uB2E4."
+      - Cosmetics saved.
+      - "\u5DF2\u4FDD\u5B58\u88C5\u9970\u3002"
+      - "\u5DF2\u5132\u5B58\u88DD\u98FE\u3002"
+      - "\u88C5\u98FE\u3092\u4FDD\u5B58\u3057\u307E\u3057\u305F\u3002"
+      - "Cosm\xE9ticos guardados."
+      - "Cosm\xE9ticos salvos."
+      - "D\xE9corations enregistr\xE9es."
+      - Kosmetik gespeichert.
+      - Kosmetik disimpan.
+      - "\u0938\u091C\u093E\u0935\u091F \u0938\u0939\u0947\u091C \u0926\u0940 \u0917\u0908\u0964"
+      - "\u062A\u0645 \u062D\u0641\u0638 \u0627\u0644\u0632\u064A\u0646\u0629."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7ZSE66as7KaYIOyeie2BrA
+      TermType: 0
+      Description: "\uD504\uB9AC\uC998 \uC789\uD06C"
+      Languages:
+      - "\uD504\uB9AC\uC998 \uC789\uD06C"
+      - Prism ink
+      - "\u68F1\u955C\u58A8\u6C34"
+      - "\u7A1C\u93E1\u58A8\u6C34"
+      - "\u30D7\u30EA\u30BA\u30E0\u30A4\u30F3\u30AF"
+      - Tinta prisma
+      - Tinta prisma
+      - Encre prismatique
+      - Prismentinte
+      - Tinta prisma
+      - "\u092A\u094D\u0930\u093F\u091C\u093C\u094D\u092E \u0938\u094D\u092F\u093E\u0939\u0940"
+      - "\u062D\u0628\u0631 \u0627\u0644\u0645\u0646\u0634\u0648\u0631"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7Zmp6riIIOyEnOuqhQ
+      TermType: 0
+      Description: "\uD669\uAE08 \uC11C\uBA85"
+      Languages:
+      - "\uD669\uAE08 \uC11C\uBA85"
+      - Golden signature
+      - "\u9EC4\u91D1\u7B7E\u540D"
+      - "\u9EC3\u91D1\u7C3D\u540D"
+      - "\u9EC4\u91D1\u306E\u30B5\u30A4\u30F3"
+      - Firma dorada
+      - Assinatura dourada
+      - "Signature dor\xE9e"
+      - Goldene Signatur
+      - Tanda tangan emas
+      - "\u0938\u0941\u0928\u0939\u0930\u093E \u0939\u0938\u094D\u0924\u093E\u0915\u094D\u0937\u0930"
+      - "\u062A\u0648\u0642\u064A\u0639 \u0630\u0647\u0628\u064A"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/66-87Yq4IOyeie2BrA
+      TermType: 0
+      Description: "\uBBFC\uD2B8 \uC789\uD06C"
+      Languages:
+      - "\uBBFC\uD2B8 \uC789\uD06C"
+      - Mint ink
+      - "\u8584\u8377\u58A8\u6C34"
+      - "\u8584\u8377\u58A8\u6C34"
+      - "\u30DF\u30F3\u30C8\u30A4\u30F3\u30AF"
+      - Tinta menta
+      - Tinta menta
+      - Encre menthe
+      - Minztinte
+      - Tinta mint
+      - "\u092E\u093F\u0902\u091F \u0938\u094D\u092F\u093E\u0939\u0940"
+      - "\u062D\u0628\u0631 \u0627\u0644\u0646\u0639\u0646\u0627\u0639"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/64Sk7JioIOyCrOyduA
+      TermType: 0
+      Description: "\uB124\uC628 \uC0AC\uC778"
+      Languages:
+      - "\uB124\uC628 \uC0AC\uC778"
+      - Neon sign
+      - "\u9713\u8679\u62DB\u724C"
+      - "\u9713\u8679\u62DB\u724C"
+      - "\u30CD\u30AA\u30F3\u30B5\u30A4\u30F3"
+      - "Letrero ne\xF3n"
+      - Letreiro neon
+      - "Enseigne n\xE9on"
+      - Neonschrift
+      - Papan neon
+      - "\u0928\u093F\u092F\u0949\u0928 \u0938\u0902\u0915\u0947\u0924"
+      - "\u0644\u0627\u0641\u062A\u0629 \u0646\u064A\u0648\u0646"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/64W47J2EIOyeie2BrA
+      TermType: 0
+      Description: "\uB178\uC744 \uC789\uD06C"
+      Languages:
+      - "\uB178\uC744 \uC789\uD06C"
+      - Sunset ink
+      - "\u665A\u971E\u58A8\u6C34"
+      - "\u665A\u971E\u58A8\u6C34"
+      - "\u5915\u713C\u3051\u30A4\u30F3\u30AF"
+      - Tinta atardecer
+      - "Tinta p\xF4r do sol"
+      - "Encre cr\xE9puscule"
+      - Sonnenuntergangstinte
+      - Tinta senja
+      - "\u0938\u093E\u0901\u091D \u0915\u0940 \u0938\u094D\u092F\u093E\u0939\u0940"
+      - "\u062D\u0628\u0631 \u0627\u0644\u063A\u0631\u0648\u0628"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7Jik66Gc6528IOygleybkA
+      TermType: 0
+      Description: "\uC624\uB85C\uB77C \uC815\uC6D0"
+      Languages:
+      - "\uC624\uB85C\uB77C \uC815\uC6D0"
+      - Aurora garden
+      - "\u6781\u5149\u82B1\u56ED"
+      - "\u6975\u5149\u82B1\u5712"
+      - "\u30AA\u30FC\u30ED\u30E9\u30AC\u30FC\u30C7\u30F3"
+      - "Jard\xEDn de auroras"
+      - Jardim de auroras
+      - Jardin d'aurores
+      - Auroragarten
+      - Taman aurora
+      - "\u0911\u0930\u094B\u0930\u093E \u0909\u0926\u094D\u092F\u093E\u0928"
+      - "\u062D\u062F\u064A\u0642\u0629 \u0627\u0644\u0634\u0641\u0642"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/67OE67mbIOuwpO2VmOuKmA
+      TermType: 0
+      Description: "\uBCC4\uBE5B \uBC24\uD558\uB298"
+      Languages:
+      - "\uBCC4\uBE5B \uBC24\uD558\uB298"
+      - Starlit sky
+      - "\u661F\u5149\u591C\u7A7A"
+      - "\u661F\u5149\u591C\u7A7A"
+      - "\u661F\u7A7A\u306E\u591C"
+      - Cielo estrellado
+      - "C\xE9u estrelado"
+      - "Ciel \xE9toil\xE9"
+      - Sternenhimmel
+      - Langit berbintang
+      - "\u0924\u093E\u0930\u094B\u0902 \u092D\u0930\u093E \u0906\u0915\u093E\u0936"
+      - "\u0633\u0645\u0627\u0621 \u0645\u0631\u0635\u0639\u0629 \u0628\u0627\u0644\u0646\u062C\u0648\u0645"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/67Ka6r2DIO2OuOyngA
+      TermType: 0
+      Description: "\uBC9A\uAF43 \uD3B8\uC9C0"
+      Languages:
+      - "\uBC9A\uAF43 \uD3B8\uC9C0"
+      - Cherry blossom letter
+      - "\u6A31\u82B1\u4FE1\u7B3A"
+      - "\u6AFB\u82B1\u4FE1\u7B8B"
+      - "\u685C\u306E\u624B\u7D19"
+      - Carta de cerezos
+      - Carta de cerejeiras
+      - Lettre de cerisier
+      - "Kirschbl\xFCtenbrief"
+      - Surat sakura
+      - "\u091A\u0947\u0930\u0940 \u092B\u0942\u0932 \u0915\u093E \u092A\u0924\u094D\u0930"
+      - "\u0631\u0633\u0627\u0644\u0629 \u0623\u0632\u0647\u0627\u0631 \u0627\u0644\u0643\u0631\u0632"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7ZG466W4IO2MjOuPhA
+      TermType: 0
+      Description: "\uD478\uB978 \uD30C\uB3C4"
+      Languages:
+      - "\uD478\uB978 \uD30C\uB3C4"
+      - Blue waves
+      - "\u84DD\u8272\u6CE2\u6D6A"
+      - "\u85CD\u8272\u6CE2\u6D6A"
+      - "\u9752\u3044\u6CE2"
+      - Olas azules
+      - Ondas azuis
+      - Vagues bleues
+      - Blaue Wellen
+      - Ombak biru
+      - "\u0928\u0940\u0932\u0940 \u0932\u0939\u0930\u0947\u0902"
+      - "\u0623\u0645\u0648\u0627\u062C \u0632\u0631\u0642\u0627\u0621"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/64W47J2EIO2VmOuKmA
+      TermType: 0
+      Description: "\uB178\uC744 \uD558\uB298"
+      Languages:
+      - "\uB178\uC744 \uD558\uB298"
+      - Sunset sky
+      - "\u665A\u971E\u5929\u7A7A"
+      - "\u665A\u971E\u5929\u7A7A"
+      - "\u5915\u713C\u3051\u7A7A"
+      - Cielo al atardecer
+      - "C\xE9u do p\xF4r do sol"
+      - "Ciel du cr\xE9puscule"
+      - Abendhimmel
+      - Langit senja
+      - "\u0938\u093E\u0901\u091D \u0915\u093E \u0906\u0915\u093E\u0936"
+      - "\u0633\u0645\u0627\u0621 \u0627\u0644\u063A\u0631\u0648\u0628"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7JuU6rOE7IiYIO2FjOuRkOumrA
+      TermType: 0
+      Description: "\uC6D4\uACC4\uC218 \uD14C\uB450\uB9AC"
+      Languages:
+      - "\uC6D4\uACC4\uC218 \uD14C\uB450\uB9AC"
+      - Laurel frame
+      - "\u6708\u6842\u8FB9\u6846"
+      - "\u6708\u6842\u908A\u6846"
+      - "\u6708\u6842\u6A39\u30D5\u30EC\u30FC\u30E0"
+      - Marco de laurel
+      - Moldura de louros
+      - Cadre de laurier
+      - Lorbeerrahmen
+      - Bingkai laurel
+      - "\u0932\u0949\u0930\u0947\u0932 \u092B\u093C\u094D\u0930\u0947\u092E"
+      - "\u0625\u0637\u0627\u0631 \u0627\u0644\u063A\u0627\u0631"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7YGs66as7Iqk7YOIIO2FjOuRkOumrA
+      TermType: 0
+      Description: "\uD06C\uB9AC\uC2A4\uD0C8 \uD14C\uB450\uB9AC"
+      Languages:
+      - "\uD06C\uB9AC\uC2A4\uD0C8 \uD14C\uB450\uB9AC"
+      - Crystal frame
+      - "\u6C34\u6676\u8FB9\u6846"
+      - "\u6C34\u6676\u908A\u6846"
+      - "\u30AF\u30EA\u30B9\u30BF\u30EB\u30D5\u30EC\u30FC\u30E0"
+      - Marco de cristal
+      - Moldura de cristal
+      - Cadre de cristal
+      - Kristallrahmen
+      - Bingkai kristal
+      - "\u0915\u094D\u0930\u093F\u0938\u094D\u091F\u0932 \u092B\u093C\u094D\u0930\u0947\u092E"
+      - "\u0625\u0637\u0627\u0631 \u0628\u0644\u0648\u0631\u064A"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/64Sk7JioIO2FjOuRkOumrA
+      TermType: 0
+      Description: "\uB124\uC628 \uD14C\uB450\uB9AC"
+      Languages:
+      - "\uB124\uC628 \uD14C\uB450\uB9AC"
+      - Neon frame
+      - "\u9713\u8679\u8FB9\u6846"
+      - "\u9713\u8679\u908A\u6846"
+      - "\u30CD\u30AA\u30F3\u30D5\u30EC\u30FC\u30E0"
+      - "Marco ne\xF3n"
+      - Moldura neon
+      - "Cadre n\xE9on"
+      - Neonrahmen
+      - Bingkai neon
+      - "\u0928\u093F\u092F\u0949\u0928 \u092B\u093C\u094D\u0930\u0947\u092E"
+      - "\u0625\u0637\u0627\u0631 \u0646\u064A\u0648\u0646"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/66as67O4IO2FjOuRkOumrA
+      TermType: 0
+      Description: "\uB9AC\uBCF8 \uD14C\uB450\uB9AC"
+      Languages:
+      - "\uB9AC\uBCF8 \uD14C\uB450\uB9AC"
+      - Ribbon frame
+      - "\u4E1D\u5E26\u8FB9\u6846"
+      - "\u7DDE\u5E36\u908A\u6846"
+      - "\u30EA\u30DC\u30F3\u30D5\u30EC\u30FC\u30E0"
+      - Marco de lazo
+      - "Moldura de la\xE7o"
+      - Cadre de ruban
+      - Schleifenrahmen
+      - Bingkai pita
+      - "\u0930\u093F\u092C\u0928 \u092B\u093C\u094D\u0930\u0947\u092E"
+      - "\u0625\u0637\u0627\u0631 \u0634\u0631\u064A\u0637\u064A"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/67OE7J6Q66asIO2FjOuRkOumrA
+      TermType: 0
+      Description: "\uBCC4\uC790\uB9AC \uD14C\uB450\uB9AC"
+      Languages:
+      - "\uBCC4\uC790\uB9AC \uD14C\uB450\uB9AC"
+      - Constellation frame
+      - "\u661F\u5EA7\u8FB9\u6846"
+      - "\u661F\u5EA7\u908A\u6846"
+      - "\u661F\u5EA7\u30D5\u30EC\u30FC\u30E0"
+      - "Marco de constelaci\xF3n"
+      - "Moldura de constela\xE7\xE3o"
+      - Cadre de constellation
+      - Sternbildrahmen
+      - Bingkai rasi bintang
+      - "\u0924\u093E\u0930\u093E\u092E\u0902\u0921\u0932 \u092B\u093C\u094D\u0930\u0947\u092E"
+      - "\u0625\u0637\u0627\u0631 \u0643\u0648\u0643\u0628\u0629"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/6rWs66aEIOunkO2SjeyEoA
+      TermType: 0
+      Description: "\uAD6C\uB984 \uB9D0\uD48D\uC120"
+      Languages:
+      - "\uAD6C\uB984 \uB9D0\uD48D\uC120"
+      - Cloud bubble
+      - "\u4E91\u6735\u6C14\u6CE1"
+      - "\u96F2\u6735\u6C23\u6CE1"
+      - "\u96F2\u306E\u5439\u304D\u51FA\u3057"
+      - Burbuja de nube
+      - "Bal\xE3o de nuvem"
+      - Bulle de nuage
+      - Wolkenblase
+      - Gelembung awan
+      - "\u092C\u093E\u0926\u0932 \u092C\u092C\u0932"
+      - "\u0641\u0642\u0627\u0639\u0629 \u0633\u062D\u0627\u0628"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/66mU66qo7KeAIOunkO2SjeyEoA
+      TermType: 0
+      Description: "\uBA54\uBAA8\uC9C0 \uB9D0\uD48D\uC120"
+      Languages:
+      - "\uBA54\uBAA8\uC9C0 \uB9D0\uD48D\uC120"
+      - Sticky note bubble
+      - "\u4FBF\u7B7E\u6C14\u6CE1"
+      - "\u4FBF\u689D\u6C23\u6CE1"
+      - "\u30E1\u30E2\u306E\u5439\u304D\u51FA\u3057"
+      - Burbuja de nota
+      - "Bal\xE3o de recado"
+      - "Bulle de pense-b\xEAte"
+      - Notizzettelblase
+      - Gelembung catatan
+      - "\u0928\u094B\u091F \u092C\u092C\u0932"
+      - "\u0641\u0642\u0627\u0639\u0629 \u0645\u0644\u0627\u062D\u0638\u0627\u062A"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/64Sk7JioIOunkO2SjeyEoA
+      TermType: 0
+      Description: "\uB124\uC628 \uB9D0\uD48D\uC120"
+      Languages:
+      - "\uB124\uC628 \uB9D0\uD48D\uC120"
+      - Neon bubble
+      - "\u9713\u8679\u6C14\u6CE1"
+      - "\u9713\u8679\u6C23\u6CE1"
+      - "\u30CD\u30AA\u30F3\u306E\u5439\u304D\u51FA\u3057"
+      - "Burbuja ne\xF3n"
+      - "Bal\xE3o neon"
+      - "Bulle n\xE9on"
+      - Neonblase
+      - Gelembung neon
+      - "\u0928\u093F\u092F\u0949\u0928 \u092C\u092C\u0932"
+      - "\u0641\u0642\u0627\u0639\u0629 \u0646\u064A\u0648\u0646"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7ZS97IWAIOunkO2SjeyEoA
+      TermType: 0
+      Description: "\uD53D\uC140 \uB9D0\uD48D\uC120"
+      Languages:
+      - "\uD53D\uC140 \uB9D0\uD48D\uC120"
+      - Pixel bubble
+      - "\u50CF\u7D20\u6C14\u6CE1"
+      - "\u50CF\u7D20\u6C23\u6CE1"
+      - "\u30D4\u30AF\u30BB\u30EB\u306E\u5439\u304D\u51FA\u3057"
+      - "Burbuja de p\xEDxeles"
+      - "Bal\xE3o de pixels"
+      - "Bulle pixelis\xE9e"
+      - Pixelblase
+      - Gelembung piksel
+      - "\u092A\u093F\u0915\u094D\u0938\u0947\u0932 \u092C\u092C\u0932"
+      - "\u0641\u0642\u0627\u0639\u0629 \u0628\u0643\u0633\u0644"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/6r2D7J6OIOunkO2SjeyEoA
+      TermType: 0
+      Description: "\uAF43\uC78E \uB9D0\uD48D\uC120"
+      Languages:
+      - "\uAF43\uC78E \uB9D0\uD48D\uC120"
+      - Petal bubble
+      - "\u82B1\u74E3\u6C14\u6CE1"
+      - "\u82B1\u74E3\u6C23\u6CE1"
+      - "\u82B1\u3073\u3089\u306E\u5439\u304D\u51FA\u3057"
+      - "Burbuja de p\xE9talos"
+      - "Bal\xE3o de p\xE9talas"
+      - "Bulle de p\xE9tales"
+      - "Bl\xFCtenblattblase"
+      - Gelembung kelopak
+      - "\u092A\u0902\u0916\u0941\u0921\u093C\u0940 \u092C\u092C\u0932"
+      - "\u0641\u0642\u0627\u0639\u0629 \u0628\u062A\u0644\u0627\u062A"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/66y07KeA6rCc67mb7Jy866GcIOuLieuEpOyehOydhCDrrLzrk6Tsl6zsmpQu
+      TermType: 0
+      Description: "\uBB34\uC9C0\uAC1C\uBE5B\uC73C\uB85C \uB2C9\uB124\uC784\uC744
+        \uBB3C\uB4E4\uC5EC\uC694."
+      Languages:
+      - "\uBB34\uC9C0\uAC1C\uBE5B\uC73C\uB85C \uB2C9\uB124\uC784\uC744 \uBB3C\uB4E4\uC5EC\uC694."
+      - Color your nickname with rainbow hues.
+      - "\u7528\u5F69\u8679\u8272\u70B9\u4EAE\u6635\u79F0\u3002"
+      - "\u7528\u5F69\u8679\u8272\u9EDE\u4EAE\u66B1\u7A31\u3002"
+      - "\u30CB\u30C3\u30AF\u30CD\u30FC\u30E0\u3092\u8679\u8272\u306B\u5F69\u308A\u307E\u3059\u3002"
+      - "Colorea tu apodo con tonos de arco\xEDris."
+      - "D\xEA ao seu apelido tons de arco-\xEDris."
+      - Colorez votre pseudo aux couleurs de l'arc-en-ciel.
+      - "F\xE4rbe deinen Namen in Regenbogenfarben."
+      - Warnai nama panggilan dengan warna pelangi.
+      - "\u0909\u092A\u0928\u093E\u092E \u0915\u094B \u0907\u0902\u0926\u094D\u0930\u0927\u0928\u0941\u0937\u0940
+        \u0930\u0902\u0917\u094B\u0902 \u0938\u0947 \u0938\u091C\u093E\u090F\u0901\u0964"
+      - "\u0644\u0648\u0651\u0646 \u0627\u0633\u0645\u0643 \u0628\u0623\u0644\u0648\u0627\u0646
+        \u0642\u0648\u0633 \u0642\u0632\u062D."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/65Sw65y77ZWcIO2Zqeq4iOu5m-ycvOuhnCDri4nrhKTsnoTsnYQg6r6466mw7JqULg
+      TermType: 0
+      Description: "\uB530\uB73B\uD55C \uD669\uAE08\uBE5B\uC73C\uB85C \uB2C9\uB124\uC784\uC744
+        \uAFB8\uBA70\uC694."
+      Languages:
+      - "\uB530\uB73B\uD55C \uD669\uAE08\uBE5B\uC73C\uB85C \uB2C9\uB124\uC784\uC744
+        \uAFB8\uBA70\uC694."
+      - Decorate your nickname with warm golden hues.
+      - "\u7528\u6E29\u6696\u91D1\u8272\u88C5\u9970\u6635\u79F0\u3002"
+      - "\u7528\u6EAB\u6696\u91D1\u8272\u88DD\u98FE\u66B1\u7A31\u3002"
+      - "\u30CB\u30C3\u30AF\u30CD\u30FC\u30E0\u3092\u6696\u304B\u306A\u91D1\u8272\u3067\u98FE\u308A\u307E\u3059\u3002"
+      - "Decora tu apodo con c\xE1lidos tonos dorados."
+      - Decore seu apelido com tons dourados.
+      - "D\xE9corez votre pseudo de teintes dor\xE9es chaleureuses."
+      - "Schm\xFCcke deinen Namen mit warmem Gold."
+      - Hiasi nama panggilan dengan warna emas hangat.
+      - "\u0909\u092A\u0928\u093E\u092E \u0915\u094B \u0938\u0941\u0928\u0939\u0930\u0947
+        \u0930\u0902\u0917 \u0938\u0947 \u0938\u091C\u093E\u090F\u0901\u0964"
+      - "\u0632\u064A\u0651\u0646 \u0627\u0633\u0645\u0643 \u0628\u062F\u0631\u062C\u0627\u062A
+        \u0630\u0647\u0628\u064A\u0629 \u062F\u0627\u0641\u0626\u0629."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7IKw65y77ZWcIOuvvO2KuOu5m-ycvOuhnCDri4nrhKTsnoTsnYQg6r6466mw7JqULg
+      TermType: 0
+      Description: "\uC0B0\uB73B\uD55C \uBBFC\uD2B8\uBE5B\uC73C\uB85C \uB2C9\uB124\uC784\uC744
+        \uAFB8\uBA70\uC694."
+      Languages:
+      - "\uC0B0\uB73B\uD55C \uBBFC\uD2B8\uBE5B\uC73C\uB85C \uB2C9\uB124\uC784\uC744
+        \uAFB8\uBA70\uC694."
+      - Decorate your nickname with fresh mint hues.
+      - "\u7528\u6E05\u65B0\u8584\u8377\u8272\u88C5\u9970\u6635\u79F0\u3002"
+      - "\u7528\u6E05\u65B0\u8584\u8377\u8272\u88DD\u98FE\u66B1\u7A31\u3002"
+      - "\u30CB\u30C3\u30AF\u30CD\u30FC\u30E0\u3092\u723D\u3084\u304B\u306A\u30DF\u30F3\u30C8\u8272\u3067\u98FE\u308A\u307E\u3059\u3002"
+      - Decora tu apodo con frescos tonos menta.
+      - Decore seu apelido com tons frescos de menta.
+      - "D\xE9corez votre pseudo de teintes menthe fra\xEEches."
+      - "Schm\xFCcke deinen Namen mit frischem Mint."
+      - Hiasi nama panggilan dengan warna mint segar.
+      - "\u0909\u092A\u0928\u093E\u092E \u0915\u094B \u0924\u093E\u091C\u093C\u0947
+        \u092E\u093F\u0902\u091F \u0930\u0902\u0917 \u0938\u0947 \u0938\u091C\u093E\u090F\u0901\u0964"
+      - "\u0632\u064A\u0651\u0646 \u0627\u0633\u0645\u0643 \u0628\u062F\u0631\u062C\u0627\u062A
+        \u0627\u0644\u0646\u0639\u0646\u0627\u0639 \u0627\u0644\u0645\u0646\u0639\u0634\u0629."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7ISg66qF7ZWcIOuEpOyYqOu5m-ycvOuhnCDri4nrhKTsnoTsnYQg6r6466mw7JqULg
+      TermType: 0
+      Description: "\uC120\uBA85\uD55C \uB124\uC628\uBE5B\uC73C\uB85C \uB2C9\uB124\uC784\uC744
+        \uAFB8\uBA70\uC694."
+      Languages:
+      - "\uC120\uBA85\uD55C \uB124\uC628\uBE5B\uC73C\uB85C \uB2C9\uB124\uC784\uC744
+        \uAFB8\uBA70\uC694."
+      - Decorate your nickname with vivid neon hues.
+      - "\u7528\u9C9C\u8273\u9713\u8679\u8272\u88C5\u9970\u6635\u79F0\u3002"
+      - "\u7528\u9BAE\u8C54\u9713\u8679\u8272\u88DD\u98FE\u66B1\u7A31\u3002"
+      - "\u30CB\u30C3\u30AF\u30CD\u30FC\u30E0\u3092\u9BAE\u3084\u304B\u306A\u30CD\u30AA\u30F3\u8272\u3067\u98FE\u308A\u307E\u3059\u3002"
+      - "Decora tu apodo con vivos tonos ne\xF3n."
+      - Decore seu apelido com tons vivos de neon.
+      - "D\xE9corez votre pseudo de teintes n\xE9on vives."
+      - "Schm\xFCcke deinen Namen mit leuchtendem Neon."
+      - Hiasi nama panggilan dengan warna neon cerah.
+      - "\u0909\u092A\u0928\u093E\u092E \u0915\u094B \u091A\u092E\u0915\u0940\u0932\u0947
+        \u0928\u093F\u092F\u0949\u0928 \u0930\u0902\u0917 \u0938\u0947 \u0938\u091C\u093E\u090F\u0901\u0964"
+      - "\u0632\u064A\u0651\u0646 \u0627\u0633\u0645\u0643 \u0628\u062F\u0631\u062C\u0627\u062A
+        \u0646\u064A\u0648\u0646 \u0632\u0627\u0647\u064A\u0629."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/67aE7ZmN67mbIOuFuOydhCDsg4nsnLzroZwg64uJ64Sk7J6E7J2EIOq-uOupsOyalC4
+      TermType: 0
+      Description: "\uBD84\uD64D\uBE5B \uB178\uC744 \uC0C9\uC73C\uB85C \uB2C9\uB124\uC784\uC744
+        \uAFB8\uBA70\uC694."
+      Languages:
+      - "\uBD84\uD64D\uBE5B \uB178\uC744 \uC0C9\uC73C\uB85C \uB2C9\uB124\uC784\uC744
+        \uAFB8\uBA70\uC694."
+      - Decorate your nickname with pink sunset hues.
+      - "\u7528\u7C89\u8272\u665A\u971E\u88C5\u9970\u6635\u79F0\u3002"
+      - "\u7528\u7C89\u8272\u665A\u971E\u88DD\u98FE\u66B1\u7A31\u3002"
+      - "\u30CB\u30C3\u30AF\u30CD\u30FC\u30E0\u3092\u30D4\u30F3\u30AF\u306E\u5915\u713C\u3051\u8272\u3067\u98FE\u308A\u307E\u3059\u3002"
+      - Decora tu apodo con tonos de un atardecer rosa.
+      - "Decore seu apelido com tons rosados do p\xF4r do sol."
+      - "D\xE9corez votre pseudo de teintes roses du cr\xE9puscule."
+      - "Schm\xFCcke deinen Namen mit rosa Abendfarben."
+      - Hiasi nama panggilan dengan warna senja merah muda.
+      - "\u0909\u092A\u0928\u093E\u092E \u0915\u094B \u0917\u0941\u0932\u093E\u092C\u0940
+        \u0938\u093E\u0901\u091D \u0915\u0947 \u0930\u0902\u0917 \u0938\u0947 \u0938\u091C\u093E\u090F\u0901\u0964"
+      - "\u0632\u064A\u0651\u0646 \u0627\u0633\u0645\u0643 \u0628\u062F\u0631\u062C\u0627\u062A
+        \u0627\u0644\u063A\u0631\u0648\u0628 \u0627\u0644\u0648\u0631\u062F\u064A\u0629."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7LqQ66at7YSwIOuSpOuhnCDsmKTroZzrnbzruZvsnbQg7Y687LOQ7KC47JqULg
+      TermType: 0
+      Description: "\uCE90\uB9AD\uD130 \uB4A4\uB85C \uC624\uB85C\uB77C\uBE5B\uC774
+        \uD3BC\uCCD0\uC838\uC694."
+      Languages:
+      - "\uCE90\uB9AD\uD130 \uB4A4\uB85C \uC624\uB85C\uB77C\uBE5B\uC774 \uD3BC\uCCD0\uC838\uC694."
+      - Aurora colors spread behind your character.
+      - "\u8BA9\u6781\u5149\u5728\u89D2\u8272\u8EAB\u540E\u94FA\u5C55\u3002"
+      - "\u8B93\u6975\u5149\u5728\u89D2\u8272\u8EAB\u5F8C\u92EA\u5C55\u3002"
+      - "\u30AD\u30E3\u30E9\u30AF\u30BF\u30FC\u306E\u5F8C\u308D\u306B\u30AA\u30FC\u30ED\u30E9\u304C\u5E83\u304C\u308A\u307E\u3059\u3002"
+      - "Colores de aurora detr\xE1s de tu personaje."
+      - "Cores de aurora atr\xE1s do seu personagem."
+      - "Des couleurs d'aurore derri\xE8re votre personnage."
+      - Aurorafarben hinter deinem Charakter.
+      - Warna aurora terbentang di belakang karakter.
+      - "\u0915\u093F\u0930\u0926\u093E\u0930 \u0915\u0947 \u092A\u0940\u091B\u0947
+        \u0911\u0930\u094B\u0930\u093E \u0915\u0947 \u0930\u0902\u0917 \u092B\u0948\u0932\u0924\u0947
+        \u0939\u0948\u0902\u0964"
+      - "\u062A\u0646\u062A\u0634\u0631 \u0623\u0644\u0648\u0627\u0646 \u0627\u0644\u0634\u0641\u0642
+        \u062E\u0644\u0641 \u0634\u062E\u0635\u064A\u062A\u0643."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7LqQ66at7YSwIOuSpOuhnCDsnpHsnYAg67OE65Ok7J20IOu5m-uCmOyalC4
+      TermType: 0
+      Description: "\uCE90\uB9AD\uD130 \uB4A4\uB85C \uC791\uC740 \uBCC4\uB4E4\uC774
+        \uBE5B\uB098\uC694."
+      Languages:
+      - "\uCE90\uB9AD\uD130 \uB4A4\uB85C \uC791\uC740 \uBCC4\uB4E4\uC774 \uBE5B\uB098\uC694."
+      - Little stars shine behind your character.
+      - "\u8BA9\u5C0F\u661F\u661F\u5728\u89D2\u8272\u8EAB\u540E\u95EA\u8000\u3002"
+      - "\u8B93\u5C0F\u661F\u661F\u5728\u89D2\u8272\u8EAB\u5F8C\u9583\u8000\u3002"
+      - "\u30AD\u30E3\u30E9\u30AF\u30BF\u30FC\u306E\u5F8C\u308D\u3067\u5C0F\u3055\u306A\u661F\u304C\u8F1D\u304D\u307E\u3059\u3002"
+      - "Peque\xF1as estrellas brillan detr\xE1s de tu personaje."
+      - "Pequenas estrelas brilham atr\xE1s do seu personagem."
+      - "De petites \xE9toiles brillent derri\xE8re votre personnage."
+      - Kleine Sterne leuchten hinter deinem Charakter.
+      - Bintang kecil bersinar di belakang karakter.
+      - "\u0915\u093F\u0930\u0926\u093E\u0930 \u0915\u0947 \u092A\u0940\u091B\u0947
+        \u091B\u094B\u091F\u0947 \u0924\u093E\u0930\u0947 \u091A\u092E\u0915\u0924\u0947
+        \u0939\u0948\u0902\u0964"
+      - "\u062A\u0644\u0645\u0639 \u0646\u062C\u0648\u0645 \u0635\u063A\u064A\u0631\u0629
+        \u062E\u0644\u0641 \u0634\u062E\u0635\u064A\u062A\u0643."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7LqQ66at7YSwIOuSpOulvCDrtoTtmY0g6r2D7J6O7Jy866GcIOq-uOupsOyalC4
+      TermType: 0
+      Description: "\uCE90\uB9AD\uD130 \uB4A4\uB97C \uBD84\uD64D \uAF43\uC78E\uC73C\uB85C
+        \uAFB8\uBA70\uC694."
+      Languages:
+      - "\uCE90\uB9AD\uD130 \uB4A4\uB97C \uBD84\uD64D \uAF43\uC78E\uC73C\uB85C \uAFB8\uBA70\uC694."
+      - Decorate your character's background with pink petals.
+      - "\u7528\u7C89\u8272\u82B1\u74E3\u88C5\u9970\u89D2\u8272\u80CC\u666F\u3002"
+      - "\u7528\u7C89\u8272\u82B1\u74E3\u88DD\u98FE\u89D2\u8272\u80CC\u666F\u3002"
+      - "\u30AD\u30E3\u30E9\u30AF\u30BF\u30FC\u306E\u80CC\u666F\u3092\u30D4\u30F3\u30AF\u306E\u82B1\u3073\u3089\u3067\u98FE\u308A\u307E\u3059\u3002"
+      - "Decora el fondo de tu personaje con p\xE9talos rosas."
+      - "Decore o fundo do personagem com p\xE9talas rosas."
+      - "D\xE9corez le fond du personnage de p\xE9tales roses."
+      - "Schm\xFCcke den Hintergrund mit rosa Bl\xFCtenbl\xE4ttern."
+      - Hiasi latar karakter dengan kelopak merah muda.
+      - "\u0915\u093F\u0930\u0926\u093E\u0930 \u0915\u0940 \u092A\u0943\u0937\u094D\u0920\u092D\u0942\u092E\u093F
+        \u0915\u094B \u0917\u0941\u0932\u093E\u092C\u0940 \u092A\u0902\u0916\u0941\u0921\u093C\u093F\u092F\u094B\u0902
+        \u0938\u0947 \u0938\u091C\u093E\u090F\u0901\u0964"
+      - "\u0632\u064A\u0651\u0646 \u062E\u0644\u0641\u064A\u0629 \u0634\u062E\u0635\u064A\u062A\u0643
+        \u0628\u0628\u062A\u0644\u0627\u062A \u0648\u0631\u062F\u064A\u0629."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7LqQ66at7YSwIOuSpOuhnCDtkbjrpbgg66y86rKw7J20IO2OvOyzkOyguOyalC4
+      TermType: 0
+      Description: "\uCE90\uB9AD\uD130 \uB4A4\uB85C \uD478\uB978 \uBB3C\uACB0\uC774
+        \uD3BC\uCCD0\uC838\uC694."
+      Languages:
+      - "\uCE90\uB9AD\uD130 \uB4A4\uB85C \uD478\uB978 \uBB3C\uACB0\uC774 \uD3BC\uCCD0\uC838\uC694."
+      - Blue waves spread behind your character.
+      - "\u8BA9\u84DD\u8272\u6CE2\u6D6A\u5728\u89D2\u8272\u8EAB\u540E\u94FA\u5C55\u3002"
+      - "\u8B93\u85CD\u8272\u6CE2\u6D6A\u5728\u89D2\u8272\u8EAB\u5F8C\u92EA\u5C55\u3002"
+      - "\u30AD\u30E3\u30E9\u30AF\u30BF\u30FC\u306E\u5F8C\u308D\u306B\u9752\u3044\u6CE2\u304C\u5E83\u304C\u308A\u307E\u3059\u3002"
+      - "Olas azules detr\xE1s de tu personaje."
+      - "Ondas azuis atr\xE1s do seu personagem."
+      - "Des vagues bleues derri\xE8re votre personnage."
+      - Blaue Wellen hinter deinem Charakter.
+      - Ombak biru terbentang di belakang karakter.
+      - "\u0915\u093F\u0930\u0926\u093E\u0930 \u0915\u0947 \u092A\u0940\u091B\u0947
+        \u0928\u0940\u0932\u0940 \u0932\u0939\u0930\u0947\u0902 \u092B\u0948\u0932\u0924\u0940
+        \u0939\u0948\u0902\u0964"
+      - "\u062A\u0645\u062A\u062F \u0623\u0645\u0648\u0627\u062C \u0632\u0631\u0642\u0627\u0621
+        \u062E\u0644\u0641 \u0634\u062E\u0635\u064A\u062A\u0643."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7LqQ66at7YSwIOuSpOulvCDrlLDrnLvtlZwg64W47J2E66GcIOq-uOupsOyalC4
+      TermType: 0
+      Description: "\uCE90\uB9AD\uD130 \uB4A4\uB97C \uB530\uB73B\uD55C \uB178\uC744\uB85C
+        \uAFB8\uBA70\uC694."
+      Languages:
+      - "\uCE90\uB9AD\uD130 \uB4A4\uB97C \uB530\uB73B\uD55C \uB178\uC744\uB85C \uAFB8\uBA70\uC694."
+      - Decorate your character's background with a warm sunset.
+      - "\u7528\u6E29\u6696\u665A\u971E\u88C5\u9970\u89D2\u8272\u80CC\u666F\u3002"
+      - "\u7528\u6EAB\u6696\u665A\u971E\u88DD\u98FE\u89D2\u8272\u80CC\u666F\u3002"
+      - "\u30AD\u30E3\u30E9\u30AF\u30BF\u30FC\u306E\u80CC\u666F\u3092\u6696\u304B\u306A\u5915\u713C\u3051\u3067\u98FE\u308A\u307E\u3059\u3002"
+      - "Decora el fondo con un c\xE1lido atardecer."
+      - "Decore o fundo com um p\xF4r do sol acolhedor."
+      - "D\xE9corez le fond d'un cr\xE9puscule chaleureux."
+      - "Schm\xFCcke den Hintergrund mit warmem Abendlicht."
+      - Hiasi latar karakter dengan senja hangat.
+      - "\u0915\u093F\u0930\u0926\u093E\u0930 \u0915\u0940 \u092A\u0943\u0937\u094D\u0920\u092D\u0942\u092E\u093F
+        \u0915\u094B \u0938\u093E\u0901\u091D \u0915\u0947 \u0930\u0902\u0917\u094B\u0902
+        \u0938\u0947 \u0938\u091C\u093E\u090F\u0901\u0964"
+      - "\u0632\u064A\u0651\u0646 \u062E\u0644\u0641\u064A\u0629 \u0634\u062E\u0635\u064A\u062A\u0643
+        \u0628\u063A\u0631\u0648\u0628 \u062F\u0627\u0641\u0626."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7LqQ66at7YSw66W8IOyblOqzhOyImCDsno7snLzroZwg6rCQ7Iu47JqULg
+      TermType: 0
+      Description: "\uCE90\uB9AD\uD130\uB97C \uC6D4\uACC4\uC218 \uC78E\uC73C\uB85C
+        \uAC10\uC2F8\uC694."
+      Languages:
+      - "\uCE90\uB9AD\uD130\uB97C \uC6D4\uACC4\uC218 \uC78E\uC73C\uB85C \uAC10\uC2F8\uC694."
+      - Surround your character with laurel leaves.
+      - "\u7528\u6708\u6842\u53F6\u73AF\u7ED5\u89D2\u8272\u3002"
+      - "\u7528\u6708\u6842\u8449\u74B0\u7E5E\u89D2\u8272\u3002"
+      - "\u30AD\u30E3\u30E9\u30AF\u30BF\u30FC\u3092\u6708\u6842\u6A39\u306E\u8449\u3067\u56F2\u307F\u307E\u3059\u3002"
+      - Rodea tu personaje con hojas de laurel.
+      - Envolva seu personagem com folhas de louro.
+      - Entourez votre personnage de feuilles de laurier.
+      - "Umrahme deinen Charakter mit Lorbeerbl\xE4ttern."
+      - Kelilingi karakter dengan daun laurel.
+      - "\u0915\u093F\u0930\u0926\u093E\u0930 \u0915\u094B \u0932\u0949\u0930\u0947\u0932
+        \u0915\u0940 \u092A\u0924\u094D\u0924\u093F\u092F\u094B\u0902 \u0938\u0947
+        \u0918\u0947\u0930\u0947\u0902\u0964"
+      - "\u0623\u062D\u0637 \u0634\u062E\u0635\u064A\u062A\u0643 \u0628\u0623\u0648\u0631\u0627\u0642
+        \u0627\u0644\u063A\u0627\u0631."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7LqQ66at7YSw66W8IOuwmOynneydtOuKlCDrs7TshJ3snLzroZwg6rCQ7Iu47JqULg
+      TermType: 0
+      Description: "\uCE90\uB9AD\uD130\uB97C \uBC18\uC9DD\uC774\uB294 \uBCF4\uC11D\uC73C\uB85C
+        \uAC10\uC2F8\uC694."
+      Languages:
+      - "\uCE90\uB9AD\uD130\uB97C \uBC18\uC9DD\uC774\uB294 \uBCF4\uC11D\uC73C\uB85C
+        \uAC10\uC2F8\uC694."
+      - Surround your character with sparkling gems.
+      - "\u7528\u95EA\u8000\u5B9D\u77F3\u73AF\u7ED5\u89D2\u8272\u3002"
+      - "\u7528\u9583\u8000\u5BF6\u77F3\u74B0\u7E5E\u89D2\u8272\u3002"
+      - "\u30AD\u30E3\u30E9\u30AF\u30BF\u30FC\u3092\u8F1D\u304F\u5B9D\u77F3\u3067\u56F2\u307F\u307E\u3059\u3002"
+      - Rodea tu personaje con gemas brillantes.
+      - Envolva seu personagem com gemas brilhantes.
+      - "Entourez votre personnage de gemmes \xE9tincelantes."
+      - Umrahme deinen Charakter mit funkelnden Edelsteinen.
+      - Kelilingi karakter dengan permata berkilau.
+      - "\u0915\u093F\u0930\u0926\u093E\u0930 \u0915\u094B \u091A\u092E\u0915\u0924\u0947
+        \u0930\u0924\u094D\u0928\u094B\u0902 \u0938\u0947 \u0918\u0947\u0930\u0947\u0902\u0964"
+      - "\u0623\u062D\u0637 \u0634\u062E\u0635\u064A\u062A\u0643 \u0628\u062C\u0648\u0627\u0647\u0631
+        \u0645\u062A\u0644\u0623\u0644\u0626\u0629."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7LqQ66at7YSw66W8IOyEoOuqhe2VnCDrhKTsmKgg7ISg7Jy866GcIOqwkOyLuOyalC4
+      TermType: 0
+      Description: "\uCE90\uB9AD\uD130\uB97C \uC120\uBA85\uD55C \uB124\uC628 \uC120\uC73C\uB85C
+        \uAC10\uC2F8\uC694."
+      Languages:
+      - "\uCE90\uB9AD\uD130\uB97C \uC120\uBA85\uD55C \uB124\uC628 \uC120\uC73C\uB85C
+        \uAC10\uC2F8\uC694."
+      - Surround your character with vivid neon lines.
+      - "\u7528\u9C9C\u8273\u9713\u8679\u7EBF\u6761\u73AF\u7ED5\u89D2\u8272\u3002"
+      - "\u7528\u9BAE\u8C54\u9713\u8679\u7DDA\u689D\u74B0\u7E5E\u89D2\u8272\u3002"
+      - "\u30AD\u30E3\u30E9\u30AF\u30BF\u30FC\u3092\u9BAE\u3084\u304B\u306A\u30CD\u30AA\u30F3\u306E\u7DDA\u3067\u56F2\u307F\u307E\u3059\u3002"
+      - "Rodea tu personaje con l\xEDneas ne\xF3n vivas."
+      - Envolva seu personagem com linhas neon vivas.
+      - "Entourez votre personnage de lignes n\xE9on vives."
+      - Umrahme deinen Charakter mit leuchtenden Neonlinien.
+      - Kelilingi karakter dengan garis neon cerah.
+      - "\u0915\u093F\u0930\u0926\u093E\u0930 \u0915\u094B \u091A\u092E\u0915\u0940\u0932\u0940
+        \u0928\u093F\u092F\u0949\u0928 \u0930\u0947\u0916\u093E\u0913\u0902 \u0938\u0947
+        \u0918\u0947\u0930\u0947\u0902\u0964"
+      - "\u0623\u062D\u0637 \u0634\u062E\u0635\u064A\u062A\u0643 \u0628\u062E\u0637\u0648\u0637
+        \u0646\u064A\u0648\u0646 \u0632\u0627\u0647\u064A\u0629."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7LqQ66at7YSw66W8IOyCrOuekeyKpOufrOyatCDrpqzrs7jsnLzroZwg6rCQ7Iu47JqULg
+      TermType: 0
+      Description: "\uCE90\uB9AD\uD130\uB97C \uC0AC\uB791\uC2A4\uB7EC\uC6B4 \uB9AC\uBCF8\uC73C\uB85C
+        \uAC10\uC2F8\uC694."
+      Languages:
+      - "\uCE90\uB9AD\uD130\uB97C \uC0AC\uB791\uC2A4\uB7EC\uC6B4 \uB9AC\uBCF8\uC73C\uB85C
+        \uAC10\uC2F8\uC694."
+      - Surround your character with lovely ribbons.
+      - "\u7528\u53EF\u7231\u4E1D\u5E26\u73AF\u7ED5\u89D2\u8272\u3002"
+      - "\u7528\u53EF\u611B\u7DDE\u5E36\u74B0\u7E5E\u89D2\u8272\u3002"
+      - "\u30AD\u30E3\u30E9\u30AF\u30BF\u30FC\u3092\u304B\u308F\u3044\u3044\u30EA\u30DC\u30F3\u3067\u56F2\u307F\u307E\u3059\u3002"
+      - Rodea tu personaje con bonitos lazos.
+      - "Envolva seu personagem com lindos la\xE7os."
+      - Entourez votre personnage de jolis rubans.
+      - "Umrahme deinen Charakter mit h\xFCbschen Schleifen."
+      - Kelilingi karakter dengan pita cantik.
+      - "\u0915\u093F\u0930\u0926\u093E\u0930 \u0915\u094B \u0938\u0941\u0902\u0926\u0930
+        \u0930\u093F\u092C\u0928 \u0938\u0947 \u0918\u0947\u0930\u0947\u0902\u0964"
+      - "\u0623\u062D\u0637 \u0634\u062E\u0635\u064A\u062A\u0643 \u0628\u0634\u0631\u0627\u0626\u0637
+        \u062C\u0645\u064A\u0644\u0629."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7LqQ66at7YSw66W8IOyekeydgCDrs4TsnpDrpqzroZwg6rCQ7Iu47JqULg
+      TermType: 0
+      Description: "\uCE90\uB9AD\uD130\uB97C \uC791\uC740 \uBCC4\uC790\uB9AC\uB85C
+        \uAC10\uC2F8\uC694."
+      Languages:
+      - "\uCE90\uB9AD\uD130\uB97C \uC791\uC740 \uBCC4\uC790\uB9AC\uB85C \uAC10\uC2F8\uC694."
+      - Surround your character with tiny constellations.
+      - "\u7528\u5C0F\u661F\u5EA7\u73AF\u7ED5\u89D2\u8272\u3002"
+      - "\u7528\u5C0F\u661F\u5EA7\u74B0\u7E5E\u89D2\u8272\u3002"
+      - "\u30AD\u30E3\u30E9\u30AF\u30BF\u30FC\u3092\u5C0F\u3055\u306A\u661F\u5EA7\u3067\u56F2\u307F\u307E\u3059\u3002"
+      - "Rodea tu personaje con peque\xF1as constelaciones."
+      - "Envolva seu personagem com pequenas constela\xE7\xF5es."
+      - Entourez votre personnage de petites constellations.
+      - Umrahme deinen Charakter mit kleinen Sternbildern.
+      - Kelilingi karakter dengan rasi bintang kecil.
+      - "\u0915\u093F\u0930\u0926\u093E\u0930 \u0915\u094B \u091B\u094B\u091F\u0947
+        \u0924\u093E\u0930\u093E\u092E\u0902\u0921\u0932\u094B\u0902 \u0938\u0947
+        \u0918\u0947\u0930\u0947\u0902\u0964"
+      - "\u0623\u062D\u0637 \u0634\u062E\u0635\u064A\u062A\u0643 \u0628\u0643\u0648\u0643\u0628\u0627\u062A
+        \u0635\u063A\u064A\u0631\u0629."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7LGE7YyF7J2EIO2PrOq3vO2VnCDqtazrpoQg66qo7JaR7Jy866GcIOq-uOupsOyalC4
+      TermType: 0
+      Description: "\uCC44\uD305\uC744 \uD3EC\uADFC\uD55C \uAD6C\uB984 \uBAA8\uC591\uC73C\uB85C
+        \uAFB8\uBA70\uC694."
+      Languages:
+      - "\uCC44\uD305\uC744 \uD3EC\uADFC\uD55C \uAD6C\uB984 \uBAA8\uC591\uC73C\uB85C
+        \uAFB8\uBA70\uC694."
+      - Decorate your chat with soft cloud shapes.
+      - "\u7528\u67D4\u8F6F\u4E91\u6735\u88C5\u9970\u804A\u5929\u3002"
+      - "\u7528\u67D4\u8EDF\u96F2\u6735\u88DD\u98FE\u804A\u5929\u3002"
+      - "\u30C1\u30E3\u30C3\u30C8\u3092\u3075\u3093\u308F\u308A\u3057\u305F\u96F2\u306E\u5F62\u3067\u98FE\u308A\u307E\u3059\u3002"
+      - Decora tu chat con suaves formas de nube.
+      - Decore o chat com formas suaves de nuvens.
+      - "D\xE9corez vos messages de formes de nuages doux."
+      - "Schm\xFCcke deinen Chat mit weichen Wolkenformen."
+      - Hiasi obrolan dengan bentuk awan lembut.
+      - "\u091A\u0948\u091F \u0915\u094B \u092E\u0941\u0932\u093E\u092F\u092E \u092C\u093E\u0926\u0932\u094B\u0902
+        \u0915\u0947 \u0906\u0915\u093E\u0930 \u0938\u0947 \u0938\u091C\u093E\u090F\u0901\u0964"
+      - "\u0632\u064A\u0651\u0646 \u0627\u0644\u062F\u0631\u062F\u0634\u0629 \u0628\u0623\u0634\u0643\u0627\u0644
+        \u0633\u062D\u0628 \u0646\u0627\u0639\u0645\u0629."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7LGE7YyF7J2EIOuFuOuegCDrqZTrqqjsp4DroZwg6r6466mw7JqULg
+      TermType: 0
+      Description: "\uCC44\uD305\uC744 \uB178\uB780 \uBA54\uBAA8\uC9C0\uB85C \uAFB8\uBA70\uC694."
+      Languages:
+      - "\uCC44\uD305\uC744 \uB178\uB780 \uBA54\uBAA8\uC9C0\uB85C \uAFB8\uBA70\uC694."
+      - Decorate your chat with yellow sticky notes.
+      - "\u7528\u9EC4\u8272\u4FBF\u7B7E\u88C5\u9970\u804A\u5929\u3002"
+      - "\u7528\u9EC3\u8272\u4FBF\u689D\u88DD\u98FE\u804A\u5929\u3002"
+      - "\u30C1\u30E3\u30C3\u30C8\u3092\u9EC4\u8272\u3044\u30E1\u30E2\u3067\u98FE\u308A\u307E\u3059\u3002"
+      - Decora tu chat con notas amarillas.
+      - Decore o chat com notas adesivas amarelas.
+      - "D\xE9corez vos messages de pense-b\xEAtes jaunes."
+      - "Schm\xFCcke deinen Chat mit gelben Notizzetteln."
+      - Hiasi obrolan dengan catatan kuning.
+      - "\u091A\u0948\u091F \u0915\u094B \u092A\u0940\u0932\u0947 \u0928\u094B\u091F
+        \u0938\u0947 \u0938\u091C\u093E\u090F\u0901\u0964"
+      - "\u0632\u064A\u0651\u0646 \u0627\u0644\u062F\u0631\u062F\u0634\u0629 \u0628\u0645\u0644\u0627\u062D\u0638\u0627\u062A
+        \u0635\u0641\u0631\u0627\u0621."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7LGE7YyF7J2EIOyEoOuqhe2VnCDrhKTsmKgg7IOJ7Jy866GcIOq-uOupsOyalC4
+      TermType: 0
+      Description: "\uCC44\uD305\uC744 \uC120\uBA85\uD55C \uB124\uC628 \uC0C9\uC73C\uB85C
+        \uAFB8\uBA70\uC694."
+      Languages:
+      - "\uCC44\uD305\uC744 \uC120\uBA85\uD55C \uB124\uC628 \uC0C9\uC73C\uB85C \uAFB8\uBA70\uC694."
+      - Decorate your chat with vivid neon colors.
+      - "\u7528\u9C9C\u8273\u9713\u8679\u8272\u88C5\u9970\u804A\u5929\u3002"
+      - "\u7528\u9BAE\u8C54\u9713\u8679\u8272\u88DD\u98FE\u804A\u5929\u3002"
+      - "\u30C1\u30E3\u30C3\u30C8\u3092\u9BAE\u3084\u304B\u306A\u30CD\u30AA\u30F3\u8272\u3067\u98FE\u308A\u307E\u3059\u3002"
+      - "Decora tu chat con vivos colores ne\xF3n."
+      - Decore o chat com cores vivas de neon.
+      - "D\xE9corez vos messages de couleurs n\xE9on vives."
+      - "Schm\xFCcke deinen Chat mit leuchtenden Neonfarben."
+      - Hiasi obrolan dengan warna neon cerah.
+      - "\u091A\u0948\u091F \u0915\u094B \u091A\u092E\u0915\u0940\u0932\u0947 \u0928\u093F\u092F\u0949\u0928
+        \u0930\u0902\u0917\u094B\u0902 \u0938\u0947 \u0938\u091C\u093E\u090F\u0901\u0964"
+      - "\u0632\u064A\u0651\u0646 \u0627\u0644\u062F\u0631\u062F\u0634\u0629 \u0628\u0623\u0644\u0648\u0627\u0646
+        \u0646\u064A\u0648\u0646 \u0632\u0627\u0647\u064A\u0629."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7LGE7YyF7J2EIOq3gOyXrOyatCDtlL3shYAg66qo7JaR7Jy866GcIOq-uOupsOyalC4
+      TermType: 0
+      Description: "\uCC44\uD305\uC744 \uADC0\uC5EC\uC6B4 \uD53D\uC140 \uBAA8\uC591\uC73C\uB85C
+        \uAFB8\uBA70\uC694."
+      Languages:
+      - "\uCC44\uD305\uC744 \uADC0\uC5EC\uC6B4 \uD53D\uC140 \uBAA8\uC591\uC73C\uB85C
+        \uAFB8\uBA70\uC694."
+      - Decorate your chat with cute pixel shapes.
+      - "\u7528\u53EF\u7231\u50CF\u7D20\u5F62\u72B6\u88C5\u9970\u804A\u5929\u3002"
+      - "\u7528\u53EF\u611B\u50CF\u7D20\u5F62\u72C0\u88DD\u98FE\u804A\u5929\u3002"
+      - "\u30C1\u30E3\u30C3\u30C8\u3092\u304B\u308F\u3044\u3044\u30D4\u30AF\u30BB\u30EB\u5F62\u3067\u98FE\u308A\u307E\u3059\u3002"
+      - "Decora tu chat con bonitas formas de p\xEDxeles."
+      - Decore o chat com formas fofas de pixels.
+      - "D\xE9corez vos messages de jolis motifs pixelis\xE9s."
+      - "Schm\xFCcke deinen Chat mit niedlichen Pixelformen."
+      - Hiasi obrolan dengan bentuk piksel lucu.
+      - "\u091A\u0948\u091F \u0915\u094B \u092A\u094D\u092F\u093E\u0930\u0947 \u092A\u093F\u0915\u094D\u0938\u0947\u0932
+        \u0906\u0915\u093E\u0930 \u0938\u0947 \u0938\u091C\u093E\u090F\u0901\u0964"
+      - "\u0632\u064A\u0651\u0646 \u0627\u0644\u062F\u0631\u062F\u0634\u0629 \u0628\u0623\u0634\u0643\u0627\u0644
+        \u0628\u0643\u0633\u0644 \u0644\u0637\u064A\u0641\u0629."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7LGE7YyF7J2EIOu2gOuTnOufrOyatCDqvYPsno4g7IOJ7Jy866GcIOq-uOupsOyalC4
+      TermType: 0
+      Description: "\uCC44\uD305\uC744 \uBD80\uB4DC\uB7EC\uC6B4 \uAF43\uC78E \uC0C9\uC73C\uB85C
+        \uAFB8\uBA70\uC694."
+      Languages:
+      - "\uCC44\uD305\uC744 \uBD80\uB4DC\uB7EC\uC6B4 \uAF43\uC78E \uC0C9\uC73C\uB85C
+        \uAFB8\uBA70\uC694."
+      - Decorate your chat with soft petal colors.
+      - "\u7528\u67D4\u548C\u82B1\u74E3\u8272\u88C5\u9970\u804A\u5929\u3002"
+      - "\u7528\u67D4\u548C\u82B1\u74E3\u8272\u88DD\u98FE\u804A\u5929\u3002"
+      - "\u30C1\u30E3\u30C3\u30C8\u3092\u3084\u308F\u3089\u304B\u306A\u82B1\u3073\u3089\u306E\u8272\u3067\u98FE\u308A\u307E\u3059\u3002"
+      - "Decora tu chat con suaves colores de p\xE9talos."
+      - "Decore o chat com cores suaves de p\xE9talas."
+      - "D\xE9corez vos messages de douces couleurs de p\xE9tales."
+      - "Schm\xFCcke deinen Chat mit sanften Bl\xFCtenfarben."
+      - Hiasi obrolan dengan warna kelopak lembut.
+      - "\u091A\u0948\u091F \u0915\u094B \u092A\u0902\u0916\u0941\u0921\u093C\u093F\u092F\u094B\u0902
+        \u0915\u0947 \u0939\u0932\u094D\u0915\u0947 \u0930\u0902\u0917\u094B\u0902
+        \u0938\u0947 \u0938\u091C\u093E\u090F\u0901\u0964"
+      - "\u0632\u064A\u0651\u0646 \u0627\u0644\u062F\u0631\u062F\u0634\u0629 \u0628\u0623\u0644\u0648\u0627\u0646
+        \u0628\u062A\u0644\u0627\u062A \u0646\u0627\u0639\u0645\u0629."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
     CaseInsensitiveTerms: 0
     OnMissingTranslation: 0
     mTerm_AppName:

@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using System.Linq;
 
 namespace DrawLiar
 {
@@ -7,6 +8,7 @@ namespace DrawLiar
     {
         public const string PAID_GEMS = "PaidGems";
         public const string PAINTER_SUBSCRIPTION = "PainterSubscription";
+        public const string COSMETIC = "Cosmetic";
         public const string PAINTER_PRODUCT_ID = "painter-membership-30d";
         public const int SUBSCRIPTION_DAYS = 30;
 
@@ -17,7 +19,7 @@ namespace DrawLiar
             GemProduct("gems-1200", "보석 1,200개", 1200),
             new CommerceProduct { Id = PAINTER_PRODUCT_ID, Name = "화가 세트", Kind = PAINTER_SUBSCRIPTION,
                 PricePaidGems = 300, SubscriptionDays = SUBSCRIPTION_DAYS }
-        };
+        }.Concat(CosmeticRules.CreateProducts()).ToArray();
 
         private static CommerceProduct GemProduct(string id, string name, int amount) => new CommerceProduct
         {

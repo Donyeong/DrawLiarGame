@@ -148,14 +148,14 @@ public sealed partial class ServerDatabase : IDisposable
         return new ServerSession(reader.GetGuid(0), hash, reader.GetString(1), reader.GetFieldValue<DateTimeOffset>(2));
     }
 
-    public async Task<(ServerSession Session, string DisplayName, int Level)> AuthenticateLobbyAsync(string token, string scope, CancellationToken cancellationToken)
+    public async Task<(ServerSession Session, string DisplayName, int Level, CosmeticLoadout Cosmetics)> AuthenticateLobbyAsync(string token, string scope, CancellationToken cancellationToken)
     {
         await using var connection = await _source.OpenConnectionAsync(cancellationToken);
         var session = await AuthenticateHash(connection, null, ServerRuntime.Hash(token), scope, cancellationToken);
-        await using var command = Command(connection, null, "SELECT \"DisplayName\",\"Experience\" FROM \"Account\" WHERE \"Id\"=$1 AND NOT \"IsBanned\"", session.AccountId);
+        await using var command = Command(connection, null, "SELECT \"DisplayName\",\"Experience\",\"Cosmetics\"::text FROM \"Account\" WHERE \"Id\"=$1 AND NOT \"IsBanned\"", session.AccountId);
         await using var reader = await command.ExecuteReaderAsync(cancellationToken);
         if (!await reader.ReadAsync(cancellationToken)) throw new ApiException("Unauthorized", 401);
-        return (session, reader.GetString(0), AccountLevelRules.GetLevel(reader.GetInt64(1)));
+        return (session, reader.GetString(0), AccountLevelRules.GetLevel(reader.GetInt64(1)), ReadCosmetics(reader.GetString(2)));
     }
 
     public async Task LogoutAsync(ServerSession session)
@@ -177,7 +177,7 @@ public sealed partial class ServerDatabase : IDisposable
             SELECT a."DisplayName",a."AvatarColor",a."Accessory",a."Coins",
                 a."GuestId" IS NOT NULL AND NOT EXISTS (SELECT 1 FROM "ExternalIdentity" e WHERE e."AccountId"=a."Id"),
                 EXISTS (SELECT 1 FROM "ExternalIdentity" e WHERE e."AccountId"=a."Id" AND e."Provider"='google'),a."Experience",
-                a."PaidGems",a."SubscriptionExpiresAt",a."ShowSubscriberBadge"
+                a."PaidGems",a."SubscriptionExpiresAt",a."ShowSubscriberBadge",a."Cosmetics"::text
             FROM "Account" a WHERE a."Id"=$1 AND NOT a."IsBanned"
             """;
         await using (var command = Command(connection, transaction, sql, id))
@@ -190,12 +190,15 @@ public sealed partial class ServerDatabase : IDisposable
                 Accessory = AvatarParts.Sanitize(reader.GetInt64(2)), Coins = reader.GetInt32(3), IsGuest = reader.GetBoolean(4), HasGoogleAccount = reader.GetBoolean(5),
                 Experience = reader.GetInt64(6), Level = AccountLevelRules.GetLevel(reader.GetInt64(6)), PaidGems = reader.GetInt32(7),
                 SubscriptionExpiresAt = reader.IsDBNull(8) ? "" : ServerRuntime.Timestamp(reader.GetFieldValue<DateTimeOffset>(8)),
-                ShowSubscriberBadge = reader.GetBoolean(9), ServerTimeUnixSeconds = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
+                ShowSubscriberBadge = reader.GetBoolean(9), ServerTimeUnixSeconds = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+                Cosmetics = ReadCosmetics(reader.GetString(10))
             };
             profile.HasPainterSubscription = CommerceRules.IsPainterSubscriber(profile, DateTimeOffset.UtcNow);
             profile.ShowSubscriberBadge &= profile.HasPainterSubscription;
         }
         profile.OwnedAccessories = await ReadOwnedAccessories(connection, transaction, id);
+        profile.OwnedCosmetics = await ReadOwnedCosmetics(connection, transaction, id);
+        profile.Cosmetics = CosmeticRules.KeepOwned(profile.Cosmetics, profile.OwnedCosmetics);
         return profile;
     }
 

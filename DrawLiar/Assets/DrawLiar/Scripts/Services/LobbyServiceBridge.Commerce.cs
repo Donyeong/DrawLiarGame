@@ -24,7 +24,10 @@ namespace DrawLiar
             && CommerceRules.IsPainterSubscriber(Profile, CommerceUtcNow);
         public event Action CommerceChanged;
 
-        public string CommercePrice(CommerceProduct product) => product?.Kind == CommerceRules.PAINTER_SUBSCRIPTION
+        public bool OwnsCosmetic(string productId) => !string.IsNullOrEmpty(productId)
+            && (Profile?.OwnedCosmetics ?? Array.Empty<string>()).Contains(productId, StringComparer.Ordinal);
+
+        public string CommercePrice(CommerceProduct product) => product?.Kind == CommerceRules.PAINTER_SUBSCRIPTION || product?.Kind == CommerceRules.COSMETIC
             ? DrawLocalization.Format("{0} 보석", product.PricePaidGems)
             : _platformPayments?.LocalizedPrice(product) ?? DrawLocalization.Text("현재 결제를 이용할 수 없습니다.");
 
@@ -32,8 +35,9 @@ namespace DrawLiar
         {
             if (!IsAuthenticated || !CommerceLoaded || product == null || IsBusy || _loggingOut) return false;
             if (!(Commerce.Products ?? Array.Empty<CommerceProduct>()).Any(candidate => candidate?.Id == product.Id)) return false;
-            return product.Kind == CommerceRules.PAINTER_SUBSCRIPTION
+            return product.Kind == CommerceRules.PAINTER_SUBSCRIPTION || product.Kind == CommerceRules.COSMETIC
                 ? product.PricePaidGems > 0 && Profile.PaidGems >= product.PricePaidGems
+                    && (product.Kind != CommerceRules.COSMETIC || !OwnsCosmetic(product.Id))
                 : _platformPayments?.CanPurchase(product) == true;
         }
 
@@ -76,7 +80,7 @@ namespace DrawLiar
             var product = (Commerce.Products ?? Array.Empty<CommerceProduct>()).FirstOrDefault(candidate => candidate?.Id == productId);
             if (product == null) throw new InvalidOperationException(DrawLocalization.Text("현재 구매할 수 없는 아이템이 있어요."));
             string session = _gameSession, account = Profile.AccountId;
-            if (product.Kind == CommerceRules.PAINTER_SUBSCRIPTION)
+            if (product.Kind == CommerceRules.PAINTER_SUBSCRIPTION || product.Kind == CommerceRules.COSMETIC)
             {
                 if (product.PricePaidGems != expectedPricePaidGems)
                     throw new InvalidOperationException(DrawLocalization.Text("상품 정보가 변경되었습니다. 상점을 새로고침해 주세요."));
@@ -87,7 +91,7 @@ namespace DrawLiar
                 EnsureCommerceIdentity(session, account, cancellationToken);
                 ApplyCommerceProfile(profile, account);
                 _commerceOperations.Remove(product.Id);
-                SetStatus("구독을 구매했습니다.");
+                SetStatus(product.Kind == CommerceRules.COSMETIC ? "아이템을 구매했습니다." : "구독을 구매했습니다.");
             }
             else
             {
@@ -108,6 +112,23 @@ namespace DrawLiar
             await _platformPayments.RestoreAsync(cancellationToken);
             if (_manager != null && _manager.IsConnected) await _manager.RefreshProfileAsync();
             SetStatus("구매 내역을 확인했습니다.");
+            CommerceChanged?.Invoke();
+        });
+
+        public Task SaveCosmeticAsync(string category, string productId, CancellationToken cancellationToken = default) => RunAsync(async () =>
+        {
+            RequireLogin();
+            if (!CosmeticRules.IsCategory(category) || (!string.IsNullOrEmpty(productId)
+                && (CosmeticRules.Find(productId)?.Category != category || !OwnsCosmetic(productId))))
+                throw new InvalidOperationException(DrawLocalization.Text("보유한 아이템만 장착할 수 있습니다."));
+            string session = _gameSession, account = Profile.AccountId;
+            var profile = await SendAsync<ProfileData>(_gameServerUrl, "/api/profile/cosmetics", "POST",
+                new CosmeticEquipRequest { Category = category, ProductId = productId ?? "" }, session, cancellationToken);
+            EnsureCommerceIdentity(session, account, cancellationToken);
+            ApplyCommerceProfile(profile, account);
+            if (_manager != null && _manager.IsConnected) await _manager.RefreshProfileAsync();
+            EnsureCommerceIdentity(session, account, cancellationToken);
+            SetStatus("꾸미기를 저장했습니다.");
             CommerceChanged?.Invoke();
         });
 
@@ -169,7 +190,9 @@ namespace DrawLiar
                     || product.PaidGems < 0 || product.PricePaidGems < 0
                     || (product.Kind == CommerceRules.PAID_GEMS && (product.PaidGems <= 0 || string.IsNullOrWhiteSpace(product.StoreProductId)))
                     || (product.Kind == CommerceRules.PAINTER_SUBSCRIPTION && (product.SubscriptionDays != CommerceRules.SUBSCRIPTION_DAYS || product.PricePaidGems <= 0))
-                    || (product.Kind != CommerceRules.PAID_GEMS && product.Kind != CommerceRules.PAINTER_SUBSCRIPTION))
+                    || (product.Kind == CommerceRules.COSMETIC && (product.PricePaidGems <= 0 || !CosmeticRules.IsCategory(product.Category)
+                        || CosmeticRules.Find(product.Id)?.Category != product.Category))
+                    || (product.Kind != CommerceRules.PAID_GEMS && product.Kind != CommerceRules.PAINTER_SUBSCRIPTION && product.Kind != CommerceRules.COSMETIC))
                 || catalogue.Products.Select(product => product.Id).Distinct(StringComparer.Ordinal).Count() != catalogue.Products.Length
                 || catalogue.Providers.Any(provider => provider == null || (provider.Id != DrawPlatformPaymentProviders.STEAM && provider.Id != DrawPlatformPaymentProviders.GOOGLE_PLAY)))
                 throw new InvalidOperationException(DrawLocalization.Text("결제 정보를 확인할 수 없습니다."));

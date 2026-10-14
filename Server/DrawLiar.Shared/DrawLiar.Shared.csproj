@@ -4,6 +4,7 @@
   <ItemGroup><Compile Include="../../DrawLiar/Assets/DrawLiar/Scripts/Services/ServerContracts.cs" Link="ServerContracts.cs" /></ItemGroup>
   <ItemGroup><Compile Include="../../DrawLiar/Assets/DrawLiar/Scripts/Services/CommerceContracts.cs" Link="CommerceContracts.cs" /><Compile Include="../../DrawLiar/Assets/DrawLiar/Scripts/Game/CommerceRules.cs" Link="CommerceRules.cs" /></ItemGroup>
   <ItemGroup><Compile Include="../../DrawLiar/Assets/DrawLiar/Scripts/Game/AvatarParts.cs" Link="AvatarParts.cs" /></ItemGroup>
+  <ItemGroup><Compile Include="../../DrawLiar/Assets/DrawLiar/Scripts/Game/CosmeticRules.cs" Link="CosmeticRules.cs" /></ItemGroup>
   <ItemGroup><Compile Include="../../DrawLiar/Assets/DrawLiar/Scripts/Game/TopicWorkshopRules.cs" Link="TopicWorkshopRules.cs" /></ItemGroup>
   <ItemGroup><Compile Include="../../DrawLiar/Assets/DrawLiar/Scripts/Game/MatchRewardRules.cs" Link="MatchRewardRules.cs" /></ItemGroup>
   <ItemGroup><Compile Include="../../DrawLiar/Assets/DrawLiar/Scripts/Game/AccountLevelRules.cs" Link="AccountLevelRules.cs" /></ItemGroup>

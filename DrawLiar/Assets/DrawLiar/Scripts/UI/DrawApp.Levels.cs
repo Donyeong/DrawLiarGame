@@ -25,11 +25,12 @@ namespace DrawLiar
             return label;
         }
 
-        private static Label LeveledName(VisualElement parent, string name, int level, string classes, string locator, string accountId = null, bool subscriber = false)
+        private Label LeveledName(VisualElement parent, string name, int level, string classes, string locator, string accountId = null, bool subscriber = false, CosmeticLoadout cosmetics = null)
         {
             var label = RawText(parent, name, classes);
             label.name = locator;
             AddLevelBadge(label, level, locator, accountId);
+            DrawCosmeticPresentation.ApplyNickname(label, cosmetics ?? (accountId == lobby.Profile?.AccountId ? lobby.Profile?.Cosmetics : null));
             if (subscriber)
             {
                 var badge = new DrawSubscriberBadge { name = "subscriber-badge-" + locator, userData = accountId };
@@ -38,12 +39,25 @@ namespace DrawLiar
             return label;
         }
 
+        private AvatarElement DecoratedAvatar(int color, long decoration) => DecoratedAvatar(color, decoration, lobby.Profile?.Cosmetics);
+
+        private static AvatarElement DecoratedAvatar(int color, long decoration, CosmeticLoadout cosmetics)
+        {
+            var avatar = new AvatarElement(color, decoration);
+            DrawCosmeticPresentation.ApplyAvatar(avatar, cosmetics);
+            return avatar;
+        }
+
+        private static string CosmeticKey(CosmeticLoadout cosmetics) => cosmetics == null ? ""
+            : cosmetics.NicknameEffect + "," + cosmetics.AvatarBackground + "," + cosmetics.AvatarFrame + "," + cosmetics.ChatBubble;
+
         private static void RefreshNameLevel(Label label, PlayerView player)
         {
             var badge = label?.parent?.Q<DrawLevelBadge>();
             if (badge == null) return;
             badge.style.display = player == null ? DisplayStyle.None : DisplayStyle.Flex;
             if (player != null) { badge.SetLevel(player.Level); badge.userData = player.AccountId; }
+            DrawCosmeticPresentation.ApplyNickname(label, player?.Cosmetics);
         }
 
         private void AccountExperience(VisualElement parent)

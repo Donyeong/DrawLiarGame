@@ -101,6 +101,7 @@ namespace DrawLiar
             var lavender = new Color32(157,147,219,255);
             var body = Colors[_colorIndex];
             var drawing=new AvatarDrawContext(p,size,offset,body,headCenter,headWidth,headSeat);
+            PaintCosmeticBackground(drawing);
             p.strokeColor=ink; p.lineWidth=Mathf.Max(.65f,size*.0135f); p.lineCap=LineCap.Round; p.lineJoin=LineJoin.Round;
             Ellipse(.53f,.918f,.27f,.022f,new Color32(64,53,83,20));
             if((Equipment & AvatarAccessory.Cape)!=0)
@@ -617,6 +618,7 @@ namespace DrawLiar
                 Ellipse(.29f,.72f,.035f,.037f,body,true);
             }
             PaintMemeHand(drawing,(AvatarAccessory)AvatarParts.Get((long)Equipment,AvatarPartSlot.Hand));
+            PaintCosmeticFrame(drawing);
         }
     }
 }

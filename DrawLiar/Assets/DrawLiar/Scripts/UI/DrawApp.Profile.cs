@@ -60,8 +60,8 @@ namespace DrawLiar
         private void FriendProfileIdentity(VisualElement row, FriendData friend)
         {
             var identity = Box(row, "row friend-profile-identity grow");
-            identity.Add(new AvatarElement(friend.AvatarColor, friend.Accessory));
-            LeveledName(identity, friend.DisplayName, friend.Level, "player-name grow", "friend-" + friend.AccountId, friend.AccountId);
+            identity.Add(DecoratedAvatar(friend.AvatarColor, friend.Accessory, friend.Cosmetics));
+            LeveledName(identity, friend.DisplayName, friend.Level, "player-name grow", "friend-" + friend.AccountId, friend.AccountId, cosmetics: friend.Cosmetics);
             BindProfileTarget(identity, friend.AccountId);
         }
 
@@ -176,12 +176,12 @@ namespace DrawLiar
             _loadedPublicProfile = profile;
             _profileBody.Clear();
             var hero = Box(_profileBody, "row public-profile-hero");
-            var avatar = new AvatarElement(profile.AvatarColor, profile.Accessory);
+            var avatar = DecoratedAvatar(profile.AvatarColor, profile.Accessory, profile.Cosmetics);
             avatar.AddToClassList("public-profile-avatar");
             hero.Add(avatar);
             var identity = Box(hero, "grow public-profile-identity");
             LeveledName(identity, profile.DisplayName, profile.Level, "public-profile-name", "public-profile-name", profile.AccountId,
-                profile.AccountId == lobby.Profile?.AccountId ? OwnSubscriberBadge : profile.ShowSubscriberBadge);
+                profile.AccountId == lobby.Profile?.AccountId ? OwnSubscriberBadge : profile.ShowSubscriberBadge, profile.Cosmetics);
             var joined = Box(identity, "row public-profile-joined");
             Text(joined, "가입일", "public-profile-label");
             RawText(joined, PublicProfileDate(profile.JoinedAt), "public-profile-label");
@@ -311,7 +311,7 @@ namespace DrawLiar
             {
                 var row = Box(_roomModerationList, "row room-moderation-player");
                 row.name = "room-moderation-player-" + player.Id;
-                LeveledName(row, player.Name, player.Level, "grow room-moderation-name", "moderation-" + player.Id, player.AccountId);
+                LeveledName(row, player.Name, player.Level, "grow room-moderation-name", "moderation-" + player.Id, player.AccountId, cosmetics: player.Cosmetics);
                 if (player.IsSpectator) Text(row, "관전", "room-moderation-spectator");
                 Button profile = null;
                 profile = Button(row, "프로필 보기", () =>

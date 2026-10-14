@@ -579,6 +579,8 @@ namespace DrawLiar
                 throw new InvalidOperationException("서버 프로필 응답을 확인할 수 없습니다.");
             if (Profile?.AccountId == profile.AccountId) profile.Experience = Math.Max(Profile.Experience, profile.Experience);
             profile.Level = AccountLevelRules.GetLevel(profile.Experience);
+            profile.OwnedCosmetics = CosmeticRules.SanitizeOwned(profile.OwnedCosmetics);
+            profile.Cosmetics = CosmeticRules.KeepOwned(profile.Cosmetics, profile.OwnedCosmetics);
             if (Profile?.AccountId != profile.AccountId) { ResetTopicWorkshop(); ResetMatchRewards(); ResetCommerce(); }
             Profile = profile;
             CaptureCommerceClock(profile.ServerTimeUnixSeconds);
@@ -699,7 +701,9 @@ namespace DrawLiar
                 case "InvalidTopics": return "주제 이름과 제시어를 확인하세요.";
                 case "InvalidSettings": return "방 설정을 확인하세요.";
                 case "AlreadyOwnsRoom": return "이미 만든 방에 다시 참가하거나 방을 닫은 뒤 새 방을 만드세요.";
+                case "CosmeticNotOwned":
                 case "AccessoryNotOwned": return "보유한 아이템만 장착할 수 있습니다.";
+                case "InvalidCosmetic": return "현재 구매할 수 없는 아이템이 있어요.";
                 case "AlreadyOwned": return "이미 보유한 아이템입니다.";
                 case "FriendLimit": return "친구 목록의 최대 인원에 도달했습니다.";
                 case "AccountNotFound": return "계정 ID를 찾지 못했습니다.";

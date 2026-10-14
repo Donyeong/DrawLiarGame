@@ -93,14 +93,16 @@ internal sealed partial class DedicatedRoom
                 _playerIds[ticket.AccountId] = playerId;
             }
             if (!_session.Contains(playerId) && !_session.Join(playerId, ticket.Profile.DisplayName,
-                ticket.Profile.AvatarColor, ticket.Profile.Accessory, ticket.SpectatorOnly, ticket.SpectatorOnly, ticket.Profile.Level)) return false;
+                ticket.Profile.AvatarColor, ticket.Profile.Accessory, ticket.SpectatorOnly, ticket.SpectatorOnly, ticket.Profile.Level,
+                ticket.Profile.Cosmetics)) return false;
             if (_connections.TryGetValue(ticket.AccountId, out var previous)) previous.Abort();
             connection.PlayerId = playerId;
             _connections[ticket.AccountId] = connection;
             if (ticket.AdmissionId.Length > 0) _admittedIds.Add(ticket.AdmissionId);
             _reconnectUntil.Remove(ticket.AccountId);
             _closeRequested = false;
-            _session.UpdateProfile(playerId, ticket.Profile.DisplayName, ticket.Profile.AvatarColor, ticket.Profile.Accessory, ticket.Profile.Level);
+            _session.UpdateProfile(playerId, ticket.Profile.DisplayName, ticket.Profile.AvatarColor, ticket.Profile.Accessory,
+                ticket.Profile.Level, ticket.Profile.Cosmetics);
             EnsureHostLocked();
             QueueReplayLocked(connection, now);
             BroadcastSnapshotsLocked(now);
@@ -297,7 +299,8 @@ internal sealed partial class DedicatedRoom
     {
         text = GameRules.CleanText(text, 160);
         if (text.Length == 0 || !connection.AcceptChat(now)) return false;
-        var line = new ChatLine { PlayerId = connection.PlayerId, Name = _session.PlayerName(connection.PlayerId), Text = text, Level = _session.PlayerLevel(connection.PlayerId) };
+        var line = new ChatLine { PlayerId = connection.PlayerId, Name = _session.PlayerName(connection.PlayerId), Text = text,
+            Level = _session.PlayerLevel(connection.PlayerId), Cosmetics = _session.PlayerCosmetics(connection.PlayerId) };
         var envelope = new GameplayEnvelope { Type = "chat", Line = line, Sequence = ++_sequence };
         bool spectatorOnly = _session.Phase != GamePhase.Lobby && _session.Phase != GamePhase.MatchResults
             && _session.Snapshot(connection.PlayerId, -1, now).LocalIsSpectator;

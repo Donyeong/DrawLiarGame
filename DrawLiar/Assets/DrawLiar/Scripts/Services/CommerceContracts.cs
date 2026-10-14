@@ -13,6 +13,8 @@ namespace DrawLiar
         public string Id = "";
         public string Name = "";
         public string Kind = "";
+        public string Category = "";
+        public string Description = "";
         public int PaidGems;
         public int PricePaidGems;
         public int SubscriptionDays;

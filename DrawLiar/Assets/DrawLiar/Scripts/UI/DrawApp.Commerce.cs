@@ -9,7 +9,7 @@ namespace DrawLiar
 {
     public sealed partial class DrawApp
     {
-        private enum ShopSection { Cosmetics, Gems, Subscription }
+        private enum ShopSection { Cosmetics, PremiumCosmetics, Gems, Subscription }
         private ShopSection _shopSection;
         private VisualElement _commerceCatalogue;
         private bool _commerceEventsAttached;
@@ -26,6 +26,21 @@ namespace DrawLiar
         {
             if (lobby != null && _commerceEventsAttached) lobby.CommerceChanged -= RefreshCommerceView;
             _commerceEventsAttached = false;
+        }
+
+        private bool TryRefreshShopProfile()
+        {
+            if (inRoom || lobbyScreen != LobbyScreen.Shop || !lobby.IsAuthenticated || lobby.Profile == null
+                || _shopPreviewAccountId != lobby.Profile.AccountId || content.Q<VisualElement>("shop-page")?.panel == null) return false;
+            root.Query<Label>(className: "shop-profile-name").ForEach(label =>
+            {
+                SetRawText(label, nickname);
+                DrawCosmeticPresentation.ApplyNickname(label, lobby.Profile.Cosmetics);
+            });
+            RefreshAccountLevels();
+            RefreshShop();
+            RefreshCommerceView();
+            return true;
         }
 
         private void ShopCommerceNavigation(VisualElement page)
@@ -48,6 +63,7 @@ namespace DrawLiar
                 button.EnableInClassList("commerce-selected", _shopSection == section);
             }
             Tab(ShopSection.Cosmetics, "코스튬", "cosmetics");
+            Tab(ShopSection.PremiumCosmetics, "꾸미기", "premium-cosmetics");
             Tab(ShopSection.Gems, "보석", "gems");
             Tab(ShopSection.Subscription, "구독", "subscription");
             RefreshCommerceControls();
@@ -55,6 +71,7 @@ namespace DrawLiar
 
         private void CommerceCataloguePage(VisualElement page)
         {
+            if (_shopSection == ShopSection.PremiumCosmetics) { CosmeticCataloguePage(page); return; }
             var panel = Box(page, "shop-panel commerce-catalog grow");
             panel.name = "commerce-catalog";
             var header = Box(panel, "row commerce-heading");
@@ -74,16 +91,20 @@ namespace DrawLiar
             root.Query<Label>(className: "shop-coins").ForEach(label => SetText(label, "{0} 코인", lobby.Profile?.Coins ?? 0));
             if (_commerceCatalogue?.panel != null && !inRoom && lobbyScreen == LobbyScreen.Shop && _shopSection != ShopSection.Cosmetics)
             {
-                _commerceCatalogue.Clear();
-                if (_shopSection == ShopSection.Subscription) SubscriberSettings(_commerceCatalogue, false);
-                var grid = Box(_commerceCatalogue, "row commerce-grid");
-                var products = lobby.Commerce?.Products ?? Array.Empty<CommerceProduct>();
-                foreach (var product in products.Where(product => product != null &&
-                    product.Kind == (_shopSection == ShopSection.Gems ? CommerceRules.PAID_GEMS : CommerceRules.PAINTER_SUBSCRIPTION)))
-                    CommerceProductCard(grid, product);
-                if (grid.childCount == 0) Text(grid, "판매 중인 상품이 없습니다.", "muted");
-                grid.RegisterCallback<GeometryChangedEvent>(_ => SizeCommerceCards(grid));
-                SizeCommerceCards(grid);
+                if (_shopSection == ShopSection.PremiumCosmetics) RefreshCosmeticCatalogueView();
+                else
+                {
+                    _commerceCatalogue.Clear();
+                    if (_shopSection == ShopSection.Subscription) SubscriberSettings(_commerceCatalogue, false);
+                    var grid = Box(_commerceCatalogue, "row commerce-grid");
+                    var products = lobby.Commerce?.Products ?? Array.Empty<CommerceProduct>();
+                    foreach (var product in products.Where(product => product != null &&
+                        product.Kind == (_shopSection == ShopSection.Gems ? CommerceRules.PAID_GEMS : CommerceRules.PAINTER_SUBSCRIPTION)))
+                        CommerceProductCard(grid, product);
+                    if (grid.childCount == 0) Text(grid, "판매 중인 상품이 없습니다.", "muted");
+                    grid.RegisterCallback<GeometryChangedEvent>(_ => SizeCommerceCards(grid));
+                    SizeCommerceCards(grid);
+                }
             }
             RefreshSubscriptionControls();
             RefreshCommerceControls();
@@ -96,7 +117,7 @@ namespace DrawLiar
             {
                 var gem = new DrawPremiumGem(); gem.AddToClassList("commerce-product-symbol"); card.Add(gem);
                 Text(card, "보석 {0}개", "commerce-product-name", product.PaidGems);
-                Text(card, "보석 잔액으로 구독 상품을 구매할 수 있어요.", "commerce-description");
+                Text(card, "보석으로 꾸미기와 구독 상품을 구매할 수 있어요.", "commerce-description");
             }
             else
             {
@@ -133,6 +154,7 @@ namespace DrawLiar
         private void ConfirmCommercePurchase(CommerceProduct product)
         {
             if (!lobby.CanPurchaseCommerce(product) || runningAction) return;
+            if (product.Kind == CommerceRules.COSMETIC) { ConfirmCosmeticPurchase(product); return; }
             string account = lobby.Profile.AccountId;
             var modal = Modal(product.Kind == CommerceRules.PAINTER_SUBSCRIPTION ? "화가 세트 구독" : "보석 충전");
             modal.name = "commerce-confirm";
@@ -233,6 +255,7 @@ namespace DrawLiar
                 button.SetEnabled(!runningAction && lobby.CanPurchaseCommerce(product));
             });
             root.Query<Button>(className: "commerce-restore").ForEach(button => button.SetEnabled(!runningAction && !lobby.IsBusy && lobby.IsPlatformPaymentAvailable));
+            RefreshCosmeticControls();
             RefreshSubscriptionControls();
         }
     }

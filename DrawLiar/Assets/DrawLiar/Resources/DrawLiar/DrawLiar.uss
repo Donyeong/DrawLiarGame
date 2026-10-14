@@ -907,6 +907,39 @@
 .commerce-confirm-description { margin-bottom: 16px; font-size: 18px; white-space: normal; }
 .commerce-confirm-actions { margin-top: 12px; }
 .commerce-confirm-actions .secondary { margin-right: 8px; }
+.cosmetic-catalog { flex-basis: 0; }
+.cosmetic-permanent { flex-shrink: 0; margin-bottom: 12px; }
+.cosmetic-categories { flex-shrink: 0; flex-wrap: wrap; margin-bottom: 8px; }
+.app .cosmetic-categories .cosmetic-category { min-width: 0; margin: 0 8px 8px 0; padding: 8px 14px; white-space: normal; }
+.app .cosmetic-categories .commerce-selected { background-color: #EDE5FA; border-color: #8B75BA; color: #615383; }
+.cosmetic-workspace { flex-basis: 0; min-width: 0; min-height: 0; align-items: stretch; }
+.cosmetic-workspace .cosmetic-preview-scroll { width: 276px; flex-grow: 0; flex-basis: auto; flex-shrink: 0; margin-right: 20px; }
+.cosmetic-preview-panel { width: 100%; min-width: 0; flex-shrink: 0; padding: 16px; background-color: #F7F3FC; border-width: 1px; border-color: #E4DBEF; border-radius: 14px; }
+.cosmetic-preview-identity { flex-shrink: 0; align-items: center; }
+.cosmetic-preview-avatar { width: 184px; height: 184px; flex-shrink: 0; margin-bottom: 8px; }
+.cosmetic-preview-details { min-width: 0; width: 100%; align-items: center; }
+.cosmetic-preview-nickname { max-width: 100%; min-width: 0; margin-bottom: 16px; font-size: 22px; -unity-font-style: bold; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cosmetic-sample-bubble { min-width: 0; max-width: 100%; align-self: center; padding: 12px; background-color: #FFFFFF; border-radius: 12px; border-width: 1px; border-color: #DED5EA; }
+.cosmetic-chat-text { min-width: 0; margin: 0; padding: 0; font-size: 16px; white-space: normal; color: #34304B; }
+.cosmetic-preview-controls { flex-shrink: 0; margin-top: 20px; }
+.cosmetic-preview-title { font-size: 17px; -unity-font-style: bold; white-space: normal; margin: 0 0 8px; }
+.cosmetic-preview-status { font-size: 14px; color: #736957; margin: 0 0 12px; }
+.app .cosmetic-preview-controls .button { margin-bottom: 8px; padding: 6px 8px; white-space: normal; }
+.cosmetic-grid { width: 100%; }
+.cosmetic-product { min-height: 310px; padding: 16px; }
+.cosmetic-product-preview { flex-shrink: 0; min-width: 0; height: 112px; margin-bottom: 12px; align-items: center; justify-content: center; overflow: hidden; }
+.cosmetic-card-avatar { width: 108px; height: 108px; flex-shrink: 0; }
+.cosmetic-card-nickname { max-width: 100%; min-width: 0; margin: 0; font-size: 22px; -unity-font-style: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cosmetic-product .commerce-product-name { font-size: 19px; margin-bottom: 8px; }
+.cosmetic-product .commerce-description { font-size: 14px; }
+.cosmetic-product .commerce-price { font-size: 15px; padding-top: 8px; }
+.cosmetic-product-actions { flex-shrink: 0; }
+.app .cosmetic-product-actions .button { padding: 6px 8px; min-width: 0; white-space: normal; }
+.app .cosmetic-product-actions .secondary { margin-bottom: 8px; }
+.cosmetic-equipped { background-color: #F1F7F2; border-color: #89AE9D; }
+.cosmetic-selected { border-width: 2px; border-color: #8B75BA; }
+.cosmetic-confirm-actions { margin-top: 12px; }
+.app .cosmetic-confirm-actions .button { min-height: 48px; margin: 0 0 8px; white-space: normal; }
 .subscriber-settings { flex-shrink: 0; margin-bottom: 16px; padding: 16px; border-width: 1px; border-color: #D8CCE8; border-radius: 14px; background-color: #F4EFFB; }
 .subscriber-heading { align-items: center; margin-bottom: 8px; }
 .subscriber-title { margin: 0; font-size: 18px; -unity-font-style: bold; }

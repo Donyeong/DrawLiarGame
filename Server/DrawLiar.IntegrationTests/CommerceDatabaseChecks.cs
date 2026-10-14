@@ -36,8 +36,9 @@ internal static partial class Integration
             await database.InitializeAsync(); await database.InitializeAsync();
             var fresh = await database.ProfileAsync(account);
             Check(fresh.Coins == 500 && fresh.PaidGems == 0 && !fresh.HasPainterSubscription && !fresh.ShowSubscriberBadge
-                && fresh.SubscriptionExpiresAt == "" && (await CommerceScalar(owner, "SELECT count(*) FROM \"SchemaVersion\" WHERE \"Version\"=19")) == 1,
-                "V18 기존 계정은 V19 두 번 초기화에도 코인 유지·보석0·구독 없음으로 이전해야 합니다.");
+                && fresh.SubscriptionExpiresAt == "" && fresh.OwnedCosmetics.Length == 0 && fresh.Cosmetics.NicknameEffect == ""
+                && (await CommerceScalar(owner, "SELECT count(*) FROM \"SchemaVersion\" WHERE \"Version\" IN (19,20)")) == 2,
+                "V18 기존 계정은 V20 두 번 초기화에도 코인 유지·보석0·구독/꾸미기 없음으로 이전해야 합니다.");
             CheckPublicProfileFields(await database.PublicProfileAsync(other, account));
             var provider = new CommerceTestProvider(); var service = new CommerceService(database, new[] { provider });
             var operation = Guid.NewGuid().ToString();
@@ -133,7 +134,8 @@ internal static partial class Integration
                 && DateTimeOffset.Parse(completedOrderSubscription.SubscriptionExpiresAt) == DateTimeOffset.Parse(namespaceConfirmed.Profile.SubscriptionExpiresAt).AddDays(30)
                 && await CommerceScalar(owner, "SELECT count(*) FROM \"CommerceLedger\" WHERE \"OperationId\"=$1", Guid.Parse(namespaceRefill.Order.OrderId)) == 2,
                 "완료된 보석 주문 ID와 구독 operation도 별도 namespace로 저장해야 합니다.");
-            Report("격리 PostgreSQL V18→V19·재초기화·동시 확정/구매·전역 거래 소유권·원장 실패 전체 롤백·UTC30일 연장/만료·뱃지·가격·환불 감사·원장 namespace 충돌 회귀 검증");
+            await VerifyCosmeticDatabaseAsync(database, owner);
+            Report("격리 PostgreSQL V18→V20·재초기화·동시 확정/구매·전역 거래 소유권·원장 실패 전체 롤백·UTC30일 연장/만료·뱃지·가격·환불 감사·원장 namespace 충돌 회귀 검증");
         }
         finally { await CommerceSql(owner, "DROP SCHEMA \"" + schema + "\" CASCADE"); }
     }

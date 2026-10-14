@@ -26,12 +26,12 @@ namespace DrawLiar
             {
                 var row = Box(body, "score-row");
                 var identity = Box(row, "row round-result-score-identity");
-                var avatar = new AvatarElement(player.AvatarColor, player.Accessory);
+                var avatar = DecoratedAvatar(player.AvatarColor, player.Accessory, player.Cosmetics);
                 identity.Add(avatar);
                 BindProfileTarget(avatar, player.AccountId);
                 string template = state.Winners.Contains(player.Id)
                     ? (player.IsLiar ? "★ {0} · 라이어" : "★ {0} · 시민") : (player.IsLiar ? "{0} · 라이어" : "{0} · 시민");
-                AddLevelBadge(Text(identity, template, "round-result-player-name", player.Name), player.Level, "result-" + player.Id, player.AccountId);
+                DrawCosmeticPresentation.ApplyNickname(AddLevelBadge(Text(identity, template, "round-result-player-name", player.Name), player.Level, "result-" + player.Id, player.AccountId), player.Cosmetics);
                 Text(row, "{0}점 (+{1})", "player-score", player.Score, player.RoundPoints);
                 if (state.Phase == GamePhase.MatchResults || PhasePresentationElapsed() < .4f)
                     Enter(row, 260, 8, 200 + 45 * scoreIndex);
@@ -74,11 +74,11 @@ namespace DrawLiar
             foreach (var player in state.Players.Where(player => player.IsLiar))
             {
                 var identity = Box(identities, "reveal-liar");
-                var avatar = new AvatarElement(player.AvatarColor, player.Accessory);
+                var avatar = DecoratedAvatar(player.AvatarColor, player.Accessory, player.Cosmetics);
                 avatar.AddToClassList("avatar-preview");
                 identity.Add(avatar);
                 BindProfileTarget(avatar, player.AccountId);
-                LeveledName(identity, player.Name, player.Level, "player-name", "revealed-" + player.Id, player.AccountId);
+                LeveledName(identity, player.Name, player.Level, "player-name", "revealed-" + player.Id, player.AccountId, cosmetics: player.Cosmetics);
                 Text(identity, player.IsCaught ? "지목됨" : "지목 안 됨", "rules");
             }
             _revealConfirm = Button(modal, "확인", CloseModal, "primary round-result-dismiss", DrawSound.UiConfirm);

@@ -616,3 +616,32 @@
 .app.mobile .commerce-description { font-size: 14px; }
 .app.mobile .subscriber-settings { padding: 12px; }
 .app.mobile .subscriber-title { font-size: 16px; }
+.app.mobile .commerce-tabs .commerce-tab { height: auto; font-size: 14px; margin-right: 4px; white-space: normal; }
+.app.mobile .cosmetic-categories { margin-bottom: 4px; }
+.app.mobile .cosmetic-categories .cosmetic-category { flex-grow: 1; flex-basis: 42%; height: auto; min-height: 44px; margin: 0 4px 6px 0; padding: 6px; font-size: 14px; }
+.app.mobile .cosmetic-workspace { flex-direction: column; }
+.app.mobile .cosmetic-scroll-body { width: 100%; min-width: 0; flex-shrink: 0; }
+.app.mobile .cosmetic-scrolling-workspace { width: 100%; flex-basis: auto; flex-shrink: 0; }
+.app.mobile .cosmetic-preview-panel { width: 100%; padding: 10px; margin: 0 0 12px; flex-direction: column; align-items: stretch; }
+.app.mobile .cosmetic-preview-identity { min-width: 0; flex-direction: row; align-items: center; }
+.app.mobile .cosmetic-preview-avatar { width: 94px; height: 94px; margin: 0 10px 0 0; }
+.app.mobile .cosmetic-preview-details { flex-grow: 1; flex-basis: 0; min-width: 0; width: auto; align-items: flex-start; }
+.app.mobile .cosmetic-preview-nickname { margin-bottom: 10px; font-size: 18px; }
+.app.mobile .cosmetic-preview-controls { width: 100%; min-width: 0; margin: 8px 0 0; flex-direction: row; flex-wrap: wrap; }
+.app.mobile .cosmetic-preview-title { width: 100%; margin-bottom: 4px; font-size: 14px; }
+.app.mobile .cosmetic-preview-status { display: none; }
+.app.mobile .cosmetic-preview-controls .button { flex-grow: 1; flex-basis: 42%; height: auto; min-height: 44px; margin: 0 4px 4px 0; padding: 4px 6px; font-size: 12px; }
+.app.mobile .cosmetic-chat-text { font-size: 14px; }
+.app.mobile .cosmetic-product { min-height: 300px; padding: 12px; }
+.app.mobile .cosmetic-product-preview { height: 100px; }
+.app.mobile .cosmetic-card-avatar { width: 96px; height: 96px; }
+.app.mobile .cosmetic-card-nickname { font-size: 18px; }
+.app.mobile-landscape .cosmetic-workspace { flex-direction: row; }
+.app.mobile-landscape .cosmetic-preview-panel { width: 230px; margin: 0 12px 0 0; flex-direction: column; align-self: flex-start; }
+.app.mobile-landscape .cosmetic-scrolling-workspace > .cosmetic-grid { width: auto; flex-grow: 1; flex-basis: 0; }
+.app.mobile-landscape .cosmetic-preview-identity { flex-direction: column; flex-grow: 0; flex-basis: auto; }
+.app.mobile-landscape .cosmetic-preview-avatar { width: 80px; height: 80px; margin: 0 0 4px; }
+.app.mobile-landscape .cosmetic-preview-details { align-items: center; }
+.app.mobile-landscape .cosmetic-preview-controls { width: 100%; margin: 8px 0 0; flex-direction: column; flex-wrap: nowrap; }
+.app.mobile-landscape .cosmetic-preview-controls .button { flex-grow: 0; flex-basis: auto; min-height: 40px; }
+.app.mobile-landscape .cosmetic-categories .cosmetic-category { flex-basis: 20%; }

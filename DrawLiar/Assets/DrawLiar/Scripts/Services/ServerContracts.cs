@@ -34,7 +34,17 @@ namespace DrawLiar
         public bool IsGuest;
         public bool HasGoogleAccount;
         public long[] OwnedAccessories = Array.Empty<long>();
+        public CosmeticLoadout Cosmetics = new CosmeticLoadout();
+        public string[] OwnedCosmetics = Array.Empty<string>();
     }
+    [Serializable] public sealed class CosmeticLoadout
+    {
+        public string NicknameEffect = "";
+        public string AvatarBackground = "";
+        public string AvatarFrame = "";
+        public string ChatBubble = "";
+    }
+    [Serializable] public sealed class CosmeticEquipRequest { public string Category = ""; public string ProductId = ""; }
     [Serializable] public sealed class UpdateProfileRequest { public string DisplayName = ""; public int AvatarColor; public long Accessory; }
     [Serializable] public sealed class PublicProfileData
     {
@@ -43,6 +53,7 @@ namespace DrawLiar
         public int AvatarColor;
         public long Accessory;
         public int Level = 1;
+        public CosmeticLoadout Cosmetics = new CosmeticLoadout();
         public bool ShowSubscriberBadge;
         public string JoinedAt = "";
         public string Friendship = "None";
@@ -112,7 +123,7 @@ namespace DrawLiar
     [Serializable] public sealed class GoogleChallengeRequest { public string Platform = "desktop"; }
     [Serializable] public sealed class GoogleChallengeResponse { public string ChallengeId = ""; public string Nonce = ""; public string ClientId = ""; public string ExpiresAt = ""; }
     [Serializable] public sealed class GoogleAuthRequest { public string ChallengeId = ""; public string IdToken = ""; public string Code = ""; public string CodeVerifier = ""; public string RedirectUri = ""; }
-    [Serializable] public sealed class FriendData { public string AccountId = ""; public string DisplayName = ""; public int AvatarColor; public long Accessory; public int Level = 1; }
+    [Serializable] public sealed class FriendData { public string AccountId = ""; public string DisplayName = ""; public int AvatarColor; public long Accessory; public int Level = 1; public CosmeticLoadout Cosmetics = new CosmeticLoadout(); }
     [Serializable] public sealed class FriendListResponse { public FriendData[] Friends = Array.Empty<FriendData>(); public FriendData[] Incoming = Array.Empty<FriendData>(); public FriendData[] Outgoing = Array.Empty<FriendData>(); }
     [Serializable] public sealed class FriendRequest { public string AccountId = ""; }
     [Serializable] public sealed class FriendRespondRequest { public string AccountId = ""; public bool Accept; }
@@ -223,6 +234,7 @@ namespace DrawLiar
         public string AccountId = "";
         public string DisplayName = "";
         public int Level = 1;
+        public CosmeticLoadout Cosmetics = new CosmeticLoadout();
         public string Text = "";
         public string SentAt = "";
     }

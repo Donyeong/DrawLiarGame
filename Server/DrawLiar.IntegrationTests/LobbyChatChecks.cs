@@ -21,7 +21,8 @@ internal static partial class Integration
         string firstToken = new('a', 64), secondToken = new('b', 64), expiredToken = new('c', 64);
         Guid firstId = Guid.NewGuid(), secondId = Guid.NewGuid();
         var identities = new ConcurrentDictionary<string, LobbyChatIdentity>();
-        identities[firstToken] = new(firstId, "첫화가", clock.GetUtcNow().AddHours(12));
+        identities[firstToken] = new(firstId, "첫화가", clock.GetUtcNow().AddHours(12), Cosmetics:
+            new CosmeticLoadout { NicknameEffect = "nickname-prism", ChatBubble = "bubble-cloud" });
         identities[secondToken] = new(secondId, "둘째화가", clock.GetUtcNow().AddHours(12));
         identities[expiredToken] = new(Guid.NewGuid(), "만료화가", clock.GetUtcNow().AddSeconds(-1));
         var hub = new LobbyChatHub((token, cancellation) => identities.TryGetValue(token, out var identity)
@@ -67,10 +68,12 @@ internal static partial class Integration
         await first.SendAsync(new LobbyChatEnvelope
         {
             Type = "chat", Text = "  그림 좋아요 <b>그대로</b>  ", RequestId = "first",
-            Message = new LobbyChatMessage { AccountId = secondId.ToString(), DisplayName = "위조이름", Id = 999 }
+            Message = new LobbyChatMessage { AccountId = secondId.ToString(), DisplayName = "위조이름", Id = 999,
+                Cosmetics = new CosmeticLoadout { NicknameEffect = "nickname-gold", ChatBubble = "bubble-neon" } }
         }, true);
         var accepted = await first.WaitAsync(message => message.Type == "chat" && message.RequestId == "first");
         Check(accepted.Message.AccountId == firstId.ToString() && accepted.Message.DisplayName == "첫화가"
+            && accepted.Message.Cosmetics.NicknameEffect == "nickname-prism" && accepted.Message.Cosmetics.ChatBubble == "bubble-cloud"
             && accepted.Message.Text == "그림 좋아요 <b>그대로</b>" && accepted.Message.Id == 1
             && DateTimeOffset.Parse(accepted.Message.SentAt) == clock.GetUtcNow(), "서버는 발신 계정·이름·순번·시간을 결정하고 사용자 문자를 보존해야 합니다.");
         foreach (var peer in new[] { second, duplicate })

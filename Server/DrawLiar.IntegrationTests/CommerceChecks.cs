@@ -7,9 +7,9 @@ internal static partial class Integration
     {
         var now = new DateTimeOffset(2026, 10, 9, 0, 0, 0, TimeSpan.Zero);
         var products = CommerceRules.CreateProducts();
-        Check(products.Length == 4 && products.Select(product => product.Id).Distinct().Count() == 4
+        Check(products.Length == 24 && products.Select(product => product.Id).Distinct().Count() == 24
             && products.Where(product => product.Kind == CommerceRules.PAID_GEMS).Select(product => product.PaidGems).SequenceEqual(new[] { 100, 550, 1200 }),
-            "보석 충전 세 가지와 구독은 고유 상품 ID를 사용해야 합니다.");
+            "보석 충전 세 가지와 구독, 꾸미기 스무 가지는 고유 상품 ID를 사용해야 합니다.");
         Check(AvatarParts.CreateShopProducts().Single(product => product.Id == "painter").Name == "화가 세트"
             && products.Single(product => product.Id == CommerceRules.PAINTER_PRODUCT_ID) is { Name: "화가 세트", PricePaidGems: 300, SubscriptionDays: 30 },
             "코인 코스튬 화가 세트와 30일 구독 상품은 영구적으로 분리해야 합니다.");

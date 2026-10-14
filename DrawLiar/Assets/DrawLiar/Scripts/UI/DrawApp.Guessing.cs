@@ -100,7 +100,7 @@ namespace DrawLiar
                 {
                     var current = Text(summary, recorded ? "현재 투표 · {0}" : "선택 · {0}", "nomination-current grow", noLiarSelected ? DrawLocalization.Text("라이어 없음") : selectedTarget.Name);
                     current.name = "nomination-current";
-                    if (selectedTarget != null) AddLevelBadge(current, selectedTarget.Level, "nomination-current", selectedTarget.AccountId);
+                    if (selectedTarget != null) DrawCosmeticPresentation.ApplyNickname(AddLevelBadge(current, selectedTarget.Level, "nomination-current", selectedTarget.AccountId), selectedTarget.Cosmetics);
                 }
                 else Text(summary, prompt, "nomination-prompt grow").name = "nomination-guidance";
                 voteProgress = Text(summary, "", "nomination-progress");
@@ -319,7 +319,7 @@ namespace DrawLiar
                 var row = Box(results, "guess-result-row");
                 row.name = "guess-result-" + liar.Id;
                 var identity = Box(row, "row");
-                LeveledName(identity, liar.Name, liar.Level, "guess-result-name grow", "guess-name-" + liar.Id, liar.AccountId);
+                LeveledName(identity, liar.Name, liar.Level, "guess-result-name grow", "guess-name-" + liar.Id, liar.AccountId, cosmetics: liar.Cosmetics);
                 string outcome = liar.GuessOutcome == GuessOutcome.Correct ? "정답" : liar.GuessOutcome == GuessOutcome.Incorrect ? "오답" : "미제출";
                 var status = Text(identity, outcome, "guess-result-status");
                 status.AddToClassList(liar.GuessOutcome == GuessOutcome.Correct ? "guess-correct" : "guess-incorrect");

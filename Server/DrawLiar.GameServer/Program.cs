@@ -19,7 +19,7 @@ Task<ServerSession> Authenticate(HttpContext context) => database.AuthenticateAs
 var lobbyChat = new LobbyChatHub(async (token, cancellation) =>
 {
     var identity = await database.AuthenticateLobbyAsync(token, "game:" + nodeId, cancellation);
-    return new LobbyChatIdentity(identity.Session.AccountId, identity.DisplayName, identity.Session.ExpiresAt, identity.Level);
+    return new LobbyChatIdentity(identity.Session.AccountId, identity.DisplayName, identity.Session.ExpiresAt, identity.Level, identity.Cosmetics);
 });
 app.Map("/ws/lobby", lobbyChat.HandleAsync);
 
@@ -53,6 +53,8 @@ app.MapGet("/api/payments/orders", (Func<HttpContext, Task<CommerceOrdersRespons
     await database.CommerceOrdersAsync((await Authenticate(context)).AccountId, context.RequestAborted)));
 app.MapPost("/api/profile/subscriber-badge", async (HttpContext context, SubscriberBadgeRequest request) =>
     await database.SetSubscriberBadgeAsync((await Authenticate(context)).AccountId, request.ShowBadge, context.RequestAborted));
+app.MapPost("/api/profile/cosmetics", async (HttpContext context, CosmeticEquipRequest request) =>
+    await database.EquipCosmeticAsync((await Authenticate(context)).AccountId, request, context.RequestAborted));
 app.MapGet("/api/topic-workshop", async (HttpContext context, string? language, bool? mine, int? offset, int? limit, string? search, string? sort) =>
     await database.ListWorkshopTopicsAsync((await Authenticate(context)).AccountId, language, mine ?? false, offset ?? 0, limit ?? 20, context.RequestAborted, search, sort));
 app.MapPost("/api/topic-workshop", async (HttpContext context, TopicWorkshopPublishRequest request) =>

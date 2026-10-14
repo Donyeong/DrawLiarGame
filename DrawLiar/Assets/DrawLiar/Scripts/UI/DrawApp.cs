@@ -554,16 +554,16 @@ namespace DrawLiar
                 if(_lobbyChatLines.TryGetValue(message.Id,out var existing))
                 {
                     var previous=existing.userData as LobbyChatMessage;
-                    if(previous?.DisplayName!=message.DisplayName||previous?.Text!=message.Text||previous?.Level!=message.Level)
+                    if(previous?.DisplayName!=message.DisplayName||previous?.Text!=message.Text||previous?.Level!=message.Level||CosmeticKey(previous?.Cosmetics)!=CosmeticKey(message.Cosmetics))
                     {
                         var name=existing.Q<Label>(className:"lobby-chat-name");var body=existing.Q<Label>(className:"lobby-chat-message");
-                        SetRawText(name,message.DisplayName);name.tooltip=message.DisplayName;existing.Q<DrawLevelBadge>()?.SetLevel(message.Level);SetRawText(body,message.Text);body.tooltip=message.Text;existing.userData=message;
+                        SetRawText(name,message.DisplayName);name.tooltip=message.DisplayName;existing.Q<DrawLevelBadge>()?.SetLevel(message.Level);SetRawText(body,message.Text);body.tooltip=message.Text;DrawCosmeticPresentation.ApplyNickname(name,message.Cosmetics);DrawCosmeticPresentation.ApplyChatBubble(body,message.Cosmetics);existing.userData=message;
                     }
                     continue;
                 }
                 var entry=Box(history,"lobby-chat-line");entry.name="lobby-chat-message-"+message.Id;
-                var nickname=LeveledName(entry,message.DisplayName,message.Level,"lobby-chat-name","lobby-chat-"+message.Id,message.AccountId);BindProfileTarget(nickname,message.AccountId);
-                var text=RawText(entry,message.Text,"lobby-chat-message");text.tooltip=message.Text;
+                var nickname=LeveledName(entry,message.DisplayName,message.Level,"lobby-chat-name","lobby-chat-"+message.Id,message.AccountId,cosmetics:message.Cosmetics);BindProfileTarget(nickname,message.AccountId);
+                var text=RawText(entry,message.Text,"lobby-chat-message");text.tooltip=message.Text;DrawCosmeticPresentation.ApplyChatBubble(text,message.Cosmetics);
                 entry.userData=message;_lobbyChatLines[message.Id]=entry;added=true;
             }
             var empty=history.contentViewport.Q<VisualElement>("lobby-chat-empty");
@@ -651,7 +651,7 @@ namespace DrawLiar
 
         private void UpdateLobbyAvatar(int color,long decoration)
         {
-            avatarStage.Clear();var avatar=new AvatarElement(color,decoration);avatar.AddToClassList("lobby-avatar");avatarStage.Add(avatar);
+            avatarStage.Clear();var avatar=DecoratedAvatar(color,decoration);avatar.AddToClassList("lobby-avatar");avatarStage.Add(avatar);
         }
 
         private void RevealAvatarPreview()
@@ -681,7 +681,7 @@ namespace DrawLiar
             }
             if(!inRoom&&content!=null)
             {
-                Home();
+                if(!TryRefreshShopProfile())Home();
                 if(popup.HasValue&&lobby.IsAuthenticated)OpenUtilityPopup(popup.Value);
                 if(friendDraft!=null)overlay?.Q<TextField>("friend-request-id")?.SetValueWithoutNotify(friendDraft);
             }
@@ -1734,7 +1734,7 @@ namespace DrawLiar
             bool toolsWereVisible=drawingTools.resolvedStyle.display!=DisplayStyle.None;
             drawingTools.style.display=network.CanDraw?DisplayStyle.Flex:DisplayStyle.None;drawingTools.SetEnabled(network.CanDraw);
             if(network.CanDraw&&!toolsWereVisible)Enter(drawingTools,140,4);
-            var key=string.Join("|",state.Players.Select(p=>$"{p.Id},{p.AccountId},{p.Name},{p.IsSpectator},{p.IsConnected},{p.AvatarColor},{p.Accessory}"))+state.HostPlayerId+state.Phase+state.LocalIsSpectator;
+            var key=string.Join("|",state.Players.Select(p=>$"{p.Id},{p.AccountId},{p.Name},{p.IsSpectator},{p.IsConnected},{p.AvatarColor},{p.Accessory},{CosmeticKey(p.Cosmetics)}"))+state.HostPlayerId+state.Phase+state.LocalIsSpectator;
             if(key!=playerKey){playerKey=key;Players(state);}
             PrepareGuessingInput(state,local);
             if(voteSubmitted&&local?.HasVoted==true&&state.LocalVoteTargetId==selectedPlayerId)voteSubmitted=false;
@@ -1785,12 +1785,12 @@ namespace DrawLiar
                 var p=players[i];var parent=IsMobile?playerStrip:i%2==0?_pcLeftPlayers:_pcRightPlayers;
                 var card=Box(parent,"player");card.name="player-slot-"+p.Id;card.userData=p.Id;card.focusable=true;card.tabIndex=0;
                 card.EnableInClassList("last-player",i==players.Length-1);playerCards[p.Id]=card;
-                var row=Box(card,"row player-identity");var avatar=new AvatarElement(p.AvatarColor,p.Accessory);avatar.AddToClassList("player-avatar");row.Add(avatar);
+                var row=Box(card,"row player-identity");var avatar=DecoratedAvatar(p.AvatarColor,p.Accessory,p.Cosmetics);avatar.AddToClassList("player-avatar");row.Add(avatar);
                 if(!IsMobile)card.RegisterCallback<GeometryChangedEvent>(_=>SizePcPlayerAvatar(card,avatar));
                 if(!IsMobile)BindProfileTarget(avatar,p.AccountId,()=>!IsNominationPhase(network.State));
                 var info=Box(row,"grow");
                 var name=p.Id==state.LocalPlayerId?Text(info,"{0} · 나","player-name",p.Name):RawText(info,p.Name,"player-name");
-                AddLevelBadge(name,p.Level,"player-"+p.Id,p.AccountId);
+                AddLevelBadge(name,p.Level,"player-"+p.Id,p.AccountId);DrawCosmeticPresentation.ApplyNickname(name,p.Cosmetics);
                 name.name="player-name-"+p.Id;if(!IsMobile)BindProfileTarget(name,p.AccountId,()=>!IsNominationPhase(network.State));card.tooltip=p.Name;
                 if(IsMobile)CreatePlayerProfileButton(card,p);
                 if(CanSelectVote(state,p))SetTooltip(card,"지목하기");
@@ -1974,7 +1974,7 @@ namespace DrawLiar
             PresentationText(modal,L.Text(LocalRoleName(state)),"title role-reveal-title","role-reveal-title",.15f,.075f);
             modal.AddToClassList("room-role-details");
             var identity=Box(modal,"role-information-identity");
-            var avatar=new AvatarElement(avatarColor,accessory);avatar.AddToClassList("avatar-preview");identity.Add(avatar);
+            var avatar=DecoratedAvatar(avatarColor,accessory);avatar.AddToClassList("avatar-preview");identity.Add(avatar);
             var details=Box(identity,"role-information-details");
             Text(details,"주제 · {0}","subtitle",state.Topic);
             if(showWord&&!string.IsNullOrEmpty(state.Word))PresentationText(details,L.Format("제시어 · {0}",state.Word),"section-title","role-reveal-word",.3f,.035f);
@@ -2073,7 +2073,7 @@ namespace DrawLiar
             Button save=null;
             void UpdateAvatar()
             {
-                preview.Clear();var a=new AvatarElement(selectedColor,selectedAccessory);a.AddToClassList("lobby-avatar");preview.Add(a);
+                preview.Clear();var a=DecoratedAvatar(selectedColor,selectedAccessory);a.AddToClassList("lobby-avatar");preview.Add(a);
                 foreach(var item in equipmentButtons)
                 {
                     bool equipped=item.Key==AvatarAccessory.None?AvatarParts.Get(selectedAccessory,_customizePartSlot)==0:AvatarParts.IsEquipped(selectedAccessory,(long)item.Key);
@@ -2184,13 +2184,13 @@ namespace DrawLiar
             bool visible=state.Phase==GamePhase.Rebuttal&&accused!=null&&surface?.HasAuthorPreview!=true;
             _accusedSpotlight.style.display=visible?DisplayStyle.Flex:DisplayStyle.None;
             if(!visible){_accusedKey="";return;}
-            string key=$"{accused.Id}/{accused.Name}/{accused.Level}/{accused.AvatarColor}/{accused.Accessory}/{accused.AccountId}";
+            string key=$"{accused.Id}/{accused.Name}/{accused.Level}/{accused.AvatarColor}/{accused.Accessory}/{accused.AccountId}/{CosmeticKey(accused.Cosmetics)}";
             if(key==_accusedKey)return;
             _accusedKey=key;_accusedSpotlight.Clear();
             var heading=Text(_accusedSpotlight,"지목된 플레이어","accused-caption");heading.pickingMode=PickingMode.Ignore;
-            var avatar=new AvatarElement(accused.AvatarColor,accused.Accessory);avatar.AddToClassList("accused-avatar");
+            var avatar=DecoratedAvatar(accused.AvatarColor,accused.Accessory,accused.Cosmetics);avatar.AddToClassList("accused-avatar");
             _accusedSpotlight.Add(avatar);BindProfileTarget(avatar,accused.AccountId);
-            var name=LeveledName(_accusedSpotlight,accused.Name,accused.Level,"accused-name","accused-name",accused.AccountId);BindProfileTarget(name,accused.AccountId);
+            var name=LeveledName(_accusedSpotlight,accused.Name,accused.Level,"accused-name","accused-name",accused.AccountId,cosmetics:accused.Cosmetics);BindProfileTarget(name,accused.AccountId);
             Enter(_accusedSpotlight,160,4);
         }
         private void CreateSpeechLayer(VisualElement parent)
@@ -2235,6 +2235,7 @@ namespace DrawLiar
                     {message.Label=RawText(messageContainer,SpeechPreview(message.Text),"player-speech-text");message.Label.pickingMode=PickingMode.Ignore;}
                     message.Label.EnableInClassList("player-speech-following",messageIndex++>0);
                 }
+                DrawCosmeticPresentation.ApplyChatBubble(bubble,network.State?.Players.FirstOrDefault(player=>player.Id==speech.Key)?.Cosmetics);
                 bool visible=!IsMobile||_mobileChatSheet?.style.display==DisplayStyle.None;
                 Rect cardBounds=card.worldBound;
                 if(IsMobile)

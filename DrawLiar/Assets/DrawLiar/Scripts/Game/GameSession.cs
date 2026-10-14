@@ -14,6 +14,7 @@ namespace DrawLiar
             public int Score, RoundPoints, Color;
             public int Level = 1;
             public long Accessory;
+            public CosmeticLoadout Cosmetics = new CosmeticLoadout();
             public bool Connected = true, SeatReserved = true, Spectator, SpectatorOnly, Liar, Caught, Guessed;
             public int? Vote;
             public bool? Judgment;
@@ -74,7 +75,7 @@ namespace DrawLiar
         public bool HoldsPlayerSeat(int id) => players.TryGetValue(id, out var player) && !player.Spectator && (player.Connected || player.SeatReserved);
         public bool HoldsSpectatorSeat(int id) => players.TryGetValue(id, out var player) && player.Spectator && (player.Connected || player.SeatReserved);
 
-        public bool Join(int id, string name, int color, long accessory, bool spectator = false, bool spectatorOnly = false, int level = 1)
+        public bool Join(int id, string name, int color, long accessory, bool spectator = false, bool spectatorOnly = false, int level = 1, CosmeticLoadout cosmetics = null)
         {
             if (players.TryGetValue(id, out var existing))
             {
@@ -84,6 +85,7 @@ namespace DrawLiar
                 existing.Connected = true;
                 existing.SeatReserved = true;
                 existing.Level = Math.Max(1, Math.Min(AccountLevelRules.MAX_LEVEL, level));
+                existing.Cosmetics = CosmeticRules.Sanitize(cosmetics);
                 AddRoundParticipant(existing);
                 Changed?.Invoke();
                 return true;
@@ -97,6 +99,7 @@ namespace DrawLiar
                 Id = id, Name = GameRules.CleanText(name, 16, "그림친구"),
                 Color = Math.Max(0, Math.Min(7, color)), Accessory = AvatarParts.Sanitize(accessory),
                 Level = Math.Max(1, Math.Min(AccountLevelRules.MAX_LEVEL, level)),
+                Cosmetics = CosmeticRules.Sanitize(cosmetics),
                 Spectator = spectator, SpectatorOnly = spectatorOnly
             };
             players[id] = participant;
@@ -105,18 +108,21 @@ namespace DrawLiar
             return true;
         }
 
-        public void UpdateProfile(int id, string name, int color, long accessory, int level = 1)
+        public void UpdateProfile(int id, string name, int color, long accessory, int level = 1, CosmeticLoadout cosmetics = null)
         {
             if (!players.TryGetValue(id, out var player)) return;
             player.Name = GameRules.CleanText(name, 16, "그림친구");
             player.Color = Math.Max(0, Math.Min(7, color));
             player.Accessory = AvatarParts.Sanitize(accessory);
             player.Level = Math.Max(1, Math.Min(AccountLevelRules.MAX_LEVEL, level));
+            player.Cosmetics = CosmeticRules.Sanitize(cosmetics);
             Changed?.Invoke();
         }
 
         public string PlayerName(int id) => players.TryGetValue(id, out var player) ? player.Name : "그림친구";
         public int PlayerLevel(int id) => players.TryGetValue(id, out var player) ? player.Level : 1;
+        public CosmeticLoadout PlayerCosmetics(int id) => players.TryGetValue(id, out var player)
+            ? CosmeticRules.Sanitize(player.Cosmetics) : new CosmeticLoadout();
 
         public void Disconnect(int id, double now, bool reserveSeat = true)
         {
@@ -355,6 +361,7 @@ namespace DrawLiar
                     Id = player.Id, Name = player.Name, Level = player.Level, Score = player.Score, RoundPoints = result ? player.RoundPoints : 0,
                     IsSpectator = player.Spectator, IsConnected = player.Connected, IsLiar = reveal && player.Liar,
                     IsCaught = reveal && player.Caught, AvatarColor = player.Color, Accessory = player.Accessory,
+                    Cosmetics = CosmeticRules.Sanitize(player.Cosmetics),
                     HasVoted = player.Vote.HasValue, HasJudged = player.Judgment.HasValue, HasGuessed = reveal && player.Guessed,
                     VoteCount = showVoteCount ? ActivePlayers().Count(voter => voter.Vote == player.Id) : 0,
                     Guess = result && player.Liar ? player.Guess : "",

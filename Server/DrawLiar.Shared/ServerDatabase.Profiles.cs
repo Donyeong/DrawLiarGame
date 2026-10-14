@@ -10,7 +10,7 @@ public sealed partial class ServerDatabase
         await using var transaction = await connection.BeginTransactionAsync(IsolationLevel.RepeatableRead, cancellationToken);
         var profile = new PublicProfileData { AccountId = target.ToString() };
         await using (var command = Command(connection, transaction,
-            "SELECT \"DisplayName\",\"AvatarColor\",\"Accessory\",\"CreatedAt\",\"Experience\",(\"ShowSubscriberBadge\" AND COALESCE(\"SubscriptionExpiresAt\">now(),false)) FROM \"Account\" WHERE \"Id\"=$1 AND NOT \"IsBanned\"", target))
+            "SELECT \"DisplayName\",\"AvatarColor\",\"Accessory\",\"CreatedAt\",\"Experience\",(\"ShowSubscriberBadge\" AND COALESCE(\"SubscriptionExpiresAt\">now(),false)),\"Cosmetics\"::text FROM \"Account\" WHERE \"Id\"=$1 AND NOT \"IsBanned\"", target))
         await using (var reader = await command.ExecuteReaderAsync(cancellationToken))
         {
             if (!await reader.ReadAsync(cancellationToken)) throw new ApiException("AccountNotFound", 404);
@@ -20,6 +20,7 @@ public sealed partial class ServerDatabase
             profile.JoinedAt = ServerRuntime.Timestamp(reader.GetFieldValue<DateTimeOffset>(3));
             profile.Level = AccountLevelRules.GetLevel(reader.GetInt64(4));
             profile.ShowSubscriberBadge = reader.GetBoolean(5);
+            profile.Cosmetics = ReadCosmetics(reader.GetString(6));
         }
         if (requester == target) profile.Friendship = "Self";
         else

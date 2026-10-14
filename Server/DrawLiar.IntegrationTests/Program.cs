@@ -30,9 +30,18 @@ internal static partial class Integration
             await VerifyCommerceAsync();
             return;
         }
+        if (args.Contains("--cosmetic-only"))
+        {
+            VerifyCosmeticRules();
+            await VerifyCosmeticWireAsync();
+            await VerifyLobbyChatAsync();
+            return;
+        }
         if (args.Contains("--commerce-database-only"))
         {
             await VerifyCommerceAsync();
+            VerifyCosmeticRules();
+            await VerifyCosmeticWireAsync();
             await VerifyCommerceDatabaseAsync();
             return;
         }
@@ -148,6 +157,8 @@ internal static partial class Integration
         DrawLiar.Editor.GameSelfCheck.Run();
         VerifyAccountLevelRules();
         VerifyAvatarPartRules();
+        VerifyCosmeticRules();
+        await VerifyCosmeticWireAsync();
         await VerifyRoomPolicyAsync();
         await VerifyRoomCustomTopicsAsync();
         await VerifyConsensusWireAsync();

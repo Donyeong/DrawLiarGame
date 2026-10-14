@@ -190,10 +190,11 @@ namespace DrawLiar
             update.OwnMessage |= mobile || compact || ownMessage;
             var entry = Box(history, "chat-entry");
             var player = network?.State?.Players.FirstOrDefault(value => value.Id == line.PlayerId);
-            var name = LeveledName(entry, line.Name, line.Level, "chat-name", "chat-" + line.PlayerId, player?.AccountId);
+            var name = LeveledName(entry, line.Name, line.Level, "chat-name", "chat-" + line.PlayerId, player?.AccountId, cosmetics: line.Cosmetics);
             BindProfileTarget(name, player?.AccountId);
             var message = RawText(entry, line.Text, "chat-message");
             message.tooltip = line.Text;
+            DrawCosmeticPresentation.ApplyChatBubble(message, line.Cosmetics);
             while (history.contentContainer.childCount > limit) history.contentContainer.ElementAt(0).RemoveFromHierarchy();
             update.Entry = entry;
             Enter(entry, 140, 2);

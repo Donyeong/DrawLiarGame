@@ -80,6 +80,7 @@ namespace DrawLiar
         public bool IsCaught;
         public int AvatarColor;
         public long Accessory;
+        public CosmeticLoadout Cosmetics = new CosmeticLoadout();
         public bool HasVoted;
         public bool HasJudged;
         public bool HasGuessed;
@@ -170,6 +171,7 @@ namespace DrawLiar
         public string Name;
         public int Level;
         public string Text;
+        public CosmeticLoadout Cosmetics;
     }
 
     [Serializable]

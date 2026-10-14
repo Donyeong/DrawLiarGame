@@ -188,6 +188,7 @@ namespace DrawLiar
             if(!inRoom||surface==null||player==null){ClearDrawingPreview();return;}
             surface.ShowAuthorPreview(authorId,state.Settings.Mode,network.GetAuthorStrokes(authorId));
             SetRawText(_drawingPreviewName,player.Name);
+            DrawCosmeticPresentation.ApplyNickname(_drawingPreviewName,player.Cosmetics);
             _drawingPreviewIdentity.Q<DrawLevelBadge>()?.SetLevel(player.Level);
             _drawingPreviewIdentity.style.display=surface.HasAuthorPreview?DisplayStyle.Flex:DisplayStyle.None;
             RefreshAccusedSpotlight(state);
