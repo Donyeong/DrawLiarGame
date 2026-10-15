@@ -41,6 +41,7 @@ namespace DrawLiar
         private bool _isJudgmentCoinToss, _judgmentCoinApproved;
         private int[] _judgmentCoinCorrectVoters = Array.Empty<int>();
         private string topic = "", word = "", summary = GameRules.TieRule;
+        private readonly HashSet<string> _acceptedGuesses = new HashSet<string>(StringComparer.Ordinal);
         private string _mismatchWord = "";
 
         public GamePhase Phase { get; private set; }
@@ -229,6 +230,7 @@ namespace DrawLiar
             Phase = GamePhase.Lobby;
             Round = 0;
             word = topic = _mismatchWord = "";
+            _acceptedGuesses.Clear();
             summary = GameRules.TieRule;
             winners = Array.Empty<int>();
             matchDecided = false;
@@ -420,6 +422,13 @@ namespace DrawLiar
                 : selected.Words.Where(value => !string.IsNullOrWhiteSpace(value)).ToArray();
             int wordIndex = random.Next(words.Length);
             word = words[wordIndex];
+            string normalizedWord = GameRules.NormalizeGuess(word);
+            _acceptedGuesses.Clear();
+            _acceptedGuesses.Add(normalizedWord);
+            foreach (var alias in selected.Aliases ?? Array.Empty<WordAlias>())
+                if (alias?.Accept != null && GameRules.NormalizeGuess(alias.Word) == normalizedWord)
+                    foreach (string accepted in alias.Accept.Select(GameRules.NormalizeGuess).Where(value => value.Length > 0))
+                        _acceptedGuesses.Add(accepted);
             _mismatchWord = Settings.LiarMode == LiarMode.Mismatch
                 ? words[(wordIndex + 1 + random.Next(words.Length - 1)) % words.Length] : "";
             foreach (var player in players.Values)
@@ -602,7 +611,7 @@ namespace DrawLiar
         }
 
         private bool HasCorrectGuess(Participant player) => player.Guessed
-            && GameRules.NormalizeGuess(player.Guess) == GameRules.NormalizeGuess(word);
+            && _acceptedGuesses.Contains(GameRules.NormalizeGuess(player.Guess));
 
         private void FinishMatch()
         {

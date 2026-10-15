@@ -9,13 +9,39 @@ namespace DrawLiar
     internal sealed class DrawBrowserTextInput : IDisposable
     {
         private const float CHAT_LAYOUT_GRACE_SECONDS = .3f;
-        [Serializable] private sealed class InputFields { public InputField[] Fields; public int ChatShortcutToken; }
-        [Serializable] private sealed class InputField
+        [Serializable] private sealed class InputFields
+        {
+            public List<InputField> Fields = new List<InputField>(128);
+            public int ChatShortcutToken;
+
+            public bool Matches(InputFields other)
+            {
+                if (ChatShortcutToken != other.ChatShortcutToken || Fields.Count != other.Fields.Count) return false;
+                for (int index = 0; index < Fields.Count; index++)
+                    if (!Fields[index].Matches(other.Fields[index])) return false;
+                return true;
+            }
+        }
+        [Serializable] private struct InputField
         {
             public int Id, Limit, Keyboard;
             public float X, Y, Width, Height, ClipX, ClipY, ClipWidth, ClipHeight, HitX, HitY, HitWidth, HitHeight, FontSize;
             public bool Multiline, Password, Correction, Rtl, SubmitOnCompositionEnd, ChatShortcut;
             public string Value, Placeholder, Name, Color, Background;
+
+            public bool Matches(InputField other)
+            {
+                return Id == other.Id && Limit == other.Limit && Keyboard == other.Keyboard
+                    && X.Equals(other.X) && Y.Equals(other.Y) && Width.Equals(other.Width) && Height.Equals(other.Height)
+                    && ClipX.Equals(other.ClipX) && ClipY.Equals(other.ClipY)
+                    && ClipWidth.Equals(other.ClipWidth) && ClipHeight.Equals(other.ClipHeight)
+                    && HitX.Equals(other.HitX) && HitY.Equals(other.HitY)
+                    && HitWidth.Equals(other.HitWidth) && HitHeight.Equals(other.HitHeight) && FontSize.Equals(other.FontSize)
+                    && Multiline == other.Multiline && Password == other.Password && Correction == other.Correction
+                    && Rtl == other.Rtl && SubmitOnCompositionEnd == other.SubmitOnCompositionEnd && ChatShortcut == other.ChatShortcut
+                    && Value == other.Value && Placeholder == other.Placeholder && Name == other.Name
+                    && Color == other.Color && Background == other.Background;
+            }
         }
 
         private sealed class BrowserKeyDownEvent : KeyDownEvent
@@ -53,13 +79,18 @@ namespace DrawLiar
         private readonly Dictionary<TextField, int> _ids = new Dictionary<TextField, int>();
         private readonly Dictionary<int, TextField> _fields = new Dictionary<int, TextField>();
         private readonly Dictionary<TextField, InputField> _layouts = new Dictionary<TextField, InputField>();
+        private readonly HashSet<TextField> _foundFields = new HashSet<TextField>();
+        private readonly List<TextField> _queriedFields = new List<TextField>(128);
+        private readonly List<TextField> _removedFields = new List<TextField>(128);
+        private readonly List<VisualElement> _focusControls = new List<VisualElement>();
+        private readonly InputFields _configuration = new InputFields(), _sentConfiguration = new InputFields();
         private readonly float[] _keyboardMetrics = new float[3];
         private readonly IVisualElementScheduledItem _poller;
         private TextField _active;
         private VisualElement _configuredChatShortcut;
         private TextElement _text;
         private StyleFloat _opacity;
-        private bool _hideKeyboard, _captureKeyboard, _reading, _disposed;
+        private bool _hideKeyboard, _captureKeyboard, _reading, _disposed, _refreshingFields, _hasConfiguration;
         private string _knownValue;
         private int _nextId, _activeId, _chatShortcutVersion;
         private float _nextLayout, _chatLayoutGraceUntil;
@@ -142,18 +173,28 @@ namespace DrawLiar
 
         private void RefreshFields()
         {
+            if (_refreshingFields) { _nextLayout = 0; return; }
+            _refreshingFields = true;
+            try { RefreshConfiguration(); }
+            finally { _refreshingFields = false; }
+        }
+
+        private void RefreshConfiguration()
+        {
             _nextLayout = Time.unscaledTime + .08f;
             Rect panel = _root.panel?.visualTree.worldBound ?? default;
             if (panel.width <= 0 || panel.height <= 0) return;
-            var found = new HashSet<TextField>();
-            var configuration = new List<InputField>();
+            var found = _foundFields;
+            var configuration = _configuration.Fields;
+            found.Clear(); configuration.Clear(); _queriedFields.Clear(); _removedFields.Clear();
             var chatShortcut = _chatShortcutTarget?.Invoke();
             if (_configuredChatShortcut != chatShortcut)
             {
                 _configuredChatShortcut = chatShortcut;
                 _chatShortcutVersion++;
             }
-            foreach (var field in _root.Query<TextField>().ToList())
+            _root.Query<TextField>().ToList(_queriedFields);
+            foreach (var field in _queriedFields)
             {
                 if (field.isReadOnly || !IsVisible(field) || configuration.Count >= 128) continue;
                 var input = field.Q<VisualElement>(className: TextField.inputUssClassName);
@@ -204,17 +245,22 @@ namespace DrawLiar
             {
                 activeLayout.Value = _active.value ?? "";
                 activeLayout.ChatShortcut = _active == chatShortcut;
+                _layouts[_active] = activeLayout;
                 found.Add(_active);
                 configuration.Add(activeLayout);
             }
             if (_active != null && !found.Contains(_active)) Close(false);
-            var removed = new List<TextField>();
+            var removed = _removedFields;
             foreach (var field in _ids.Keys) if (!found.Contains(field)) removed.Add(field);
             foreach (var field in removed) { _fields.Remove(_ids[field]); _ids.Remove(field); _layouts.Remove(field); }
-            DrawBrowserInterop.DrawBrowserInputConfigure(JsonUtility.ToJson(new InputFields
+            _configuration.ChatShortcutToken = chatShortcut != null ? _chatShortcutVersion : 0;
+            if (!_hasConfiguration || !_configuration.Matches(_sentConfiguration))
             {
-                Fields = configuration.ToArray(), ChatShortcutToken = chatShortcut != null ? _chatShortcutVersion : 0
-            }));
+                DrawBrowserInterop.DrawBrowserInputConfigure(JsonUtility.ToJson(_configuration));
+                _sentConfiguration.Fields.Clear(); _sentConfiguration.Fields.AddRange(configuration);
+                _sentConfiguration.ChatShortcutToken = _configuration.ChatShortcutToken;
+                _hasConfiguration = true;
+            }
             var focused = ParentField(_root.panel?.focusController.focusedElement as VisualElement);
             if (_active == null && focused != null && found.Contains(focused) && _ids.TryGetValue(focused, out int focusedId))
                 Open(focused, focusedId);
@@ -342,8 +388,10 @@ namespace DrawLiar
             var previous = _active;
             Dispatch(KeyCode.Tab, backwards ? EventModifiers.Shift : EventModifiers.None);
             if (_active != previous || previous == null) return;
-            var controls = _root.Query<VisualElement>().ToList().FindAll(element => element.focusable && element.tabIndex >= 0
-                && IsVisible(element) && (element is TextField || element is Button || element is Toggle || element is DropdownField));
+            var controls = _focusControls;
+            controls.Clear(); _root.Query<VisualElement>().ToList(controls);
+            controls.RemoveAll(element => !element.focusable || element.tabIndex < 0 || !IsVisible(element)
+                || !(element is TextField || element is Button || element is Toggle || element is DropdownField));
             int index = controls.FindIndex(element => element == previous);
             if (controls.Count == 0) return;
             int next = (index + (backwards ? -1 : 1) + controls.Count) % controls.Count;
@@ -380,6 +428,8 @@ namespace DrawLiar
             _root.UnregisterCallback<DetachFromPanelEvent>(OnDetached);
             DrawBrowserInterop.DrawBrowserInputShutdown();
             _fields.Clear(); _ids.Clear(); _layouts.Clear();
+            _foundFields.Clear(); _queriedFields.Clear(); _removedFields.Clear(); _focusControls.Clear();
+            _configuration.Fields.Clear(); _sentConfiguration.Fields.Clear();
         }
     }
 }

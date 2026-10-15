@@ -16,9 +16,10 @@ public sealed class LobbyChatHub
     public const int MAX_MESSAGE_LENGTH = 200;
     public const int HISTORY_LIMIT = 50;
     private const int MAX_FRAME_BYTES = 4096;
+    private const int MAX_RATE_VIOLATIONS = 5;
     private readonly object _gate = new();
     private readonly Dictionary<Guid, HashSet<Connection>> _members = new();
-    private readonly Dictionary<Guid, Queue<DateTimeOffset>> _sent = new();
+    private readonly Dictionary<Guid, Queue<DateTimeOffset>> _attempts = new();
     private readonly Queue<LobbyChatMessage> _history = new();
     private readonly SemaphoreSlim _slots = new(512, 512);
     private readonly Func<string, CancellationToken, Task<LobbyChatIdentity>> _authenticate;
@@ -101,6 +102,7 @@ public sealed class LobbyChatHub
                         connection.Notice("InvalidChat", request.RequestId);
                         continue;
                     }
+                    if (!TryTakeAttempt(connection, request.RequestId)) continue;
                     identity = await _authenticate(connection.Token, connection.ReadCancellation);
                     if (identity.AccountId != connection.AccountId || identity.ExpiresAt <= _clock.GetUtcNow())
                         throw new ApiException("Unauthorized", 401);
@@ -160,15 +162,6 @@ public sealed class LobbyChatHub
         {
             if (connection.ReadCancellation.IsCancellationRequested) return;
             DateTimeOffset now = _clock.GetUtcNow();
-            TrimRates(now);
-            if (!_sent.TryGetValue(connection.AccountId, out var recent))
-                _sent.Add(connection.AccountId, recent = new Queue<DateTimeOffset>());
-            if (recent.Count >= 5 || recent.Count > 0 && now - recent.Last() < TimeSpan.FromSeconds(1))
-            {
-                connection.Notice("ChatRateLimited", requestId);
-                return;
-            }
-            recent.Enqueue(now);
             var message = new LobbyChatMessage
             {
                 Id = ++_sequence, AccountId = connection.AccountId.ToString(), DisplayName = displayName,
@@ -186,12 +179,31 @@ public sealed class LobbyChatHub
         }
     }
 
+    private bool TryTakeAttempt(Connection connection, string requestId)
+    {
+        lock (_gate)
+        {
+            if (connection.ReadCancellation.IsCancellationRequested) return false;
+            DateTimeOffset now = _clock.GetUtcNow();
+            TrimRates(now);
+            if (!_attempts.TryGetValue(connection.AccountId, out var recent))
+                _attempts.Add(connection.AccountId, recent = new Queue<DateTimeOffset>());
+            if (recent.Count >= 5 || recent.Count > 0 && now - recent.Last() < TimeSpan.FromSeconds(1))
+            {
+                connection.RateLimited(now, requestId);
+                return false;
+            }
+            recent.Enqueue(now);
+            return true;
+        }
+    }
+
     private void TrimRates(DateTimeOffset now)
     {
-        foreach (var pair in _sent.ToArray())
+        foreach (var pair in _attempts.ToArray())
         {
             while (pair.Value.TryPeek(out var timestamp) && now - timestamp >= TimeSpan.FromSeconds(10)) pair.Value.Dequeue();
-            if (pair.Value.Count == 0) _sent.Remove(pair.Key);
+            if (pair.Value.Count == 0) _attempts.Remove(pair.Key);
         }
     }
 
@@ -259,6 +271,8 @@ public sealed class LobbyChatHub
         private readonly CancellationTokenSource _write;
         private readonly Task _sender;
         private readonly TaskCompletionSource _ended = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        private DateTimeOffset _rateViolationStarted;
+        private int _rateViolations;
         private int _stopped;
         public string Token { get; }
         public Guid AccountId { get; }
@@ -286,10 +300,20 @@ public sealed class LobbyChatHub
             }
         }
         public void Notice(string code, string requestId = "") => Queue(new LobbyChatEnvelope { Type = "notice", Code = code, RequestId = requestId });
-        public void Stop(string code)
+        public void RateLimited(DateTimeOffset now, string requestId)
+        {
+            if (now - _rateViolationStarted >= TimeSpan.FromSeconds(10))
+            {
+                _rateViolationStarted = now;
+                _rateViolations = 0;
+            }
+            if (++_rateViolations >= MAX_RATE_VIOLATIONS) Stop("ChatRateLimited", requestId);
+            else Notice("ChatRateLimited", requestId);
+        }
+        public void Stop(string code, string requestId = "")
         {
             if (Interlocked.Exchange(ref _stopped, 1) != 0) return;
-            Notice(code);
+            Notice(code, requestId);
             CancelRead();
         }
         public void CancelRead()

@@ -21,6 +21,7 @@ namespace DrawLiar
         public string[] Topics = Array.Empty<string>();
         public bool IsInProgress;
         public bool AllowMidRoundJoin = true;
+        public string TopicLanguage = ServerRoomSettings.DEFAULT_TOPIC_LANGUAGE;
     }
 
     public sealed class RoomPasswordPrompt
@@ -61,6 +62,8 @@ namespace DrawLiar
         private readonly HashSet<string> _knownRoomInvitations = new HashSet<string>();
 
         public string RoomCode => _roomCode;
+        private string _roomId = "";
+        public string CurrentRoomId => string.IsNullOrEmpty(_roomCode) ? "" : _roomId;
         public bool IsGoogleSigningIn => _googleCancellation != null;
         public string Status => DrawLocalization.Format(_statusSource, _statusArguments);
         public bool IsBusy { get; private set; }
@@ -85,6 +88,12 @@ namespace DrawLiar
         public event Action SocialChanged;
         public event Action<string> SocialNotice;
         public event Func<RoomPasswordPrompt, CancellationToken, Task<string>> RoomPasswordRequested;
+
+        private sealed class ApiRequestException : InvalidOperationException
+        {
+            public string Code { get; }
+            public ApiRequestException(string code, string message) : base(message) => Code = code;
+        }
 
         private sealed class RoomPasswordException : InvalidOperationException
         {
@@ -264,6 +273,7 @@ namespace DrawLiar
             ResetCommerce();
             ResetSocial();
             SetProfile(session.Profile);
+            await RefreshBlocksAsync();
             StartLobbyChat();
             SetStatus("로그인했습니다. 방을 만들거나 참가하세요.");
         }
@@ -485,6 +495,42 @@ namespace DrawLiar
             await ConnectRoomAsync(assignment);
         });
 
+        // 자리가 남은 대기 방을 먼저, 그다음 중도 참가를 허용한 진행 중 방을 인원이 많은 순으로 시도한다.
+        // 방이 차거나 사라지거나 비밀번호·강퇴로 막힌 후보만 건너뛰고, 그 밖의 오류는 그대로 알린다. 참가할 방이 없으면 false를 돌려준다.
+        public async Task<bool> QuickJoinAsync()
+        {
+            bool joined = false;
+            await RunAsync(async () =>
+            {
+                RequireAvailable();
+                string session = _gameSession;
+                var response = await SendGameAsync<RoomListResponse>("/api/rooms?search=", "GET");
+                foreach (var room in SelectQuickJoinRooms(response.Rooms, ServerRoomSettings.NormalizeTopicLanguage(DrawLocalization.CurrentLanguageCode)))
+                {
+                    DedicatedAssignment assignment;
+                    try
+                    {
+                        assignment = await SendGameAsync<DedicatedAssignment>("/api/rooms/" + Uri.EscapeDataString(room.RoomId) + "/join", "POST", new JoinRoomRequest());
+                    }
+                    catch (RoomPasswordException) { continue; }
+                    catch (ApiRequestException exception) when (exception.Code == "RoomFull" || exception.Code == "RoomUnavailable" || exception.Code == "RoomKicked") { continue; }
+                    if (session != _gameSession || _loggingOut) throw new OperationCanceledException();
+                    await ConnectRoomAsync(assignment);
+                    joined = true;
+                    return;
+                }
+                SetStatus("참가할 수 있는 방이 없습니다. 새 방을 만들어 보세요.");
+            });
+            return joined;
+        }
+
+        // 내 언어로 주제를 쓰는 방을 먼저, 그 안에서 대기 방·인원이 많은 방 순으로 고른다.
+        public static ServerRoomData[] SelectQuickJoinRooms(IEnumerable<ServerRoomData> rooms, string topicLanguage) => (rooms ?? Array.Empty<ServerRoomData>())
+            .Where(room => room != null && room.Settings != null && !room.IsPrivate && !room.Settings.IsPrivate
+                && room.PlayerCount < room.Settings.MaxPlayers && (!room.IsInProgress || room.Settings.AllowMidRoundJoin))
+            .OrderBy(room => ServerRoomSettings.NormalizeTopicLanguage(room.Settings.TopicLanguage) != topicLanguage)
+            .ThenBy(room => room.IsInProgress).ThenByDescending(room => room.PlayerCount).Take(3).ToArray();
+
         private async Task<DedicatedAssignment> RequestRoomAssignmentAsync(Func<string, Task<DedicatedAssignment>> request,
             string roomCode, string roomName)
         {
@@ -518,6 +564,7 @@ namespace DrawLiar
             SetStatus("게임 서버에 연결하고 있습니다…");
             await _manager.ConnectAsync(assignment);
             _roomCode = string.IsNullOrEmpty(assignment.RoomCode) ? assignment.RoomId : assignment.RoomCode;
+            _roomId = assignment.RoomId;
             SetStatus("방에 연결했습니다. 방 코드: {0}", _roomCode);
         }
 
@@ -530,7 +577,8 @@ namespace DrawLiar
             foreach (var room in response.Rooms)
                 _publicRooms.Add(new PublicRoomInfo { Id = room.RoomId, Code = room.RoomCode, Name = room.Name, Players = room.PlayerCount,
                     MaxPlayers = room.Settings.MaxPlayers, Spectators = room.SpectatorCount, LiarMode = (LiarMode)room.Settings.LiarMode, IsInProgress = room.IsInProgress,
-                    AllowMidRoundJoin = room.Settings.AllowMidRoundJoin, Topics = room.Settings.Topics?.ToArray() ?? Array.Empty<string>() });
+                    AllowMidRoundJoin = room.Settings.AllowMidRoundJoin, Topics = room.Settings.Topics?.ToArray() ?? Array.Empty<string>(),
+                    TopicLanguage = ServerRoomSettings.NormalizeTopicLanguage(room.Settings.TopicLanguage) });
             if (_publicRooms.Count == 0) SetStatus("공개 방이 없습니다.");
             else SetStatus("공개 방 {0}개를 찾았습니다.", _publicRooms.Count);
         });
@@ -600,9 +648,15 @@ namespace DrawLiar
             IsBusy = true; Changed?.Invoke();
             try { await operation(); }
             catch (OperationCanceledException) { SetStatus("요청을 취소했습니다."); throw; }
-            catch (Exception exception) { SetStatus(exception.Message); throw; }
+            catch (Exception exception) { SetStatus(UserFacingMessage(exception)); throw; }
             finally { IsBusy = false; Changed?.Invoke(); }
         }
+
+        // 게임 코드가 안내 문구로 던진 예외만 그대로 보여주고, 시스템 예외의 영문·내부 메시지는 공통 안내로 바꾼다.
+        public static string UserFacingMessage(Exception exception) =>
+            exception is InvalidOperationException && !(exception is ObjectDisposedException) || exception is TimeoutException
+                || exception.GetType() == typeof(ArgumentException)
+                ? exception.Message : "요청을 처리하지 못했습니다. 다시 시도하세요.";
 
         private Task<T> SendGameAsync<T>(string path, string method, object body = null) where T : class, new() =>
             SendAsync<T>(_gameServerUrl, path, method, body, _gameSession);
@@ -638,14 +692,15 @@ namespace DrawLiar
                 string message = DescribeError(code, request.responseCode);
                 if (code == "RoomPasswordRequired" || code == "InvalidRoomPassword" || code == "InvalidRoomPasswordFormat")
                     throw new RoomPasswordException(message);
-                throw new InvalidOperationException(message);
+                throw new ApiRequestException(code, message);
             }
             if (string.IsNullOrEmpty(request.downloadHandler.text))
             {
                 if (typeof(T) == typeof(ApiError)) return new T();
                 throw new InvalidOperationException("서버 응답을 확인할 수 없습니다.");
             }
-            return JsonUtility.FromJson<T>(request.downloadHandler.text) ?? throw new InvalidOperationException("서버 응답을 확인할 수 없습니다.");
+            try { return JsonUtility.FromJson<T>(request.downloadHandler.text) ?? throw new InvalidOperationException("서버 응답을 확인할 수 없습니다."); }
+            catch (ArgumentException) { throw new InvalidOperationException("서버 응답을 확인할 수 없습니다."); }
         }
 
         public static string NormalizeCode(string value)
@@ -665,6 +720,11 @@ namespace DrawLiar
                 case "InvalidGuestCredential": return "게스트 인증 정보를 확인할 수 없습니다. Google 연동 계정은 Google로 로그인하세요.";
                 case "ExternalLoginRequired": return "Google에 연동된 계정입니다. Google로 로그인해 주세요.";
                 case "InvalidCredentials": return "인증 정보를 확인하세요.";
+                case "BlockLimit": return "차단 목록이 가득 찼습니다.";
+                case "BlockedPlayer": return "차단한 플레이어입니다. 차단을 해제한 뒤 다시 시도하세요.";
+                case "ReportLimit": return "오늘은 더 이상 신고할 수 없습니다. 내일 다시 시도하세요.";
+                case "InvalidReport": return "신고 내용을 확인하세요.";
+                case "PlayerUnavailable": return "플레이어를 찾지 못했습니다.";
                 case "AlreadyExists": return "이미 추가한 항목입니다.";
                 case "RoomUnavailable": return "방을 찾지 못했습니다. 방 코드를 확인하세요.";
                 case "InvalidRoomCode": return "영문·숫자 6자리 방 코드를 확인하세요.";

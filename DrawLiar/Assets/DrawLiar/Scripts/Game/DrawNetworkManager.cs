@@ -45,8 +45,7 @@ namespace DrawLiar
         public bool IsConnected => _socket != null && _socket.State == WebSocketState.Open && State != null;
         public int LocalPlayerId => State?.LocalPlayerId ?? -1;
         public int CanvasVersion => _canvasVersion;
-        public bool CanDraw => IsConnected && !State.LocalIsSpectator
-            && State.Players.Any(player => player.Id == LocalPlayerId && player.IsConnected && !player.IsSpectator)
+        public bool CanDraw => IsConnected && !State.LocalIsSpectator && LocalPlayerCanAct()
             && (State.Phase == GamePhase.Lobby || State.Phase == GamePhase.Drawing && State.ArtistId == LocalPlayerId);
         public event Action<RoomSnapshot> StateChanged;
         public event Action<DrawStroke> StrokeReceived;
@@ -136,6 +135,14 @@ namespace DrawLiar
                 _configuringRoom = false;
                 password = "";
             }
+        }
+
+        private bool LocalPlayerCanAct()
+        {
+            int localId = LocalPlayerId;
+            foreach (var player in State.Players)
+                if (player.Id == localId) return player.IsConnected && !player.IsSpectator;
+            return false;
         }
 
         private bool CanConfigureRoom(RoomSnapshot state) => IsConnected && state != null && state.IsHost

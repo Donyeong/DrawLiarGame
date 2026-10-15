@@ -254,7 +254,50 @@ namespace DrawLiar
                     Button(actions, "친구 요청", () => StartPublicProfileFriendAction(() => lobby.RequestFriendAsync(profile.AccountId)), "primary").name = "public-profile-request";
                     break;
             }
+            if (profile.Friendship != "Self" && profile.AccountId != lobby.Profile?.AccountId) RenderPublicProfileSafety(actions, profile);
             RefreshPublicProfileActions();
+        }
+
+        private string _profileBlockConfirmAccount;
+
+        private void RenderPublicProfileSafety(VisualElement actions, PublicProfileData profile)
+        {
+            string id = profile.AccountId;
+            void Rerender() { actions.Clear(); RenderPublicProfileFriendship(actions, profile); }
+            bool muted = lobby.IsChatMuted(id), blocked = lobby.IsBlocked(id);
+            Button(actions, muted ? "채팅 보이기" : "채팅 숨기기", () =>
+            {
+                lobby.SetChatMuted(id, !muted);
+                Toast(muted ? "채팅을 다시 표시합니다." : "이 기기에서 이 플레이어의 채팅을 숨겼습니다.");
+                Rerender();
+            }, "secondary").name = "public-profile-mute";
+            if (blocked) Button(actions, "차단 해제", () => StartPublicProfileFriendAction(() => lobby.SetBlockedAsync(id, false)), "secondary").name = "public-profile-unblock";
+            else if (_profileBlockConfirmAccount == id)
+                Button(actions, "차단 확인", () => { _profileBlockConfirmAccount = null; StartPublicProfileFriendAction(() => lobby.SetBlockedAsync(id, true)); }, "danger").name = "public-profile-block-confirm";
+            else Button(actions, "차단", () => { _profileBlockConfirmAccount = id; Rerender(); Toast("차단하면 친구 관계가 끊기고 채팅이 보이지 않습니다. 한 번 더 누르면 차단합니다."); }, "secondary").name = "public-profile-block";
+            Button(actions, "신고", () =>
+            {
+                actions.Clear();
+                RenderReportForm(actions, id, PlayerReportRequest.REASON_ABUSE, "", Rerender, request => StartPublicProfileFriendAction(() => lobby.ReportAsync(request)));
+            }, "secondary").name = "public-profile-report";
+        }
+
+        private static readonly string[] REPORT_REASON_LABELS = { "욕설·비하", "부적절한 그림", "부적절한 닉네임", "도배·광고", "부적절한 주제", "기타" };
+
+        // 신고 사유와 선택 입력을 받는다. 방에 있으면 현재 방 ID를, 창작마당 주제면 주제 ID를 함께 보낸다.
+        private void RenderReportForm(VisualElement parent, string targetAccountId, string defaultReason, string workshopTopicId, Action cancel,
+            Action<PlayerReportRequest> submit)
+        {
+            var request = new PlayerReportRequest { TargetAccountId = targetAccountId, Reason = defaultReason, WorkshopTopicId = workshopTopicId ?? "",
+                RoomId = inRoom ? lobby.CurrentRoomId : "" };
+            var form = Box(parent, "report-form grow"); form.name = "report-form";
+            Choice(form, "신고 사유", REPORT_REASON_LABELS, Math.Max(0, Array.IndexOf(PlayerReportRequest.REASONS, defaultReason)),
+                index => request.Reason = PlayerReportRequest.REASONS[index]).name = "report-reason";
+            var detail = Field(form, "자세한 내용 (선택)", ""); detail.name = "report-detail"; detail.multiline = true; detail.maxLength = PlayerReportRequest.MAX_CONTEXT_LENGTH;
+            detail.RegisterValueChangedCallback(evt => { if (ReferenceEquals(evt.target, detail)) request.Context = evt.newValue; });
+            var buttons = Box(form, "row");
+            Button(buttons, "취소", cancel, "secondary grow", DrawSound.UiCancel).name = "report-cancel";
+            Button(buttons, "신고하기", () => submit(request), "danger grow").name = "report-submit";
         }
 
         private void RefreshPublicProfileActions()
@@ -426,7 +469,7 @@ namespace DrawLiar
             }
             catch (Exception exception)
             {
-                if (Current()) { DrawAudio.Instance?.Play(DrawSound.UiError); Toast(exception.Message); }
+                if (Current()) { DrawAudio.Instance?.Play(DrawSound.UiError); Toast(LobbyServiceBridge.UserFacingMessage(exception)); }
             }
             finally { _profileKickBusy = false; RefreshPublicProfileActions(); }
         }
@@ -578,7 +621,7 @@ namespace DrawLiar
             {
                 if (!IsCurrentPublicProfile(popup, version, token)) return;
                 DrawAudio.Instance?.Play(DrawSound.UiError);
-                Toast(exception.Message);
+                Toast(LobbyServiceBridge.UserFacingMessage(exception));
                 BeginPublicProfileLoad();
             }
         }

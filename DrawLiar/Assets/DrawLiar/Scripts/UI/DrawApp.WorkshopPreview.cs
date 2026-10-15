@@ -111,6 +111,17 @@ namespace DrawLiar
                 var words = Box(_workshopPreviewBody, "row workshop-preview-words");
                 for (int index = 0; index < detail.Words.Length; index++)
                     RawText(words, detail.Words[index], "workshop-preview-word").name = "workshop-preview-word-" + index;
+                if (!string.IsNullOrEmpty(entry.CreatorAccountId) && entry.CreatorAccountId != lobby.Profile?.AccountId)
+                {
+                    var report = Box(_workshopPreviewBody, "row workshop-preview-report");
+                    void ShowReportButton()
+                    {
+                        report.Clear();
+                        Button(report, "신고", () => RenderReportForm(Cleared(report), entry.CreatorAccountId, PlayerReportRequest.REASON_TOPIC, entry.Id, ShowReportButton,
+                            request => Run(async () => { await lobby.ReportAsync(request); if (report.panel != null) ShowReportButton(); })), "secondary").name = "workshop-preview-report";
+                    }
+                    ShowReportButton();
+                }
                 HideMobileScrollers();
             }
             catch (OperationCanceledException) { }
@@ -123,6 +134,8 @@ namespace DrawLiar
                 Button(_workshopPreviewBody, "다시 시도", BeginWorkshopPreviewLoad, "secondary").name = "workshop-preview-retry";
             }
         }
+
+        private static VisualElement Cleared(VisualElement element) { element.Clear(); return element; }
 
         private void CancelWorkshopPreviewRequest()
         {

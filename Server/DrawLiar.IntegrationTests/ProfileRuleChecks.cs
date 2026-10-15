@@ -170,7 +170,8 @@ internal static partial class Integration
         try
         {
             using var registry = new RoomRegistry(new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
-            { ["Dedicated:GameDataPath"] = path, ["Dedicated:NodeId"] = "profile-test-node", ["Dedicated:Capacity"] = "1" }).Build());
+            { ["Dedicated:GameDataPath"] = path, ["Dedicated:OutboxPath"] = path + ".outbox",
+                ["Dedicated:NodeId"] = "profile-test-node", ["Dedicated:Capacity"] = "1" }).Build());
             var roomData = new ServerRoomData
             {
                 RoomId = Guid.NewGuid().ToString(), OwnerAccountId = Guid.NewGuid().ToString(),
@@ -222,6 +223,10 @@ internal static partial class Integration
             }
             finally { foreach (var connection in connections) await connection.DisposeAsync(); }
         }
-        finally { File.Delete(path); }
+        finally
+        {
+            File.Delete(path);
+            if (Directory.Exists(path + ".outbox")) Directory.Delete(path + ".outbox", true);
+        }
     }
 }

@@ -5,14 +5,16 @@ namespace DrawLiar.Server;
 
 public sealed partial class ServerDatabase
 {
-    private static readonly Lazy<ServerTopicData[]> _builtInTopics = new(() =>
+    private static readonly Lazy<(string Language, ServerTopicData Topic)[]> _builtInTopics = new(() =>
     {
         using var stream = typeof(ServerDatabase).Assembly.GetManifestResourceStream("DrawLiar.BuiltInGameData.json")!;
         using var document = JsonDocument.Parse(stream);
-        return document.RootElement.GetProperty("Topics").Deserialize<ServerTopicData[]>(ServerRuntime.Json)!;
+        return document.RootElement.GetProperty("Topics").EnumerateArray().Select(element => (
+            ServerRoomSettings.TopicLanguageOf(element.TryGetProperty("LanguageCode", out var code) ? code.GetString() ?? "" : ""),
+            element.Deserialize<ServerTopicData>(ServerRuntime.Json)!)).ToArray();
     });
     private static readonly Lazy<HashSet<string>> _builtInTopicNames = new(() => _builtInTopics.Value
-        .Select(topic => topic.Name).ToHashSet(StringComparer.Ordinal));
+        .Select(entry => entry.Topic.Name).ToHashSet(StringComparer.Ordinal));
     public async Task RegisterGameAsync(RegisterGameRequest request, bool allowHttp)
     {
         ValidateNode(request.NodeId, request.PublicUrl, false, allowHttp);
@@ -42,6 +44,10 @@ public sealed partial class ServerDatabase
         await using var connection = await _source.OpenConnectionAsync();
         await using var transaction = await connection.BeginTransactionAsync();
         string hash = ServerRuntime.Hash(assignmentToken);
+        if (await Scalar(connection, transaction, "SELECT \"AccountId\" FROM \"Session\" WHERE \"Hash\"=$1", hash) is not Guid accountId)
+            throw new ApiException("InvalidAssignment", 401);
+        await LockSessionExchange(connection, transaction, accountId);
+        await LockSessionAccount(connection, transaction, accountId);
         await Execute(connection, transaction, "SELECT \"Hash\" FROM \"Session\" WHERE \"Hash\"=$1 FOR UPDATE", hash);
         var assignment = await AuthenticateHash(connection, transaction, hash, "assignment:" + nodeId);
         string parent;
@@ -293,6 +299,10 @@ public sealed partial class ServerDatabase
         if (request.JoinTicket == null || request.JoinTicket.Length != 64) throw new ApiException("InvalidTicket", 401);
         await using var connection = await _source.OpenConnectionAsync();
         await using var transaction = await connection.BeginTransactionAsync();
+        string ticketHash = ServerRuntime.Hash(request.JoinTicket);
+        if (await Scalar(connection, transaction, "SELECT \"AccountId\" FROM \"JoinTicket\" WHERE \"Hash\"=$1", ticketHash) is not Guid ticketAccountId)
+            throw new ApiException("InvalidTicket", 401);
+        await LockSessionExchange(connection, transaction, ticketAccountId);
         await Execute(connection, transaction, "SELECT \"RoomId\" FROM \"Room\" WHERE \"RoomId\"=$1 AND \"NodeId\"=$2 FOR UPDATE", roomId, request.NodeId);
         Guid accountId;
         string sessionHash;
@@ -304,7 +314,7 @@ public sealed partial class ServerDatabase
             DELETE FROM "JoinTicket" t USING "Room" r WHERE t."Hash"=$1 AND t."ExpiresAt">now() AND t."RoomId"=$2
             AND r."RoomId"=t."RoomId" AND r."NodeId"=$3 AND t."AccessVersion"=r."AccessVersion"
             RETURNING t."AccountId",t."SessionHash",t."IsSpectator",t."SpectatorOnly",t."ExpiresAt",t."AccessVersion"
-            """, ServerRuntime.Hash(request.JoinTicket), roomId, request.NodeId))
+            """, ticketHash, roomId, request.NodeId))
         await using (var reader = await command.ExecuteReaderAsync())
         {
             if (!await reader.ReadAsync()) throw new ApiException("InvalidTicket", 401);
@@ -395,6 +405,7 @@ public sealed partial class ServerDatabase
         settings.Topics ??= [];
         if (settings.Topics.Length > 128 || settings.Topics.Any(topic => string.IsNullOrWhiteSpace(topic) || topic.Length > 40 || topic.Any(char.IsControl))) throw new ApiException("InvalidTopics");
         settings.Topics = settings.Topics.Select(topic => topic.Trim()).Distinct().ToArray();
+        settings.TopicLanguage = ServerRoomSettings.NormalizeTopicLanguage(settings.TopicLanguage);
     }
 
     public static void ValidateCustomTopics(ServerTopicData[] topics)
@@ -430,7 +441,9 @@ public sealed partial class ServerDatabase
 
     private static void ValidateSelectedTopics(ServerRoomSettings settings, ServerTopicData[] customTopics)
     {
-        var available = _builtInTopics.Value.Concat(customTopics).ToDictionary(topic => topic.Name, StringComparer.Ordinal);
+        string language = ServerRoomSettings.NormalizeTopicLanguage(settings.TopicLanguage);
+        var available = _builtInTopics.Value.Where(entry => entry.Language == language).Select(entry => entry.Topic)
+            .Concat(customTopics).ToDictionary(topic => topic.Name, StringComparer.Ordinal);
         if (settings.Topics.Length == 0 || settings.Topics.Any(topic => !available.ContainsKey(topic))) throw new ApiException("InvalidTopics");
         if (settings.LiarMode == 1 && !settings.Topics.Any(name => available[name].Words.Select(word => new string(word
                 .Normalize(System.Text.NormalizationForm.FormKC).Where(character => !char.IsWhiteSpace(character)).ToArray()).ToLowerInvariant())

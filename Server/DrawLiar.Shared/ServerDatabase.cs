@@ -13,6 +13,10 @@ public sealed partial class ServerDatabase : IDisposable
 {
     private readonly NpgsqlDataSource _source;
     private static readonly string _dummyPassword = ServerRuntime.PasswordHash("invalid-account-password");
+    private const int EXPIRY_CLEANUP_BATCH_SIZE = 256;
+    private readonly CancellationTokenSource _maintenanceLifetime = new();
+    private Task? _maintenanceTask;
+    private int _disposed;
 
     public ServerDatabase(IConfiguration configuration)
     {
@@ -41,6 +45,74 @@ public sealed partial class ServerDatabase : IDisposable
             await Execute(connection, transaction, "INSERT INTO \"SchemaVersion\" (\"Version\") VALUES ($1)", migration);
         }
         await transaction.CommitAsync();
+        _maintenanceTask ??= MaintainExpiredDataAsync(_maintenanceLifetime.Token);
+    }
+
+    private async Task MaintainExpiredDataAsync(CancellationToken cancellationToken)
+    {
+        using var timer = new PeriodicTimer(TimeSpan.FromMinutes(1));
+        try
+        {
+            do
+            {
+                try { await CleanupExpiredDataAsync(cancellationToken); }
+                catch (Exception exception) when (exception is NpgsqlException or TimeoutException)
+                {
+                    Console.Error.WriteLine($"만료 데이터 정리 실패: {exception.GetType().Name}");
+                }
+            } while (await timer.WaitForNextTickAsync(cancellationToken));
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { }
+    }
+
+    private async Task CleanupExpiredDataAsync(CancellationToken cancellationToken)
+    {
+        await using var connection = await _source.OpenConnectionAsync(cancellationToken);
+        await using var transaction = await connection.BeginTransactionAsync(cancellationToken);
+        await using (var gate = Command(connection, transaction, "SELECT pg_try_advisory_xact_lock($1)", 647291931L))
+            if (await gate.ExecuteScalarAsync(cancellationToken) is not true) return;
+        const string sessionsSql = """
+            WITH RECURSIVE "expired" AS (
+                SELECT "Hash" FROM "Session" WHERE "ExpiresAt"<=now()
+                ORDER BY "ExpiresAt","Hash" LIMIT $1
+            ), "invalid" AS (
+                SELECT "Hash" FROM "expired"
+                UNION SELECT "s"."Hash" FROM "Session" "s" JOIN "invalid" "p" ON "s"."ParentHash"="p"."Hash"
+            ) SELECT "s"."Hash" FROM "Session" "s" JOIN "invalid" "i" ON "i"."Hash"="s"."Hash"
+                WHERE NOT EXISTS (SELECT 1 FROM "Session" "c" WHERE "c"."ParentHash"="s"."Hash")
+                ORDER BY "s"."ExpiresAt","s"."Hash" LIMIT $1 FOR UPDATE OF "s" SKIP LOCKED
+            """;
+        const string challengesSql = """
+            WITH "expired" AS (
+                SELECT "Id" FROM "AuthChallenge" WHERE "ExpiresAt"<=now()
+                ORDER BY "ExpiresAt","Id" LIMIT $1 FOR UPDATE SKIP LOCKED
+            ) DELETE FROM "AuthChallenge" WHERE "Id" IN (SELECT "Id" FROM "expired")
+            """;
+        const string friendsSql = """
+            WITH "expired" AS (
+                SELECT "FromAccountId","ToAccountId" FROM "Friendship" WHERE NOT "Accepted" AND "CreatedAt"<=$2
+                ORDER BY "CreatedAt","FromAccountId","ToAccountId" LIMIT $1 FOR UPDATE SKIP LOCKED
+            ) DELETE FROM "Friendship" "f" USING "expired" "e"
+                WHERE "f"."FromAccountId"="e"."FromAccountId" AND "f"."ToAccountId"="e"."ToAccountId"
+            """;
+        var sessionHashes = new List<string>();
+        await using (var sessions = Command(connection, transaction, sessionsSql, EXPIRY_CLEANUP_BATCH_SIZE))
+        await using (var reader = await sessions.ExecuteReaderAsync(cancellationToken))
+            while (await reader.ReadAsync(cancellationToken)) sessionHashes.Add(reader.GetString(0));
+        if (sessionHashes.Count > 0)
+        {
+            // 행 잠금 뒤 새 스냅샷으로 자식을 재확인하여 FK 연쇄 삭제도 배치 상한 안에 둔다.
+            await using var sessions = Command(connection, transaction, """
+                DELETE FROM "Session" "s" WHERE "s"."Hash"=ANY($1)
+                    AND NOT EXISTS (SELECT 1 FROM "Session" "c" WHERE "c"."ParentHash"="s"."Hash")
+                """, (object)sessionHashes.ToArray());
+            await sessions.ExecuteNonQueryAsync(cancellationToken);
+        }
+        await using (var challenges = Command(connection, transaction, challengesSql, EXPIRY_CLEANUP_BATCH_SIZE))
+            await challenges.ExecuteNonQueryAsync(cancellationToken);
+        await using (var friends = Command(connection, transaction, friendsSql, EXPIRY_CLEANUP_BATCH_SIZE, DateTimeOffset.UtcNow - _friendRequestLifetime))
+            await friends.ExecuteNonQueryAsync(cancellationToken);
+        await transaction.CommitAsync(cancellationToken);
     }
 
     private static NpgsqlCommand Command(NpgsqlConnection connection, NpgsqlTransaction? transaction, string sql, params object?[] values)
@@ -112,11 +184,8 @@ public sealed partial class ServerDatabase : IDisposable
     private static async Task<IssuedSession> IssueSession(NpgsqlConnection connection, NpgsqlTransaction transaction, Guid accountId, string scope, string? parentHash, DateTimeOffset expiresAt,
         CancellationToken cancellationToken = default)
     {
-        await using (var account = Command(connection, transaction, "SELECT \"Id\" FROM \"Account\" WHERE \"Id\"=$1 AND NOT \"IsBanned\" FOR UPDATE", accountId))
-            if (await account.ExecuteScalarAsync(cancellationToken) == null) throw new ApiException("AccountUnavailable", 403);
-        await using (var expired = Command(connection, transaction, "DELETE FROM \"Session\" WHERE \"AccountId\"=$1 AND \"ExpiresAt\" < now()", accountId))
-            await expired.ExecuteNonQueryAsync(cancellationToken);
-        await using var countCommand = Command(connection, transaction, "SELECT count(*) FROM \"Session\" WHERE \"AccountId\"=$1", accountId);
+        await LockSessionAccount(connection, transaction, accountId, cancellationToken);
+        await using var countCommand = Command(connection, transaction, "SELECT count(*) FROM \"Session\" WHERE \"AccountId\"=$1 AND \"ExpiresAt\">now()", accountId);
         var count = await countCommand.ExecuteScalarAsync(cancellationToken);
         if (Convert.ToInt64(count) >= 32) throw new ApiException("SessionLimit", 429);
         string token = ServerRuntime.NewToken();
@@ -125,6 +194,17 @@ public sealed partial class ServerDatabase : IDisposable
         await insert.ExecuteNonQueryAsync(cancellationToken);
         return new IssuedSession(token, expiresAt);
     }
+
+    private static async Task LockSessionAccount(NpgsqlConnection connection, NpgsqlTransaction transaction, Guid accountId,
+        CancellationToken cancellationToken = default)
+    {
+        await using var account = Command(connection, transaction,
+            "SELECT \"Id\" FROM \"Account\" WHERE \"Id\"=$1 AND NOT \"IsBanned\" FOR UPDATE", accountId);
+        if (await account.ExecuteScalarAsync(cancellationToken) == null) throw new ApiException("AccountUnavailable", 403);
+    }
+
+    private static Task<int> LockSessionExchange(NpgsqlConnection connection, NpgsqlTransaction transaction, Guid accountId) =>
+        Execute(connection, transaction, "SELECT pg_advisory_xact_lock(hashtextextended($1,$2))", "session-exchange:" + accountId, 0L);
 
     public async Task<ServerSession> AuthenticateAsync(string token, string scope)
     {
@@ -233,7 +313,6 @@ public sealed partial class ServerDatabase : IDisposable
         if (string.IsNullOrEmpty(clientId)) throw new ApiException("GoogleUnavailable", 503);
         var response = new GoogleChallengeResponse { ChallengeId = ServerRuntime.NewToken(), Nonce = ServerRuntime.NewToken(), ClientId = clientId, ExpiresAt = ServerRuntime.Timestamp(DateTimeOffset.UtcNow.AddMinutes(5)) };
         await using var connection = await _source.OpenConnectionAsync();
-        await Execute(connection, null, "DELETE FROM \"AuthChallenge\" WHERE \"ExpiresAt\" < now()");
         await Execute(connection, null, "INSERT INTO \"AuthChallenge\" (\"Id\",\"Nonce\",\"ClientId\",\"Platform\",\"AccountId\",\"ExpiresAt\") VALUES ($1,$2,$3,$4,$5,$6)",
             response.ChallengeId, response.Nonce, clientId, platform, accountId, DateTimeOffset.Parse(response.ExpiresAt));
         return response;
@@ -285,5 +364,15 @@ public sealed partial class ServerDatabase : IDisposable
         return id;
     }
 
-    public void Dispose() => _source.Dispose();
+    public void Dispose()
+    {
+        if (Interlocked.Exchange(ref _disposed, 1) != 0) return;
+        _maintenanceLifetime.Cancel();
+        try { _maintenanceTask?.GetAwaiter().GetResult(); }
+        finally
+        {
+            _maintenanceLifetime.Dispose();
+            _source.Dispose();
+        }
+    }
 }

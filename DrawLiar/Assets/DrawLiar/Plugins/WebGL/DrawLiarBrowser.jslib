@@ -116,8 +116,23 @@ var DrawLiarBrowserLibrary = {
       stringToUTF8(value, pointer, length);
       return pointer;
     },
+    googleScriptLoaded: function() { this.onload = this.onerror = null; },
+    googleScriptFailed: function() { this.onload = this.onerror = null; this.remove(); },
+    removeGoogleScriptListeners: function(request) {
+      if (request.script) {
+        request.script.removeEventListener('load', request.scriptLoad);
+        request.script.removeEventListener('error', request.scriptError);
+      }
+      request.script = null; request.scriptLoad = null; request.scriptError = null;
+    },
+    finishGoogle: function(request, state) {
+      if (DrawBrowser.google !== request || request.state !== 0) return;
+      request.state = state;
+      DrawBrowser.removeGoogleScriptListeners(request);
+    },
     removeGoogle: function(request) {
       if (!request) return;
+      DrawBrowser.removeGoogleScriptListeners(request);
       if (request.element) request.element.remove();
       if (request.keyHandler) document.removeEventListener('keydown', request.keyHandler);
       if (request.timer) clearTimeout(request.timer);
@@ -169,6 +184,7 @@ var DrawLiarBrowserLibrary = {
         + Math.max(0, (field.X + field.Width - field.ClipX - field.ClipWidth) * rectangle.width) + 'px '
         + Math.max(0, (field.Y + field.Height - field.ClipY - field.ClipHeight) * rectangle.height) + 'px '
         + Math.max(0, (field.ClipX - field.X) * rectangle.width) + 'px)';
+      entry.nextLayout = (typeof performance !== 'undefined' ? performance.now() : Date.now()) + 80;
     },
     closeInput: function(id, focusCanvas) {
       var entry = DrawBrowser.input;
@@ -312,15 +328,15 @@ var DrawLiarBrowserLibrary = {
           callback: function(response) {
             if (DrawBrowser.google !== request || request.state !== 0) return;
             if (!response || typeof response.credential !== 'string' || response.credential.length > 65536) {
-              request.state = 3;
+              DrawBrowser.finishGoogle(request, 3);
               return;
             }
             request.credential = response.credential;
-            request.state = 1;
+            DrawBrowser.finishGoogle(request, 1);
           }
         });
         google.accounts.id.renderButton(request.button, {theme:'outline', size:'large', width:280});
-      } catch (_) { request.state = 3; }
+      } catch (_) { DrawBrowser.finishGoogle(request, 3); }
     }
   },
 
@@ -612,6 +628,8 @@ var DrawLiarBrowserLibrary = {
   DrawBrowserInputState: function(id) {
     var entry = DrawBrowser.input;
     if (!entry || entry.id !== id) return 4;
+    var now = typeof performance !== 'undefined' ? performance.now() : Date.now();
+    if (!(entry.nextLayout > now)) DrawBrowser.layoutInput(entry);
     var flags = entry.flags | (entry.composing ? 32 : 0);
     if (document.activeElement === entry.element) flags &= ~4;
     entry.flags = 0;
@@ -787,35 +805,52 @@ var DrawLiarBrowserLibrary = {
       close.textContent = '\u00d7';
       close.setAttribute('aria-label', UTF8ToString(closePointer));
       close.style.cssText = 'position:absolute;right:8px;top:8px;width:40px;height:40px;border:0;background:transparent;color:#38304a;font:28px sans-serif;cursor:pointer;';
-      close.onclick = function() { request.state = 2; };
+      close.onclick = function() { DrawBrowser.finishGoogle(request, 2); };
       request.button = document.createElement('div');
       panel.appendChild(close);
       panel.appendChild(request.button);
       overlay.appendChild(panel);
       DrawBrowser.overlayParent(overlay);
-      overlay.onclick = function(event) { if (event.target === overlay) request.state = 2; };
-      request.keyHandler = function(event) { if (event.key === 'Escape') { event.preventDefault(); request.state = 2; } };
+      overlay.onclick = function(event) { if (event.target === overlay) DrawBrowser.finishGoogle(request, 2); };
+      request.keyHandler = function(event) { if (event.key === 'Escape') { event.preventDefault(); DrawBrowser.finishGoogle(request, 2); } };
       document.addEventListener('keydown', request.keyHandler);
       close.focus();
-      request.timer = setTimeout(function() { if (request.state === 0) request.state = 2; }, 240000);
+      request.timer = setTimeout(function() { DrawBrowser.finishGoogle(request, 2); }, 240000);
       if (window.google && google.accounts && google.accounts.id) DrawBrowser.renderGoogle(request);
       else {
         var script = document.getElementById('drawliar-google-identity');
-        if (!script) {
+        var appendScript = !script;
+        if (appendScript) {
           script = document.createElement('script');
           script.id = 'drawliar-google-identity';
           script.src = 'https://accounts.google.com/gsi/client';
           script.async = true;
-          document.head.appendChild(script);
+          script.onload = DrawBrowser.googleScriptLoaded;
+          script.onerror = DrawBrowser.googleScriptFailed;
         }
-        script.addEventListener('load', function() { DrawBrowser.renderGoogle(request); }, {once:true});
-        script.addEventListener('error', function() {
+        request.script = script;
+        request.scriptLoad = function() {
+          DrawBrowser.removeGoogleScriptListeners(request);
+          DrawBrowser.renderGoogle(request);
+        };
+        request.scriptError = function() {
+          DrawBrowser.removeGoogleScriptListeners(request);
+          if (DrawBrowser.google !== request || request.state !== 0) return;
           script.remove();
-          if (DrawBrowser.google === request) request.state = 3;
-        }, {once:true});
+          DrawBrowser.finishGoogle(request, 3);
+        };
+        script.addEventListener('load', request.scriptLoad);
+        script.addEventListener('error', request.scriptError);
+        if (appendScript) document.head.appendChild(script);
       }
       return request.id;
-    } catch (_) { return -1; }
+    } catch (_) {
+      if (request) {
+        if (DrawBrowser.google === request) DrawBrowser.google = null;
+        DrawBrowser.removeGoogle(request);
+      }
+      return -1;
+    }
   },
 
   DrawBrowserGoogleState: function(id) {

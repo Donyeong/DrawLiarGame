@@ -32,6 +32,7 @@ namespace DrawLiar
         public string RoomName = "우리들의 그림방";
         public bool IsPrivate;
         public bool AllowMidRoundJoin = true;
+        public string TopicLanguage = ServerRoomSettings.DEFAULT_TOPIC_LANGUAGE;
 
         public RoomSettings Copy()
         {
@@ -58,6 +59,7 @@ namespace DrawLiar
             if (!Enum.IsDefined(typeof(DrawingMode), Mode)) Mode = DrawingMode.Relay;
             if (!Enum.IsDefined(typeof(VictoryMode), Victory)) Victory = VictoryMode.RoundCount;
             RoomName = GameRules.CleanText(RoomName, 30, "우리들의 그림방");
+            TopicLanguage = ServerRoomSettings.NormalizeTopicLanguage(TopicLanguage);
             Topics = Topics?.Select(value => GameRules.CleanText(value, 40, ""))
                 .Where(value => value.Length > 0).Distinct().Take(128).ToArray();
         }
@@ -189,6 +191,15 @@ namespace DrawLiar
         public string[] Words;
         public string WorkshopId = "";
         public string LanguageCode = "";
+        public WordAlias[] Aliases;
+    }
+
+    // 제시어와 같은 대상을 가리키는 동의어·표기 변형. 정답 판정에만 쓰고 클라이언트 상태에는 보내지 않는다.
+    [Serializable]
+    public sealed class WordAlias
+    {
+        public string Word;
+        public string[] Accept;
     }
 
     [Serializable]

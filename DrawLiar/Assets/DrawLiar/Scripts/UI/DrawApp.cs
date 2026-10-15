@@ -161,7 +161,8 @@ namespace DrawLiar
             network=GetComponent<DrawNetworkManager>();
             lobby=GetComponent<LobbyServiceBridge>();
             lobby.Initialize(network);
-            draft.Topics=GameDataStore.Load().Topics.Select(t=>t.Name).ToArray();
+            draft.TopicLanguage=ServerRoomSettings.NormalizeTopicLanguage(L.CurrentLanguageCode);
+            draft.Topics=GameDataStore.Load(topicLanguage:draft.TopicLanguage).Topics.Select(t=>t.Name).ToArray();
             nickname=PlayerPrefs.GetString("DrawLiar.Name","동글이"+UnityEngine.Random.Range(10,99));
             avatarColor=Mathf.Clamp(PlayerPrefs.GetInt("DrawLiar.Color",0),0,AvatarElement.Colors.Length-1);
             accessory=DrawAvatarEquipmentStore.Load();
@@ -420,7 +421,8 @@ namespace DrawLiar
         {
             var actions=Box(parent,classes);
             Button(actions,"주제 관리",()=>Navigate(LobbyScreen.Topics),"secondary grow").name="lobby-manage-topics";
-            Button(actions,"방 만들기",()=>Navigate(LobbyScreen.CreateRoom),"primary menu-orange grow").name="lobby-create";
+            Button(actions,"빠른 참가",()=>Run(async()=>{if(!await lobby.QuickJoinAsync())Navigate(LobbyScreen.CreateRoom);}),"primary menu-orange grow").name="lobby-quick-join";
+            Button(actions,"방 만들기",()=>Navigate(LobbyScreen.CreateRoom),"secondary grow").name="lobby-create";
             Button(actions,"코드로 입장",()=>Navigate(LobbyScreen.JoinCode),"secondary grow mobile-last").name="lobby-join-code";
         }
 
@@ -540,7 +542,7 @@ namespace DrawLiar
             SetRawText(_lobbyChatStatus,lobby.LobbyChatStatus);
             _lobbyChatStatus.style.display=string.IsNullOrEmpty(lobby.LobbyChatStatus)?DisplayStyle.None:DisplayStyle.Flex;
             RefreshLobbyChatComposer();
-            var history=_lobbyChatHistory;var messages=lobby.LobbyMessages;
+            var history=_lobbyChatHistory;var messages=lobby.LobbyMessages.Where(message=>!lobby.IsChatHidden(message.AccountId)).ToList();
             bool atBottom=_lobbyChatLines.Count==0||history.scrollOffset.y>=history.verticalScroller.highValue-24;
             var ids=new HashSet<long>(messages.Select(message=>message.Id));
             if(messages.Count>0&&_lobbyChatLines.Count>0&&messages[0].Id<_lobbyChatLines.Keys.Min())
@@ -587,7 +589,7 @@ namespace DrawLiar
                     if(_lobbyChatInput?.value==text)_lobbyChatInput.SetValueWithoutNotify("");
                 }
             }
-            catch(Exception ex){DrawAudio.Instance?.Play(DrawSound.UiError);Toast(ex.Message);}
+            catch(Exception ex){DrawAudio.Instance?.Play(DrawSound.UiError);Toast(LobbyServiceBridge.UserFacingMessage(ex));}
             finally{RefreshLobbyChatComposer();}
         }
 
@@ -995,7 +997,7 @@ namespace DrawLiar
             var rules=CreateRoomSection(form,"게임 규칙","create-rules",_createRulesExpanded,value=>_createRulesExpanded=value,out var rulesSummary);
             var time=CreateRoomSection(form,"시간 설정","create-time",_createTimeExpanded,value=>_createTimeExpanded=value,out var timeSummary);
             var topics=CreateRoomSection(form,"주제 선택","create-topics",_createTopicsExpanded,value=>_createTopicsExpanded=value,out var topicSummary);
-            var topicData=GameDataStore.Load().Topics;
+            var topicData=GameDataStore.Load(topicLanguage:draft.TopicLanguage).Topics;
             var names=topicData.Select(entry=>entry.Name).Distinct().ToArray();
             var mismatchTopics=new HashSet<string>(topicData.Where(entry=>(entry.Words??Array.Empty<string>()).Select(value=>GameRules.CleanText(value,40))
                 .Where(value=>value.Length>0).Select(GameRules.NormalizeGuess).Distinct().Take(2).Count()>=2).Select(entry=>entry.Name));
@@ -1038,6 +1040,12 @@ namespace DrawLiar
             MidRoundJoinToggle(rules.contentContainer,draft,"create-mid-round-join",RefreshSummaries);
             var timeGrid=Box(time.contentContainer,"create-time-grid");TimeFields(timeGrid,draft);
             timeGrid.RegisterCallback<ChangeEvent<int>>(_=>RefreshSummaries());
+            TopicLanguageField(topics.contentContainer,draft.TopicLanguage,"create-topic-language",code=>
+            {
+                var customNames=new HashSet<string>(GameDataStore.LoadCustomTopics().Select(entry=>entry.Name));
+                draft.Topics=BuiltInTopicNames(code).Concat(selected.Where(customNames.Contains)).Distinct().ToArray();
+                draft.TopicLanguage=code;Home();
+            });
             var bulk=Box(topics.contentContainer,"row create-topic-actions");
             void RefreshTopics()
             {
@@ -1129,6 +1137,7 @@ namespace DrawLiar
                 list.scrollOffset=Vector2.zero;
             }
             else emptyState?.RemoveFromHierarchy();
+            string ownTopicLanguage=ServerRoomSettings.NormalizeTopicLanguage(L.CurrentLanguageCode);
             foreach(var room in lobby.PublicRooms)
             {
                 var entry=Box(publicRoomList,IsMobile?"room-entry mobile-room-item":"room-entry");var info=Box(entry,"grow room-entry-info");
@@ -1138,11 +1147,13 @@ namespace DrawLiar
                     var metadata=Box(info,"mobile-room-metadata row");Text(metadata,"{0} / {1}명","muted mobile-small mobile-room-meta",room.Players,room.MaxPlayers);
                     if(room.Spectators>0)Text(metadata,"관전 {0}명","muted mobile-small mobile-room-meta",room.Spectators);
                     if(room.LiarMode!=LiarMode.Classic)Text(metadata,room.LiarMode==LiarMode.Optional?"불확정":"미스매치","muted mobile-small mobile-room-meta").name="room-liar-mode-"+room.Id;
+                    if(room.TopicLanguage!=ownTopicLanguage)RawText(metadata,TopicLanguageName(room.TopicLanguage),"muted mobile-small mobile-room-meta");
                 }
                 else
                 {
                     RawText(info,room.Name,"player-name");Text(info,room.IsInProgress?"{0} / {1}명 · 관전 {2}명 · 진행 중":"{0} / {1}명 · 관전 {2}명 · 대기 중","muted mobile-small",room.Players,room.MaxPlayers,room.Spectators);
                     if(room.LiarMode!=LiarMode.Classic)Text(info,room.LiarMode==LiarMode.Optional?"불확정":"미스매치","muted mobile-small").name="room-liar-mode-"+room.Id;
+                    if(room.TopicLanguage!=ownTopicLanguage)RawText(info,TopicLanguageName(room.TopicLanguage),"muted mobile-small");
                 }
                 CreatePublicRoomTopics(info,room);
                 var actions=IsMobile?Box(entry,"mobile-room-entry-actions mobile-room-action row"):entry;
@@ -1551,12 +1562,7 @@ namespace DrawLiar
             var state=network.State;if(!CanEditRoomOptions(state))return;
             var settings=state.Settings.Copy();
             var names=state.AvailableTopics??Array.Empty<string>();
-            if(names.Length==0)
-            {
-                var asset=Resources.Load<TextAsset>("DrawLiar/GameData");
-                var data=asset!=null?JsonUtility.FromJson<GameData>(asset.text):new GameData();
-                names=(data.Topics??Array.Empty<TopicData>()).Select(entry=>entry.Name).Concat(settings.Topics??Array.Empty<string>()).Distinct().ToArray();
-            }
+            if(names.Length==0)names=BuiltInTopicNames(settings.TopicLanguage).Concat(settings.Topics??Array.Empty<string>()).Distinct().ToArray();
             names=names.Where(name=>!string.IsNullOrWhiteSpace(name)).Distinct().Take(128).ToArray();
             var editor=Modal("방 옵션",false);editor.name="room-options-editor";editor.AddToClassList("room-options-editor");
             _roomOptionsEditor=editor;_roomOptionsDraft=settings;
@@ -1620,6 +1626,14 @@ namespace DrawLiar
                 else if(index==2)TimeFields(body,settings);
                 else
                 {
+                    TopicLanguageField(body,settings.TopicLanguage,"room-options-topic-language",code=>
+                    {
+                        var allBuiltIn=new HashSet<string>((GameDataStore.LoadBuiltIn().Topics??Array.Empty<TopicData>()).Select(entry=>entry.Name));
+                        var languageTopics=BuiltInTopicNames(code);
+                        names=languageTopics.Concat(names.Where(name=>!allBuiltIn.Contains(name))).Distinct().Take(128).ToArray();
+                        settings.Topics=languageTopics.Concat((settings.Topics??Array.Empty<string>()).Where(name=>!allBuiltIn.Contains(name))).Distinct().ToArray();
+                        settings.TopicLanguage=code;SelectTab(3);
+                    });
                     var available=names.Concat(_roomOptionsCustomTopics.Keys).Distinct().Take(128).ToArray();
                     var selected=new HashSet<string>((settings.Topics??available).Intersect(available));var controls=Box(body,"row spread");
                     var count=Text(controls,"","topic-count");var bulk=Box(controls,"row");
@@ -2164,6 +2178,8 @@ namespace DrawLiar
         }
         private void OnChat(ChatLine line)
         {
+            var author=network.State?.Players.FirstOrDefault(player=>player.Id==line.PlayerId);
+            if(author!=null&&lobby.IsChatHidden(author.AccountId))return;
             if(inRoom&&network.State?.Players.Any(player=>player.Id==line.PlayerId&&!player.IsSpectator)==true)
             {
                 if(!_speeches.TryGetValue(line.PlayerId,out var speech)){speech=new SpeechState();_speeches.Add(line.PlayerId,speech);}
@@ -2347,7 +2363,7 @@ namespace DrawLiar
         {
             if(runningAction||lobby.IsBusy){Toast("연결을 처리하고 있어요. 잠시 기다려 주세요.");return;}
             runningAction=true;
-            try{await action();}catch(OperationCanceledException){}catch(Exception ex){DrawAudio.Instance?.Play(DrawSound.UiError);Toast(ex.Message);Debug.LogWarning(ex.Message);}
+            try{await action();}catch(OperationCanceledException){}catch(Exception ex){DrawAudio.Instance?.Play(DrawSound.UiError);string message=LobbyServiceBridge.UserFacingMessage(ex);Toast(message);if(message==ex.Message)Debug.LogWarning(ex.Message);else Debug.LogException(ex);}
             finally{runningAction=false;RefreshSocialControls();RefreshCommerceControls();}
         }
         private VisualElement Modal(string title,bool mobileScroll=true)

@@ -154,6 +154,12 @@ namespace DrawLiar
     [Serializable] public sealed class ServerRoomSettings
     {
         public const int MAX_PLAYERS = 8;
+        public const string DEFAULT_TOPIC_LANGUAGE = "ko-KR";
+        public static readonly string[] TOPIC_LANGUAGES = { "ko-KR", "en", "zh-CN", "zh-TW", "ja-JP", "es", "pt-BR", "fr-FR", "de-DE", "id", "hi-IN", "ar" };
+        public static string NormalizeTopicLanguage(string code) => Array.IndexOf(TOPIC_LANGUAGES, code) >= 0 ? code : DEFAULT_TOPIC_LANGUAGE;
+        // 언어 코드가 없는 기존 기본 주제는 한국어로 본다.
+        public static string TopicLanguageOf(string languageCode) => string.IsNullOrEmpty(languageCode) ? DEFAULT_TOPIC_LANGUAGE : languageCode;
+        public string TopicLanguage = DEFAULT_TOPIC_LANGUAGE;
         public int MaxPlayers = MAX_PLAYERS;
         public int LiarCount = 1;
         public int LiarMode;
@@ -228,6 +234,24 @@ namespace DrawLiar
     [Serializable] public sealed class SessionCheckRequest { public string SessionToken = ""; public string AccountId = ""; }
     [Serializable] public sealed class SessionCheckResponse { public bool Valid; }
     [Serializable] public sealed class AdminAccountAction { public bool IsBanned; }
+    [Serializable] public sealed class BlockListResponse { public string[] AccountIds = Array.Empty<string>(); }
+    [Serializable] public sealed class PlayerReportRequest
+    {
+        public const string REASON_ABUSE = "Abuse", REASON_DRAWING = "Drawing", REASON_NICKNAME = "Nickname", REASON_SPAM = "Spam", REASON_TOPIC = "Topic", REASON_OTHER = "Other";
+        public static readonly string[] REASONS = { REASON_ABUSE, REASON_DRAWING, REASON_NICKNAME, REASON_SPAM, REASON_TOPIC, REASON_OTHER };
+        public const int MAX_CONTEXT_LENGTH = 500;
+        public string TargetAccountId = "";
+        public string Reason = "";
+        public string Context = "";
+        public string RoomId = "";
+        public string WorkshopTopicId = "";
+    }
+    [Serializable] public sealed class AdminReportData
+    {
+        public string ReportId = "", ReporterAccountId = "", ReporterName = "", TargetAccountId = "", TargetName = "", Reason = "", Context = "";
+        public string RoomId = "", WorkshopTopicId = "", Status = "", CreatedAt = "";
+    }
+    [Serializable] public sealed class AdminReportAction { public string Status = ""; }
     [Serializable] public sealed class LobbyChatMessage
     {
         public long Id;

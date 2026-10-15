@@ -48,9 +48,10 @@ internal sealed partial class DedicatedRoom
         _closeAfter = now + 120;
         var settings = System.Text.Json.JsonSerializer.Deserialize<RoomSettings>(
             System.Text.Json.JsonSerializer.Serialize(room.Settings, GameplayWire.Json), GameplayWire.Json)!;
+        settings.TopicLanguage = ServerRoomSettings.NormalizeTopicLanguage(settings.TopicLanguage);
+        var roomData = RoomGameData(_customTopics, settings.TopicLanguage);
         if (settings.Topics == null || settings.Topics.Length == 0)
-            settings.Topics = data.Topics.Select(topic => topic.Name).ToArray();
-        var roomData = RoomGameData(_customTopics);
+            settings.Topics = roomData.Topics.Select(topic => topic.Name).ToArray();
         _session = new GameSession(settings, roomData);
         _session.MatchCompleted += completed =>
         {
@@ -72,10 +73,12 @@ internal sealed partial class DedicatedRoom
         _session.CanvasCleared += ClearCanvasLocked;
     }
 
-    private GameData RoomGameData(ServerTopicData[] customTopics) => new()
+    // 방의 주제 언어에 맞는 기본 주제와 방의 사용자 주제만 담는다. 상태의 주제 목록도 이 범위로 줄어든다.
+    private GameData RoomGameData(ServerTopicData[] customTopics, string topicLanguage) => new()
     {
         Scoring = _builtInData.Scoring,
-        Topics = _builtInData.Topics.Select(topic => new TopicData { Name = topic.Name, Words = topic.Words.ToArray() })
+        Topics = _builtInData.Topics.Where(topic => ServerRoomSettings.TopicLanguageOf(topic.LanguageCode) == topicLanguage)
+            .Select(topic => new TopicData { Name = topic.Name, Words = topic.Words.ToArray(), Aliases = topic.Aliases })
             .Concat(customTopics.Select(topic => new TopicData { Name = topic.Name, Words = topic.Words.ToArray() })).ToArray()
     };
 
@@ -309,6 +312,55 @@ internal sealed partial class DedicatedRoom
         return true;
     }
 
+    public void ValidateConfigurationStateSize(ConfigureRoomRequest request)
+    {
+        lock (_gate)
+        {
+            var settings = System.Text.Json.JsonSerializer.Deserialize<RoomSettings>(
+                System.Text.Json.JsonSerializer.Serialize(request.Settings, GameplayWire.Json), GameplayWire.Json)!;
+            settings.Validate();
+            var customTopics = DrawLiar.Server.ServerDatabase.MergeCustomTopics(_customTopics, request.CustomTopics);
+            var data = RoomGameData(customTopics, settings.TopicLanguage);
+            ValidateStateSize(settings, data.Topics.Where(topic => !string.IsNullOrWhiteSpace(topic.Name)
+                && topic.Words != null && topic.Words.Any(word => !string.IsNullOrWhiteSpace(word))).Select(topic => topic.Name));
+        }
+    }
+
+    public static void ValidateStateSize(RoomSettings settings, IEnumerable<string> availableTopicNames)
+    {
+        // 관전·재입장으로 남는 경기 참가자까지 GameSession의 64명 상한을 예약한다.
+        const int MAX_RECORDED_PLAYERS = 64;
+        string escapedWord = new('\'', 40);
+        var cosmetics = new CosmeticLoadout();
+        foreach (string category in CosmeticRules.Categories)
+        {
+            string longest = CosmeticRules.CreateProducts().Where(product => product.Category == category)
+                .OrderByDescending(product => product.Id.Length).Select(product => product.Id).FirstOrDefault() ?? "";
+            cosmetics = CosmeticRules.SetEquipped(cosmetics, category, longest);
+        }
+        var snapshot = new RoomSnapshot
+        {
+            Settings = settings.Copy(), AvailableTopics = availableTopicNames.Distinct(StringComparer.Ordinal).ToArray(),
+            MatchId = new string('f', 36), Phase = GamePhase.MatchResults, Round = int.MaxValue,
+            ArtistId = int.MaxValue, Topic = escapedWord, Word = escapedWord, MismatchWord = escapedWord,
+            LocalPlayerId = int.MaxValue, HostPlayerId = int.MaxValue, CanvasVersion = int.MaxValue,
+            DrawingEpoch = int.MaxValue, BallotVersion = int.MaxValue, AccusedPlayerId = int.MaxValue,
+            LocalVoteTargetId = int.MaxValue, RemainingSeconds = float.MaxValue,
+            Summary = new string('\'', 160), DrawingOrder = Enumerable.Repeat(int.MaxValue, MAX_RECORDED_PLAYERS).ToArray(),
+            Winners = Enumerable.Repeat(int.MaxValue, MAX_RECORDED_PLAYERS).ToArray(),
+            Players = Enumerable.Range(0, MAX_RECORDED_PLAYERS).Select(index => new PlayerView
+            {
+                Id = int.MaxValue, AccountId = new string('f', 36), Name = new string('\'', 16), Level = int.MaxValue,
+                Score = int.MinValue, RoundPoints = int.MinValue, VoteCount = int.MaxValue, Accessory = long.MaxValue,
+                Cosmetics = cosmetics, Guess = index < GameRules.MAX_PLAYERS - 1 ? escapedWord : "",
+                GuessOutcome = GuessOutcome.Unanswered
+            }).ToArray()
+        };
+        if (GameConnection.Serialize(new GameplayEnvelope { Type = "state", State = snapshot, Sequence = long.MaxValue }).Length
+            > GameplayWire.MAX_FRAME_BYTES)
+            throw new DrawLiar.Server.ApiException("RoomStateTooLarge");
+    }
+
     private void BroadcastSnapshotsLocked(double now)
     {
         int hostId = _playerIds.TryGetValue(_ownerAccountId, out int id) ? id : -1;
@@ -320,13 +372,60 @@ internal sealed partial class DedicatedRoom
             snapshot.CanStart &= !_configurationPending && !_configurationSyncRequired;
             foreach (var player in snapshot.Players)
                 player.AccountId = accounts.TryGetValue(player.Id, out string? accountId) ? accountId : "";
-            connection.Queue(new GameplayEnvelope
-            {
-                Type = "state", State = snapshot, Sequence = sequence
-            });
+            QueueSnapshotLocked(connection, snapshot, sequence);
         }
         _lastSnapshot = now;
         _dirty = false;
+    }
+
+    private void QueueSnapshotLocked(GameConnection connection, RoomSnapshot snapshot, long sequence)
+    {
+        byte[]? bytes = SerializeState(snapshot, sequence, out bool reduced);
+        if (bytes != null && connection.QueueSerialized(bytes) && reduced && !connection.StateSizeNoticeSent)
+        {
+            connection.StateSizeNoticeSent = true;
+            NoticeLocked(connection, "방 설정이 커 일부 주제 목록만 표시합니다. 주제 수를 줄여 다시 저장해 주세요.");
+        }
+    }
+
+    internal static byte[]? SerializeState(RoomSnapshot snapshot, long sequence, out bool reduced)
+    {
+        var envelope = new GameplayEnvelope { Type = "state", State = snapshot, Sequence = sequence };
+        byte[] bytes = GameConnection.Serialize(envelope);
+        reduced = bytes.Length > GameplayWire.MAX_FRAME_BYTES;
+        if (reduced)
+        {
+            // 기존 방은 전송 복사본의 주제 목록만 줄여 게임 진행 상태를 계속 전달한다.
+            string[] names = snapshot.AvailableTopics;
+            snapshot.AvailableTopics = [];
+            bytes = GameConnection.Serialize(envelope);
+            if (bytes.Length > GameplayWire.MAX_FRAME_BYTES)
+            {
+                names = snapshot.Settings.Topics ?? [];
+                snapshot.Settings = snapshot.Settings.Copy();
+                snapshot.Settings.Topics = [];
+                bytes = GameConnection.Serialize(envelope);
+                if (bytes.Length > GameplayWire.MAX_FRAME_BYTES) return null;
+                bytes = FitTopicPrefix(names, topics => snapshot.Settings.Topics = topics, bytes);
+            }
+            else bytes = FitTopicPrefix(names, topics => snapshot.AvailableTopics = topics, bytes);
+        }
+        return bytes;
+
+        byte[] FitTopicPrefix(string[] names, Action<string[]> assign, byte[] minimum)
+        {
+            int lower = 0, upper = names.Length;
+            byte[] result = minimum;
+            while (lower < upper)
+            {
+                int count = lower + (upper - lower + 1) / 2;
+                assign(names.Take(count).ToArray());
+                byte[] candidate = GameConnection.Serialize(envelope);
+                if (candidate.Length <= GameplayWire.MAX_FRAME_BYTES) { lower = count; result = candidate; }
+                else upper = count - 1;
+            }
+            return result;
+        }
     }
 
     private void NoticeLocked(GameConnection connection, string text) => connection.Queue(new GameplayEnvelope

@@ -34,6 +34,7 @@ namespace DrawLiar.Editor
             VerifyMutableNomination();
             VerifyJudgmentCoinToss();
             VerifyGuessResults();
+            VerifyGuessAliases();
             VerifyRevealTimeline();
 #if UNITY_EDITOR
             UnityEngine.Debug.Log("DrawLiar game self-check PASS: 게임 모드, 승리 조건, 지목·찬반 합의, 점수, 비밀 상태, 재접속, 관전자, 타이머 검증");
@@ -105,6 +106,31 @@ namespace DrawLiar.Editor
                     && game.Snapshot(liar, 0, end).Word == "" && game.Snapshot(99, 0, end).Word == "",
                     "연출 이후 라이어는 손실 없는 추측 시간을 받고 관전자와 함께 정답을 계속 숨겨야 합니다.");
             }
+        }
+
+        private static void VerifyGuessAliases()
+        {
+            var data = Data();
+            data.Topics[0].Aliases = new[]
+            {
+                new WordAlias { Word = "사과", Accept = new[] { "애플", " " } },
+                new WordAlias { Word = "바나나", Accept = new[] { "banana" } }
+            };
+            var game = new GameSession(new RoomSettings { LiarCount = 2, RoundCount = 1, ResultSeconds = 5 }, data, 73);
+            for (int id = 1; id <= 4; id++) Check(game.Join(id, "P" + id, 0, 0), "별칭 검증 참가자가 입장해야 합니다.");
+            Check(game.Start(0), "별칭 검증 경기를 시작해야 합니다.");
+            game.Tick(6);
+            while (game.Phase == GamePhase.Drawing) game.EndTurn(game.ArtistId, 6);
+            game.Tick(51);
+            double now = 51d + game.Snapshot(1, 1, 51).RemainingSeconds;
+            game.Tick(now);
+            Check(game.Phase == GamePhase.Guessing, "별칭 검증 라운드는 라이어 추측으로 진행해야 합니다.");
+            int[] liars = game.Snapshot(1, 1, now).Players.Where(player => player.IsLiar).Select(player => player.Id).ToArray();
+            Check(game.Guess(liars[0], "애 플", now) && game.Guess(liars[1], "banana", now + .1), "라이어 추측을 제출해야 합니다.");
+            var result = game.Snapshot(1, 1, now + .1).Players;
+            Check(result.Single(player => player.Id == liars[0]).GuessOutcome == GuessOutcome.Correct
+                && result.Single(player => player.Id == liars[1]).GuessOutcome == GuessOutcome.Incorrect,
+                "현재 제시어의 별칭만 정답으로 인정하고 다른 단어의 별칭은 인정하면 안 됩니다.");
         }
 
         private static void VerifyGuessResults()

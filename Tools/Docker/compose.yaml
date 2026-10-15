@@ -71,6 +71,9 @@ services:
     working_dir: /apps/DedicatedServer
     command: ["dotnet", "DrawLiar.DedicatedServer.dll"]
     mem_limit: 512m
+    volumes:
+      - /srv/drawliar/dev/secrets:/secrets:ro
+      - dedicated-outbox:/var/lib/drawliar/outbox
     environment:
       <<: *environment
       ASPNETCORE_Kestrel__Endpoints__Public__Url: https://0.0.0.0:19070
@@ -78,6 +81,7 @@ services:
       Dedicated__GameServerUrl: https://game:19060
       Dedicated__PublicUrl: wss://${DRAWLIAR_PUBLIC_HOST}:19070/play
       Dedicated__Capacity: 16
+      Dedicated__OutboxPath: /var/lib/drawliar/outbox
     ports: ["19070:19070"]
   admin:
     <<: *app
@@ -91,3 +95,4 @@ services:
     ports: ["19080:19080"]
 volumes:
   database:
+  dedicated-outbox:

@@ -276,12 +276,12 @@ namespace DrawLiar
             try
             {
                 if (!TryWorkshopTopic(_workshopNameDraft, _workshopWordsDraft, out var topic, out string error)) throw new ArgumentException(error);
-                var asset = Resources.Load<TextAsset>("DrawLiar/GameData"); var builtin = asset != null ? JsonUtility.FromJson<GameData>(asset.text) : null;
-                if (builtin?.Topics?.Any(value => GameRules.NormalizeGuess(value.Name) == GameRules.NormalizeGuess(topic.Name)) == true) throw new ArgumentException("기본 주제와 다른 이름을 입력하세요.");
+                var builtin = GameDataStore.LoadBuiltIn();
+                if (builtin.Topics?.Any(value => GameRules.NormalizeGuess(value.Name) == GameRules.NormalizeGuess(topic.Name)) == true) throw new ArgumentException("기본 주제와 다른 이름을 입력하세요.");
                 GameDataStore.UpsertCustomTopic(topic.Name, string.Join("\n", topic.Words));
                 SelectWorkshopTopic(topic.Name); RenderWorkshopLocalTopics(); Toast("새 주제를 저장했습니다.");
             }
-            catch (Exception exception) { DrawAudio.Instance?.Play(DrawSound.UiError); Toast(exception.Message); }
+            catch (Exception exception) { DrawAudio.Instance?.Play(DrawSound.UiError); Toast(LobbyServiceBridge.UserFacingMessage(exception)); }
         }
 
         private void SelectWorkshopTopic(string name)
@@ -314,7 +314,7 @@ namespace DrawLiar
                         if (_workshopSelectedLocal?.Name == topic.Name) NewWorkshopTopic();
                         RenderWorkshopLocalTopics(); RefreshTopicWorkshopControls();
                     }
-                    catch (Exception exception) { Toast(exception.Message); }
+                    catch (Exception exception) { Toast(LobbyServiceBridge.UserFacingMessage(exception)); }
                 }, "danger grow workshop-action").name = "workshop-local-delete-" + topic.Name;
             }
         }
@@ -400,7 +400,7 @@ namespace DrawLiar
             _workshopBusy = true; _workshopPendingCalls++; RefreshTopicWorkshopControls();
             try { await action(version, account, view); }
             catch (OperationCanceledException) { }
-            catch (Exception exception) { if (IsCurrentTopicWorkshop(version, account, view)) { DrawAudio.Instance?.Play(DrawSound.UiError); Toast(exception.Message); } }
+            catch (Exception exception) { if (IsCurrentTopicWorkshop(version, account, view)) { DrawAudio.Instance?.Play(DrawSound.UiError); Toast(LobbyServiceBridge.UserFacingMessage(exception)); } }
             finally
             {
                 _workshopPendingCalls--;
@@ -446,7 +446,7 @@ namespace DrawLiar
                 if (IsCurrentTopicWorkshop(version, account) && CurrentQuery())
                 {
                     _workshopLoadError = exception.Message; RenderTopicWorkshopList();
-                    if (IsCurrentTopicWorkshop(version, account, view)) { DrawAudio.Instance?.Play(DrawSound.UiError); Toast(exception.Message); }
+                    if (IsCurrentTopicWorkshop(version, account, view)) { DrawAudio.Instance?.Play(DrawSound.UiError); Toast(LobbyServiceBridge.UserFacingMessage(exception)); }
                 }
             }
             finally

@@ -46,6 +46,7 @@ app.Map("/play", async (HttpContext context, GameClusterClient cluster, RoomRegi
             return;
         }
         connection = new GameConnection(socket, ticket.AccountId, ticket.SessionToken, context.RequestAborted);
+        cluster.TrackValidatedSession(connection);
         room = rooms.Join(connection, ticket);
         if (room == null)
         {

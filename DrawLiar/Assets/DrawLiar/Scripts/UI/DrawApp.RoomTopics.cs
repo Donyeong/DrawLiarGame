@@ -15,15 +15,33 @@ namespace DrawLiar
         private bool _roomTopicsFromWaitingRoom;
         private string[] _defaultRoomTopics, _roomTopicsVisibleNames = Array.Empty<string>();
 
+        // 방의 기본 주제 언어를 고른다. 언어 이름은 각 언어의 고유 표기를 그대로 쓴다.
+        private DropdownField TopicLanguageField(VisualElement parent, string selected, string name, Action<string> changed)
+        {
+            var languages = DrawLocalization.AvailableLanguages.Where(language => Array.IndexOf(ServerRoomSettings.TOPIC_LANGUAGES, language.Code) >= 0).ToArray();
+            var field = new DropdownField(DrawLocalization.Text("주제 언어"), languages.Select(language => language.DisplayName).ToList(),
+                Mathf.Max(0, Array.FindIndex(languages, language => language.Code == selected)));
+            SetText(field.labelElement, "주제 언어"); Classes(field, "field topic-language"); field.name = name; parent.Add(field);
+            field.RegisterValueChangedCallback(evt =>
+            {
+                if (ReferenceEquals(evt.target, field) && field.index >= 0 && languages[field.index].Code != selected) changed(languages[field.index].Code);
+            });
+            return field;
+        }
+
+        private static string TopicLanguageName(string code) =>
+            DrawLocalization.AvailableLanguages.FirstOrDefault(language => language.Code == code)?.DisplayName ?? code;
+
+        private static string[] BuiltInTopicNames(string language) => (GameDataStore.LoadBuiltIn().Topics ?? Array.Empty<TopicData>())
+            .Where(entry => ServerRoomSettings.TopicLanguageOf(entry.LanguageCode) == language).Select(entry => entry.Name).ToArray();
+
         private string[] RoomTopicNames(string[] selected)
         {
             var names = (selected ?? Array.Empty<string>()).Where(name => !string.IsNullOrWhiteSpace(name)).Distinct().ToArray();
             if (names.Length > 0) return names;
             if (_defaultRoomTopics == null)
             {
-                var asset = Resources.Load<TextAsset>("DrawLiar/GameData");
-                var data = asset != null ? JsonUtility.FromJson<GameData>(asset.text) : new GameData();
-                _defaultRoomTopics = (data.Topics ?? Array.Empty<TopicData>()).Select(entry => entry.Name)
+                _defaultRoomTopics = BuiltInTopicNames(ServerRoomSettings.DEFAULT_TOPIC_LANGUAGE)
                     .Where(name => !string.IsNullOrWhiteSpace(name)).Distinct().ToArray();
             }
             return _defaultRoomTopics;

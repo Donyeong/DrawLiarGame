@@ -23,7 +23,31 @@ namespace DrawLiar.Editor
             Require(LobbyServiceBridge.NormalizeCode(LEGACY_ROOM_ID) == LEGACY_ROOM_ID, "기존 방 코드 호환 실패");
             CheckRoomJoinAddresses(LEGACY_ROOM_ID);
             CheckGoogleCallback();
-            Debug.Log("DRAWLIAR_SERVICES_CHECKS_OK: room-code/address validation and Google PKCE callback validation.");
+            CheckQuickJoinAndMessages();
+            Debug.Log("DRAWLIAR_SERVICES_CHECKS_OK: room-code/address validation, Google PKCE callback, quick join selection and error messages.");
+        }
+
+        private static void CheckQuickJoinAndMessages()
+        {
+            ServerRoomData Room(string id, int players, bool inProgress = false, bool midJoin = true, bool isPrivate = false, string language = "ko-KR") => new ServerRoomData
+            {
+                RoomId = id, PlayerCount = players, IsInProgress = inProgress, IsPrivate = isPrivate,
+                Settings = new ServerRoomSettings { AllowMidRoundJoin = midJoin, IsPrivate = isPrivate, TopicLanguage = language }
+            };
+            var rooms = new[]
+            {
+                Room("full", 8), Room("private", 5, isPrivate: true), Room("locked", 6, inProgress: true, midJoin: false),
+                Room("playing", 7, inProgress: true), Room("small", 2), Room("big", 5), null, Room("busy", 6, inProgress: true), Room("english", 7, language: "en")
+            };
+            string Picked(string language) => string.Join(",", Array.ConvertAll(LobbyServiceBridge.SelectQuickJoinRooms(rooms, language), room => room.RoomId));
+            Require(Picked("ko-KR") == "big,small,playing", "빠른 참가 후보 선택·순서 오류");
+            Require(Picked("en") == "english,big,small", "빠른 참가가 같은 주제 언어 방을 먼저 고르지 않습니다.");
+            Require(LobbyServiceBridge.SelectQuickJoinRooms(null, "ko-KR").Length == 0, "빈 방 목록 처리 실패");
+            const string GENERIC = "요청을 처리하지 못했습니다. 다시 시도하세요.";
+            Require(LobbyServiceBridge.UserFacingMessage(new InvalidOperationException("방 코드를 입력하세요.")) == "방 코드를 입력하세요.", "게임 안내 문구가 바뀌었습니다.");
+            Require(LobbyServiceBridge.UserFacingMessage(new NullReferenceException()) == GENERIC
+                && LobbyServiceBridge.UserFacingMessage(new ObjectDisposedException("socket")) == GENERIC
+                && LobbyServiceBridge.UserFacingMessage(new ArgumentNullException("value")) == GENERIC, "시스템 예외 메시지가 사용자에게 노출됩니다.");
         }
 
         private static void CheckRoomJoinAddresses(string legacyId)

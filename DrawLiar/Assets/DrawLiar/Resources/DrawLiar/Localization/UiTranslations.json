@@ -11865,6 +11865,499 @@
         "चैट को पंखुड़ियों के हल्के रंगों से सजाएँ।",
         "زيّن الدردشة بألوان بتلات ناعمة."
       ]
+    },
+    {
+      "Key": "빠른 참가",
+      "Values": [
+        "빠른 참가",
+        "Quick join",
+        "快速加入",
+        "快速加入",
+        "クイック参加",
+        "Unirse rápido",
+        "Entrada rápida",
+        "Partie rapide",
+        "Schnell beitreten",
+        "Gabung cepat",
+        "तुरंत जुड़ें",
+        "انضمام سريع"
+      ]
+    },
+    {
+      "Key": "참가할 수 있는 방이 없습니다. 새 방을 만들어 보세요.",
+      "Values": [
+        "참가할 수 있는 방이 없습니다. 새 방을 만들어 보세요.",
+        "No rooms are available to join. Try creating a new room.",
+        "暂无可加入的房间。试试创建新房间吧。",
+        "目前沒有可加入的房間。試著建立新房間吧。",
+        "参加できるルームがありません。新しいルームを作成してみましょう。",
+        "No hay salas disponibles. Prueba a crear una nueva.",
+        "Não há salas disponíveis para entrar. Tente criar uma nova.",
+        "Aucun salon disponible. Essayez d'en créer un.",
+        "Es gibt keine verfügbaren Räume. Erstelle einen neuen Raum.",
+        "Tidak ada ruang yang bisa diikuti. Coba buat ruang baru.",
+        "जुड़ने के लिए कोई कमरा उपलब्ध नहीं है। नया कमरा बनाकर देखें।",
+        "لا توجد غرف متاحة للانضمام. جرّب إنشاء غرفة جديدة."
+      ]
+    },
+    {
+      "Key": "주제 언어",
+      "Values": [
+        "주제 언어",
+        "Topic language",
+        "主题语言",
+        "主題語言",
+        "お題の言語",
+        "Idioma de los temas",
+        "Idioma dos temas",
+        "Langue des thèmes",
+        "Themensprache",
+        "Bahasa topik",
+        "विषय की भाषा",
+        "لغة المواضيع"
+      ]
+    },
+    {
+      "Key": "채팅 숨기기",
+      "Values": [
+        "채팅 숨기기",
+        "Hide chat",
+        "隐藏聊天",
+        "隱藏聊天",
+        "チャットを非表示",
+        "Ocultar chat",
+        "Ocultar chat",
+        "Masquer le chat",
+        "Chat ausblenden",
+        "Sembunyikan obrolan",
+        "चैट छिपाएँ",
+        "إخفاء الدردشة"
+      ]
+    },
+    {
+      "Key": "채팅 보이기",
+      "Values": [
+        "채팅 보이기",
+        "Show chat",
+        "显示聊天",
+        "顯示聊天",
+        "チャットを表示",
+        "Mostrar chat",
+        "Mostrar chat",
+        "Afficher le chat",
+        "Chat anzeigen",
+        "Tampilkan obrolan",
+        "चैट दिखाएँ",
+        "إظهار الدردشة"
+      ]
+    },
+    {
+      "Key": "채팅을 다시 표시합니다.",
+      "Values": [
+        "채팅을 다시 표시합니다.",
+        "Chat will be shown again.",
+        "将重新显示聊天。",
+        "將重新顯示聊天。",
+        "チャットを再び表示します。",
+        "El chat se mostrará de nuevo.",
+        "O chat será exibido novamente.",
+        "Le chat est de nouveau affiché.",
+        "Der Chat wird wieder angezeigt.",
+        "Obrolan akan ditampilkan lagi.",
+        "चैट फिर से दिखेगी।",
+        "سيتم عرض الدردشة مجددًا."
+      ]
+    },
+    {
+      "Key": "이 기기에서 이 플레이어의 채팅을 숨겼습니다.",
+      "Values": [
+        "이 기기에서 이 플레이어의 채팅을 숨겼습니다.",
+        "This player's chat is hidden on this device.",
+        "已在此设备上隐藏该玩家的聊天。",
+        "已在此裝置上隱藏該玩家的聊天。",
+        "この端末でこのプレイヤーのチャットを非表示にしました。",
+        "El chat de este jugador está oculto en este dispositivo.",
+        "O chat deste jogador foi ocultado neste dispositivo.",
+        "Le chat de ce joueur est masqué sur cet appareil.",
+        "Der Chat dieses Spielers ist auf diesem Gerät ausgeblendet.",
+        "Obrolan pemain ini disembunyikan di perangkat ini.",
+        "इस डिवाइस पर इस खिलाड़ी की चैट छिपा दी गई है।",
+        "تم إخفاء دردشة هذا اللاعب على هذا الجهاز."
+      ]
+    },
+    {
+      "Key": "차단 해제",
+      "Values": [
+        "차단 해제",
+        "Unblock",
+        "取消屏蔽",
+        "解除封鎖",
+        "ブロック解除",
+        "Desbloquear",
+        "Desbloquear",
+        "Débloquer",
+        "Blockierung aufheben",
+        "Buka blokir",
+        "अनब्लॉक करें",
+        "إلغاء الحظر"
+      ]
+    },
+    {
+      "Key": "차단 확인",
+      "Values": [
+        "차단 확인",
+        "Confirm block",
+        "确认屏蔽",
+        "確認封鎖",
+        "ブロックを確定",
+        "Confirmar bloqueo",
+        "Confirmar bloqueio",
+        "Confirmer le blocage",
+        "Blockieren bestätigen",
+        "Konfirmasi blokir",
+        "ब्लॉक की पुष्टि करें",
+        "تأكيد الحظر"
+      ]
+    },
+    {
+      "Key": "차단",
+      "Values": [
+        "차단",
+        "Block",
+        "屏蔽",
+        "封鎖",
+        "ブロック",
+        "Bloquear",
+        "Bloquear",
+        "Bloquer",
+        "Blockieren",
+        "Blokir",
+        "ब्लॉक करें",
+        "حظر"
+      ]
+    },
+    {
+      "Key": "차단하면 친구 관계가 끊기고 채팅이 보이지 않습니다. 한 번 더 누르면 차단합니다.",
+      "Values": [
+        "차단하면 친구 관계가 끊기고 채팅이 보이지 않습니다. 한 번 더 누르면 차단합니다.",
+        "Blocking removes this friend and hides their chat. Tap again to block.",
+        "屏蔽后将解除好友关系并隐藏其聊天。再点一次即可屏蔽。",
+        "封鎖後將解除好友關係並隱藏其聊天。再點一次即可封鎖。",
+        "ブロックするとフレンドが解除され、チャットが表示されなくなります。もう一度押すとブロックします。",
+        "Al bloquear se elimina la amistad y se oculta su chat. Pulsa de nuevo para bloquear.",
+        "Ao bloquear, a amizade é desfeita e o chat fica oculto. Toque de novo para bloquear.",
+        "Bloquer supprime l'ami et masque son chat. Appuyez de nouveau pour bloquer.",
+        "Beim Blockieren wird die Freundschaft beendet und der Chat ausgeblendet. Zum Blockieren erneut tippen.",
+        "Memblokir akan menghapus pertemanan dan menyembunyikan obrolannya. Ketuk lagi untuk memblokir.",
+        "ब्लॉक करने पर दोस्ती हट जाएगी और चैट नहीं दिखेगी। ब्लॉक करने के लिए फिर से दबाएँ।",
+        "الحظر يزيل الصداقة ويخفي دردشته. اضغط مرة أخرى للحظر."
+      ]
+    },
+    {
+      "Key": "신고",
+      "Values": [
+        "신고",
+        "Report",
+        "举报",
+        "檢舉",
+        "通報",
+        "Denunciar",
+        "Denunciar",
+        "Signaler",
+        "Melden",
+        "Laporkan",
+        "रिपोर्ट करें",
+        "إبلاغ"
+      ]
+    },
+    {
+      "Key": "신고 사유",
+      "Values": [
+        "신고 사유",
+        "Reason",
+        "举报原因",
+        "檢舉原因",
+        "通報理由",
+        "Motivo",
+        "Motivo",
+        "Motif",
+        "Grund",
+        "Alasan",
+        "कारण",
+        "السبب"
+      ]
+    },
+    {
+      "Key": "자세한 내용 (선택)",
+      "Values": [
+        "자세한 내용 (선택)",
+        "Details (optional)",
+        "详细说明（可选）",
+        "詳細說明（選填）",
+        "詳細（任意）",
+        "Detalles (opcional)",
+        "Detalhes (opcional)",
+        "Détails (facultatif)",
+        "Details (optional)",
+        "Detail (opsional)",
+        "विवरण (वैकल्पिक)",
+        "التفاصيل (اختياري)"
+      ]
+    },
+    {
+      "Key": "신고하기",
+      "Values": [
+        "신고하기",
+        "Submit report",
+        "提交举报",
+        "送出檢舉",
+        "通報する",
+        "Enviar denuncia",
+        "Enviar denúncia",
+        "Envoyer le signalement",
+        "Meldung senden",
+        "Kirim laporan",
+        "रिपोर्ट भेजें",
+        "إرسال البلاغ"
+      ]
+    },
+    {
+      "Key": "욕설·비하",
+      "Values": [
+        "욕설·비하",
+        "Abuse or insults",
+        "辱骂或贬低",
+        "辱罵或貶低",
+        "暴言・侮辱",
+        "Insultos o acoso",
+        "Ofensas ou insultos",
+        "Insultes ou harcèlement",
+        "Beleidigung",
+        "Kata kasar atau hinaan",
+        "गाली या अपमान",
+        "إساءة أو شتائم"
+      ]
+    },
+    {
+      "Key": "부적절한 그림",
+      "Values": [
+        "부적절한 그림",
+        "Inappropriate drawing",
+        "不当画作",
+        "不當畫作",
+        "不適切な絵",
+        "Dibujo inapropiado",
+        "Desenho impróprio",
+        "Dessin inapproprié",
+        "Unangemessene Zeichnung",
+        "Gambar tidak pantas",
+        "अनुचित चित्र",
+        "رسم غير لائق"
+      ]
+    },
+    {
+      "Key": "부적절한 닉네임",
+      "Values": [
+        "부적절한 닉네임",
+        "Inappropriate nickname",
+        "不当昵称",
+        "不當暱稱",
+        "不適切なニックネーム",
+        "Apodo inapropiado",
+        "Apelido impróprio",
+        "Pseudo inapproprié",
+        "Unangemessener Nickname",
+        "Nama panggilan tidak pantas",
+        "अनुचित उपनाम",
+        "اسم مستعار غير لائق"
+      ]
+    },
+    {
+      "Key": "도배·광고",
+      "Values": [
+        "도배·광고",
+        "Spam or ads",
+        "刷屏或广告",
+        "洗版或廣告",
+        "荒らし・宣伝",
+        "Spam o publicidad",
+        "Spam ou propaganda",
+        "Spam ou publicité",
+        "Spam oder Werbung",
+        "Spam atau iklan",
+        "स्पैम या विज्ञापन",
+        "رسائل مزعجة أو إعلانات"
+      ]
+    },
+    {
+      "Key": "부적절한 주제",
+      "Values": [
+        "부적절한 주제",
+        "Inappropriate topic",
+        "不当主题",
+        "不當主題",
+        "不適切なお題",
+        "Tema inapropiado",
+        "Tema impróprio",
+        "Thème inapproprié",
+        "Unangemessenes Thema",
+        "Topik tidak pantas",
+        "अनुचित विषय",
+        "موضوع غير لائق"
+      ]
+    },
+    {
+      "Key": "기타",
+      "Values": [
+        "기타",
+        "Other",
+        "其他",
+        "其他",
+        "その他",
+        "Otro",
+        "Outro",
+        "Autre",
+        "Sonstiges",
+        "Lainnya",
+        "अन्य",
+        "أخرى"
+      ]
+    },
+    {
+      "Key": "차단했습니다. 이 플레이어의 채팅이 보이지 않습니다.",
+      "Values": [
+        "차단했습니다. 이 플레이어의 채팅이 보이지 않습니다.",
+        "Blocked. You won't see this player's chat.",
+        "已屏蔽。将不再显示该玩家的聊天。",
+        "已封鎖。將不再顯示該玩家的聊天。",
+        "ブロックしました。このプレイヤーのチャットは表示されません。",
+        "Bloqueado. No verás el chat de este jugador.",
+        "Bloqueado. Você não verá o chat deste jogador.",
+        "Bloqué. Vous ne verrez plus le chat de ce joueur.",
+        "Blockiert. Der Chat dieses Spielers wird nicht mehr angezeigt.",
+        "Diblokir. Obrolan pemain ini tidak akan terlihat.",
+        "ब्लॉक कर दिया। इस खिलाड़ी की चैट नहीं दिखेगी।",
+        "تم الحظر. لن ترى دردشة هذا اللاعب."
+      ]
+    },
+    {
+      "Key": "차단을 해제했습니다.",
+      "Values": [
+        "차단을 해제했습니다.",
+        "Unblocked.",
+        "已取消屏蔽。",
+        "已解除封鎖。",
+        "ブロックを解除しました。",
+        "Desbloqueado.",
+        "Desbloqueado.",
+        "Débloqué.",
+        "Blockierung aufgehoben.",
+        "Blokir dibuka.",
+        "अनब्लॉक कर दिया।",
+        "تم إلغاء الحظر."
+      ]
+    },
+    {
+      "Key": "신고를 접수했습니다. 검토 후 조치합니다.",
+      "Values": [
+        "신고를 접수했습니다. 검토 후 조치합니다.",
+        "Report received. We'll review it and take action.",
+        "已收到举报，我们将审核后处理。",
+        "已收到檢舉，我們將審核後處理。",
+        "通報を受け付けました。確認のうえ対応します。",
+        "Denuncia recibida. La revisaremos y tomaremos medidas.",
+        "Denúncia recebida. Vamos analisar e tomar providências.",
+        "Signalement reçu. Nous allons l'examiner et agir.",
+        "Meldung erhalten. Wir prüfen sie und handeln entsprechend.",
+        "Laporan diterima. Kami akan meninjau dan menindaklanjutinya.",
+        "रिपोर्ट मिल गई। हम जाँच करके कार्रवाई करेंगे।",
+        "تم استلام البلاغ. سنراجعه ونتخذ الإجراء المناسب."
+      ]
+    },
+    {
+      "Key": "차단 목록이 가득 찼습니다.",
+      "Values": [
+        "차단 목록이 가득 찼습니다.",
+        "Your block list is full.",
+        "屏蔽列表已满。",
+        "封鎖名單已滿。",
+        "ブロックリストがいっぱいです。",
+        "Tu lista de bloqueo está llena.",
+        "Sua lista de bloqueio está cheia.",
+        "Votre liste de blocage est pleine.",
+        "Deine Blockliste ist voll.",
+        "Daftar blokir sudah penuh.",
+        "आपकी ब्लॉक सूची भर गई है।",
+        "قائمة الحظر ممتلئة."
+      ]
+    },
+    {
+      "Key": "차단한 플레이어입니다. 차단을 해제한 뒤 다시 시도하세요.",
+      "Values": [
+        "차단한 플레이어입니다. 차단을 해제한 뒤 다시 시도하세요.",
+        "You've blocked this player. Unblock them and try again.",
+        "你已屏蔽该玩家。请取消屏蔽后重试。",
+        "你已封鎖該玩家。請解除封鎖後再試。",
+        "ブロック中のプレイヤーです。ブロックを解除してからもう一度お試しください。",
+        "Has bloqueado a este jugador. Desbloquéalo e inténtalo de nuevo.",
+        "Você bloqueou este jogador. Desbloqueie e tente novamente.",
+        "Vous avez bloqué ce joueur. Débloquez-le puis réessayez.",
+        "Du hast diesen Spieler blockiert. Hebe die Blockierung auf und versuche es erneut.",
+        "Kamu memblokir pemain ini. Buka blokir lalu coba lagi.",
+        "आपने इस खिलाड़ी को ब्लॉक किया है। अनब्लॉक करके फिर से कोशिश करें।",
+        "لقد حظرت هذا اللاعب. ألغِ الحظر ثم حاول مرة أخرى."
+      ]
+    },
+    {
+      "Key": "오늘은 더 이상 신고할 수 없습니다. 내일 다시 시도하세요.",
+      "Values": [
+        "오늘은 더 이상 신고할 수 없습니다. 내일 다시 시도하세요.",
+        "You can't send more reports today. Try again tomorrow.",
+        "今天无法再举报，请明天再试。",
+        "今天無法再檢舉，請明天再試。",
+        "本日はこれ以上通報できません。明日もう一度お試しください。",
+        "No puedes enviar más denuncias hoy. Inténtalo mañana.",
+        "Você não pode enviar mais denúncias hoje. Tente amanhã.",
+        "Vous ne pouvez plus signaler aujourd'hui. Réessayez demain.",
+        "Du kannst heute keine weiteren Meldungen senden. Versuche es morgen erneut.",
+        "Kamu tidak bisa melapor lagi hari ini. Coba lagi besok.",
+        "आज आप और रिपोर्ट नहीं कर सकते। कल फिर कोशिश करें।",
+        "لا يمكنك إرسال مزيد من البلاغات اليوم. حاول غدًا."
+      ]
+    },
+    {
+      "Key": "신고 내용을 확인하세요.",
+      "Values": [
+        "신고 내용을 확인하세요.",
+        "Please check your report.",
+        "请检查举报内容。",
+        "請確認檢舉內容。",
+        "通報内容を確認してください。",
+        "Revisa tu denuncia.",
+        "Verifique sua denúncia.",
+        "Vérifiez votre signalement.",
+        "Bitte überprüfe deine Meldung.",
+        "Periksa laporanmu.",
+        "कृपया अपनी रिपोर्ट जाँचें।",
+        "يرجى التحقق من البلاغ."
+      ]
+    },
+    {
+      "Key": "플레이어를 찾지 못했습니다.",
+      "Values": [
+        "플레이어를 찾지 못했습니다.",
+        "Player not found.",
+        "未找到该玩家。",
+        "找不到該玩家。",
+        "プレイヤーが見つかりません。",
+        "No se encontró al jugador.",
+        "Jogador não encontrado.",
+        "Joueur introuvable.",
+        "Spieler nicht gefunden.",
+        "Pemain tidak ditemukan.",
+        "खिलाड़ी नहीं मिला।",
+        "لم يتم العثور على اللاعب."
+      ]
     }
   ]
 }

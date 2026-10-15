@@ -38,7 +38,7 @@ internal sealed partial class DedicatedRoom
             try
             {
                 additions = ServerDatabase.MergeCustomTopics(null, envelope.CustomTopics);
-                gameData = RoomGameData(ServerDatabase.MergeCustomTopics(_customTopics, additions));
+                gameData = RoomGameData(ServerDatabase.MergeCustomTopics(_customTopics, additions), settings.TopicLanguage);
             }
             catch (ApiException)
             {
@@ -128,7 +128,8 @@ internal sealed partial class DedicatedRoom
         ServerTopicData[] customTopics;
         try { customTopics = configuration.CustomTopics == null ? _customTopics : ServerDatabase.MergeCustomTopics(null, configuration.CustomTopics); }
         catch (ApiException) { return false; }
-        if (!_session.Configure(settings, RoomGameData(customTopics))) return false;
+        settings.TopicLanguage = ServerRoomSettings.NormalizeTopicLanguage(settings.TopicLanguage);
+        if (!_session.Configure(settings, RoomGameData(customTopics, settings.TopicLanguage))) return false;
         _customTopics = customTopics;
         _configurationVersion = configuration.Version;
         _accessVersion = configuration.AccessVersion;

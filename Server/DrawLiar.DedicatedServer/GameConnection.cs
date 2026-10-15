@@ -1,5 +1,7 @@
 using System.Net.WebSockets;
+using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Unicode;
 using System.Threading.Channels;
 
 namespace DrawLiar.DedicatedServer;
@@ -7,6 +9,10 @@ namespace DrawLiar.DedicatedServer;
 internal sealed class GameConnection : IAsyncDisposable
 {
     private const double CHAT_INTERVAL_SECONDS = .5;
+    private static readonly JsonSerializerOptions _outgoingJson = new(GameplayWire.Json)
+    {
+        Encoder = JavaScriptEncoder.Create(UnicodeRanges.All)
+    };
     private readonly WebSocket _socket;
     private readonly CancellationTokenSource _lifetime;
     private readonly Channel<byte[]> _outgoing = Channel.CreateBounded<byte[]>(new BoundedChannelOptions(256)
@@ -30,6 +36,7 @@ internal sealed class GameConnection : IAsyncDisposable
     public bool IsAlive => Volatile.Read(ref _stopped) == 0;
     public bool FrameRateExceeded => _frameCount > 120;
     public bool LeftVoluntarily { get; private set; }
+    public bool StateSizeNoticeSent { get; set; }
 
     public GameConnection(WebSocket socket, string accountId, string sessionToken, CancellationToken cancellationToken)
     {
@@ -43,8 +50,15 @@ internal sealed class GameConnection : IAsyncDisposable
     public bool Queue(GameplayEnvelope envelope)
     {
         if (!IsAlive) return false;
-        var bytes = JsonSerializer.SerializeToUtf8Bytes(envelope, GameplayWire.Json);
-        if (bytes.Length > GameplayWire.MAX_FRAME_BYTES || !_outgoing.Writer.TryWrite(bytes))
+        return QueueSerialized(Serialize(envelope));
+    }
+
+    public static byte[] Serialize(GameplayEnvelope envelope) => JsonSerializer.SerializeToUtf8Bytes(envelope, _outgoingJson);
+
+    public bool QueueSerialized(byte[] bytes)
+    {
+        if (!IsAlive || bytes.Length > GameplayWire.MAX_FRAME_BYTES) return false;
+        if (!_outgoing.Writer.TryWrite(bytes))
         {
             Abort();
             return false;

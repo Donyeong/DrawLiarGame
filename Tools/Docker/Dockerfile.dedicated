@@ -3,4 +3,5 @@ FROM ${DRAWLIAR_BASE_IMAGE}
 USER root
 RUN rm -rf /apps/DedicatedServer
 COPY Apps/DedicatedServer /apps/DedicatedServer
+RUN install -d -o app -g app -m 0700 /var/lib/drawliar/outbox
 USER app

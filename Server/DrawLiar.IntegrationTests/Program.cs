@@ -20,6 +20,18 @@ internal static partial class Integration
 
     public static async Task RunAsync(string[] args)
     {
+        if (args.Contains("--server-reliability-only"))
+        {
+            await VerifyLobbyChatThrottleAsync();
+            await VerifyStateFrameSafetyAsync();
+            await VerifyServerReliabilityAsync();
+            return;
+        }
+        if (args.Contains("--server-reliability-database-only"))
+        {
+            await VerifyServerReliabilityDatabaseAsync();
+            return;
+        }
         if (args.Contains("--room-creation-only"))
         {
             await VerifyRoomCreationAsync();
@@ -161,6 +173,7 @@ internal static partial class Integration
         await VerifyCosmeticWireAsync();
         await VerifyRoomPolicyAsync();
         await VerifyRoomCustomTopicsAsync();
+        await VerifyTopicLanguageAsync();
         await VerifyConsensusWireAsync();
         await VerifyCoinTossWireAsync();
         await VerifyDrawingHistoryAsync();
@@ -184,6 +197,9 @@ internal static partial class Integration
             return;
         }
         await VerifyLobbyChatAsync();
+        await VerifyLobbyChatThrottleAsync();
+        await VerifyStateFrameSafetyAsync();
+        await VerifyServerReliabilityAsync();
         if (args.Contains("--rules-only")) return;
         string mainUrl = args.Length > 0 ? args[0] : "http://127.0.0.1:19050";
         string adminUrl = args.Length > 1 ? args[1] : "http://127.0.0.1:19080";

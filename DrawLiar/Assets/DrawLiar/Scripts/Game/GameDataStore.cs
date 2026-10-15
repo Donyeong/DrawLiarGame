@@ -15,10 +15,31 @@ namespace DrawLiar
 
         public static string CustomTopicsPath => Path.Combine(Application.persistentDataPath, "custom-topics.json");
 
-        public static GameData Load(string customTopicsPath = null)
+        private static GameData _builtIn;
+
+        // 언어별 기본 주제 전체를 한 번만 파싱한다. 호출한 쪽이 고쳐도 캐시가 바뀌지 않도록 목록과 점수 규칙은 복사해서 돌려준다.
+        public static GameData LoadBuiltIn()
         {
-            var asset = Resources.Load<TextAsset>("DrawLiar/GameData");
-            var data = asset != null ? JsonUtility.FromJson<GameData>(asset.text) : new GameData();
+            if (_builtIn == null)
+            {
+                var asset = Resources.Load<TextAsset>("DrawLiar/GameData");
+                _builtIn = (asset != null ? JsonUtility.FromJson<GameData>(asset.text) : null) ?? new GameData();
+            }
+            var scoring = _builtIn.Scoring ?? new ScoreRules();
+            return new GameData
+            {
+                Scoring = new ScoreRules { LiarUncaught = scoring.LiarUncaught, LiarCorrectGuess = scoring.LiarCorrectGuess, CitizenCorrectVote = scoring.CitizenCorrectVote },
+                Topics = (_builtIn.Topics ?? Array.Empty<TopicData>()).ToArray()
+            };
+        }
+
+        // topicLanguage를 주면 그 언어의 기본 주제만 남긴다. 사용자 주제는 언어와 관계없이 모두 포함한다.
+        public static GameData Load(string customTopicsPath = null, string topicLanguage = null)
+        {
+            var data = LoadBuiltIn();
+            if (topicLanguage != null)
+                data.Topics = (data.Topics ?? Array.Empty<TopicData>())
+                    .Where(topic => ServerRoomSettings.TopicLanguageOf(topic.LanguageCode) == topicLanguage).ToArray();
             data.Scoring ??= new ScoreRules();
             data.Scoring.LiarUncaught = Mathf.Clamp(data.Scoring.LiarUncaught, 0, 1000);
             data.Scoring.LiarCorrectGuess = Mathf.Clamp(data.Scoring.LiarCorrectGuess, 0, 1000);
@@ -66,8 +87,7 @@ namespace DrawLiar
 
         private static TopicData[] SeparateBuiltInNames(TopicData[] topics)
         {
-            var asset = Resources.Load<TextAsset>("DrawLiar/GameData");
-            var builtin = asset != null ? JsonUtility.FromJson<GameData>(asset.text)?.Topics : null;
+            var builtin = LoadBuiltIn().Topics;
             var reserved = new System.Collections.Generic.HashSet<string>((builtin ?? Array.Empty<TopicData>()).Select(topic => GameRules.NormalizeGuess(topic.Name)), StringComparer.Ordinal);
             var taken = new System.Collections.Generic.HashSet<string>(reserved.Concat(topics.Select(topic => GameRules.NormalizeGuess(topic.Name))), StringComparer.Ordinal);
             foreach (var topic in topics.Where(topic => reserved.Contains(GameRules.NormalizeGuess(topic.Name))))
@@ -128,8 +148,7 @@ namespace DrawLiar
             string name = previous?.Name ?? entry.Name;
             if (previous == null)
             {
-                var asset = Resources.Load<TextAsset>("DrawLiar/GameData");
-                var builtin = asset != null ? JsonUtility.FromJson<GameData>(asset.text).Topics : Array.Empty<TopicData>();
+                var builtin = LoadBuiltIn().Topics ?? Array.Empty<TopicData>();
                 var taken = new System.Collections.Generic.HashSet<string>(existing.Select(topic => GameRules.NormalizeGuess(topic.Name))
                     .Concat(builtin.Select(topic => GameRules.NormalizeGuess(topic.Name))), StringComparer.Ordinal);
                 int suffix = 2;
