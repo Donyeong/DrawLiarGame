@@ -9,6 +9,9 @@ namespace DrawLiar
     {
         private Button _clearOwnButton;
         private bool _clearOwnPending;
+        private VisualElement _clearOwnConfirmation;
+        private bool _clearOwnConfirming;
+        private readonly Dictionary<VisualElement,StyleEnum<DisplayStyle>> _clearOwnHiddenTools = new Dictionary<VisualElement,StyleEnum<DisplayStyle>>();
         private int? _previewAuthorId;
         private Label _drawingPreviewName;
         private VisualElement _drawingPreviewIdentity;
@@ -20,6 +23,7 @@ namespace DrawLiar
 
         private void CreateDrawingTools(VisualElement context)
         {
+            CloseClearOwnDrawingConfirmation();
             drawingTools=Box(context,"tools");
             _brushSwatches.Clear();_pressureButton=null;
             var toolRow=Box(drawingTools,"tool-row");
@@ -50,6 +54,7 @@ namespace DrawLiar
             }
             surface.BrushSize=11/1200f;
             if(!IsMobile){_pressureButton=CreatePressureToggle(drawingTools);_pressureButton.style.minWidth=94;_pressureButton.style.marginLeft=10;}
+            CreateClearOwnDrawingConfirmation();
             RefreshBrushControls();
         }
 
@@ -164,10 +169,67 @@ namespace DrawLiar
 
         private void ClearOwnDrawing()
         {
-            var state=network.State;
-            if(state==null||!network.CanDraw||surface==null||surface.HasAuthorPreview||_clearOwnPending||network.GetAuthorStrokes(state.LocalPlayerId).Count==0)return;
-            surface.CancelDrawing();_clearOwnPending=true;_clearOwnButton?.SetEnabled(false);
-            network.ClearOwnStrokes();
+            if(!CanClearOwnDrawing()||_clearOwnConfirmation==null||_clearOwnConfirming)return;
+            _clearOwnConfirming=true;
+            surface.CancelDrawing();
+            foreach(var element in drawingTools.Children())
+            {
+                if(element==_clearOwnConfirmation)continue;
+                _clearOwnHiddenTools[element]=element.style.display;element.style.display=DisplayStyle.None;
+            }
+            _clearOwnConfirmation.style.display=DisplayStyle.Flex;
+            _clearOwnConfirmation.Q<Button>("clear-own-cancel")?.Focus();
+        }
+
+        private bool CanClearOwnDrawing()
+        {
+            var state=network?.State;
+            return isActiveAndEnabled&&inRoom&&overlay==null&&_profileOverlay==null&&_roomPasswordOverlay==null
+                &&_roomCustomizeOverlay==null&&_roomTopicWorkshopOverlay==null&&_workshopPreviewOverlay==null
+                &&(!IsMobile||_mobileChatSheet==null||_mobileChatSheet.style.display==DisplayStyle.None)
+                &&state!=null&&network.CanDraw&&surface?.panel!=null&&drawingTools?.panel!=null
+                &&!surface.HasAuthorPreview&&!_clearOwnPending&&network.GetAuthorStrokes(state.LocalPlayerId).Count>0
+                &&(state.Phase!=GamePhase.Drawing||state.RemainingSeconds>0&&_timerClock.Remaining(Time.realtimeSinceStartupAsDouble)>0);
+        }
+
+        private void CreateClearOwnDrawingConfirmation()
+        {
+            var confirmation=_clearOwnConfirmation=Box(drawingTools,"clear-own-confirmation");confirmation.name="clear-own-confirmation";
+            confirmation.style.display=DisplayStyle.None;confirmation.style.width=Length.Percent(100);confirmation.style.minWidth=0;
+            confirmation.style.flexDirection=FlexDirection.Column;confirmation.style.flexShrink=0;
+            var question=Text(confirmation,"내가 그린 선을 모두 지울까요?","clear-own-confirm-question");
+            question.style.whiteSpace=WhiteSpace.Normal;question.style.fontSize=14;question.style.marginBottom=6;
+            var actions=Box(confirmation,"clear-own-confirm-actions");actions.style.flexDirection=FlexDirection.Row;
+            var cancel=Button(actions,"취소",()=>{CloseClearOwnDrawingConfirmation();_clearOwnButton?.Focus();},"secondary",DrawSound.UiCancel);cancel.name="clear-own-cancel";
+            var confirm=Button(actions,"모두 지우기",()=>
+            {
+                bool canClear=_clearOwnConfirming&&CanClearOwnDrawing();
+                CloseClearOwnDrawingConfirmation();
+                if(!canClear)return;
+                surface.CancelDrawing();_clearOwnPending=true;_clearOwnButton?.SetEnabled(false);
+                network.ClearOwnStrokes();
+            },"danger");confirm.name="clear-own-confirm";
+            foreach(var button in new[]{cancel,confirm})
+            {
+                button.style.flexGrow=1;button.style.flexBasis=0;button.style.minWidth=0;
+                button.style.minHeight=44;button.style.height=StyleKeyword.Auto;button.style.whiteSpace=WhiteSpace.Normal;
+                button.style.marginLeft=0;button.style.marginRight=0;button.style.marginTop=0;button.style.marginBottom=0;
+                button.style.fontSize=14;
+            }
+            cancel.style.marginRight=8;
+            confirmation.RegisterCallback<DetachFromPanelEvent>(_=>
+            {
+                if(_clearOwnConfirmation!=confirmation)return;
+                CloseClearOwnDrawingConfirmation();
+            });
+        }
+
+        private void CloseClearOwnDrawingConfirmation()
+        {
+            _clearOwnConfirming=false;
+            if(_clearOwnConfirmation!=null)_clearOwnConfirmation.style.display=DisplayStyle.None;
+            foreach(var entry in _clearOwnHiddenTools)entry.Key.style.display=entry.Value;
+            _clearOwnHiddenTools.Clear();
         }
 
         private void PreviewAuthorDrawing(int authorId)
@@ -216,13 +278,14 @@ namespace DrawLiar
         {
             bool changed=_drawingPreviewRound!=state.Round||_drawingPreviewPhase!=state.Phase||_drawingPreviewMode!=state.Settings.Mode||
                 _drawingPreviewArtist!=state.ArtistId||_drawingPreviewVersion!=state.CanvasVersion||_drawingPreviewEpoch!=state.DrawingEpoch;
-            if(changed){ClearDrawingPreview();_clearOwnPending=false;}
+            if(changed){ClearDrawingPreview();_clearOwnPending=false;CloseClearOwnDrawingConfirmation();}
             _drawingPreviewRound=state.Round;_drawingPreviewPhase=state.Phase;_drawingPreviewMode=state.Settings.Mode;
             _drawingPreviewArtist=state.ArtistId;_drawingPreviewVersion=state.CanvasVersion;_drawingPreviewEpoch=state.DrawingEpoch;
             if(_previewAuthorId.HasValue&&!state.Players.Any(player=>player.Id==_previewAuthorId.Value&&!player.IsSpectator))ClearDrawingPreview();
             if(_previewAuthorId.HasValue&&state.Settings.Mode==DrawingMode.Individual)network.RequestAuthorDrawing(_previewAuthorId.Value);
             foreach(var entry in playerCards)entry.Value.EnableInClassList("preview-player",entry.Key==_previewAuthorId);
-            _clearOwnButton?.SetEnabled(network.CanDraw&&surface?.HasAuthorPreview!=true&&!_clearOwnPending&&network.GetAuthorStrokes(state.LocalPlayerId).Count>0);
+            if(_clearOwnConfirming&&!CanClearOwnDrawing())CloseClearOwnDrawingConfirmation();
+            _clearOwnButton?.SetEnabled(CanClearOwnDrawing());
         }
     }
 }

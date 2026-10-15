@@ -64,6 +64,9 @@ namespace DrawLiar
         public string RoomCode => _roomCode;
         private string _roomId = "";
         public string CurrentRoomId => string.IsNullOrEmpty(_roomCode) ? "" : _roomId;
+        private string _rejoinRoomId = "";
+        private bool _rejoinAsSpectator;
+        public bool CanRejoin => !string.IsNullOrEmpty(_rejoinRoomId);
         public bool IsGoogleSigningIn => _googleCancellation != null;
         public string Status => DrawLocalization.Format(_statusSource, _statusArguments);
         public bool IsBusy { get; private set; }
@@ -111,6 +114,7 @@ namespace DrawLiar
             if (index >= 0 && index + 1 < arguments.Length) _config.SetDevelopmentServer(arguments[index + 1]);
 #endif
             _manager.StateChanged += OnRoomState;
+            _manager.Disconnected += OnRoomDisconnected;
             _lobbyChat.Changed += OnLobbyChatChanged;
             _lobbyChat.Notice += OnLobbyChatNotice;
 #if UNITY_WEBGL && !UNITY_EDITOR
@@ -130,6 +134,21 @@ namespace DrawLiar
             TrackMatchReward(state);
             if (IsOnlineRoom) StopLobbyChat(); else StartLobbyChat();
             Changed?.Invoke();
+        }
+
+        private void OnRoomDisconnected()
+        {
+            _rejoinRoomId = string.IsNullOrEmpty(_roomCode) ? "" : _roomId;
+            _rejoinAsSpectator = _manager.State?.LocalIsSpectator == true;
+        }
+
+        public void DismissRejoin() => _rejoinRoomId = "";
+
+        public Task RejoinAsync()
+        {
+            string roomId = _rejoinRoomId;
+            _rejoinRoomId = "";
+            return JoinLobbyAsync(roomId, _rejoinAsSpectator);
         }
 
         private void StartLobbyChat()
@@ -565,6 +584,7 @@ namespace DrawLiar
             await _manager.ConnectAsync(assignment);
             _roomCode = string.IsNullOrEmpty(assignment.RoomCode) ? assignment.RoomId : assignment.RoomCode;
             _roomId = assignment.RoomId;
+            _rejoinRoomId = "";
             SetStatus("방에 연결했습니다. 방 코드: {0}", _roomCode);
         }
 
@@ -602,7 +622,7 @@ namespace DrawLiar
             }
             finally
             {
-                _mainSession = _gameSession = _gameServerUrl = _roomCode = "";
+                _mainSession = _gameSession = _gameServerUrl = _roomCode = _rejoinRoomId = "";
                 StopLobbyChat(true);
                 _loggingOut = false;
                 Profile = null; ResetTopicWorkshop(); ResetMatchRewards(); Friends = new FriendListResponse(); Shop = new ShopResponse(); _publicRooms.Clear();
@@ -788,7 +808,7 @@ namespace DrawLiar
             _googleCancellation?.Cancel();
             _socialCancellation.Cancel();
             _socialCancellation.Dispose();
-            if (_manager != null) _manager.StateChanged -= OnRoomState;
+            if (_manager != null) { _manager.StateChanged -= OnRoomState; _manager.Disconnected -= OnRoomDisconnected; }
             _lobbyChat.Changed -= OnLobbyChatChanged;
             _lobbyChat.Notice -= OnLobbyChatNotice;
             _lobbyChat.Dispose();

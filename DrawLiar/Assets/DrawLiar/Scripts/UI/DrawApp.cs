@@ -383,6 +383,7 @@ namespace DrawLiar
             IconButton(heading,"새로고침",DrawUIIcon.Kind.Refresh,()=>SearchRooms(_roomSearchDraft),"room-refresh");
             RoomSearch(page);
             publicRoomList=DrawSmoothScroll.Create(ScrollViewMode.Vertical);Classes(publicRoomList,"room-list lobby-room-list mobile-lobby-room-list");page.Add(publicRoomList);RefreshPublicRooms();
+            RejoinBanner(page);
             _mobileLobbyChatButton=Button(page,"로비 채팅",OpenLobbyChat,"secondary mobile-lobby-chat-open");_mobileLobbyChatButton.name="mobile-lobby-chat-open";
             DrawUIMotion.Stagger(page,28,220,8);
         }
@@ -407,6 +408,7 @@ namespace DrawLiar
             Button(services,"친구",()=>Navigate(LobbyScreen.Friends),"secondary");
             Button(services,"내 계정",()=>Navigate(LobbyScreen.Account),"secondary pc-lobby-service-last");
             var main=Box(workspace,"pc-lobby-main grow");main.name="pc-lobby-main";
+            RejoinBanner(main);
             var rooms=Box(main,"pc-lobby-card pc-lobby-rooms grow");rooms.name="pc-lobby-rooms";
             var heading=Box(rooms,"row pc-lobby-room-heading");Text(heading,"공개 방","section-title grow");
             LobbyRoomActions(heading,"row pc-lobby-room-actions");
@@ -415,6 +417,15 @@ namespace DrawLiar
             publicRoomList=DrawSmoothScroll.Create(ScrollViewMode.Vertical);Classes(publicRoomList,"room-list lobby-room-list pc-lobby-room-list grow");rooms.Add(publicRoomList);RefreshPublicRooms();
             BuildLobbyChat(main,false);
             DrawUIMotion.Stagger(screen,28,220,8);
+        }
+
+        private void RejoinBanner(VisualElement parent)
+        {
+            if(!lobby.CanRejoin)return;
+            var banner=Box(parent,"row rejoin-banner");banner.name="rejoin-banner";
+            Text(banner,"방 연결이 끊겼어요.","rejoin-banner-text grow");
+            Button(banner,"다시 연결",()=>{banner.RemoveFromHierarchy();Run(lobby.RejoinAsync);},"primary").name="rejoin-room";
+            Button(banner,"닫기",()=>{lobby.DismissRejoin();banner.RemoveFromHierarchy();},"secondary",DrawSound.UiCancel).name="rejoin-dismiss";
         }
 
         private void LobbyRoomActions(VisualElement parent,string classes)
@@ -2341,6 +2352,7 @@ namespace DrawLiar
             float remaining=_timerClock.Remaining(now);
             _hudTimer?.Refresh(remaining,_timerClock.Duration,_timerClock.Period,_timerClock.IsVisible);
             _guessCountdown?.Refresh(remaining,_timerClock.Duration,_timerClock.Period,_timerClock.IsVisible);
+            RefreshResultsCountdown();
         }
         private void RefreshServiceStatus()
         {

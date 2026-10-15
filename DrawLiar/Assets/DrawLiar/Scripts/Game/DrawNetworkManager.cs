@@ -53,6 +53,7 @@ namespace DrawLiar
         public event Action<ChatLine> ChatReceived;
         public event Action<string> Notice;
         public event Action<string> Kicked;
+        public event Action Disconnected;
 
         public async Task ConnectAsync(DedicatedAssignment assignment)
         {
@@ -405,6 +406,7 @@ namespace DrawLiar
             if (failure != null && incoming.Generation == DrawAsync.Read(ref _generation))
             {
                 _initialState?.TrySetException(new IOException(failure));
+                Disconnected?.Invoke();
                 Leave();
                 Notice?.Invoke(failure);
                 return;
@@ -446,6 +448,7 @@ namespace DrawLiar
                         return;
                     case "disconnected":
                         _initialState?.TrySetException(new IOException(message.Text));
+                        Disconnected?.Invoke();
                         Leave();
                         Notice?.Invoke(message.Text);
                         break;

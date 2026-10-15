@@ -15,11 +15,11 @@ namespace DrawLiar
 
         private static readonly CommerceProduct[] _products =
         {
-            Product("nickname-prism", "프리즘 잉크", NICKNAME_EFFECT, "무지개빛으로 닉네임을 물들여요.", 80),
-            Product("nickname-gold", "황금 서명", NICKNAME_EFFECT, "따뜻한 황금빛으로 닉네임을 꾸며요.", 100),
-            Product("nickname-mint", "민트 잉크", NICKNAME_EFFECT, "산뜻한 민트빛으로 닉네임을 꾸며요.", 120),
-            Product("nickname-neon", "네온 사인", NICKNAME_EFFECT, "선명한 네온빛으로 닉네임을 꾸며요.", 140),
-            Product("nickname-sunset", "노을 잉크", NICKNAME_EFFECT, "분홍빛 노을 색으로 닉네임을 꾸며요.", 160),
+            Product("nickname-prism", "프리즘 잉크", NICKNAME_EFFECT, "무지개빛으로 닉네임 배경까지 물들여요.", 80),
+            Product("nickname-gold", "황금 서명", NICKNAME_EFFECT, "따뜻한 황금빛으로 닉네임 배경까지 꾸며요.", 100),
+            Product("nickname-mint", "민트 잉크", NICKNAME_EFFECT, "산뜻한 민트빛으로 닉네임 배경까지 꾸며요.", 120),
+            Product("nickname-neon", "네온 사인", NICKNAME_EFFECT, "선명한 네온빛으로 닉네임 배경까지 꾸며요.", 140),
+            Product("nickname-sunset", "노을 잉크", NICKNAME_EFFECT, "분홍빛 노을 색으로 닉네임 배경까지 꾸며요.", 160),
             Product("background-aurora", "오로라 정원", AVATAR_BACKGROUND, "캐릭터 뒤로 오로라빛이 펼쳐져요.", 80),
             Product("background-starlight", "별빛 밤하늘", AVATAR_BACKGROUND, "캐릭터 뒤로 작은 별들이 빛나요.", 100),
             Product("background-petals", "벚꽃 편지", AVATAR_BACKGROUND, "캐릭터 뒤를 분홍 꽃잎으로 꾸며요.", 120),
@@ -67,10 +67,10 @@ namespace DrawLiar
 
         public static CosmeticLoadout SetEquipped(CosmeticLoadout loadout, string category, string productId)
         {
-            if (!IsCategory(category)) throw new ArgumentException("꾸미기 카테고리가 올바르지 않습니다.", nameof(category));
+            if (!IsCategory(category)) throw new ArgumentException("장식 카테고리가 올바르지 않습니다.", nameof(category));
             productId = productId ?? "";
             if (productId.Length > 0 && Find(productId)?.Category != category)
-                throw new ArgumentException("꾸미기 상품이 카테고리와 일치하지 않습니다.", nameof(productId));
+                throw new ArgumentException("장식 상품이 카테고리와 일치하지 않습니다.", nameof(productId));
             var result = Sanitize(loadout);
             switch (category)
             {

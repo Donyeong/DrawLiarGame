@@ -37,6 +37,13 @@ namespace DrawLiar
                     Enter(row, 260, 8, 200 + 45 * scoreIndex);
                 scoreIndex++;
             }
+            if (state.Phase == GamePhase.RoundResults)
+            {
+                _resultsCountdown = Text(modal, "", "rules round-result-countdown");
+                _resultsCountdown.name = "results-countdown";
+                _resultsCountdownSeconds = -1;
+                RefreshResultsCountdown();
+            }
             Button(modal, "닫기", CloseModal, "primary round-result-dismiss", DrawSound.UiCancel).name = "results-close";
             HideMobileScrollers();
             RefreshTextPresentation();

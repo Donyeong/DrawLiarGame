@@ -63,7 +63,7 @@ namespace DrawLiar
                 button.EnableInClassList("commerce-selected", _shopSection == section);
             }
             Tab(ShopSection.Cosmetics, "코스튬", "cosmetics");
-            Tab(ShopSection.PremiumCosmetics, "꾸미기", "premium-cosmetics");
+            Tab(ShopSection.PremiumCosmetics, "장식", "premium-cosmetics");
             Tab(ShopSection.Gems, "보석", "gems");
             Tab(ShopSection.Subscription, "구독", "subscription");
             RefreshCommerceControls();
@@ -117,7 +117,7 @@ namespace DrawLiar
             {
                 var gem = new DrawPremiumGem(); gem.AddToClassList("commerce-product-symbol"); card.Add(gem);
                 Text(card, "보석 {0}개", "commerce-product-name", product.PaidGems);
-                Text(card, "보석으로 꾸미기와 구독 상품을 구매할 수 있어요.", "commerce-description");
+                Text(card, "보석으로 장식과 구독 상품을 구매할 수 있어요.", "commerce-description");
             }
             else
             {

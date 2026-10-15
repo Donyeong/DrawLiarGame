@@ -1,5 +1,7 @@
 .app.mobile { padding: 0; background-color: #F7F3EA; color: #34304B; font-size: 16px; --ink: #34304B; --muted: #817A87; --brand: #78679E; --border: #E3DDD4; --mint: #537F70; }
  .app.mobile .mobile-lobby-chat-open { min-height: 48px; flex-shrink: 0; margin-top: 12px; }
+.app.mobile .rejoin-banner { margin: 12px 0 0; padding: 8px 12px; }
+.app.mobile .rejoin-banner .button { min-height: 44px; height: auto; padding: 8px 12px; }
  .app.mobile .modal.lobby-chat-modal { height: 82%; max-height: 760px; min-height: 220px; padding: 20px; }
  .mobile .lobby-chat-modal-heading { min-height: 48px; flex-shrink: 0; margin-bottom: 12px; }
  .mobile .lobby-chat-modal-heading > .title { margin: 0; font-size: 24px; }
@@ -9,7 +11,7 @@
 .mobile .account-level-badge { width: 20px; height: 20px; min-width: 20px; min-height: 20px; margin-right: 4px; }
 .mobile .account-level-number { font-size: 10px; }
 .mobile .level-tier-5 .account-level-number { font-size: 8px; }
-.mobile .level-name-lobby-chat-name { width: 96px; min-width: 96px; }
+.mobile .level-name-lobby-chat-name { width: 104px; min-width: 104px; }
 .mobile .level-name-shop-profile-name { height: 24px; margin-bottom: 8px; align-self: stretch; }
 .mobile-landscape .level-name-shop-profile-name { height: 14px; margin-bottom: 2px; }
 .mobile-landscape .level-name-shop-profile-name .account-level-badge { width: 20px; height: 14px; min-width: 20px; min-height: 14px; }

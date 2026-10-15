@@ -11696,8 +11696,8 @@ MonoBehaviour:
       Languages:
       - "\uCF54\uC2A4\uD2AC"
       - Costumes
-      - "\u88C5\u626E"
-      - "\u88DD\u626E"
+      - "\u670D\u9970"
+      - "\u670D\u98FE"
       - "\u30B3\u30B9\u30C1\u30E5\u30FC\u30E0"
       - Disfraces
       - Trajes
@@ -12656,40 +12656,40 @@ MonoBehaviour:
       - "\u0627\u0644\u0627\u062E\u062A\u064A\u0627\u0631 \xB7 {0}"
       Flags: 000000000000000000000000
       Languages_Touch: []
-    - Term: UI/67O07ISdIOq-uOuvuOq4sA
+    - Term: UI/67O07ISdIOyepeyLnQ
       TermType: 0
-      Description: "\uBCF4\uC11D \uAFB8\uBBF8\uAE30"
+      Description: "\uBCF4\uC11D \uC7A5\uC2DD"
       Languages:
-      - "\uBCF4\uC11D \uAFB8\uBBF8\uAE30"
-      - Gem cosmetics
+      - "\uBCF4\uC11D \uC7A5\uC2DD"
+      - Gem decorations
       - "\u5B9D\u77F3\u88C5\u9970"
       - "\u5BF6\u77F3\u88DD\u98FE"
-      - "\u30B8\u30A7\u30E0\u3067\u7740\u305B\u66FF\u3048"
-      - "Cosm\xE9ticos con gemas"
-      - "Cosm\xE9ticos com gemas"
-      - "D\xE9corations avec des gemmes"
-      - Kosmetik mit Edelsteinen
-      - Kosmetik dengan permata
-      - "\u0930\u0924\u094D\u0928\u094B\u0902 \u0938\u0947 \u0938\u091C\u093E\u0935\u091F"
+      - "\u30B8\u30A7\u30E0\u88C5\u98FE"
+      - Decoraciones con gemas
+      - "Decora\xE7\xF5es com gemas"
+      - "D\xE9corations en gemmes"
+      - Edelstein-Dekorationen
+      - Dekorasi permata
+      - "\u0930\u0924\u094D\u0928 \u0938\u091C\u093E\u0935\u091F"
       - "\u0632\u064A\u0646\u0629 \u0628\u0627\u0644\u062C\u0648\u0627\u0647\u0631"
       Flags: 000000000000000000000000
       Languages_Touch: []
-    - Term: UI/67O07ISd7Jy866GcIOq-uOuvuOq4sOyZgCDqtazrj4Ug7IOB7ZKI7J2EIOq1rOunpO2VoCDsiJgg7J6I7Ja07JqULg
+    - Term: UI/67O07ISd7Jy866GcIOyepeyLneqzvCDqtazrj4Ug7IOB7ZKI7J2EIOq1rOunpO2VoCDsiJgg7J6I7Ja07JqULg
       TermType: 0
-      Description: "\uBCF4\uC11D\uC73C\uB85C \uAFB8\uBBF8\uAE30\uC640 \uAD6C\uB3C5
-        \uC0C1\uD488\uC744 \uAD6C\uB9E4\uD560 \uC218 \uC788\uC5B4\uC694."
-      Languages:
-      - "\uBCF4\uC11D\uC73C\uB85C \uAFB8\uBBF8\uAE30\uC640 \uAD6C\uB3C5 \uC0C1\uD488\uC744
+      Description: "\uBCF4\uC11D\uC73C\uB85C \uC7A5\uC2DD\uACFC \uAD6C\uB3C5 \uC0C1\uD488\uC744
         \uAD6C\uB9E4\uD560 \uC218 \uC788\uC5B4\uC694."
-      - Use gems to buy cosmetics and subscriptions.
+      Languages:
+      - "\uBCF4\uC11D\uC73C\uB85C \uC7A5\uC2DD\uACFC \uAD6C\uB3C5 \uC0C1\uD488\uC744
+        \uAD6C\uB9E4\uD560 \uC218 \uC788\uC5B4\uC694."
+      - Use gems to buy decorations and subscriptions.
       - "\u53EF\u4F7F\u7528\u5B9D\u77F3\u8D2D\u4E70\u88C5\u9970\u548C\u8BA2\u9605\u3002"
       - "\u53EF\u4F7F\u7528\u5BF6\u77F3\u8CFC\u8CB7\u88DD\u98FE\u548C\u8A02\u95B1\u3002"
       - "\u30B8\u30A7\u30E0\u3067\u88C5\u98FE\u3084\u30B5\u30D6\u30B9\u30AF\u30EA\u30D7\u30B7\u30E7\u30F3\u3092\u8CFC\u5165\u3067\u304D\u307E\u3059\u3002"
-      - "Usa gemas para comprar cosm\xE9ticos y suscripciones."
-      - "Use gemas para comprar cosm\xE9ticos e assinaturas."
-      - "Achetez des d\xE9corations et des abonnements avec des gemmes."
-      - Kaufe Kosmetik und Abonnements mit Edelsteinen.
-      - Gunakan permata untuk membeli kosmetik dan langganan.
+      - Usa gemas para comprar decoraciones y suscripciones.
+      - "Use gemas para comprar decora\xE7\xF5es e assinaturas."
+      - "Utilisez des gemmes pour acheter des d\xE9corations et des abonnements."
+      - Kaufe Dekorationen und Abos mit Edelsteinen.
+      - Gunakan permata untuk membeli dekorasi dan langganan.
       - "\u0930\u0924\u094D\u0928\u094B\u0902 \u0938\u0947 \u0938\u091C\u093E\u0935\u091F
         \u0914\u0930 \u0938\u0926\u0938\u094D\u092F\u0924\u093E \u0916\u0930\u0940\u0926\u0947\u0902\u0964"
       - "\u0627\u0633\u062A\u062E\u062F\u0645 \u0627\u0644\u062C\u0648\u0627\u0647\u0631
@@ -12884,20 +12884,20 @@ MonoBehaviour:
         \u0627\u0644\u0627\u0641\u062A\u0631\u0627\u0636\u064A"
       Flags: 000000000000000000000000
       Languages_Touch: []
-    - Term: UI/6r6466-46riwIOq1rOunpA
+    - Term: UI/7J6l7IudIOq1rOunpA
       TermType: 0
-      Description: "\uAFB8\uBBF8\uAE30 \uAD6C\uB9E4"
+      Description: "\uC7A5\uC2DD \uAD6C\uB9E4"
       Languages:
-      - "\uAFB8\uBBF8\uAE30 \uAD6C\uB9E4"
-      - Buy cosmetic
+      - "\uC7A5\uC2DD \uAD6C\uB9E4"
+      - Buy decoration
       - "\u8D2D\u4E70\u88C5\u9970"
       - "\u8CFC\u8CB7\u88DD\u98FE"
       - "\u88C5\u98FE\u3092\u8CFC\u5165"
-      - "Comprar cosm\xE9tico"
-      - "Comprar cosm\xE9tico"
+      - "Comprar decoraci\xF3n"
+      - "Comprar decora\xE7\xE3o"
       - "Acheter une d\xE9coration"
-      - Kosmetik kaufen
-      - Beli kosmetik
+      - Dekoration kaufen
+      - Beli dekorasi
       - "\u0938\u091C\u093E\u0935\u091F \u0916\u0930\u0940\u0926\u0947\u0902"
       - "\u0634\u0631\u0627\u0621 \u0632\u064A\u0646\u0629"
       Flags: 000000000000000000000000
@@ -12956,22 +12956,22 @@ MonoBehaviour:
       - "\u062A\u062C\u0647\u064A\u0632"
       Flags: 000000000000000000000000
       Languages_Touch: []
-    - Term: UI/6r6466-46riw66W8IOyggOyepe2WiOyKteuLiOuLpC4
+    - Term: UI/7J6l7Iud7J2EIOyggeyaqe2WiOyKteuLiOuLpC4
       TermType: 0
-      Description: "\uAFB8\uBBF8\uAE30\uB97C \uC800\uC7A5\uD588\uC2B5\uB2C8\uB2E4."
+      Description: "\uC7A5\uC2DD\uC744 \uC801\uC6A9\uD588\uC2B5\uB2C8\uB2E4."
       Languages:
-      - "\uAFB8\uBBF8\uAE30\uB97C \uC800\uC7A5\uD588\uC2B5\uB2C8\uB2E4."
-      - Cosmetics saved.
-      - "\u5DF2\u4FDD\u5B58\u88C5\u9970\u3002"
-      - "\u5DF2\u5132\u5B58\u88DD\u98FE\u3002"
-      - "\u88C5\u98FE\u3092\u4FDD\u5B58\u3057\u307E\u3057\u305F\u3002"
-      - "Cosm\xE9ticos guardados."
-      - "Cosm\xE9ticos salvos."
-      - "D\xE9corations enregistr\xE9es."
-      - Kosmetik gespeichert.
-      - Kosmetik disimpan.
-      - "\u0938\u091C\u093E\u0935\u091F \u0938\u0939\u0947\u091C \u0926\u0940 \u0917\u0908\u0964"
-      - "\u062A\u0645 \u062D\u0641\u0638 \u0627\u0644\u0632\u064A\u0646\u0629."
+      - "\uC7A5\uC2DD\uC744 \uC801\uC6A9\uD588\uC2B5\uB2C8\uB2E4."
+      - Decoration applied.
+      - "\u5DF2\u5E94\u7528\u88C5\u9970\u3002"
+      - "\u5DF2\u5957\u7528\u88DD\u98FE\u3002"
+      - "\u88C5\u98FE\u3092\u9069\u7528\u3057\u307E\u3057\u305F\u3002"
+      - "Decoraci\xF3n aplicada."
+      - "Decora\xE7\xE3o aplicada."
+      - "D\xE9coration appliqu\xE9e."
+      - Dekoration angewendet.
+      - Dekorasi diterapkan.
+      - "\u0938\u091C\u093E\u0935\u091F \u0932\u093E\u0917\u0942 \u0915\u0940 \u0917\u0908\u0964"
+      - "\u062A\u0645 \u062A\u0637\u0628\u064A\u0642 \u0627\u0644\u0632\u064A\u0646\u0629."
       Flags: 000000000000000000000000
       Languages_Touch: []
     - Term: UI/7ZSE66as7KaYIOyeie2BrA
@@ -13334,113 +13334,121 @@ MonoBehaviour:
       - "\u0641\u0642\u0627\u0639\u0629 \u0628\u062A\u0644\u0627\u062A"
       Flags: 000000000000000000000000
       Languages_Touch: []
-    - Term: UI/66y07KeA6rCc67mb7Jy866GcIOuLieuEpOyehOydhCDrrLzrk6Tsl6zsmpQu
+    - Term: UI/66y07KeA6rCc67mb7Jy866GcIOuLieuEpOyehCDrsLDqsr3quYzsp4Ag66y865Ok7Jes7JqULg
       TermType: 0
-      Description: "\uBB34\uC9C0\uAC1C\uBE5B\uC73C\uB85C \uB2C9\uB124\uC784\uC744
+      Description: "\uBB34\uC9C0\uAC1C\uBE5B\uC73C\uB85C \uB2C9\uB124\uC784 \uBC30\uACBD\uAE4C\uC9C0
         \uBB3C\uB4E4\uC5EC\uC694."
       Languages:
-      - "\uBB34\uC9C0\uAC1C\uBE5B\uC73C\uB85C \uB2C9\uB124\uC784\uC744 \uBB3C\uB4E4\uC5EC\uC694."
-      - Color your nickname with rainbow hues.
-      - "\u7528\u5F69\u8679\u8272\u70B9\u4EAE\u6635\u79F0\u3002"
-      - "\u7528\u5F69\u8679\u8272\u9EDE\u4EAE\u66B1\u7A31\u3002"
-      - "\u30CB\u30C3\u30AF\u30CD\u30FC\u30E0\u3092\u8679\u8272\u306B\u5F69\u308A\u307E\u3059\u3002"
-      - "Colorea tu apodo con tonos de arco\xEDris."
-      - "D\xEA ao seu apelido tons de arco-\xEDris."
-      - Colorez votre pseudo aux couleurs de l'arc-en-ciel.
-      - "F\xE4rbe deinen Namen in Regenbogenfarben."
-      - Warnai nama panggilan dengan warna pelangi.
-      - "\u0909\u092A\u0928\u093E\u092E \u0915\u094B \u0907\u0902\u0926\u094D\u0930\u0927\u0928\u0941\u0937\u0940
+      - "\uBB34\uC9C0\uAC1C\uBE5B\uC73C\uB85C \uB2C9\uB124\uC784 \uBC30\uACBD\uAE4C\uC9C0
+        \uBB3C\uB4E4\uC5EC\uC694."
+      - Color your nickname and its background with rainbow hues.
+      - "\u7528\u5F69\u8679\u8272\u70B9\u4EAE\u6635\u79F0\u53CA\u5176\u80CC\u666F\u3002"
+      - "\u7528\u5F69\u8679\u8272\u9EDE\u4EAE\u66B1\u7A31\u53CA\u5176\u80CC\u666F\u3002"
+      - "\u30CB\u30C3\u30AF\u30CD\u30FC\u30E0\u3068\u80CC\u666F\u3092\u8679\u8272\u306B\u5F69\u308A\u307E\u3059\u3002"
+      - "Colorea tu apodo y su fondo con tonos de arco\xEDris."
+      - "D\xEA ao seu apelido e ao fundo tons de arco-\xEDris."
+      - Colorez votre pseudo et son fond aux couleurs de l'arc-en-ciel.
+      - "F\xE4rbe deinen Namen und seinen Hintergrund in Regenbogenfarben."
+      - Warnai nama panggilan dan latarnya dengan warna pelangi.
+      - "\u0909\u092A\u0928\u093E\u092E \u0914\u0930 \u0909\u0938\u0915\u0940 \u092A\u0943\u0937\u094D\u0920\u092D\u0942\u092E\u093F
+        \u0915\u094B \u0907\u0902\u0926\u094D\u0930\u0927\u0928\u0941\u0937\u0940
         \u0930\u0902\u0917\u094B\u0902 \u0938\u0947 \u0938\u091C\u093E\u090F\u0901\u0964"
-      - "\u0644\u0648\u0651\u0646 \u0627\u0633\u0645\u0643 \u0628\u0623\u0644\u0648\u0627\u0646
-        \u0642\u0648\u0633 \u0642\u0632\u062D."
+      - "\u0644\u0648\u0651\u0646 \u0627\u0633\u0645\u0643 \u0648\u062E\u0644\u0641\u064A\u062A\u0647
+        \u0628\u0623\u0644\u0648\u0627\u0646 \u0642\u0648\u0633 \u0642\u0632\u062D."
       Flags: 000000000000000000000000
       Languages_Touch: []
-    - Term: UI/65Sw65y77ZWcIO2Zqeq4iOu5m-ycvOuhnCDri4nrhKTsnoTsnYQg6r6466mw7JqULg
+    - Term: UI/65Sw65y77ZWcIO2Zqeq4iOu5m-ycvOuhnCDri4nrhKTsnoQg67Cw6rK96rmM7KeAIOq-uOupsOyalC4
       TermType: 0
-      Description: "\uB530\uB73B\uD55C \uD669\uAE08\uBE5B\uC73C\uB85C \uB2C9\uB124\uC784\uC744
-        \uAFB8\uBA70\uC694."
+      Description: "\uB530\uB73B\uD55C \uD669\uAE08\uBE5B\uC73C\uB85C \uB2C9\uB124\uC784
+        \uBC30\uACBD\uAE4C\uC9C0 \uAFB8\uBA70\uC694."
       Languages:
-      - "\uB530\uB73B\uD55C \uD669\uAE08\uBE5B\uC73C\uB85C \uB2C9\uB124\uC784\uC744
+      - "\uB530\uB73B\uD55C \uD669\uAE08\uBE5B\uC73C\uB85C \uB2C9\uB124\uC784 \uBC30\uACBD\uAE4C\uC9C0
         \uAFB8\uBA70\uC694."
-      - Decorate your nickname with warm golden hues.
-      - "\u7528\u6E29\u6696\u91D1\u8272\u88C5\u9970\u6635\u79F0\u3002"
-      - "\u7528\u6EAB\u6696\u91D1\u8272\u88DD\u98FE\u66B1\u7A31\u3002"
-      - "\u30CB\u30C3\u30AF\u30CD\u30FC\u30E0\u3092\u6696\u304B\u306A\u91D1\u8272\u3067\u98FE\u308A\u307E\u3059\u3002"
-      - "Decora tu apodo con c\xE1lidos tonos dorados."
-      - Decore seu apelido com tons dourados.
-      - "D\xE9corez votre pseudo de teintes dor\xE9es chaleureuses."
-      - "Schm\xFCcke deinen Namen mit warmem Gold."
-      - Hiasi nama panggilan dengan warna emas hangat.
-      - "\u0909\u092A\u0928\u093E\u092E \u0915\u094B \u0938\u0941\u0928\u0939\u0930\u0947
+      - Decorate your nickname and its background with warm golden hues.
+      - "\u7528\u6E29\u6696\u91D1\u8272\u88C5\u9970\u6635\u79F0\u53CA\u5176\u80CC\u666F\u3002"
+      - "\u7528\u6EAB\u6696\u91D1\u8272\u88DD\u98FE\u66B1\u7A31\u53CA\u5176\u80CC\u666F\u3002"
+      - "\u30CB\u30C3\u30AF\u30CD\u30FC\u30E0\u3068\u80CC\u666F\u3092\u6696\u304B\u306A\u91D1\u8272\u3067\u98FE\u308A\u307E\u3059\u3002"
+      - "Decora tu apodo y su fondo con c\xE1lidos tonos dorados."
+      - Decore seu apelido e o fundo com tons dourados.
+      - "D\xE9corez votre pseudo et son fond de teintes dor\xE9es chaleureuses."
+      - "Schm\xFCcke deinen Namen und seinen Hintergrund mit warmem Gold."
+      - Hiasi nama panggilan dan latarnya dengan warna emas hangat.
+      - "\u0909\u092A\u0928\u093E\u092E \u0914\u0930 \u0909\u0938\u0915\u0940 \u092A\u0943\u0937\u094D\u0920\u092D\u0942\u092E\u093F
+        \u0915\u094B \u0938\u0941\u0928\u0939\u0930\u0947 \u0930\u0902\u0917 \u0938\u0947
+        \u0938\u091C\u093E\u090F\u0901\u0964"
+      - "\u0632\u064A\u0651\u0646 \u0627\u0633\u0645\u0643 \u0648\u062E\u0644\u0641\u064A\u062A\u0647
+        \u0628\u062F\u0631\u062C\u0627\u062A \u0630\u0647\u0628\u064A\u0629 \u062F\u0627\u0641\u0626\u0629."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7IKw65y77ZWcIOuvvO2KuOu5m-ycvOuhnCDri4nrhKTsnoQg67Cw6rK96rmM7KeAIOq-uOupsOyalC4
+      TermType: 0
+      Description: "\uC0B0\uB73B\uD55C \uBBFC\uD2B8\uBE5B\uC73C\uB85C \uB2C9\uB124\uC784
+        \uBC30\uACBD\uAE4C\uC9C0 \uAFB8\uBA70\uC694."
+      Languages:
+      - "\uC0B0\uB73B\uD55C \uBBFC\uD2B8\uBE5B\uC73C\uB85C \uB2C9\uB124\uC784 \uBC30\uACBD\uAE4C\uC9C0
+        \uAFB8\uBA70\uC694."
+      - Decorate your nickname and its background with fresh mint hues.
+      - "\u7528\u6E05\u65B0\u8584\u8377\u8272\u88C5\u9970\u6635\u79F0\u53CA\u5176\u80CC\u666F\u3002"
+      - "\u7528\u6E05\u65B0\u8584\u8377\u8272\u88DD\u98FE\u66B1\u7A31\u53CA\u5176\u80CC\u666F\u3002"
+      - "\u30CB\u30C3\u30AF\u30CD\u30FC\u30E0\u3068\u80CC\u666F\u3092\u723D\u3084\u304B\u306A\u30DF\u30F3\u30C8\u8272\u3067\u98FE\u308A\u307E\u3059\u3002"
+      - Decora tu apodo y su fondo con frescos tonos menta.
+      - Decore seu apelido e o fundo com tons frescos de menta.
+      - "D\xE9corez votre pseudo et son fond de teintes menthe fra\xEEches."
+      - "Schm\xFCcke deinen Namen und seinen Hintergrund mit frischem Mint."
+      - Hiasi nama panggilan dan latarnya dengan warna mint segar.
+      - "\u0909\u092A\u0928\u093E\u092E \u0914\u0930 \u0909\u0938\u0915\u0940 \u092A\u0943\u0937\u094D\u0920\u092D\u0942\u092E\u093F
+        \u0915\u094B \u0924\u093E\u091C\u093C\u0947 \u092E\u093F\u0902\u091F \u0930\u0902\u0917
+        \u0938\u0947 \u0938\u091C\u093E\u090F\u0901\u0964"
+      - "\u0632\u064A\u0651\u0646 \u0627\u0633\u0645\u0643 \u0648\u062E\u0644\u0641\u064A\u062A\u0647
+        \u0628\u062F\u0631\u062C\u0627\u062A \u0627\u0644\u0646\u0639\u0646\u0627\u0639
+        \u0627\u0644\u0645\u0646\u0639\u0634\u0629."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7ISg66qF7ZWcIOuEpOyYqOu5m-ycvOuhnCDri4nrhKTsnoQg67Cw6rK96rmM7KeAIOq-uOupsOyalC4
+      TermType: 0
+      Description: "\uC120\uBA85\uD55C \uB124\uC628\uBE5B\uC73C\uB85C \uB2C9\uB124\uC784
+        \uBC30\uACBD\uAE4C\uC9C0 \uAFB8\uBA70\uC694."
+      Languages:
+      - "\uC120\uBA85\uD55C \uB124\uC628\uBE5B\uC73C\uB85C \uB2C9\uB124\uC784 \uBC30\uACBD\uAE4C\uC9C0
+        \uAFB8\uBA70\uC694."
+      - Decorate your nickname and its background with vivid neon hues.
+      - "\u7528\u9C9C\u8273\u9713\u8679\u8272\u88C5\u9970\u6635\u79F0\u53CA\u5176\u80CC\u666F\u3002"
+      - "\u7528\u9BAE\u8C54\u9713\u8679\u8272\u88DD\u98FE\u66B1\u7A31\u53CA\u5176\u80CC\u666F\u3002"
+      - "\u30CB\u30C3\u30AF\u30CD\u30FC\u30E0\u3068\u80CC\u666F\u3092\u9BAE\u3084\u304B\u306A\u30CD\u30AA\u30F3\u8272\u3067\u98FE\u308A\u307E\u3059\u3002"
+      - "Decora tu apodo y su fondo con vivos tonos ne\xF3n."
+      - Decore seu apelido e o fundo com tons vivos de neon.
+      - "D\xE9corez votre pseudo et son fond de teintes n\xE9on vives."
+      - "Schm\xFCcke deinen Namen und seinen Hintergrund mit leuchtendem Neon."
+      - Hiasi nama panggilan dan latarnya dengan warna neon cerah.
+      - "\u0909\u092A\u0928\u093E\u092E \u0914\u0930 \u0909\u0938\u0915\u0940 \u092A\u0943\u0937\u094D\u0920\u092D\u0942\u092E\u093F
+        \u0915\u094B \u091A\u092E\u0915\u0940\u0932\u0947 \u0928\u093F\u092F\u0949\u0928
         \u0930\u0902\u0917 \u0938\u0947 \u0938\u091C\u093E\u090F\u0901\u0964"
-      - "\u0632\u064A\u0651\u0646 \u0627\u0633\u0645\u0643 \u0628\u062F\u0631\u062C\u0627\u062A
-        \u0630\u0647\u0628\u064A\u0629 \u062F\u0627\u0641\u0626\u0629."
+      - "\u0632\u064A\u0651\u0646 \u0627\u0633\u0645\u0643 \u0648\u062E\u0644\u0641\u064A\u062A\u0647
+        \u0628\u062F\u0631\u062C\u0627\u062A \u0646\u064A\u0648\u0646 \u0632\u0627\u0647\u064A\u0629."
       Flags: 000000000000000000000000
       Languages_Touch: []
-    - Term: UI/7IKw65y77ZWcIOuvvO2KuOu5m-ycvOuhnCDri4nrhKTsnoTsnYQg6r6466mw7JqULg
+    - Term: UI/67aE7ZmN67mbIOuFuOydhCDsg4nsnLzroZwg64uJ64Sk7J6EIOuwsOqyveq5jOyngCDqvrjrqbDsmpQu
       TermType: 0
-      Description: "\uC0B0\uB73B\uD55C \uBBFC\uD2B8\uBE5B\uC73C\uB85C \uB2C9\uB124\uC784\uC744
-        \uAFB8\uBA70\uC694."
+      Description: "\uBD84\uD64D\uBE5B \uB178\uC744 \uC0C9\uC73C\uB85C \uB2C9\uB124\uC784
+        \uBC30\uACBD\uAE4C\uC9C0 \uAFB8\uBA70\uC694."
       Languages:
-      - "\uC0B0\uB73B\uD55C \uBBFC\uD2B8\uBE5B\uC73C\uB85C \uB2C9\uB124\uC784\uC744
+      - "\uBD84\uD64D\uBE5B \uB178\uC744 \uC0C9\uC73C\uB85C \uB2C9\uB124\uC784 \uBC30\uACBD\uAE4C\uC9C0
         \uAFB8\uBA70\uC694."
-      - Decorate your nickname with fresh mint hues.
-      - "\u7528\u6E05\u65B0\u8584\u8377\u8272\u88C5\u9970\u6635\u79F0\u3002"
-      - "\u7528\u6E05\u65B0\u8584\u8377\u8272\u88DD\u98FE\u66B1\u7A31\u3002"
-      - "\u30CB\u30C3\u30AF\u30CD\u30FC\u30E0\u3092\u723D\u3084\u304B\u306A\u30DF\u30F3\u30C8\u8272\u3067\u98FE\u308A\u307E\u3059\u3002"
-      - Decora tu apodo con frescos tonos menta.
-      - Decore seu apelido com tons frescos de menta.
-      - "D\xE9corez votre pseudo de teintes menthe fra\xEEches."
-      - "Schm\xFCcke deinen Namen mit frischem Mint."
-      - Hiasi nama panggilan dengan warna mint segar.
-      - "\u0909\u092A\u0928\u093E\u092E \u0915\u094B \u0924\u093E\u091C\u093C\u0947
-        \u092E\u093F\u0902\u091F \u0930\u0902\u0917 \u0938\u0947 \u0938\u091C\u093E\u090F\u0901\u0964"
-      - "\u0632\u064A\u0651\u0646 \u0627\u0633\u0645\u0643 \u0628\u062F\u0631\u062C\u0627\u062A
-        \u0627\u0644\u0646\u0639\u0646\u0627\u0639 \u0627\u0644\u0645\u0646\u0639\u0634\u0629."
-      Flags: 000000000000000000000000
-      Languages_Touch: []
-    - Term: UI/7ISg66qF7ZWcIOuEpOyYqOu5m-ycvOuhnCDri4nrhKTsnoTsnYQg6r6466mw7JqULg
-      TermType: 0
-      Description: "\uC120\uBA85\uD55C \uB124\uC628\uBE5B\uC73C\uB85C \uB2C9\uB124\uC784\uC744
-        \uAFB8\uBA70\uC694."
-      Languages:
-      - "\uC120\uBA85\uD55C \uB124\uC628\uBE5B\uC73C\uB85C \uB2C9\uB124\uC784\uC744
-        \uAFB8\uBA70\uC694."
-      - Decorate your nickname with vivid neon hues.
-      - "\u7528\u9C9C\u8273\u9713\u8679\u8272\u88C5\u9970\u6635\u79F0\u3002"
-      - "\u7528\u9BAE\u8C54\u9713\u8679\u8272\u88DD\u98FE\u66B1\u7A31\u3002"
-      - "\u30CB\u30C3\u30AF\u30CD\u30FC\u30E0\u3092\u9BAE\u3084\u304B\u306A\u30CD\u30AA\u30F3\u8272\u3067\u98FE\u308A\u307E\u3059\u3002"
-      - "Decora tu apodo con vivos tonos ne\xF3n."
-      - Decore seu apelido com tons vivos de neon.
-      - "D\xE9corez votre pseudo de teintes n\xE9on vives."
-      - "Schm\xFCcke deinen Namen mit leuchtendem Neon."
-      - Hiasi nama panggilan dengan warna neon cerah.
-      - "\u0909\u092A\u0928\u093E\u092E \u0915\u094B \u091A\u092E\u0915\u0940\u0932\u0947
-        \u0928\u093F\u092F\u0949\u0928 \u0930\u0902\u0917 \u0938\u0947 \u0938\u091C\u093E\u090F\u0901\u0964"
-      - "\u0632\u064A\u0651\u0646 \u0627\u0633\u0645\u0643 \u0628\u062F\u0631\u062C\u0627\u062A
-        \u0646\u064A\u0648\u0646 \u0632\u0627\u0647\u064A\u0629."
-      Flags: 000000000000000000000000
-      Languages_Touch: []
-    - Term: UI/67aE7ZmN67mbIOuFuOydhCDsg4nsnLzroZwg64uJ64Sk7J6E7J2EIOq-uOupsOyalC4
-      TermType: 0
-      Description: "\uBD84\uD64D\uBE5B \uB178\uC744 \uC0C9\uC73C\uB85C \uB2C9\uB124\uC784\uC744
-        \uAFB8\uBA70\uC694."
-      Languages:
-      - "\uBD84\uD64D\uBE5B \uB178\uC744 \uC0C9\uC73C\uB85C \uB2C9\uB124\uC784\uC744
-        \uAFB8\uBA70\uC694."
-      - Decorate your nickname with pink sunset hues.
-      - "\u7528\u7C89\u8272\u665A\u971E\u88C5\u9970\u6635\u79F0\u3002"
-      - "\u7528\u7C89\u8272\u665A\u971E\u88DD\u98FE\u66B1\u7A31\u3002"
-      - "\u30CB\u30C3\u30AF\u30CD\u30FC\u30E0\u3092\u30D4\u30F3\u30AF\u306E\u5915\u713C\u3051\u8272\u3067\u98FE\u308A\u307E\u3059\u3002"
-      - Decora tu apodo con tonos de un atardecer rosa.
-      - "Decore seu apelido com tons rosados do p\xF4r do sol."
-      - "D\xE9corez votre pseudo de teintes roses du cr\xE9puscule."
-      - "Schm\xFCcke deinen Namen mit rosa Abendfarben."
-      - Hiasi nama panggilan dengan warna senja merah muda.
-      - "\u0909\u092A\u0928\u093E\u092E \u0915\u094B \u0917\u0941\u0932\u093E\u092C\u0940
-        \u0938\u093E\u0901\u091D \u0915\u0947 \u0930\u0902\u0917 \u0938\u0947 \u0938\u091C\u093E\u090F\u0901\u0964"
-      - "\u0632\u064A\u0651\u0646 \u0627\u0633\u0645\u0643 \u0628\u062F\u0631\u062C\u0627\u062A
-        \u0627\u0644\u063A\u0631\u0648\u0628 \u0627\u0644\u0648\u0631\u062F\u064A\u0629."
+      - Decorate your nickname and its background with pink sunset hues.
+      - "\u7528\u7C89\u8272\u665A\u971E\u88C5\u9970\u6635\u79F0\u53CA\u5176\u80CC\u666F\u3002"
+      - "\u7528\u7C89\u8272\u665A\u971E\u88DD\u98FE\u66B1\u7A31\u53CA\u5176\u80CC\u666F\u3002"
+      - "\u30CB\u30C3\u30AF\u30CD\u30FC\u30E0\u3068\u80CC\u666F\u3092\u30D4\u30F3\u30AF\u306E\u5915\u713C\u3051\u8272\u3067\u98FE\u308A\u307E\u3059\u3002"
+      - Decora tu apodo y su fondo con tonos de un atardecer rosa.
+      - "Decore seu apelido e o fundo com tons rosados do p\xF4r do sol."
+      - "D\xE9corez votre pseudo et son fond de teintes roses du cr\xE9puscule."
+      - "Schm\xFCcke deinen Namen und seinen Hintergrund mit rosa Abendfarben."
+      - Hiasi nama panggilan dan latarnya dengan warna senja merah muda.
+      - "\u0909\u092A\u0928\u093E\u092E \u0914\u0930 \u0909\u0938\u0915\u0940 \u092A\u0943\u0937\u094D\u0920\u092D\u0942\u092E\u093F
+        \u0915\u094B \u0917\u0941\u0932\u093E\u092C\u0940 \u0938\u093E\u0901\u091D
+        \u0915\u0947 \u0930\u0902\u0917 \u0938\u0947 \u0938\u091C\u093E\u090F\u0901\u0964"
+      - "\u0632\u064A\u0651\u0646 \u0627\u0633\u0645\u0643 \u0648\u062E\u0644\u0641\u064A\u062A\u0647
+        \u0628\u062F\u0631\u062C\u0627\u062A \u0627\u0644\u063A\u0631\u0648\u0628
+        \u0627\u0644\u0648\u0631\u062F\u064A\u0629."
       Flags: 000000000000000000000000
       Languages_Touch: []
     - Term: UI/7LqQ66at7YSwIOuSpOuhnCDsmKTroZzrnbzruZvsnbQg7Y687LOQ7KC47JqULg
@@ -13813,6 +13821,873 @@ MonoBehaviour:
       - "\u0644\u0627 \u062A\u0648\u062C\u062F \u063A\u0631\u0641 \u0645\u062A\u0627\u062D\u0629
         \u0644\u0644\u0627\u0646\u0636\u0645\u0627\u0645. \u062C\u0631\u0651\u0628
         \u0625\u0646\u0634\u0627\u0621 \u063A\u0631\u0641\u0629 \u062C\u062F\u064A\u062F\u0629."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7KO87KCcIOyWuOyWtA
+      TermType: 0
+      Description: "\uC8FC\uC81C \uC5B8\uC5B4"
+      Languages:
+      - "\uC8FC\uC81C \uC5B8\uC5B4"
+      - Topic language
+      - "\u4E3B\u9898\u8BED\u8A00"
+      - "\u4E3B\u984C\u8A9E\u8A00"
+      - "\u304A\u984C\u306E\u8A00\u8A9E"
+      - Idioma de los temas
+      - Idioma dos temas
+      - "Langue des th\xE8mes"
+      - Themensprache
+      - Bahasa topik
+      - "\u0935\u093F\u0937\u092F \u0915\u0940 \u092D\u093E\u0937\u093E"
+      - "\u0644\u063A\u0629 \u0627\u0644\u0645\u0648\u0627\u0636\u064A\u0639"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7LGE7YyFIOyIqOq4sOq4sA
+      TermType: 0
+      Description: "\uCC44\uD305 \uC228\uAE30\uAE30"
+      Languages:
+      - "\uCC44\uD305 \uC228\uAE30\uAE30"
+      - Hide chat
+      - "\u9690\u85CF\u804A\u5929"
+      - "\u96B1\u85CF\u804A\u5929"
+      - "\u30C1\u30E3\u30C3\u30C8\u3092\u975E\u8868\u793A"
+      - Ocultar chat
+      - Ocultar chat
+      - Masquer le chat
+      - Chat ausblenden
+      - Sembunyikan obrolan
+      - "\u091A\u0948\u091F \u091B\u093F\u092A\u093E\u090F\u0901"
+      - "\u0625\u062E\u0641\u0627\u0621 \u0627\u0644\u062F\u0631\u062F\u0634\u0629"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7LGE7YyFIOuztOydtOq4sA
+      TermType: 0
+      Description: "\uCC44\uD305 \uBCF4\uC774\uAE30"
+      Languages:
+      - "\uCC44\uD305 \uBCF4\uC774\uAE30"
+      - Show chat
+      - "\u663E\u793A\u804A\u5929"
+      - "\u986F\u793A\u804A\u5929"
+      - "\u30C1\u30E3\u30C3\u30C8\u3092\u8868\u793A"
+      - Mostrar chat
+      - Mostrar chat
+      - Afficher le chat
+      - Chat anzeigen
+      - Tampilkan obrolan
+      - "\u091A\u0948\u091F \u0926\u093F\u0916\u093E\u090F\u0901"
+      - "\u0625\u0638\u0647\u0627\u0631 \u0627\u0644\u062F\u0631\u062F\u0634\u0629"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7LGE7YyF7J2EIOuLpOyLnCDtkZzsi5ztlanri4jri6Qu
+      TermType: 0
+      Description: "\uCC44\uD305\uC744 \uB2E4\uC2DC \uD45C\uC2DC\uD569\uB2C8\uB2E4."
+      Languages:
+      - "\uCC44\uD305\uC744 \uB2E4\uC2DC \uD45C\uC2DC\uD569\uB2C8\uB2E4."
+      - Chat will be shown again.
+      - "\u5C06\u91CD\u65B0\u663E\u793A\u804A\u5929\u3002"
+      - "\u5C07\u91CD\u65B0\u986F\u793A\u804A\u5929\u3002"
+      - "\u30C1\u30E3\u30C3\u30C8\u3092\u518D\u3073\u8868\u793A\u3057\u307E\u3059\u3002"
+      - "El chat se mostrar\xE1 de nuevo."
+      - "O chat ser\xE1 exibido novamente."
+      - "Le chat est de nouveau affich\xE9."
+      - Der Chat wird wieder angezeigt.
+      - Obrolan akan ditampilkan lagi.
+      - "\u091A\u0948\u091F \u092B\u093F\u0930 \u0938\u0947 \u0926\u093F\u0916\u0947\u0917\u0940\u0964"
+      - "\u0633\u064A\u062A\u0645 \u0639\u0631\u0636 \u0627\u0644\u062F\u0631\u062F\u0634\u0629
+        \u0645\u062C\u062F\u062F\u064B\u0627."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7J20IOq4sOq4sOyXkOyEnCDsnbQg7ZSM66CI7J207Ja07J2YIOyxhO2MheydhCDsiKjqsrzsirXri4jri6Qu
+      TermType: 0
+      Description: "\uC774 \uAE30\uAE30\uC5D0\uC11C \uC774 \uD50C\uB808\uC774\uC5B4\uC758
+        \uCC44\uD305\uC744 \uC228\uACBC\uC2B5\uB2C8\uB2E4."
+      Languages:
+      - "\uC774 \uAE30\uAE30\uC5D0\uC11C \uC774 \uD50C\uB808\uC774\uC5B4\uC758 \uCC44\uD305\uC744
+        \uC228\uACBC\uC2B5\uB2C8\uB2E4."
+      - This player's chat is hidden on this device.
+      - "\u5DF2\u5728\u6B64\u8BBE\u5907\u4E0A\u9690\u85CF\u8BE5\u73A9\u5BB6\u7684\u804A\u5929\u3002"
+      - "\u5DF2\u5728\u6B64\u88DD\u7F6E\u4E0A\u96B1\u85CF\u8A72\u73A9\u5BB6\u7684\u804A\u5929\u3002"
+      - "\u3053\u306E\u7AEF\u672B\u3067\u3053\u306E\u30D7\u30EC\u30A4\u30E4\u30FC\u306E\u30C1\u30E3\u30C3\u30C8\u3092\u975E\u8868\u793A\u306B\u3057\u307E\u3057\u305F\u3002"
+      - "El chat de este jugador est\xE1 oculto en este dispositivo."
+      - O chat deste jogador foi ocultado neste dispositivo.
+      - "Le chat de ce joueur est masqu\xE9 sur cet appareil."
+      - "Der Chat dieses Spielers ist auf diesem Ger\xE4t ausgeblendet."
+      - Obrolan pemain ini disembunyikan di perangkat ini.
+      - "\u0907\u0938 \u0921\u093F\u0935\u093E\u0907\u0938 \u092A\u0930 \u0907\u0938
+        \u0916\u093F\u0932\u093E\u0921\u093C\u0940 \u0915\u0940 \u091A\u0948\u091F
+        \u091B\u093F\u092A\u093E \u0926\u0940 \u0917\u0908 \u0939\u0948\u0964"
+      - "\u062A\u0645 \u0625\u062E\u0641\u0627\u0621 \u062F\u0631\u062F\u0634\u0629
+        \u0647\u0630\u0627 \u0627\u0644\u0644\u0627\u0639\u0628 \u0639\u0644\u0649
+        \u0647\u0630\u0627 \u0627\u0644\u062C\u0647\u0627\u0632."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7LCo64uoIO2VtOygnA
+      TermType: 0
+      Description: "\uCC28\uB2E8 \uD574\uC81C"
+      Languages:
+      - "\uCC28\uB2E8 \uD574\uC81C"
+      - Unblock
+      - "\u53D6\u6D88\u5C4F\u853D"
+      - "\u89E3\u9664\u5C01\u9396"
+      - "\u30D6\u30ED\u30C3\u30AF\u89E3\u9664"
+      - Desbloquear
+      - Desbloquear
+      - "D\xE9bloquer"
+      - Blockierung aufheben
+      - Buka blokir
+      - "\u0905\u0928\u092C\u094D\u0932\u0949\u0915 \u0915\u0930\u0947\u0902"
+      - "\u0625\u0644\u063A\u0627\u0621 \u0627\u0644\u062D\u0638\u0631"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7LCo64uoIO2ZleyduA
+      TermType: 0
+      Description: "\uCC28\uB2E8 \uD655\uC778"
+      Languages:
+      - "\uCC28\uB2E8 \uD655\uC778"
+      - Confirm block
+      - "\u786E\u8BA4\u5C4F\u853D"
+      - "\u78BA\u8A8D\u5C01\u9396"
+      - "\u30D6\u30ED\u30C3\u30AF\u3092\u78BA\u5B9A"
+      - Confirmar bloqueo
+      - Confirmar bloqueio
+      - Confirmer le blocage
+      - "Blockieren best\xE4tigen"
+      - Konfirmasi blokir
+      - "\u092C\u094D\u0932\u0949\u0915 \u0915\u0940 \u092A\u0941\u0937\u094D\u091F\u093F
+        \u0915\u0930\u0947\u0902"
+      - "\u062A\u0623\u0643\u064A\u062F \u0627\u0644\u062D\u0638\u0631"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7LCo64uo
+      TermType: 0
+      Description: "\uCC28\uB2E8"
+      Languages:
+      - "\uCC28\uB2E8"
+      - Block
+      - "\u5C4F\u853D"
+      - "\u5C01\u9396"
+      - "\u30D6\u30ED\u30C3\u30AF"
+      - Bloquear
+      - Bloquear
+      - Bloquer
+      - Blockieren
+      - Blokir
+      - "\u092C\u094D\u0932\u0949\u0915 \u0915\u0930\u0947\u0902"
+      - "\u062D\u0638\u0631"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7LCo64uo7ZWY66m0IOy5nOq1rCDqtIDqs4TqsIAg64GK6riw6rOgIOyxhO2MheydtCDrs7TsnbTsp4Ag7JWK7Iq164uI64ukLiDtlZwg67KIIOuNlCDriITrpbTrqbQg7LCo64uo7ZWp64uI64ukLg
+      TermType: 0
+      Description: "\uCC28\uB2E8\uD558\uBA74 \uCE5C\uAD6C \uAD00\uACC4\uAC00 \uB04A\uAE30\uACE0
+        \uCC44\uD305\uC774 \uBCF4\uC774\uC9C0 \uC54A\uC2B5\uB2C8\uB2E4. \uD55C \uBC88
+        \uB354 \uB204\uB974\uBA74 \uCC28\uB2E8\uD569\uB2C8\uB2E4."
+      Languages:
+      - "\uCC28\uB2E8\uD558\uBA74 \uCE5C\uAD6C \uAD00\uACC4\uAC00 \uB04A\uAE30\uACE0
+        \uCC44\uD305\uC774 \uBCF4\uC774\uC9C0 \uC54A\uC2B5\uB2C8\uB2E4. \uD55C \uBC88
+        \uB354 \uB204\uB974\uBA74 \uCC28\uB2E8\uD569\uB2C8\uB2E4."
+      - Blocking removes this friend and hides their chat. Tap again to block.
+      - "\u5C4F\u853D\u540E\u5C06\u89E3\u9664\u597D\u53CB\u5173\u7CFB\u5E76\u9690\u85CF\u5176\u804A\u5929\u3002\u518D\u70B9\u4E00\u6B21\u5373\u53EF\u5C4F\u853D\u3002"
+      - "\u5C01\u9396\u5F8C\u5C07\u89E3\u9664\u597D\u53CB\u95DC\u4FC2\u4E26\u96B1\u85CF\u5176\u804A\u5929\u3002\u518D\u9EDE\u4E00\u6B21\u5373\u53EF\u5C01\u9396\u3002"
+      - "\u30D6\u30ED\u30C3\u30AF\u3059\u308B\u3068\u30D5\u30EC\u30F3\u30C9\u304C\u89E3\u9664\u3055\u308C\u3001\u30C1\u30E3\u30C3\u30C8\u304C\u8868\u793A\u3055\u308C\u306A\u304F\u306A\u308A\u307E\u3059\u3002\u3082\u3046\u4E00\u5EA6\u62BC\u3059\u3068\u30D6\u30ED\u30C3\u30AF\u3057\u307E\u3059\u3002"
+      - Al bloquear se elimina la amistad y se oculta su chat. Pulsa de nuevo para
+        bloquear.
+      - "Ao bloquear, a amizade \xE9 desfeita e o chat fica oculto. Toque de novo
+        para bloquear."
+      - Bloquer supprime l'ami et masque son chat. Appuyez de nouveau pour bloquer.
+      - Beim Blockieren wird die Freundschaft beendet und der Chat ausgeblendet.
+        Zum Blockieren erneut tippen.
+      - Memblokir akan menghapus pertemanan dan menyembunyikan obrolannya. Ketuk
+        lagi untuk memblokir.
+      - "\u092C\u094D\u0932\u0949\u0915 \u0915\u0930\u0928\u0947 \u092A\u0930 \u0926\u094B\u0938\u094D\u0924\u0940
+        \u0939\u091F \u091C\u093E\u090F\u0917\u0940 \u0914\u0930 \u091A\u0948\u091F
+        \u0928\u0939\u0940\u0902 \u0926\u093F\u0916\u0947\u0917\u0940\u0964 \u092C\u094D\u0932\u0949\u0915
+        \u0915\u0930\u0928\u0947 \u0915\u0947 \u0932\u093F\u090F \u092B\u093F\u0930
+        \u0938\u0947 \u0926\u092C\u093E\u090F\u0901\u0964"
+      - "\u0627\u0644\u062D\u0638\u0631 \u064A\u0632\u064A\u0644 \u0627\u0644\u0635\u062F\u0627\u0642\u0629
+        \u0648\u064A\u062E\u0641\u064A \u062F\u0631\u062F\u0634\u062A\u0647. \u0627\u0636\u063A\u0637
+        \u0645\u0631\u0629 \u0623\u062E\u0631\u0649 \u0644\u0644\u062D\u0638\u0631."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7Iug6rOg
+      TermType: 0
+      Description: "\uC2E0\uACE0"
+      Languages:
+      - "\uC2E0\uACE0"
+      - Report
+      - "\u4E3E\u62A5"
+      - "\u6AA2\u8209"
+      - "\u901A\u5831"
+      - Denunciar
+      - Denunciar
+      - Signaler
+      - Melden
+      - Laporkan
+      - "\u0930\u093F\u092A\u094B\u0930\u094D\u091F \u0915\u0930\u0947\u0902"
+      - "\u0625\u0628\u0644\u0627\u063A"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7Iug6rOgIOyCrOycoA
+      TermType: 0
+      Description: "\uC2E0\uACE0 \uC0AC\uC720"
+      Languages:
+      - "\uC2E0\uACE0 \uC0AC\uC720"
+      - Reason
+      - "\u4E3E\u62A5\u539F\u56E0"
+      - "\u6AA2\u8209\u539F\u56E0"
+      - "\u901A\u5831\u7406\u7531"
+      - Motivo
+      - Motivo
+      - Motif
+      - Grund
+      - Alasan
+      - "\u0915\u093E\u0930\u0923"
+      - "\u0627\u0644\u0633\u0628\u0628"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7J6Q7IS47ZWcIOuCtOyaqSAo7ISg7YOdKQ
+      TermType: 0
+      Description: "\uC790\uC138\uD55C \uB0B4\uC6A9 (\uC120\uD0DD)"
+      Languages:
+      - "\uC790\uC138\uD55C \uB0B4\uC6A9 (\uC120\uD0DD)"
+      - Details (optional)
+      - "\u8BE6\u7EC6\u8BF4\u660E\uFF08\u53EF\u9009\uFF09"
+      - "\u8A73\u7D30\u8AAA\u660E\uFF08\u9078\u586B\uFF09"
+      - "\u8A73\u7D30\uFF08\u4EFB\u610F\uFF09"
+      - Detalles (opcional)
+      - Detalhes (opcional)
+      - "D\xE9tails (facultatif)"
+      - Details (optional)
+      - Detail (opsional)
+      - "\u0935\u093F\u0935\u0930\u0923 (\u0935\u0948\u0915\u0932\u094D\u092A\u093F\u0915)"
+      - "\u0627\u0644\u062A\u0641\u0627\u0635\u064A\u0644 (\u0627\u062E\u062A\u064A\u0627\u0631\u064A)"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7Iug6rOg7ZWY6riw
+      TermType: 0
+      Description: "\uC2E0\uACE0\uD558\uAE30"
+      Languages:
+      - "\uC2E0\uACE0\uD558\uAE30"
+      - Submit report
+      - "\u63D0\u4EA4\u4E3E\u62A5"
+      - "\u9001\u51FA\u6AA2\u8209"
+      - "\u901A\u5831\u3059\u308B"
+      - Enviar denuncia
+      - "Enviar den\xFAncia"
+      - Envoyer le signalement
+      - Meldung senden
+      - Kirim laporan
+      - "\u0930\u093F\u092A\u094B\u0930\u094D\u091F \u092D\u0947\u091C\u0947\u0902"
+      - "\u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0628\u0644\u0627\u063A"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7JqV7ISkwrfruYTtlZg
+      TermType: 0
+      Description: "\uC695\uC124\xB7\uBE44\uD558"
+      Languages:
+      - "\uC695\uC124\xB7\uBE44\uD558"
+      - Abuse or insults
+      - "\u8FB1\u9A82\u6216\u8D2C\u4F4E"
+      - "\u8FB1\u7F75\u6216\u8CB6\u4F4E"
+      - "\u66B4\u8A00\u30FB\u4FAE\u8FB1"
+      - Insultos o acoso
+      - Ofensas ou insultos
+      - "Insultes ou harc\xE8lement"
+      - Beleidigung
+      - Kata kasar atau hinaan
+      - "\u0917\u093E\u0932\u0940 \u092F\u093E \u0905\u092A\u092E\u093E\u0928"
+      - "\u0625\u0633\u0627\u0621\u0629 \u0623\u0648 \u0634\u062A\u0627\u0626\u0645"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/67aA7KCB7KCI7ZWcIOq3uOumvA
+      TermType: 0
+      Description: "\uBD80\uC801\uC808\uD55C \uADF8\uB9BC"
+      Languages:
+      - "\uBD80\uC801\uC808\uD55C \uADF8\uB9BC"
+      - Inappropriate drawing
+      - "\u4E0D\u5F53\u753B\u4F5C"
+      - "\u4E0D\u7576\u756B\u4F5C"
+      - "\u4E0D\u9069\u5207\u306A\u7D75"
+      - Dibujo inapropiado
+      - "Desenho impr\xF3prio"
+      - "Dessin inappropri\xE9"
+      - Unangemessene Zeichnung
+      - Gambar tidak pantas
+      - "\u0905\u0928\u0941\u091A\u093F\u0924 \u091A\u093F\u0924\u094D\u0930"
+      - "\u0631\u0633\u0645 \u063A\u064A\u0631 \u0644\u0627\u0626\u0642"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/67aA7KCB7KCI7ZWcIOuLieuEpOyehA
+      TermType: 0
+      Description: "\uBD80\uC801\uC808\uD55C \uB2C9\uB124\uC784"
+      Languages:
+      - "\uBD80\uC801\uC808\uD55C \uB2C9\uB124\uC784"
+      - Inappropriate nickname
+      - "\u4E0D\u5F53\u6635\u79F0"
+      - "\u4E0D\u7576\u66B1\u7A31"
+      - "\u4E0D\u9069\u5207\u306A\u30CB\u30C3\u30AF\u30CD\u30FC\u30E0"
+      - Apodo inapropiado
+      - "Apelido impr\xF3prio"
+      - "Pseudo inappropri\xE9"
+      - Unangemessener Nickname
+      - Nama panggilan tidak pantas
+      - "\u0905\u0928\u0941\u091A\u093F\u0924 \u0909\u092A\u0928\u093E\u092E"
+      - "\u0627\u0633\u0645 \u0645\u0633\u062A\u0639\u0627\u0631 \u063A\u064A\u0631
+        \u0644\u0627\u0626\u0642"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/64-E67CwwrfqtJHqs6A
+      TermType: 0
+      Description: "\uB3C4\uBC30\xB7\uAD11\uACE0"
+      Languages:
+      - "\uB3C4\uBC30\xB7\uAD11\uACE0"
+      - Spam or ads
+      - "\u5237\u5C4F\u6216\u5E7F\u544A"
+      - "\u6D17\u7248\u6216\u5EE3\u544A"
+      - "\u8352\u3089\u3057\u30FB\u5BA3\u4F1D"
+      - Spam o publicidad
+      - Spam ou propaganda
+      - "Spam ou publicit\xE9"
+      - Spam oder Werbung
+      - Spam atau iklan
+      - "\u0938\u094D\u092A\u0948\u092E \u092F\u093E \u0935\u093F\u091C\u094D\u091E\u093E\u092A\u0928"
+      - "\u0631\u0633\u0627\u0626\u0644 \u0645\u0632\u0639\u062C\u0629 \u0623\u0648
+        \u0625\u0639\u0644\u0627\u0646\u0627\u062A"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/67aA7KCB7KCI7ZWcIOyjvOygnA
+      TermType: 0
+      Description: "\uBD80\uC801\uC808\uD55C \uC8FC\uC81C"
+      Languages:
+      - "\uBD80\uC801\uC808\uD55C \uC8FC\uC81C"
+      - Inappropriate topic
+      - "\u4E0D\u5F53\u4E3B\u9898"
+      - "\u4E0D\u7576\u4E3B\u984C"
+      - "\u4E0D\u9069\u5207\u306A\u304A\u984C"
+      - Tema inapropiado
+      - "Tema impr\xF3prio"
+      - "Th\xE8me inappropri\xE9"
+      - Unangemessenes Thema
+      - Topik tidak pantas
+      - "\u0905\u0928\u0941\u091A\u093F\u0924 \u0935\u093F\u0937\u092F"
+      - "\u0645\u0648\u0636\u0648\u0639 \u063A\u064A\u0631 \u0644\u0627\u0626\u0642"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/6riw7YOA
+      TermType: 0
+      Description: "\uAE30\uD0C0"
+      Languages:
+      - "\uAE30\uD0C0"
+      - Other
+      - "\u5176\u4ED6"
+      - "\u5176\u4ED6"
+      - "\u305D\u306E\u4ED6"
+      - Otro
+      - Outro
+      - Autre
+      - Sonstiges
+      - Lainnya
+      - "\u0905\u0928\u094D\u092F"
+      - "\u0623\u062E\u0631\u0649"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7LCo64uo7ZaI7Iq164uI64ukLiDsnbQg7ZSM66CI7J207Ja07J2YIOyxhO2MheydtCDrs7TsnbTsp4Ag7JWK7Iq164uI64ukLg
+      TermType: 0
+      Description: "\uCC28\uB2E8\uD588\uC2B5\uB2C8\uB2E4. \uC774 \uD50C\uB808\uC774\uC5B4\uC758
+        \uCC44\uD305\uC774 \uBCF4\uC774\uC9C0 \uC54A\uC2B5\uB2C8\uB2E4."
+      Languages:
+      - "\uCC28\uB2E8\uD588\uC2B5\uB2C8\uB2E4. \uC774 \uD50C\uB808\uC774\uC5B4\uC758
+        \uCC44\uD305\uC774 \uBCF4\uC774\uC9C0 \uC54A\uC2B5\uB2C8\uB2E4."
+      - Blocked. You won't see this player's chat.
+      - "\u5DF2\u5C4F\u853D\u3002\u5C06\u4E0D\u518D\u663E\u793A\u8BE5\u73A9\u5BB6\u7684\u804A\u5929\u3002"
+      - "\u5DF2\u5C01\u9396\u3002\u5C07\u4E0D\u518D\u986F\u793A\u8A72\u73A9\u5BB6\u7684\u804A\u5929\u3002"
+      - "\u30D6\u30ED\u30C3\u30AF\u3057\u307E\u3057\u305F\u3002\u3053\u306E\u30D7\u30EC\u30A4\u30E4\u30FC\u306E\u30C1\u30E3\u30C3\u30C8\u306F\u8868\u793A\u3055\u308C\u307E\u305B\u3093\u3002"
+      - "Bloqueado. No ver\xE1s el chat de este jugador."
+      - "Bloqueado. Voc\xEA n\xE3o ver\xE1 o chat deste jogador."
+      - "Bloqu\xE9. Vous ne verrez plus le chat de ce joueur."
+      - Blockiert. Der Chat dieses Spielers wird nicht mehr angezeigt.
+      - Diblokir. Obrolan pemain ini tidak akan terlihat.
+      - "\u092C\u094D\u0932\u0949\u0915 \u0915\u0930 \u0926\u093F\u092F\u093E\u0964
+        \u0907\u0938 \u0916\u093F\u0932\u093E\u0921\u093C\u0940 \u0915\u0940 \u091A\u0948\u091F
+        \u0928\u0939\u0940\u0902 \u0926\u093F\u0916\u0947\u0917\u0940\u0964"
+      - "\u062A\u0645 \u0627\u0644\u062D\u0638\u0631. \u0644\u0646 \u062A\u0631\u0649
+        \u062F\u0631\u062F\u0634\u0629 \u0647\u0630\u0627 \u0627\u0644\u0644\u0627\u0639\u0628."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7LCo64uo7J2EIO2VtOygnO2WiOyKteuLiOuLpC4
+      TermType: 0
+      Description: "\uCC28\uB2E8\uC744 \uD574\uC81C\uD588\uC2B5\uB2C8\uB2E4."
+      Languages:
+      - "\uCC28\uB2E8\uC744 \uD574\uC81C\uD588\uC2B5\uB2C8\uB2E4."
+      - Unblocked.
+      - "\u5DF2\u53D6\u6D88\u5C4F\u853D\u3002"
+      - "\u5DF2\u89E3\u9664\u5C01\u9396\u3002"
+      - "\u30D6\u30ED\u30C3\u30AF\u3092\u89E3\u9664\u3057\u307E\u3057\u305F\u3002"
+      - Desbloqueado.
+      - Desbloqueado.
+      - "D\xE9bloqu\xE9."
+      - Blockierung aufgehoben.
+      - Blokir dibuka.
+      - "\u0905\u0928\u092C\u094D\u0932\u0949\u0915 \u0915\u0930 \u0926\u093F\u092F\u093E\u0964"
+      - "\u062A\u0645 \u0625\u0644\u063A\u0627\u0621 \u0627\u0644\u062D\u0638\u0631."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7Iug6rOg66W8IOygkeyImO2WiOyKteuLiOuLpC4g6rKA7YagIO2bhCDsobDsuZjtlanri4jri6Qu
+      TermType: 0
+      Description: "\uC2E0\uACE0\uB97C \uC811\uC218\uD588\uC2B5\uB2C8\uB2E4. \uAC80\uD1A0
+        \uD6C4 \uC870\uCE58\uD569\uB2C8\uB2E4."
+      Languages:
+      - "\uC2E0\uACE0\uB97C \uC811\uC218\uD588\uC2B5\uB2C8\uB2E4. \uAC80\uD1A0 \uD6C4
+        \uC870\uCE58\uD569\uB2C8\uB2E4."
+      - Report received. We'll review it and take action.
+      - "\u5DF2\u6536\u5230\u4E3E\u62A5\uFF0C\u6211\u4EEC\u5C06\u5BA1\u6838\u540E\u5904\u7406\u3002"
+      - "\u5DF2\u6536\u5230\u6AA2\u8209\uFF0C\u6211\u5011\u5C07\u5BE9\u6838\u5F8C\u8655\u7406\u3002"
+      - "\u901A\u5831\u3092\u53D7\u3051\u4ED8\u3051\u307E\u3057\u305F\u3002\u78BA\u8A8D\u306E\u3046\u3048\u5BFE\u5FDC\u3057\u307E\u3059\u3002"
+      - Denuncia recibida. La revisaremos y tomaremos medidas.
+      - "Den\xFAncia recebida. Vamos analisar e tomar provid\xEAncias."
+      - "Signalement re\xE7u. Nous allons l'examiner et agir."
+      - "Meldung erhalten. Wir pr\xFCfen sie und handeln entsprechend."
+      - Laporan diterima. Kami akan meninjau dan menindaklanjutinya.
+      - "\u0930\u093F\u092A\u094B\u0930\u094D\u091F \u092E\u093F\u0932 \u0917\u0908\u0964
+        \u0939\u092E \u091C\u093E\u0901\u091A \u0915\u0930\u0915\u0947 \u0915\u093E\u0930\u094D\u0930\u0935\u093E\u0908
+        \u0915\u0930\u0947\u0902\u0917\u0947\u0964"
+      - "\u062A\u0645 \u0627\u0633\u062A\u0644\u0627\u0645 \u0627\u0644\u0628\u0644\u0627\u063A.
+        \u0633\u0646\u0631\u0627\u062C\u0639\u0647 \u0648\u0646\u062A\u062E\u0630
+        \u0627\u0644\u0625\u062C\u0631\u0627\u0621 \u0627\u0644\u0645\u0646\u0627\u0633\u0628."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7LCo64uoIOuqqeuhneydtCDqsIDrk50g7LC87Iq164uI64ukLg
+      TermType: 0
+      Description: "\uCC28\uB2E8 \uBAA9\uB85D\uC774 \uAC00\uB4DD \uCC3C\uC2B5\uB2C8\uB2E4."
+      Languages:
+      - "\uCC28\uB2E8 \uBAA9\uB85D\uC774 \uAC00\uB4DD \uCC3C\uC2B5\uB2C8\uB2E4."
+      - Your block list is full.
+      - "\u5C4F\u853D\u5217\u8868\u5DF2\u6EE1\u3002"
+      - "\u5C01\u9396\u540D\u55AE\u5DF2\u6EFF\u3002"
+      - "\u30D6\u30ED\u30C3\u30AF\u30EA\u30B9\u30C8\u304C\u3044\u3063\u3071\u3044\u3067\u3059\u3002"
+      - "Tu lista de bloqueo est\xE1 llena."
+      - "Sua lista de bloqueio est\xE1 cheia."
+      - Votre liste de blocage est pleine.
+      - Deine Blockliste ist voll.
+      - Daftar blokir sudah penuh.
+      - "\u0906\u092A\u0915\u0940 \u092C\u094D\u0932\u0949\u0915 \u0938\u0942\u091A\u0940
+        \u092D\u0930 \u0917\u0908 \u0939\u0948\u0964"
+      - "\u0642\u0627\u0626\u0645\u0629 \u0627\u0644\u062D\u0638\u0631 \u0645\u0645\u062A\u0644\u0626\u0629."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7LCo64uo7ZWcIO2UjOugiOydtOyWtOyeheuLiOuLpC4g7LCo64uo7J2EIO2VtOygnO2VnCDrkqQg64uk7IucIOyLnOuPhO2VmOyEuOyalC4
+      TermType: 0
+      Description: "\uCC28\uB2E8\uD55C \uD50C\uB808\uC774\uC5B4\uC785\uB2C8\uB2E4.
+        \uCC28\uB2E8\uC744 \uD574\uC81C\uD55C \uB4A4 \uB2E4\uC2DC \uC2DC\uB3C4\uD558\uC138\uC694."
+      Languages:
+      - "\uCC28\uB2E8\uD55C \uD50C\uB808\uC774\uC5B4\uC785\uB2C8\uB2E4. \uCC28\uB2E8\uC744
+        \uD574\uC81C\uD55C \uB4A4 \uB2E4\uC2DC \uC2DC\uB3C4\uD558\uC138\uC694."
+      - You've blocked this player. Unblock them and try again.
+      - "\u4F60\u5DF2\u5C4F\u853D\u8BE5\u73A9\u5BB6\u3002\u8BF7\u53D6\u6D88\u5C4F\u853D\u540E\u91CD\u8BD5\u3002"
+      - "\u4F60\u5DF2\u5C01\u9396\u8A72\u73A9\u5BB6\u3002\u8ACB\u89E3\u9664\u5C01\u9396\u5F8C\u518D\u8A66\u3002"
+      - "\u30D6\u30ED\u30C3\u30AF\u4E2D\u306E\u30D7\u30EC\u30A4\u30E4\u30FC\u3067\u3059\u3002\u30D6\u30ED\u30C3\u30AF\u3092\u89E3\u9664\u3057\u3066\u304B\u3089\u3082\u3046\u4E00\u5EA6\u304A\u8A66\u3057\u304F\u3060\u3055\u3044\u3002"
+      - "Has bloqueado a este jugador. Desbloqu\xE9alo e int\xE9ntalo de nuevo."
+      - "Voc\xEA bloqueou este jogador. Desbloqueie e tente novamente."
+      - "Vous avez bloqu\xE9 ce joueur. D\xE9bloquez-le puis r\xE9essayez."
+      - Du hast diesen Spieler blockiert. Hebe die Blockierung auf und versuche es
+        erneut.
+      - Kamu memblokir pemain ini. Buka blokir lalu coba lagi.
+      - "\u0906\u092A\u0928\u0947 \u0907\u0938 \u0916\u093F\u0932\u093E\u0921\u093C\u0940
+        \u0915\u094B \u092C\u094D\u0932\u0949\u0915 \u0915\u093F\u092F\u093E \u0939\u0948\u0964
+        \u0905\u0928\u092C\u094D\u0932\u0949\u0915 \u0915\u0930\u0915\u0947 \u092B\u093F\u0930
+        \u0938\u0947 \u0915\u094B\u0936\u093F\u0936 \u0915\u0930\u0947\u0902\u0964"
+      - "\u0644\u0642\u062F \u062D\u0638\u0631\u062A \u0647\u0630\u0627 \u0627\u0644\u0644\u0627\u0639\u0628.
+        \u0623\u0644\u063A\u0650 \u0627\u0644\u062D\u0638\u0631 \u062B\u0645 \u062D\u0627\u0648\u0644
+        \u0645\u0631\u0629 \u0623\u062E\u0631\u0649."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7Jik64qY7J2AIOuNlCDsnbTsg4Eg7Iug6rOg7ZWgIOyImCDsl4bsirXri4jri6QuIOuCtOydvCDri6Tsi5wg7Iuc64-E7ZWY7IS47JqULg
+      TermType: 0
+      Description: "\uC624\uB298\uC740 \uB354 \uC774\uC0C1 \uC2E0\uACE0\uD560 \uC218
+        \uC5C6\uC2B5\uB2C8\uB2E4. \uB0B4\uC77C \uB2E4\uC2DC \uC2DC\uB3C4\uD558\uC138\uC694."
+      Languages:
+      - "\uC624\uB298\uC740 \uB354 \uC774\uC0C1 \uC2E0\uACE0\uD560 \uC218 \uC5C6\uC2B5\uB2C8\uB2E4.
+        \uB0B4\uC77C \uB2E4\uC2DC \uC2DC\uB3C4\uD558\uC138\uC694."
+      - You can't send more reports today. Try again tomorrow.
+      - "\u4ECA\u5929\u65E0\u6CD5\u518D\u4E3E\u62A5\uFF0C\u8BF7\u660E\u5929\u518D\u8BD5\u3002"
+      - "\u4ECA\u5929\u7121\u6CD5\u518D\u6AA2\u8209\uFF0C\u8ACB\u660E\u5929\u518D\u8A66\u3002"
+      - "\u672C\u65E5\u306F\u3053\u308C\u4EE5\u4E0A\u901A\u5831\u3067\u304D\u307E\u305B\u3093\u3002\u660E\u65E5\u3082\u3046\u4E00\u5EA6\u304A\u8A66\u3057\u304F\u3060\u3055\u3044\u3002"
+      - "No puedes enviar m\xE1s denuncias hoy. Int\xE9ntalo ma\xF1ana."
+      - "Voc\xEA n\xE3o pode enviar mais den\xFAncias hoje. Tente amanh\xE3."
+      - "Vous ne pouvez plus signaler aujourd'hui. R\xE9essayez demain."
+      - Du kannst heute keine weiteren Meldungen senden. Versuche es morgen erneut.
+      - Kamu tidak bisa melapor lagi hari ini. Coba lagi besok.
+      - "\u0906\u091C \u0906\u092A \u0914\u0930 \u0930\u093F\u092A\u094B\u0930\u094D\u091F
+        \u0928\u0939\u0940\u0902 \u0915\u0930 \u0938\u0915\u0924\u0947\u0964 \u0915\u0932
+        \u092B\u093F\u0930 \u0915\u094B\u0936\u093F\u0936 \u0915\u0930\u0947\u0902\u0964"
+      - "\u0644\u0627 \u064A\u0645\u0643\u0646\u0643 \u0625\u0631\u0633\u0627\u0644
+        \u0645\u0632\u064A\u062F \u0645\u0646 \u0627\u0644\u0628\u0644\u0627\u063A\u0627\u062A
+        \u0627\u0644\u064A\u0648\u0645. \u062D\u0627\u0648\u0644 \u063A\u062F\u064B\u0627."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7Iug6rOgIOuCtOyaqeydhCDtmZXsnbjtlZjshLjsmpQu
+      TermType: 0
+      Description: "\uC2E0\uACE0 \uB0B4\uC6A9\uC744 \uD655\uC778\uD558\uC138\uC694."
+      Languages:
+      - "\uC2E0\uACE0 \uB0B4\uC6A9\uC744 \uD655\uC778\uD558\uC138\uC694."
+      - Please check your report.
+      - "\u8BF7\u68C0\u67E5\u4E3E\u62A5\u5185\u5BB9\u3002"
+      - "\u8ACB\u78BA\u8A8D\u6AA2\u8209\u5167\u5BB9\u3002"
+      - "\u901A\u5831\u5185\u5BB9\u3092\u78BA\u8A8D\u3057\u3066\u304F\u3060\u3055\u3044\u3002"
+      - Revisa tu denuncia.
+      - "Verifique sua den\xFAncia."
+      - "V\xE9rifiez votre signalement."
+      - "Bitte \xFCberpr\xFCfe deine Meldung."
+      - Periksa laporanmu.
+      - "\u0915\u0943\u092A\u092F\u093E \u0905\u092A\u0928\u0940 \u0930\u093F\u092A\u094B\u0930\u094D\u091F
+        \u091C\u093E\u0901\u091A\u0947\u0902\u0964"
+      - "\u064A\u0631\u062C\u0649 \u0627\u0644\u062A\u062D\u0642\u0642 \u0645\u0646
+        \u0627\u0644\u0628\u0644\u0627\u063A."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7ZSM66CI7J207Ja066W8IOywvuyngCDrqrvtlojsirXri4jri6Qu
+      TermType: 0
+      Description: "\uD50C\uB808\uC774\uC5B4\uB97C \uCC3E\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4."
+      Languages:
+      - "\uD50C\uB808\uC774\uC5B4\uB97C \uCC3E\uC9C0 \uBABB\uD588\uC2B5\uB2C8\uB2E4."
+      - Player not found.
+      - "\u672A\u627E\u5230\u8BE5\u73A9\u5BB6\u3002"
+      - "\u627E\u4E0D\u5230\u8A72\u73A9\u5BB6\u3002"
+      - "\u30D7\u30EC\u30A4\u30E4\u30FC\u304C\u898B\u3064\u304B\u308A\u307E\u305B\u3093\u3002"
+      - "No se encontr\xF3 al jugador."
+      - "Jogador n\xE3o encontrado."
+      - Joueur introuvable.
+      - Spieler nicht gefunden.
+      - Pemain tidak ditemukan.
+      - "\u0916\u093F\u0932\u093E\u0921\u093C\u0940 \u0928\u0939\u0940\u0902 \u092E\u093F\u0932\u093E\u0964"
+      - "\u0644\u0645 \u064A\u062A\u0645 \u0627\u0644\u0639\u062B\u0648\u0631 \u0639\u0644\u0649
+        \u0627\u0644\u0644\u0627\u0639\u0628."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7J6l7Iud
+      TermType: 0
+      Description: "\uC7A5\uC2DD"
+      Languages:
+      - "\uC7A5\uC2DD"
+      - Decorations
+      - "\u88C5\u9970"
+      - "\u88DD\u98FE"
+      - "\u88C5\u98FE"
+      - Decoraciones
+      - "Decora\xE7\xF5es"
+      - "D\xE9corations"
+      - Dekorationen
+      - Dekorasi
+      - "\u0938\u091C\u093E\u0935\u091F"
+      - "\u0627\u0644\u0632\u064A\u0646\u0629"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7KCc7Iuc7Ja066W8IOyeheugpe2VtCDso7zshLjsmpQu
+      TermType: 0
+      Description: "\uC81C\uC2DC\uC5B4\uB97C \uC785\uB825\uD574 \uC8FC\uC138\uC694."
+      Languages:
+      - "\uC81C\uC2DC\uC5B4\uB97C \uC785\uB825\uD574 \uC8FC\uC138\uC694."
+      - Please enter the word.
+      - "\u8BF7\u8F93\u5165\u63D0\u793A\u8BCD\u3002"
+      - "\u8ACB\u8F38\u5165\u63D0\u793A\u8A5E\u3002"
+      - "\u304A\u984C\u306E\u5358\u8A9E\u3092\u5165\u529B\u3057\u3066\u304F\u3060\u3055\u3044\u3002"
+      - Introduce la palabra.
+      - Digite a palavra.
+      - Saisissez le mot.
+      - Bitte gib das Wort ein.
+      - Masukkan katanya.
+      - "\u0915\u0943\u092A\u092F\u093E \u0936\u092C\u094D\u0926 \u0926\u0930\u094D\u091C
+        \u0915\u0930\u0947\u0902\u0964"
+      - "\u064A\u0631\u062C\u0649 \u0625\u062F\u062E\u0627\u0644 \u0627\u0644\u0643\u0644\u0645\u0629."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/ezB964uY7J20IOudvOydtOyWtOudvOqzoCDsg53qsIHtlZjrgpjsmpQ_
+      TermType: 0
+      Description: "{0}\uB2D8\uC774 \uB77C\uC774\uC5B4\uB77C\uACE0 \uC0DD\uAC01\uD558\uB098\uC694?"
+      Languages:
+      - "{0}\uB2D8\uC774 \uB77C\uC774\uC5B4\uB77C\uACE0 \uC0DD\uAC01\uD558\uB098\uC694?"
+      - Do you think {0} is the liar?
+      - "\u4F60\u8BA4\u4E3A{0}\u662F\u8BF4\u8C0E\u8005\u5417\uFF1F"
+      - "\u4F60\u8A8D\u70BA{0}\u662F\u8AAA\u8B0A\u8005\u55CE\uFF1F"
+      - "{0}\u3055\u3093\u304C\u30E9\u30A4\u30A2\u30FC\u3060\u3068\u601D\u3044\u307E\u3059\u304B\uFF1F"
+      - "\xBFCrees que {0} es el mentiroso?"
+      - "Voc\xEA acha que {0} \xE9 o mentiroso?"
+      - Pensez-vous que {0} est le menteur ?
+      - "Glaubst du, dass {0} der L\xFCgner ist?"
+      - Menurutmu {0} adalah pembohong?
+      - "\u0915\u094D\u092F\u093E \u0906\u092A\u0915\u094B \u0932\u0917\u0924\u093E
+        \u0939\u0948 \u0915\u093F {0} \u091D\u0942\u0920\u093E \u0939\u0948?"
+      - "\u0647\u0644 \u062A\u0639\u062A\u0642\u062F \u0623\u0646 {0} \u0647\u0648
+        \u0627\u0644\u0643\u0627\u0630\u0628\u061F"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/65287J207Ja0IOunnuyVhOyalA
+      TermType: 0
+      Description: "\uB77C\uC774\uC5B4 \uB9DE\uC544\uC694"
+      Languages:
+      - "\uB77C\uC774\uC5B4 \uB9DE\uC544\uC694"
+      - "They\u2019re the liar"
+      - "\u662F\u8BF4\u8C0E\u8005"
+      - "\u662F\u8AAA\u8B0A\u8005"
+      - "\u30E9\u30A4\u30A2\u30FC\u3060\u3068\u601D\u3046"
+      - Es el mentiroso
+      - "\xC9 o mentiroso"
+      - "C\u2019est le menteur"
+      - "Ist der L\xFCgner"
+      - Dia pembohong
+      - "\u092F\u0939\u0940 \u091D\u0942\u0920\u093E \u0939\u0948"
+      - "\u0647\u0648 \u0627\u0644\u0643\u0627\u0630\u0628"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/65287J207Ja0IOyVhOuLiOyXkOyalA
+      TermType: 0
+      Description: "\uB77C\uC774\uC5B4 \uC544\uB2C8\uC5D0\uC694"
+      Languages:
+      - "\uB77C\uC774\uC5B4 \uC544\uB2C8\uC5D0\uC694"
+      - "They\u2019re not the liar"
+      - "\u4E0D\u662F\u8BF4\u8C0E\u8005"
+      - "\u4E0D\u662F\u8AAA\u8B0A\u8005"
+      - "\u30E9\u30A4\u30A2\u30FC\u3067\u306F\u306A\u3044\u3068\u601D\u3046"
+      - No es el mentiroso
+      - "N\xE3o \xE9 o mentiroso"
+      - "Ce n\u2019est pas le menteur"
+      - "Ist nicht der L\xFCgner"
+      - Dia bukan pembohong
+      - "\u092F\u0939 \u091D\u0942\u0920\u093E \u0928\u0939\u0940\u0902 \u0939\u0948"
+      - "\u0644\u064A\u0633 \u0627\u0644\u0643\u0627\u0630\u0628"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/65287J207Ja0IOyXhuyWtOyalA
+      TermType: 0
+      Description: "\uB77C\uC774\uC5B4 \uC5C6\uC5B4\uC694"
+      Languages:
+      - "\uB77C\uC774\uC5B4 \uC5C6\uC5B4\uC694"
+      - There is no liar
+      - "\u6CA1\u6709\u8BF4\u8C0E\u8005"
+      - "\u6C92\u6709\u8AAA\u8B0A\u8005"
+      - "\u30E9\u30A4\u30A2\u30FC\u306F\u3044\u306A\u3044"
+      - No hay mentiroso
+      - "N\xE3o h\xE1 mentiroso"
+      - "Il n\u2019y a aucun menteur"
+      - "Es gibt keinen L\xFCgner"
+      - Tidak ada pembohong
+      - "\u0915\u094B\u0908 \u091D\u0942\u0920\u093E \u0928\u0939\u0940\u0902 \u0939\u0948"
+      - "\u0644\u0627 \u064A\u0648\u062C\u062F \u0643\u0627\u0630\u0628"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/65287J207Ja0IOyeiOyWtOyalA
+      TermType: 0
+      Description: "\uB77C\uC774\uC5B4 \uC788\uC5B4\uC694"
+      Languages:
+      - "\uB77C\uC774\uC5B4 \uC788\uC5B4\uC694"
+      - There is a liar
+      - "\u6709\u8BF4\u8C0E\u8005"
+      - "\u6709\u8AAA\u8B0A\u8005"
+      - "\u30E9\u30A4\u30A2\u30FC\u306F\u3044\u308B"
+      - Hay un mentiroso
+      - "H\xE1 um mentiroso"
+      - Il y a un menteur
+      - "Es gibt einen L\xFCgner"
+      - Ada pembohong
+      - "\u0915\u094B\u0908 \u091D\u0942\u0920\u093E \u0939\u0948"
+      - "\u064A\u0648\u062C\u062F \u0643\u0627\u0630\u0628"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/ezB964uYIOyngOuqqeydtCDqsIDqsrDrkJjsl4jslrTsmpQu
+      TermType: 0
+      Description: "{0}\uB2D8 \uC9C0\uBAA9\uC774 \uAC00\uACB0\uB418\uC5C8\uC5B4\uC694."
+      Languages:
+      - "{0}\uB2D8 \uC9C0\uBAA9\uC774 \uAC00\uACB0\uB418\uC5C8\uC5B4\uC694."
+      - The accusation against {0} was approved.
+      - "\u5BF9{0}\u7684\u6307\u63A7\u5DF2\u901A\u8FC7\u3002"
+      - "\u5C0D{0}\u7684\u6307\u63A7\u5DF2\u901A\u904E\u3002"
+      - "{0}\u3055\u3093\u3078\u306E\u6307\u540D\u304C\u53EF\u6C7A\u3055\u308C\u307E\u3057\u305F\u3002"
+      - "Se aprob\xF3 la acusaci\xF3n contra {0}."
+      - "A acusa\xE7\xE3o contra {0} foi aprovada."
+      - "La d\xE9signation de {0} a \xE9t\xE9 approuv\xE9e."
+      - Die Nominierung von {0} wurde angenommen.
+      - Penunjukan {0} disetujui.
+      - "{0} \u0915\u093E \u0928\u093E\u092E\u093E\u0902\u0915\u0928 \u0938\u094D\u0935\u0940\u0915\u093E\u0930
+        \u0939\u094B \u0917\u092F\u093E\u0964"
+      - "\u062A\u0645\u062A \u0627\u0644\u0645\u0648\u0627\u0641\u0642\u0629 \u0639\u0644\u0649
+        \u0627\u062A\u0647\u0627\u0645 {0}."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/ezB964uYIOyngOuqqeydtCDrtoDqsrDrkJjsl4jslrTsmpQu
+      TermType: 0
+      Description: "{0}\uB2D8 \uC9C0\uBAA9\uC774 \uBD80\uACB0\uB418\uC5C8\uC5B4\uC694."
+      Languages:
+      - "{0}\uB2D8 \uC9C0\uBAA9\uC774 \uBD80\uACB0\uB418\uC5C8\uC5B4\uC694."
+      - The accusation against {0} was rejected.
+      - "\u5BF9{0}\u7684\u6307\u63A7\u88AB\u5426\u51B3\u3002"
+      - "\u5C0D{0}\u7684\u6307\u63A7\u88AB\u5426\u6C7A\u3002"
+      - "{0}\u3055\u3093\u3078\u306E\u6307\u540D\u304C\u5426\u6C7A\u3055\u308C\u307E\u3057\u305F\u3002"
+      - "Se rechaz\xF3 la acusaci\xF3n contra {0}."
+      - "A acusa\xE7\xE3o contra {0} foi rejeitada."
+      - "La d\xE9signation de {0} a \xE9t\xE9 rejet\xE9e."
+      - Die Nominierung von {0} wurde abgelehnt.
+      - Penunjukan {0} ditolak.
+      - "{0} \u0915\u093E \u0928\u093E\u092E\u093E\u0902\u0915\u0928 \u0905\u0938\u094D\u0935\u0940\u0915\u093E\u0930
+        \u0939\u094B \u0917\u092F\u093E\u0964"
+      - "\u0631\u064F\u0641\u0636 \u0627\u062A\u0647\u0627\u0645 {0}."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/4oCY65287J207Ja0IOyXhuydjOKAmSDsp4DrqqnsnbQg6rCA6rKw65CY7JeI7Ja07JqULg
+      TermType: 0
+      Description: "\u2018\uB77C\uC774\uC5B4 \uC5C6\uC74C\u2019 \uC9C0\uBAA9\uC774
+        \uAC00\uACB0\uB418\uC5C8\uC5B4\uC694."
+      Languages:
+      - "\u2018\uB77C\uC774\uC5B4 \uC5C6\uC74C\u2019 \uC9C0\uBAA9\uC774 \uAC00\uACB0\uB418\uC5C8\uC5B4\uC694."
+      - "The \u201CNo Liar\u201D nomination was approved."
+      - "\u201C\u6CA1\u6709\u8BF4\u8C0E\u8005\u201D\u7684\u63D0\u540D\u5DF2\u901A\u8FC7\u3002"
+      - "\u300C\u6C92\u6709\u8AAA\u8B0A\u8005\u300D\u7684\u63D0\u540D\u5DF2\u901A\u904E\u3002"
+      - "\u300C\u30E9\u30A4\u30A2\u30FC\u306A\u3057\u300D\u306E\u6307\u540D\u304C\u53EF\u6C7A\u3055\u308C\u307E\u3057\u305F\u3002"
+      - "Se aprob\xF3 la nominaci\xF3n \xABSin mentiroso\xBB."
+      - "A indica\xE7\xE3o \u201CSem mentiroso\u201D foi aprovada."
+      - "La d\xE9signation \xAB Aucun menteur \xBB a \xE9t\xE9 approuv\xE9e."
+      - "Die Nominierung \u201EKein L\xFCgner\u201C wurde angenommen."
+      - "Penunjukan \u201CTidak Ada Pembohong\u201D disetujui."
+      - "\u201C\u0915\u094B\u0908 \u091D\u0942\u0920\u093E \u0928\u0939\u0940\u0902\u201D
+        \u0928\u093E\u092E\u093E\u0902\u0915\u0928 \u0938\u094D\u0935\u0940\u0915\u093E\u0930
+        \u0939\u094B \u0917\u092F\u093E\u0964"
+      - "\u062A\u0645\u062A \u0627\u0644\u0645\u0648\u0627\u0641\u0642\u0629 \u0639\u0644\u0649
+        \u062A\u0631\u0634\u064A\u062D \xAB\u0644\u0627 \u064A\u0648\u062C\u062F
+        \u0643\u0627\u0630\u0628\xBB."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/4oCY65287J207Ja0IOyXhuydjOKAmSDsp4DrqqnsnbQg67aA6rKw65CY7JeI7Ja07JqULg
+      TermType: 0
+      Description: "\u2018\uB77C\uC774\uC5B4 \uC5C6\uC74C\u2019 \uC9C0\uBAA9\uC774
+        \uBD80\uACB0\uB418\uC5C8\uC5B4\uC694."
+      Languages:
+      - "\u2018\uB77C\uC774\uC5B4 \uC5C6\uC74C\u2019 \uC9C0\uBAA9\uC774 \uBD80\uACB0\uB418\uC5C8\uC5B4\uC694."
+      - "The \u201CNo Liar\u201D nomination was rejected."
+      - "\u201C\u6CA1\u6709\u8BF4\u8C0E\u8005\u201D\u7684\u63D0\u540D\u88AB\u5426\u51B3\u3002"
+      - "\u300C\u6C92\u6709\u8AAA\u8B0A\u8005\u300D\u7684\u63D0\u540D\u88AB\u5426\u6C7A\u3002"
+      - "\u300C\u30E9\u30A4\u30A2\u30FC\u306A\u3057\u300D\u306E\u6307\u540D\u304C\u5426\u6C7A\u3055\u308C\u307E\u3057\u305F\u3002"
+      - "Se rechaz\xF3 la nominaci\xF3n \xABSin mentiroso\xBB."
+      - "A indica\xE7\xE3o \u201CSem mentiroso\u201D foi rejeitada."
+      - "La d\xE9signation \xAB Aucun menteur \xBB a \xE9t\xE9 rejet\xE9e."
+      - "Die Nominierung \u201EKein L\xFCgner\u201C wurde abgelehnt."
+      - "Penunjukan \u201CTidak Ada Pembohong\u201D ditolak."
+      - "\u201C\u0915\u094B\u0908 \u091D\u0942\u0920\u093E \u0928\u0939\u0940\u0902\u201D
+        \u0928\u093E\u092E\u093E\u0902\u0915\u0928 \u0905\u0938\u094D\u0935\u0940\u0915\u093E\u0930
+        \u0939\u094B \u0917\u092F\u093E\u0964"
+      - "\u0631\u064F\u0641\u0636 \u062A\u0631\u0634\u064A\u062D \xAB\u0644\u0627
+        \u064A\u0648\u062C\u062F \u0643\u0627\u0630\u0628\xBB."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7IOIIOuplOyLnOyngCB7MH3qsJw
+      TermType: 0
+      Description: "\uC0C8 \uBA54\uC2DC\uC9C0 {0}\uAC1C"
+      Languages:
+      - "\uC0C8 \uBA54\uC2DC\uC9C0 {0}\uAC1C"
+      - '{0} new messages'
+      - "{0}\u6761\u65B0\u6D88\u606F"
+      - "{0}\u5247\u65B0\u8A0A\u606F"
+      - "\u65B0\u3057\u3044\u30E1\u30C3\u30BB\u30FC\u30B8 {0}\u4EF6"
+      - '{0} mensajes nuevos'
+      - '{0} novas mensagens'
+      - '{0} nouveaux messages'
+      - '{0} neue Nachrichten'
+      - '{0} pesan baru'
+      - "{0} \u0928\u090F \u0938\u0902\u0926\u0947\u0936"
+      - "{0} \u0631\u0633\u0627\u0626\u0644 \u062C\u062F\u064A\u062F\u0629"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/64K06rCAIOq3uOumsCDshKDsnYQg66qo65GQIOyngOyauOq5jOyalD8
+      TermType: 0
+      Description: "\uB0B4\uAC00 \uADF8\uB9B0 \uC120\uC744 \uBAA8\uB450 \uC9C0\uC6B8\uAE4C\uC694?"
+      Languages:
+      - "\uB0B4\uAC00 \uADF8\uB9B0 \uC120\uC744 \uBAA8\uB450 \uC9C0\uC6B8\uAE4C\uC694?"
+      - Erase all your lines?
+      - "\u8981\u6E05\u9664\u4F60\u753B\u7684\u6240\u6709\u7EBF\u6761\u5417\uFF1F"
+      - "\u8981\u6E05\u9664\u4F60\u756B\u7684\u6240\u6709\u7DDA\u689D\u55CE\uFF1F"
+      - "\u81EA\u5206\u304C\u63CF\u3044\u305F\u7DDA\u3092\u3059\u3079\u3066\u6D88\u3057\u307E\u3059\u304B\uFF1F"
+      - "\xBFBorrar todas tus l\xEDneas?"
+      - Apagar todas as suas linhas?
+      - Effacer tous vos traits ?
+      - "Alle deine Linien l\xF6schen?"
+      - Hapus semua garis yang kamu gambar?
+      - "\u0915\u094D\u092F\u093E \u0906\u092A\u0915\u0940 \u0916\u0940\u0902\u091A\u0940
+        \u0938\u092D\u0940 \u0930\u0947\u0916\u093E\u090F\u0902 \u092E\u093F\u091F\u093E
+        \u0926\u0947\u0902?"
+      - "\u0647\u0644 \u062A\u0631\u064A\u062F \u0645\u0633\u062D \u062C\u0645\u064A\u0639
+        \u0627\u0644\u062E\u0637\u0648\u0637 \u0627\u0644\u062A\u064A \u0631\u0633\u0645\u062A\u0647\u0627\u061F"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/66qo65GQIOyngOyasOq4sA
+      TermType: 0
+      Description: "\uBAA8\uB450 \uC9C0\uC6B0\uAE30"
+      Languages:
+      - "\uBAA8\uB450 \uC9C0\uC6B0\uAE30"
+      - Erase all
+      - "\u5168\u90E8\u6E05\u9664"
+      - "\u5168\u90E8\u6E05\u9664"
+      - "\u3059\u3079\u3066\u6D88\u3059"
+      - Borrar todo
+      - Apagar tudo
+      - Tout effacer
+      - "Alle l\xF6schen"
+      - Hapus semua
+      - "\u0938\u092D\u0940 \u092E\u093F\u091F\u093E\u090F\u0902"
+      - "\u0645\u0633\u062D \u0627\u0644\u0643\u0644"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/64uk7J2MIOuLqOqzhOq5jOyngCB7MH3stIg
+      TermType: 0
+      Description: "\uB2E4\uC74C \uB2E8\uACC4\uAE4C\uC9C0 {0}\uCD08"
+      Languages:
+      - "\uB2E4\uC74C \uB2E8\uACC4\uAE4C\uC9C0 {0}\uCD08"
+      - Next step in {0}s
+      - "{0}\u79D2\u540E\u8FDB\u5165\u4E0B\u4E00\u9636\u6BB5"
+      - "{0}\u79D2\u5F8C\u9032\u5165\u4E0B\u4E00\u968E\u6BB5"
+      - "\u6B21\u306E\u6BB5\u968E\u307E\u3067{0}\u79D2"
+      - Siguiente fase en {0} s
+      - "Pr\xF3xima etapa em {0}s"
+      - "\xC9tape suivante dans {0} s"
+      - "N\xE4chster Schritt in {0} s"
+      - Tahap berikutnya dalam {0} dtk
+      - "\u0905\u0917\u0932\u093E \u091A\u0930\u0923 {0} \u0938\u0947\u0915\u0902\u0921
+        \u092E\u0947\u0902"
+      - "\u0627\u0644\u0645\u0631\u062D\u0644\u0629 \u0627\u0644\u062A\u0627\u0644\u064A\u0629
+        \u062E\u0644\u0627\u0644 {0} \u062B"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/67CpIOyXsOqysOydtCDrgYrqsrzslrTsmpQu
+      TermType: 0
+      Description: "\uBC29 \uC5F0\uACB0\uC774 \uB04A\uACBC\uC5B4\uC694."
+      Languages:
+      - "\uBC29 \uC5F0\uACB0\uC774 \uB04A\uACBC\uC5B4\uC694."
+      - Lost connection to the room.
+      - "\u4E0E\u623F\u95F4\u7684\u8FDE\u63A5\u5DF2\u65AD\u5F00\u3002"
+      - "\u8207\u623F\u9593\u7684\u9023\u7DDA\u5DF2\u4E2D\u65B7\u3002"
+      - "\u30EB\u30FC\u30E0\u3068\u306E\u63A5\u7D9A\u304C\u5207\u308C\u307E\u3057\u305F\u3002"
+      - "Se perdi\xF3 la conexi\xF3n con la sala."
+      - "A conex\xE3o com a sala foi perdida."
+      - "La connexion au salon a \xE9t\xE9 perdue."
+      - Die Verbindung zum Raum wurde unterbrochen.
+      - Koneksi ke ruang terputus.
+      - "\u0915\u092E\u0930\u0947 \u0938\u0947 \u0915\u0928\u0947\u0915\u094D\u0936\u0928
+        \u091F\u0942\u091F \u0917\u092F\u093E\u0964"
+      - "\u0627\u0646\u0642\u0637\u0639 \u0627\u0644\u0627\u062A\u0635\u0627\u0644
+        \u0628\u0627\u0644\u063A\u0631\u0641\u0629."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/64uk7IucIOyXsOqysA
+      TermType: 0
+      Description: "\uB2E4\uC2DC \uC5F0\uACB0"
+      Languages:
+      - "\uB2E4\uC2DC \uC5F0\uACB0"
+      - Reconnect
+      - "\u91CD\u65B0\u8FDE\u63A5"
+      - "\u91CD\u65B0\u9023\u7DDA"
+      - "\u518D\u63A5\u7D9A"
+      - Reconectar
+      - Reconectar
+      - Se reconnecter
+      - Neu verbinden
+      - Sambungkan lagi
+      - "\u092B\u093F\u0930 \u0938\u0947 \u091C\u094B\u0921\u093C\u0947\u0902"
+      - "\u0625\u0639\u0627\u062F\u0629 \u0627\u0644\u0627\u062A\u0635\u0627\u0644"
       Flags: 000000000000000000000000
       Languages_Touch: []
     CaseInsensitiveTerms: 0

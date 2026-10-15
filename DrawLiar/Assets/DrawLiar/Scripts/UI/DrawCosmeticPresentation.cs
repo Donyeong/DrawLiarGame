@@ -12,6 +12,8 @@ namespace DrawLiar
         private static readonly ConditionalWeakTable<VisualElement,BubbleBinding> BUBBLES = new ConditionalWeakTable<VisualElement,BubbleBinding>();
         private static readonly Color32[] PRISM_COLORS = { new Color32(236,159,184,255), new Color32(239,207,127,255),
             new Color32(131,196,180,255), new Color32(142,183,224,255), new Color32(184,158,222,255) };
+        private const float NICKNAME_PLATE_PADDING = 4, NICKNAME_PLATE_RADIUS = 7;
+        private static readonly Dictionary<string,(Gradient Fill,Color Border)> NICKNAME_PLATES = new Dictionary<string,(Gradient,Color)>();
 
         public static void ApplyNickname(Label label, CosmeticLoadout loadout)
         {
@@ -29,13 +31,16 @@ namespace DrawLiar
                 label.style.color = binding.Color;
                 label.style.unityTextOutlineColor = binding.OutlineColor;
                 label.style.unityTextOutlineWidth = binding.OutlineWidth;
+                label.style.paddingLeft = binding.PaddingLeft;
+                label.style.paddingRight = binding.PaddingRight;
             }
             else
             {
                 label.style.color = NicknameColor(effect);
                 label.style.unityTextOutlineColor = (Color)(effect == "nickname-neon"
-                    ? new Color32(190,233,236,255) : new Color32(255,250,241,255));
-                label.style.unityTextOutlineWidth = effect == "nickname-neon" ? .45f : .2f;
+                    ? new Color32(126,226,234,255) : new Color32(255,250,241,255));
+                label.style.unityTextOutlineWidth = effect == "nickname-neon" ? .35f : .2f;
+                label.style.paddingLeft = label.style.paddingRight = NICKNAME_PLATE_PADDING;
             }
             label.MarkDirtyRepaint();
         }
@@ -125,9 +130,90 @@ namespace DrawLiar
                 case "nickname-prism": return new Color32(123,100,169,255);
                 case "nickname-gold": return new Color32(151,111,37,255);
                 case "nickname-mint": return new Color32(53,133,115,255);
-                case "nickname-neon": return new Color32(146,83,170,255);
+                case "nickname-neon": return new Color32(255,226,255,255);
                 default: return new Color32(190,106,104,255);
             }
+        }
+
+        // 효과별 닉네임 배경판의 가로 그라데이션과 테두리 색. 네온만 어두운 판 위에 밝은 글자를 쓴다.
+        private static (Gradient Fill,Color Border) NicknamePlate(string effect)
+        {
+            if (NICKNAME_PLATES.TryGetValue(effect,out var plate)) return plate;
+            Color32[] stops; Color32 border;
+            switch (effect)
+            {
+                case "nickname-prism":
+                    stops = new[] { new Color32(251,226,235,255), new Color32(252,241,214,255), new Color32(224,244,236,255),
+                        new Color32(225,236,251,255), new Color32(237,228,249,255) };
+                    border = new Color32(214,197,237,255);
+                    break;
+                case "nickname-gold":
+                    stops = new[] { new Color32(253,245,221,255), new Color32(247,229,178,255), new Color32(253,245,221,255) };
+                    border = new Color32(224,193,116,255);
+                    break;
+                case "nickname-mint":
+                    stops = new[] { new Color32(233,248,241,255), new Color32(213,239,228,255) };
+                    border = new Color32(154,207,185,255);
+                    break;
+                case "nickname-neon":
+                    stops = new[] { new Color32(48,32,74,255), new Color32(31,42,78,255) };
+                    border = new Color32(126,226,234,255);
+                    break;
+                default:
+                    stops = new[] { new Color32(252,227,232,255), new Color32(253,233,212,255), new Color32(238,228,246,255) };
+                    border = new Color32(233,181,171,255);
+                    break;
+            }
+            var keys = new GradientColorKey[stops.Length];
+            for (int index = 0; index < stops.Length; index++) keys[index] = new GradientColorKey(stops[index],index/(float)(stops.Length-1));
+            var fill = new Gradient();
+            fill.SetKeys(keys,new[] { new GradientAlphaKey(1,0), new GradientAlphaKey(1,1) });
+            plate = (fill,border);
+            NICKNAME_PLATES.Add(effect,plate);
+            return plate;
+        }
+
+        // 라벨이 줄을 채우도록 늘어나도 배경판과 밑줄은 실제 글자 영역에만 그린다. 줄바꿈되는 이름은 모든 줄을 덮는다.
+        private static bool TryNicknameTextRect(Label label, out Rect rect, out float lineHeight)
+        {
+            rect = default; lineHeight = 0;
+            var content = label.contentRect;
+            if (label.panel == null || content.width < 4 || content.height < 6) return false;
+            string text = label.text ?? "";
+            var line = label.MeasureTextSize(text,0,VisualElement.MeasureMode.Undefined,0,VisualElement.MeasureMode.Undefined);
+            var size = label.MeasureTextSize(text,content.width,VisualElement.MeasureMode.AtMost,0,VisualElement.MeasureMode.Undefined);
+            float width = float.IsNaN(size.x) || size.x <= 0 ? content.width : Mathf.Min(size.x,content.width);
+            float height = float.IsNaN(size.y) || size.y <= 0 ? content.height : Mathf.Min(size.y,content.height);
+            lineHeight = float.IsNaN(line.y) || line.y <= 0 ? height : Mathf.Min(line.y,height);
+            int align = (int)label.resolvedStyle.unityTextAlign;
+            rect = new Rect(content.xMin+(content.width-width)*(align%3)*.5f,content.yMin+(content.height-height)*(align/3)*.5f,width,height);
+            return true;
+        }
+
+        private static void PaintNicknamePlate(MeshGenerationContext context, Label label, string effect)
+        {
+            if (effect.Length == 0 || !TryNicknameTextRect(label,out var text,out float lineHeight)) return;
+            var plate = NicknamePlate(effect);
+            var outer = new Rect(text.xMin-NICKNAME_PLATE_PADDING,text.yMin,text.width+NICKNAME_PLATE_PADDING*2,text.height);
+            float radius = Mathf.Min(NICKNAME_PLATE_RADIUS,lineHeight*.5f);
+            var p = context.painter2D;
+            p.fillColor = plate.Border;
+            RoundedRect(p,outer,radius); p.Fill();
+            var inner = new Rect(outer.xMin+1,outer.yMin+1,outer.width-2,outer.height-2);
+            p.fillGradient = FillGradient.MakeLinearGradient(plate.Fill,new Vector2(inner.xMin,inner.center.y),new Vector2(inner.xMax,inner.center.y),AddressMode.Clamp);
+            RoundedRect(p,inner,Mathf.Max(0,radius-1)); p.Fill();
+            p.fillGradient = default;
+        }
+
+        private static void RoundedRect(Painter2D painter, Rect rect, float radius)
+        {
+            const float k = .5522848f;
+            float x0 = rect.xMin, x1 = rect.xMax, y0 = rect.yMin, y1 = rect.yMax, c = radius*(1-k);
+            painter.BeginPath(); painter.MoveTo(new Vector2(x0+radius,y0)); painter.LineTo(new Vector2(x1-radius,y0));
+            painter.BezierCurveTo(new Vector2(x1-c,y0),new Vector2(x1,y0+c),new Vector2(x1,y0+radius)); painter.LineTo(new Vector2(x1,y1-radius));
+            painter.BezierCurveTo(new Vector2(x1,y1-c),new Vector2(x1-c,y1),new Vector2(x1-radius,y1)); painter.LineTo(new Vector2(x0+radius,y1));
+            painter.BezierCurveTo(new Vector2(x0+c,y1),new Vector2(x0,y1-c),new Vector2(x0,y1-radius)); painter.LineTo(new Vector2(x0,y0+radius));
+            painter.BezierCurveTo(new Vector2(x0,y0+c),new Vector2(x0+c,y0),new Vector2(x0+radius,y0)); painter.ClosePath();
         }
 
         private sealed class NicknameBinding
@@ -135,12 +221,17 @@ namespace DrawLiar
             public string Effect = "";
             public readonly StyleColor Color, OutlineColor;
             public readonly StyleFloat OutlineWidth;
+            public readonly StyleLength PaddingLeft, PaddingRight;
 
             public NicknameBinding(Label label)
             {
                 Color = label.style.color;
                 OutlineColor = label.style.unityTextOutlineColor;
                 OutlineWidth = label.style.unityTextOutlineWidth;
+                PaddingLeft = label.style.paddingLeft;
+                PaddingRight = label.style.paddingRight;
+                // 배경판은 글자보다 먼저 그려야 글자를 가리지 않는다.
+                label.generateVisualContent = (Action<MeshGenerationContext>)(context => PaintNicknamePlate(context,label,Effect)) + label.generateVisualContent;
                 label.generateVisualContent += context => PaintNickname(context,label,Effect);
             }
         }
@@ -247,11 +338,9 @@ namespace DrawLiar
 
         private static void PaintNickname(MeshGenerationContext context, Label label, string effect)
         {
-            if (effect.Length == 0) return;
-            var rect = label.contentRect;
-            if (rect.width < 12 || rect.height < 8) return;
+            if (effect.Length == 0 || !TryNicknameTextRect(label,out var rect,out _) || rect.width < 12 || rect.height < 8) return;
             var p = context.painter2D;
-            float y = rect.yMax-1, left = rect.xMin+2, right = rect.xMax-2;
+            float y = rect.yMax-2.5f, left = rect.xMin+2, right = rect.xMax-2;
             p.lineWidth = 1.2f; p.lineCap = LineCap.Round;
             switch (effect)
             {

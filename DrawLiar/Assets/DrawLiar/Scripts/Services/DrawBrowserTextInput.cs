@@ -231,7 +231,8 @@ namespace DrawLiar
                     Keyboard = (int)field.textEdition.keyboardType, Correction = field.textEdition.autoCorrection,
                     Rtl = IsRightToLeft(text ?? input),
                     ChatShortcut = field == chatShortcut,
-                    SubmitOnCompositionEnd = field.ClassListContains("chat-input") || field.ClassListContains("lobby-chat-input") || field.ClassListContains("guess-input")
+                    // 정답은 제출 후 바꿀 수 없으므로 조합을 확정하는 Enter로는 제출하지 않는다.
+                    SubmitOnCompositionEnd = field.ClassListContains("chat-input") || field.ClassListContains("lobby-chat-input")
                 };
                 _layouts[field] = layout;
                 configuration.Add(layout);

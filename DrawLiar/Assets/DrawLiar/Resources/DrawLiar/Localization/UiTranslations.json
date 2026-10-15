@@ -10069,8 +10069,8 @@
       "Values": [
         "코스튬",
         "Costumes",
-        "装扮",
-        "裝扮",
+        "服饰",
+        "服飾",
         "コスチューム",
         "Disfraces",
         "Trajes",
@@ -10898,35 +10898,35 @@
       ]
     },
     {
-      "Key": "보석 꾸미기",
+      "Key": "보석 장식",
       "Values": [
-        "보석 꾸미기",
-        "Gem cosmetics",
+        "보석 장식",
+        "Gem decorations",
         "宝石装饰",
         "寶石裝飾",
-        "ジェムで着せ替え",
-        "Cosméticos con gemas",
-        "Cosméticos com gemas",
-        "Décorations avec des gemmes",
-        "Kosmetik mit Edelsteinen",
-        "Kosmetik dengan permata",
-        "रत्नों से सजावट",
+        "ジェム装飾",
+        "Decoraciones con gemas",
+        "Decorações com gemas",
+        "Décorations en gemmes",
+        "Edelstein-Dekorationen",
+        "Dekorasi permata",
+        "रत्न सजावट",
         "زينة بالجواهر"
       ]
     },
     {
-      "Key": "보석으로 꾸미기와 구독 상품을 구매할 수 있어요.",
+      "Key": "보석으로 장식과 구독 상품을 구매할 수 있어요.",
       "Values": [
-        "보석으로 꾸미기와 구독 상품을 구매할 수 있어요.",
-        "Use gems to buy cosmetics and subscriptions.",
+        "보석으로 장식과 구독 상품을 구매할 수 있어요.",
+        "Use gems to buy decorations and subscriptions.",
         "可使用宝石购买装饰和订阅。",
         "可使用寶石購買裝飾和訂閱。",
         "ジェムで装飾やサブスクリプションを購入できます。",
-        "Usa gemas para comprar cosméticos y suscripciones.",
-        "Use gemas para comprar cosméticos e assinaturas.",
-        "Achetez des décorations et des abonnements avec des gemmes.",
-        "Kaufe Kosmetik und Abonnements mit Edelsteinen.",
-        "Gunakan permata untuk membeli kosmetik dan langganan.",
+        "Usa gemas para comprar decoraciones y suscripciones.",
+        "Use gemas para comprar decorações e assinaturas.",
+        "Utilisez des gemmes pour acheter des décorations et des abonnements.",
+        "Kaufe Dekorationen und Abos mit Edelsteinen.",
+        "Gunakan permata untuk membeli dekorasi dan langganan.",
         "रत्नों से सजावट और सदस्यता खरीदें।",
         "استخدم الجواهر لشراء الزينة والاشتراكات."
       ]
@@ -11102,18 +11102,18 @@
       ]
     },
     {
-      "Key": "꾸미기 구매",
+      "Key": "장식 구매",
       "Values": [
-        "꾸미기 구매",
-        "Buy cosmetic",
+        "장식 구매",
+        "Buy decoration",
         "购买装饰",
         "購買裝飾",
         "装飾を購入",
-        "Comprar cosmético",
-        "Comprar cosmético",
+        "Comprar decoración",
+        "Comprar decoração",
         "Acheter une décoration",
-        "Kosmetik kaufen",
-        "Beli kosmetik",
+        "Dekoration kaufen",
+        "Beli dekorasi",
         "सजावट खरीदें",
         "شراء زينة"
       ]
@@ -11170,20 +11170,20 @@
       ]
     },
     {
-      "Key": "꾸미기를 저장했습니다.",
+      "Key": "장식을 적용했습니다.",
       "Values": [
-        "꾸미기를 저장했습니다.",
-        "Cosmetics saved.",
-        "已保存装饰。",
-        "已儲存裝飾。",
-        "装飾を保存しました。",
-        "Cosméticos guardados.",
-        "Cosméticos salvos.",
-        "Décorations enregistrées.",
-        "Kosmetik gespeichert.",
-        "Kosmetik disimpan.",
-        "सजावट सहेज दी गई।",
-        "تم حفظ الزينة."
+        "장식을 적용했습니다.",
+        "Decoration applied.",
+        "已应用装饰。",
+        "已套用裝飾。",
+        "装飾を適用しました。",
+        "Decoración aplicada.",
+        "Decoração aplicada.",
+        "Décoration appliquée.",
+        "Dekoration angewendet.",
+        "Dekorasi diterapkan.",
+        "सजावट लागू की गई।",
+        "تم تطبيق الزينة."
       ]
     },
     {
@@ -11527,88 +11527,88 @@
       ]
     },
     {
-      "Key": "무지개빛으로 닉네임을 물들여요.",
+      "Key": "무지개빛으로 닉네임 배경까지 물들여요.",
       "Values": [
-        "무지개빛으로 닉네임을 물들여요.",
-        "Color your nickname with rainbow hues.",
-        "用彩虹色点亮昵称。",
-        "用彩虹色點亮暱稱。",
-        "ニックネームを虹色に彩ります。",
-        "Colorea tu apodo con tonos de arcoíris.",
-        "Dê ao seu apelido tons de arco-íris.",
-        "Colorez votre pseudo aux couleurs de l'arc-en-ciel.",
-        "Färbe deinen Namen in Regenbogenfarben.",
-        "Warnai nama panggilan dengan warna pelangi.",
-        "उपनाम को इंद्रधनुषी रंगों से सजाएँ।",
-        "لوّن اسمك بألوان قوس قزح."
+        "무지개빛으로 닉네임 배경까지 물들여요.",
+        "Color your nickname and its background with rainbow hues.",
+        "用彩虹色点亮昵称及其背景。",
+        "用彩虹色點亮暱稱及其背景。",
+        "ニックネームと背景を虹色に彩ります。",
+        "Colorea tu apodo y su fondo con tonos de arcoíris.",
+        "Dê ao seu apelido e ao fundo tons de arco-íris.",
+        "Colorez votre pseudo et son fond aux couleurs de l'arc-en-ciel.",
+        "Färbe deinen Namen und seinen Hintergrund in Regenbogenfarben.",
+        "Warnai nama panggilan dan latarnya dengan warna pelangi.",
+        "उपनाम और उसकी पृष्ठभूमि को इंद्रधनुषी रंगों से सजाएँ।",
+        "لوّن اسمك وخلفيته بألوان قوس قزح."
       ]
     },
     {
-      "Key": "따뜻한 황금빛으로 닉네임을 꾸며요.",
+      "Key": "따뜻한 황금빛으로 닉네임 배경까지 꾸며요.",
       "Values": [
-        "따뜻한 황금빛으로 닉네임을 꾸며요.",
-        "Decorate your nickname with warm golden hues.",
-        "用温暖金色装饰昵称。",
-        "用溫暖金色裝飾暱稱。",
-        "ニックネームを暖かな金色で飾ります。",
-        "Decora tu apodo con cálidos tonos dorados.",
-        "Decore seu apelido com tons dourados.",
-        "Décorez votre pseudo de teintes dorées chaleureuses.",
-        "Schmücke deinen Namen mit warmem Gold.",
-        "Hiasi nama panggilan dengan warna emas hangat.",
-        "उपनाम को सुनहरे रंग से सजाएँ।",
-        "زيّن اسمك بدرجات ذهبية دافئة."
+        "따뜻한 황금빛으로 닉네임 배경까지 꾸며요.",
+        "Decorate your nickname and its background with warm golden hues.",
+        "用温暖金色装饰昵称及其背景。",
+        "用溫暖金色裝飾暱稱及其背景。",
+        "ニックネームと背景を暖かな金色で飾ります。",
+        "Decora tu apodo y su fondo con cálidos tonos dorados.",
+        "Decore seu apelido e o fundo com tons dourados.",
+        "Décorez votre pseudo et son fond de teintes dorées chaleureuses.",
+        "Schmücke deinen Namen und seinen Hintergrund mit warmem Gold.",
+        "Hiasi nama panggilan dan latarnya dengan warna emas hangat.",
+        "उपनाम और उसकी पृष्ठभूमि को सुनहरे रंग से सजाएँ।",
+        "زيّن اسمك وخلفيته بدرجات ذهبية دافئة."
       ]
     },
     {
-      "Key": "산뜻한 민트빛으로 닉네임을 꾸며요.",
+      "Key": "산뜻한 민트빛으로 닉네임 배경까지 꾸며요.",
       "Values": [
-        "산뜻한 민트빛으로 닉네임을 꾸며요.",
-        "Decorate your nickname with fresh mint hues.",
-        "用清新薄荷色装饰昵称。",
-        "用清新薄荷色裝飾暱稱。",
-        "ニックネームを爽やかなミント色で飾ります。",
-        "Decora tu apodo con frescos tonos menta.",
-        "Decore seu apelido com tons frescos de menta.",
-        "Décorez votre pseudo de teintes menthe fraîches.",
-        "Schmücke deinen Namen mit frischem Mint.",
-        "Hiasi nama panggilan dengan warna mint segar.",
-        "उपनाम को ताज़े मिंट रंग से सजाएँ।",
-        "زيّن اسمك بدرجات النعناع المنعشة."
+        "산뜻한 민트빛으로 닉네임 배경까지 꾸며요.",
+        "Decorate your nickname and its background with fresh mint hues.",
+        "用清新薄荷色装饰昵称及其背景。",
+        "用清新薄荷色裝飾暱稱及其背景。",
+        "ニックネームと背景を爽やかなミント色で飾ります。",
+        "Decora tu apodo y su fondo con frescos tonos menta.",
+        "Decore seu apelido e o fundo com tons frescos de menta.",
+        "Décorez votre pseudo et son fond de teintes menthe fraîches.",
+        "Schmücke deinen Namen und seinen Hintergrund mit frischem Mint.",
+        "Hiasi nama panggilan dan latarnya dengan warna mint segar.",
+        "उपनाम और उसकी पृष्ठभूमि को ताज़े मिंट रंग से सजाएँ।",
+        "زيّن اسمك وخلفيته بدرجات النعناع المنعشة."
       ]
     },
     {
-      "Key": "선명한 네온빛으로 닉네임을 꾸며요.",
+      "Key": "선명한 네온빛으로 닉네임 배경까지 꾸며요.",
       "Values": [
-        "선명한 네온빛으로 닉네임을 꾸며요.",
-        "Decorate your nickname with vivid neon hues.",
-        "用鲜艳霓虹色装饰昵称。",
-        "用鮮豔霓虹色裝飾暱稱。",
-        "ニックネームを鮮やかなネオン色で飾ります。",
-        "Decora tu apodo con vivos tonos neón.",
-        "Decore seu apelido com tons vivos de neon.",
-        "Décorez votre pseudo de teintes néon vives.",
-        "Schmücke deinen Namen mit leuchtendem Neon.",
-        "Hiasi nama panggilan dengan warna neon cerah.",
-        "उपनाम को चमकीले नियॉन रंग से सजाएँ।",
-        "زيّن اسمك بدرجات نيون زاهية."
+        "선명한 네온빛으로 닉네임 배경까지 꾸며요.",
+        "Decorate your nickname and its background with vivid neon hues.",
+        "用鲜艳霓虹色装饰昵称及其背景。",
+        "用鮮豔霓虹色裝飾暱稱及其背景。",
+        "ニックネームと背景を鮮やかなネオン色で飾ります。",
+        "Decora tu apodo y su fondo con vivos tonos neón.",
+        "Decore seu apelido e o fundo com tons vivos de neon.",
+        "Décorez votre pseudo et son fond de teintes néon vives.",
+        "Schmücke deinen Namen und seinen Hintergrund mit leuchtendem Neon.",
+        "Hiasi nama panggilan dan latarnya dengan warna neon cerah.",
+        "उपनाम और उसकी पृष्ठभूमि को चमकीले नियॉन रंग से सजाएँ।",
+        "زيّن اسمك وخلفيته بدرجات نيون زاهية."
       ]
     },
     {
-      "Key": "분홍빛 노을 색으로 닉네임을 꾸며요.",
+      "Key": "분홍빛 노을 색으로 닉네임 배경까지 꾸며요.",
       "Values": [
-        "분홍빛 노을 색으로 닉네임을 꾸며요.",
-        "Decorate your nickname with pink sunset hues.",
-        "用粉色晚霞装饰昵称。",
-        "用粉色晚霞裝飾暱稱。",
-        "ニックネームをピンクの夕焼け色で飾ります。",
-        "Decora tu apodo con tonos de un atardecer rosa.",
-        "Decore seu apelido com tons rosados do pôr do sol.",
-        "Décorez votre pseudo de teintes roses du crépuscule.",
-        "Schmücke deinen Namen mit rosa Abendfarben.",
-        "Hiasi nama panggilan dengan warna senja merah muda.",
-        "उपनाम को गुलाबी साँझ के रंग से सजाएँ।",
-        "زيّن اسمك بدرجات الغروب الوردية."
+        "분홍빛 노을 색으로 닉네임 배경까지 꾸며요.",
+        "Decorate your nickname and its background with pink sunset hues.",
+        "用粉色晚霞装饰昵称及其背景。",
+        "用粉色晚霞裝飾暱稱及其背景。",
+        "ニックネームと背景をピンクの夕焼け色で飾ります。",
+        "Decora tu apodo y su fondo con tonos de un atardecer rosa.",
+        "Decore seu apelido e o fundo com tons rosados do pôr do sol.",
+        "Décorez votre pseudo et son fond de teintes roses du crépuscule.",
+        "Schmücke deinen Namen und seinen Hintergrund mit rosa Abendfarben.",
+        "Hiasi nama panggilan dan latarnya dengan warna senja merah muda.",
+        "उपनाम और उसकी पृष्ठभूमि को गुलाबी साँझ के रंग से सजाएँ।",
+        "زيّن اسمك وخلفيته بدرجات الغروب الوردية."
       ]
     },
     {
@@ -12357,6 +12357,295 @@
         "Pemain tidak ditemukan.",
         "खिलाड़ी नहीं मिला।",
         "لم يتم العثور على اللاعب."
+      ]
+    },
+    {
+      "Key": "장식",
+      "Values": [
+        "장식",
+        "Decorations",
+        "装饰",
+        "裝飾",
+        "装飾",
+        "Decoraciones",
+        "Decorações",
+        "Décorations",
+        "Dekorationen",
+        "Dekorasi",
+        "सजावट",
+        "الزينة"
+      ]
+    },
+    {
+      "Key": "제시어를 입력해 주세요.",
+      "Values": [
+        "제시어를 입력해 주세요.",
+        "Please enter the word.",
+        "请输入提示词。",
+        "請輸入提示詞。",
+        "お題の単語を入力してください。",
+        "Introduce la palabra.",
+        "Digite a palavra.",
+        "Saisissez le mot.",
+        "Bitte gib das Wort ein.",
+        "Masukkan katanya.",
+        "कृपया शब्द दर्ज करें।",
+        "يرجى إدخال الكلمة."
+      ]
+    },
+    {
+      "Key": "{0}님이 라이어라고 생각하나요?",
+      "Values": [
+        "{0}님이 라이어라고 생각하나요?",
+        "Do you think {0} is the liar?",
+        "你认为{0}是说谎者吗？",
+        "你認為{0}是說謊者嗎？",
+        "{0}さんがライアーだと思いますか？",
+        "¿Crees que {0} es el mentiroso?",
+        "Você acha que {0} é o mentiroso?",
+        "Pensez-vous que {0} est le menteur ?",
+        "Glaubst du, dass {0} der Lügner ist?",
+        "Menurutmu {0} adalah pembohong?",
+        "क्या आपको लगता है कि {0} झूठा है?",
+        "هل تعتقد أن {0} هو الكاذب؟"
+      ]
+    },
+    {
+      "Key": "라이어 맞아요",
+      "Values": [
+        "라이어 맞아요",
+        "They’re the liar",
+        "是说谎者",
+        "是說謊者",
+        "ライアーだと思う",
+        "Es el mentiroso",
+        "É o mentiroso",
+        "C’est le menteur",
+        "Ist der Lügner",
+        "Dia pembohong",
+        "यही झूठा है",
+        "هو الكاذب"
+      ]
+    },
+    {
+      "Key": "라이어 아니에요",
+      "Values": [
+        "라이어 아니에요",
+        "They’re not the liar",
+        "不是说谎者",
+        "不是說謊者",
+        "ライアーではないと思う",
+        "No es el mentiroso",
+        "Não é o mentiroso",
+        "Ce n’est pas le menteur",
+        "Ist nicht der Lügner",
+        "Dia bukan pembohong",
+        "यह झूठा नहीं है",
+        "ليس الكاذب"
+      ]
+    },
+    {
+      "Key": "라이어 없어요",
+      "Values": [
+        "라이어 없어요",
+        "There is no liar",
+        "没有说谎者",
+        "沒有說謊者",
+        "ライアーはいない",
+        "No hay mentiroso",
+        "Não há mentiroso",
+        "Il n’y a aucun menteur",
+        "Es gibt keinen Lügner",
+        "Tidak ada pembohong",
+        "कोई झूठा नहीं है",
+        "لا يوجد كاذب"
+      ]
+    },
+    {
+      "Key": "라이어 있어요",
+      "Values": [
+        "라이어 있어요",
+        "There is a liar",
+        "有说谎者",
+        "有說謊者",
+        "ライアーはいる",
+        "Hay un mentiroso",
+        "Há um mentiroso",
+        "Il y a un menteur",
+        "Es gibt einen Lügner",
+        "Ada pembohong",
+        "कोई झूठा है",
+        "يوجد كاذب"
+      ]
+    },
+    {
+      "Key": "{0}님 지목이 가결되었어요.",
+      "Values": [
+        "{0}님 지목이 가결되었어요.",
+        "The accusation against {0} was approved.",
+        "对{0}的指控已通过。",
+        "對{0}的指控已通過。",
+        "{0}さんへの指名が可決されました。",
+        "Se aprobó la acusación contra {0}.",
+        "A acusação contra {0} foi aprovada.",
+        "La désignation de {0} a été approuvée.",
+        "Die Nominierung von {0} wurde angenommen.",
+        "Penunjukan {0} disetujui.",
+        "{0} का नामांकन स्वीकार हो गया।",
+        "تمت الموافقة على اتهام {0}."
+      ]
+    },
+    {
+      "Key": "{0}님 지목이 부결되었어요.",
+      "Values": [
+        "{0}님 지목이 부결되었어요.",
+        "The accusation against {0} was rejected.",
+        "对{0}的指控被否决。",
+        "對{0}的指控被否決。",
+        "{0}さんへの指名が否決されました。",
+        "Se rechazó la acusación contra {0}.",
+        "A acusação contra {0} foi rejeitada.",
+        "La désignation de {0} a été rejetée.",
+        "Die Nominierung von {0} wurde abgelehnt.",
+        "Penunjukan {0} ditolak.",
+        "{0} का नामांकन अस्वीकार हो गया।",
+        "رُفض اتهام {0}."
+      ]
+    },
+    {
+      "Key": "‘라이어 없음’ 지목이 가결되었어요.",
+      "Values": [
+        "‘라이어 없음’ 지목이 가결되었어요.",
+        "The “No Liar” nomination was approved.",
+        "“没有说谎者”的提名已通过。",
+        "「沒有說謊者」的提名已通過。",
+        "「ライアーなし」の指名が可決されました。",
+        "Se aprobó la nominación «Sin mentiroso».",
+        "A indicação “Sem mentiroso” foi aprovada.",
+        "La désignation « Aucun menteur » a été approuvée.",
+        "Die Nominierung „Kein Lügner“ wurde angenommen.",
+        "Penunjukan “Tidak Ada Pembohong” disetujui.",
+        "“कोई झूठा नहीं” नामांकन स्वीकार हो गया।",
+        "تمت الموافقة على ترشيح «لا يوجد كاذب»."
+      ]
+    },
+    {
+      "Key": "‘라이어 없음’ 지목이 부결되었어요.",
+      "Values": [
+        "‘라이어 없음’ 지목이 부결되었어요.",
+        "The “No Liar” nomination was rejected.",
+        "“没有说谎者”的提名被否决。",
+        "「沒有說謊者」的提名被否決。",
+        "「ライアーなし」の指名が否決されました。",
+        "Se rechazó la nominación «Sin mentiroso».",
+        "A indicação “Sem mentiroso” foi rejeitada.",
+        "La désignation « Aucun menteur » a été rejetée.",
+        "Die Nominierung „Kein Lügner“ wurde abgelehnt.",
+        "Penunjukan “Tidak Ada Pembohong” ditolak.",
+        "“कोई झूठा नहीं” नामांकन अस्वीकार हो गया।",
+        "رُفض ترشيح «لا يوجد كاذب»."
+      ]
+    },
+    {
+      "Key": "새 메시지 {0}개",
+      "Values": [
+        "새 메시지 {0}개",
+        "{0} new messages",
+        "{0}条新消息",
+        "{0}則新訊息",
+        "新しいメッセージ {0}件",
+        "{0} mensajes nuevos",
+        "{0} novas mensagens",
+        "{0} nouveaux messages",
+        "{0} neue Nachrichten",
+        "{0} pesan baru",
+        "{0} नए संदेश",
+        "{0} رسائل جديدة"
+      ]
+    },
+    {
+      "Key": "내가 그린 선을 모두 지울까요?",
+      "Values": [
+        "내가 그린 선을 모두 지울까요?",
+        "Erase all your lines?",
+        "要清除你画的所有线条吗？",
+        "要清除你畫的所有線條嗎？",
+        "自分が描いた線をすべて消しますか？",
+        "¿Borrar todas tus líneas?",
+        "Apagar todas as suas linhas?",
+        "Effacer tous vos traits ?",
+        "Alle deine Linien löschen?",
+        "Hapus semua garis yang kamu gambar?",
+        "क्या आपकी खींची सभी रेखाएं मिटा दें?",
+        "هل تريد مسح جميع الخطوط التي رسمتها؟"
+      ]
+    },
+    {
+      "Key": "모두 지우기",
+      "Values": [
+        "모두 지우기",
+        "Erase all",
+        "全部清除",
+        "全部清除",
+        "すべて消す",
+        "Borrar todo",
+        "Apagar tudo",
+        "Tout effacer",
+        "Alle löschen",
+        "Hapus semua",
+        "सभी मिटाएं",
+        "مسح الكل"
+      ]
+    },
+    {
+      "Key": "다음 단계까지 {0}초",
+      "Values": [
+        "다음 단계까지 {0}초",
+        "Next step in {0}s",
+        "{0}秒后进入下一阶段",
+        "{0}秒後進入下一階段",
+        "次の段階まで{0}秒",
+        "Siguiente fase en {0} s",
+        "Próxima etapa em {0}s",
+        "Étape suivante dans {0} s",
+        "Nächster Schritt in {0} s",
+        "Tahap berikutnya dalam {0} dtk",
+        "अगला चरण {0} सेकंड में",
+        "المرحلة التالية خلال {0} ث"
+      ]
+    },
+    {
+      "Key": "방 연결이 끊겼어요.",
+      "Values": [
+        "방 연결이 끊겼어요.",
+        "Lost connection to the room.",
+        "与房间的连接已断开。",
+        "與房間的連線已中斷。",
+        "ルームとの接続が切れました。",
+        "Se perdió la conexión con la sala.",
+        "A conexão com a sala foi perdida.",
+        "La connexion au salon a été perdue.",
+        "Die Verbindung zum Raum wurde unterbrochen.",
+        "Koneksi ke ruang terputus.",
+        "कमरे से कनेक्शन टूट गया।",
+        "انقطع الاتصال بالغرفة."
+      ]
+    },
+    {
+      "Key": "다시 연결",
+      "Values": [
+        "다시 연결",
+        "Reconnect",
+        "重新连接",
+        "重新連線",
+        "再接続",
+        "Reconectar",
+        "Reconectar",
+        "Se reconnecter",
+        "Neu verbinden",
+        "Sambungkan lagi",
+        "फिर से जोड़ें",
+        "إعادة الاتصال"
       ]
     }
   ]

@@ -34,7 +34,7 @@ namespace DrawLiar
                 catalogueBody = Box(scroll, "cosmetic-scroll-body");
             }
             var heading = Box(catalogueBody, "row commerce-heading");
-            Text(heading, "보석 꾸미기", "section-title grow");
+            Text(heading, "보석 장식", "section-title grow");
             IconButton(heading, "새로고침", DrawUIIcon.Kind.Refresh, () => Run(() => lobby.RefreshCommerceAsync()), "commerce-refresh");
             Text(catalogueBody, "한 번 구매하면 계속 사용할 수 있어요.", "commerce-description cosmetic-permanent");
             var categories = Box(catalogueBody, "row cosmetic-categories");
@@ -77,7 +77,7 @@ namespace DrawLiar
                 case CosmeticRules.AVATAR_BACKGROUND: return "캐릭터 배경";
                 case CosmeticRules.AVATAR_FRAME: return "프로필 테두리";
                 case CosmeticRules.CHAT_BUBBLE: return "채팅 말풍선";
-                default: return "꾸미기";
+                default: return "장식";
             }
         }
 
@@ -231,7 +231,7 @@ namespace DrawLiar
         private void ConfirmCosmeticPurchase(CommerceProduct product)
         {
             string account = lobby.Profile.AccountId;
-            var modal = Modal("꾸미기 구매");
+            var modal = Modal("장식 구매");
             modal.name = "cosmetic-confirm";
             var preview = Box(modal, "cosmetic-product-preview");
             CosmeticProductPreview(preview, product);

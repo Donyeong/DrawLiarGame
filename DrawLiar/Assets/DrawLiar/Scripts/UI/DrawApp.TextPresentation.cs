@@ -20,7 +20,8 @@ namespace DrawLiar
         private double _presentationStartedAt;
         private float _presentationElapsed;
         private VisualElement _presentationOverlay, _revealVerdictCard, _revealIdentityCard, _revealAvatars;
-        private Label _revealCaption;
+        private Label _revealCaption, _resultsCountdown;
+        private int _resultsCountdownSeconds;
         private Button _revealConfirm;
         private IVisualElementScheduledItem _presentationJob;
         private DrawLiarRevealPlan _liarRevealPlan;
@@ -122,6 +123,15 @@ namespace DrawLiar
             if (avatars && _presentationTracks.All(track => track.Text.IsComplete)) _presentationJob?.Pause();
         }
 
+        private void RefreshResultsCountdown()
+        {
+            if (_resultsCountdown == null) return;
+            int seconds = Mathf.CeilToInt(_timerClock.Remaining(Time.realtimeSinceStartupAsDouble));
+            if (seconds == _resultsCountdownSeconds) return;
+            _resultsCountdownSeconds = seconds;
+            SetText(_resultsCountdown, "다음 단계까지 {0}초", seconds);
+        }
+
         private void RestoreTextPresentation(RoomSnapshot state)
         {
             if (!_presentationNeedsView || _presentationClosed || overlay != null) return;
@@ -138,7 +148,7 @@ namespace DrawLiar
             _presentationTracks.Clear();
             _presentationOverlay = null;
             _revealVerdictCard = _revealIdentityCard = _revealAvatars = null;
-            _revealCaption = null;
+            _revealCaption = _resultsCountdown = null;
             _revealConfirm = null;
             _identityShown = _avatarsShown = false;
             _presentationElapsed = 0;

@@ -128,7 +128,7 @@ namespace DrawLiar
             ApplyCommerceProfile(profile, account);
             if (_manager != null && _manager.IsConnected) await _manager.RefreshProfileAsync();
             EnsureCommerceIdentity(session, account, cancellationToken);
-            SetStatus("꾸미기를 저장했습니다.");
+            SetStatus("장식을 적용했습니다.");
             CommerceChanged?.Invoke();
         });
 

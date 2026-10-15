@@ -49,13 +49,21 @@ namespace DrawLiar
             _judgmentPanel.EnableInClassList("nomination-panel", nomination);
             if (!visible) { _judgmentPanelKey = ""; _judgmentCounts = _judgmentProgress = null; voteProgress = null; return; }
             if (nomination) { RefreshNominationPanel(state, local); return; }
-            string key = $"judgment/{state.BallotVersion}/{state.AccusedPlayerId}/{state.Settings.LiarMode}/{state.LocalPlayerId}/{state.LocalIsSpectator}/{local?.IsConnected}/{local?.HasJudged}/{_judgmentSubmitted}/{state.LocalJudgmentApprove}/{state.IsJudgmentCoinToss}";
+            bool noLiarAccused = IsNoLiarAccused(state);
+            string accusedName = state.Players.FirstOrDefault(player => player.Id == state.AccusedPlayerId)?.Name ?? "";
+            string key = $"judgment/{state.BallotVersion}/{state.AccusedPlayerId}/{accusedName}/{state.Settings.LiarMode}/{state.LocalPlayerId}/{state.LocalIsSpectator}/{local?.IsConnected}/{local?.HasJudged}/{_judgmentSubmitted}/{state.LocalJudgmentApprove}/{state.IsJudgmentCoinToss}";
             if (key != _judgmentPanelKey)
             {
                 _judgmentPanelKey = key;
                 _judgmentPanel.Clear();
                 voteProgress = null;
-                if (IsNoLiarAccused(state)) Text(_judgmentPanel, "라이어가 없다고 생각하나요?", "nomination-prompt").name = "judgment-no-liar-prompt";
+                var prompt = noLiarAccused
+                    ? Text(_judgmentPanel, "라이어가 없다고 생각하나요?", "nomination-prompt")
+                    : Text(_judgmentPanel, "{0}님이 라이어라고 생각하나요?", "nomination-prompt", accusedName);
+                prompt.name = noLiarAccused ? "judgment-no-liar-prompt" : "judgment-prompt";
+                prompt.style.minWidth = 0;
+                prompt.style.whiteSpace = WhiteSpace.Normal;
+                prompt.style.flexShrink = 0;
                 _judgmentCounts = Text(_judgmentPanel, "", "judgment-counts");
                 _judgmentCounts.name = "judgment-counts";
                 _judgmentProgress = Text(_judgmentPanel, "", "judgment-progress");
@@ -66,10 +74,18 @@ namespace DrawLiar
                 else if (local?.IsConnected == true && !local.IsSpectator)
                 {
                     var actions = Box(_judgmentPanel, "row judgment-actions");
-                    var yes = Button(actions, "찬성", () => SubmitJudgment(true), "primary judgment-approve", DrawSound.UiConfirm);
+                    actions.style.minWidth = 0;
+                    var yes = Button(actions, noLiarAccused ? "라이어 없어요" : "라이어 맞아요", () => SubmitJudgment(true), "primary judgment-approve", DrawSound.UiConfirm);
                     yes.name = "judgment-approve";
-                    var no = Button(actions, "반대", () => SubmitJudgment(false), "secondary judgment-reject", DrawSound.UiConfirm);
+                    var no = Button(actions, noLiarAccused ? "라이어 있어요" : "라이어 아니에요", () => SubmitJudgment(false), "secondary judgment-reject", DrawSound.UiConfirm);
                     no.name = "judgment-reject";
+                    foreach (var button in new[] { yes, no })
+                    {
+                        button.style.minWidth = 0;
+                        button.style.whiteSpace = WhiteSpace.Normal;
+                        button.style.height = StyleKeyword.Auto;
+                        button.style.flexShrink = 1;
+                    }
                     yes.SetEnabled(CanJudge(state, local));
                     no.SetEnabled(CanJudge(state, local));
                     if (local.HasJudged) Text(_judgmentPanel, state.LocalJudgmentApprove ? "찬성 제출 완료" : "반대 제출 완료", "judgment-state");
@@ -247,12 +263,18 @@ namespace DrawLiar
         {
             var state = network.State;
             var local = state?.Players.FirstOrDefault(player => player.Id == state.LocalPlayerId);
-            if (_guessField == null || _guessSubmitted || !CanGuess(state, local) || _guessScope != GuessScope(state)
-                || string.IsNullOrWhiteSpace(_guessField.value)) return;
+            if (_guessField == null || _guessSubmitted || !CanGuess(state, local) || _guessScope != GuessScope(state)) return;
             _guessDraft = _guessField.value;
+            string answer = GameRules.CleanText(_guessDraft, 40);
+            if (string.IsNullOrWhiteSpace(answer))
+            {
+                Toast("제시어를 입력해 주세요.");
+                _guessField.Focus();
+                return;
+            }
             _guessSubmitted = true;
             _guessSubmit?.SetEnabled(false);
-            network.Guess(_guessDraft);
+            network.Guess(answer);
             RefreshState(state);
         }
 

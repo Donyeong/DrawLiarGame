@@ -10,7 +10,7 @@
 - 확장 파츠는 부위별 3비트 코드이며 단일 비트 플래그가 아니다. 선택·착용·보유는 `AvatarParts.Get/IsEquipped/IsOwned/KeepOwned`를 사용하고, 보유 목록을 OR하여 합치거나 확장 파츠를 부분 비트 일치로 비교하지 않는다.
 - 보석 꾸미기 정의·카테고리·장착은 공유 `CosmeticRules`를 사용한다. 영구 구매 내역과 호환되도록 상품 ID와 카테고리를 변경하거나 재사용하지 않는다.
 - `Painter2D` 채움 경로의 첫 곡선은 `BezierCurveTo`를 사용한다.
-- UI 고정 문구와 서식 문자열은 I2 Localization 기반 `DrawLocalization`을 거친다. 번역은 `UiTranslations.json`에서 수정하고 I2 소스는 자동 생성한다. 숫자·이름은 서식 인수로 분리한다.
+- UI 고정 문구와 서식 문자열은 I2 Localization 기반 `DrawLocalization`을 거친다. 번역은 `UiTranslations.json`에서 수정하고 I2 소스는 자동 생성한다. 자동 생성이 늦게 반영될 수 있으므로 커밋·빌드 전에 `Tools/DrawLiar/Localization/Refresh Catalogue`로 `DrawLiarLanguages.asset` 반영을 확인한다. 숫자·이름은 서식 인수로 분리한다.
 - 닉네임·방 이름·채팅·사용자 주제·서버 제시어는 번역하지 않는다. 언어 변경으로 서버의 게임 데이터나 정답 판정을 바꾸지 않는다.
 - 언어 변경은 현재 화면과 로고에 즉시 반영하고 선택을 저장한다. 로고와 폰트는 현재 언어에 필요한 것만 로드한다.
 - WebGL UI는 ICU 데이터가 직렬화된 `PanelSettings`를 복제한다. 런타임 `CreateInstance`로 만든 패널은 고급 문자 처리를 활성화하지 못한다.
