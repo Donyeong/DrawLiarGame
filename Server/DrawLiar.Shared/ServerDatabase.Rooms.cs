@@ -394,7 +394,7 @@ public sealed partial class ServerDatabase
     public static void ValidateSettings(ServerRoomSettings settings)
     {
         settings.MaxPlayers = ServerRoomSettings.MAX_PLAYERS;
-        if (settings.LiarMode is < 0 or > 2) throw new ApiException("InvalidSettings");
+        if (settings.LiarMode is < 0 or > 3) throw new ApiException("InvalidSettings");
         if (settings.LiarMode != 0) settings.LiarCount = 1;
         if (settings.LiarCount < 1 || settings.LiarCount >= settings.MaxPlayers || settings.RoundCount is < 1 or > 30 || settings.TargetScore is < 1 or > 1000
             || settings.Mode is < 0 or > 1 || settings.Victory is < 0 or > 1 || settings.RoleSeconds is < 3 or > 30 || settings.DrawSeconds is < 5 or > 180

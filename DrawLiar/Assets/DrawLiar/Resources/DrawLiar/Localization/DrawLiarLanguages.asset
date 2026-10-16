@@ -15613,6 +15613,809 @@ MonoBehaviour:
       - "\u0627\u0644\u062A\u062D\u0642\u0642 \u0645\u0646 \u0627\u0644\u0645\u0643\u0627\u0641\u0623\u0629"
       Flags: 000000000000000000000000
       Languages_Touch: []
+    - Term: UI/7Iqk7YyM7J20
+      TermType: 0
+      Description: "\uC2A4\uD30C\uC774"
+      Languages:
+      - "\uC2A4\uD30C\uC774"
+      - Spy
+      - "\u95F4\u8C0D"
+      - "\u9593\u8ADC"
+      - "\u30B9\u30D1\u30A4"
+      - "Esp\xEDa"
+      - "Espi\xE3o"
+      - Espion
+      - Spion
+      - Mata-mata
+      - "\u091C\u093E\u0938\u0942\u0938"
+      - "\u0627\u0644\u062C\u0627\u0633\u0648\u0633"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7Iqk7YyM7J20IOuqqOuTnA
+      TermType: 0
+      Description: "\uC2A4\uD30C\uC774 \uBAA8\uB4DC"
+      Languages:
+      - "\uC2A4\uD30C\uC774 \uBAA8\uB4DC"
+      - Spy mode
+      - "\u95F4\u8C0D\u6A21\u5F0F"
+      - "\u9593\u8ADC\u6A21\u5F0F"
+      - "\u30B9\u30D1\u30A4\u30E2\u30FC\u30C9"
+      - "Modo esp\xEDa"
+      - "Modo espi\xE3o"
+      - Mode espion
+      - Spionmodus
+      - Mode mata-mata
+      - "\u091C\u093E\u0938\u0942\u0938 \u092E\u094B\u0921"
+      - "\u0648\u0636\u0639 \u0627\u0644\u062C\u0627\u0633\u0648\u0633"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7Iqk7YyM7J2064qUIOygnOyLnOyWtOulvCDslYzqs6Ag65287J207Ja066W8IOuPleyKteuLiOuLpC4g7Iqk7YyM7J206rCAIOyggeuwnOuQmOuptCDsi5zrr7zsnbQg7Iq566as7ZWp64uI64ukLg
+      TermType: 0
+      Description: "\uC2A4\uD30C\uC774\uB294 \uC81C\uC2DC\uC5B4\uB97C \uC54C\uACE0
+        \uB77C\uC774\uC5B4\uB97C \uB3D5\uC2B5\uB2C8\uB2E4. \uC2A4\uD30C\uC774\uAC00
+        \uC801\uBC1C\uB418\uBA74 \uC2DC\uBBFC\uC774 \uC2B9\uB9AC\uD569\uB2C8\uB2E4."
+      Languages:
+      - "\uC2A4\uD30C\uC774\uB294 \uC81C\uC2DC\uC5B4\uB97C \uC54C\uACE0 \uB77C\uC774\uC5B4\uB97C
+        \uB3D5\uC2B5\uB2C8\uB2E4. \uC2A4\uD30C\uC774\uAC00 \uC801\uBC1C\uB418\uBA74
+        \uC2DC\uBBFC\uC774 \uC2B9\uB9AC\uD569\uB2C8\uB2E4."
+      - The spy knows the word and helps the liar. If the spy is exposed, the citizens
+        win.
+      - "\u95F4\u8C0D\u77E5\u9053\u8BCD\u8BED\u5E76\u5E2E\u52A9\u8BF4\u8C0E\u8005\u3002\u95F4\u8C0D\u88AB\u8BC6\u7834\u65F6\uFF0C\u5E02\u6C11\u83B7\u80DC\u3002"
+      - "\u9593\u8ADC\u77E5\u9053\u8A5E\u8A9E\u4E26\u5E6B\u52A9\u8AAA\u8B0A\u8005\u3002\u9593\u8ADC\u88AB\u8B58\u7834\u6642\uFF0C\u5E02\u6C11\u7372\u52DD\u3002"
+      - "\u30B9\u30D1\u30A4\u306F\u5358\u8A9E\u3092\u77E5\u3063\u3066\u3044\u3066\u3001\u30E9\u30A4\u30A2\u30FC\u3092\u52A9\u3051\u307E\u3059\u3002\u30B9\u30D1\u30A4\u304C\u898B\u7834\u3089\u308C\u308B\u3068\u5E02\u6C11\u306E\u52DD\u5229\u3067\u3059\u3002"
+      - "El esp\xEDa conoce la palabra y ayuda al mentiroso. Si descubren al esp\xEDa,
+        ganan los inocentes."
+      - "O espi\xE3o conhece a palavra e ajuda o mentiroso. Se o espi\xE3o for descoberto,
+        os inocentes vencem."
+      - "L\u2019espion conna\xEEt le mot et aide le menteur. Si l\u2019espion est
+        d\xE9masqu\xE9, les innocents gagnent."
+      - "Der Spion kennt das Wort und hilft dem L\xFCgner. Wird der Spion enttarnt,
+        gewinnen die Unschuldigen."
+      - Mata-mata mengetahui kata dan membantu pembohong. Jika mata-mata terbongkar,
+        pemain biasa menang.
+      - "\u091C\u093E\u0938\u0942\u0938 \u0936\u092C\u094D\u0926 \u091C\u093E\u0928\u0924\u093E
+        \u0939\u0948 \u0914\u0930 \u091D\u0942\u0920\u0947 \u0915\u0940 \u092E\u0926\u0926
+        \u0915\u0930\u0924\u093E \u0939\u0948\u0964 \u091C\u093E\u0938\u0942\u0938
+        \u0915\u0940 \u092A\u0939\u091A\u093E\u0928 \u0916\u0941\u0932\u0928\u0947
+        \u092A\u0930 \u0938\u093E\u092E\u093E\u0928\u094D\u092F \u0916\u093F\u0932\u093E\u0921\u093C\u0940
+        \u091C\u0940\u0924\u0924\u0947 \u0939\u0948\u0902\u0964"
+      - "\u064A\u0639\u0631\u0641 \u0627\u0644\u062C\u0627\u0633\u0648\u0633 \u0627\u0644\u0643\u0644\u0645\u0629
+        \u0648\u064A\u0633\u0627\u0639\u062F \u0627\u0644\u0643\u0627\u0630\u0628.
+        \u0625\u0630\u0627 \u0643\u064F\u0634\u0641\u062A \u0647\u0648\u064A\u0629
+        \u0627\u0644\u062C\u0627\u0633\u0648\u0633\u060C \u064A\u0641\u0648\u0632
+        \u0627\u0644\u0644\u0627\u0639\u0628\u0648\u0646 \u0627\u0644\u0639\u0627\u062F\u064A\u0648\u0646."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7Iqk7YyM7J2064qUIOygnOyLnOyWtOulvCDslYzqs6Ag65287J207Ja066W8IOuPleyKteuLiOuLpC4g7Iqk7YyM7J206rCAIOyggeuwnOuQmOuptCDsi5zrr7zsnbQg7Iq566as7ZWp64uI64ukLgrstZzshowgezB966qF
+      TermType: 0
+      Description: "\uC2A4\uD30C\uC774\uB294 \uC81C\uC2DC\uC5B4\uB97C \uC54C\uACE0
+        \uB77C\uC774\uC5B4\uB97C \uB3D5\uC2B5\uB2C8\uB2E4. \uC2A4\uD30C\uC774\uAC00
+        \uC801\uBC1C\uB418\uBA74 \uC2DC\uBBFC\uC774 \uC2B9\uB9AC\uD569\uB2C8\uB2E4.\n\uCD5C\uC18C
+        {0}\uBA85"
+      Languages:
+      - "\uC2A4\uD30C\uC774\uB294 \uC81C\uC2DC\uC5B4\uB97C \uC54C\uACE0 \uB77C\uC774\uC5B4\uB97C
+        \uB3D5\uC2B5\uB2C8\uB2E4. \uC2A4\uD30C\uC774\uAC00 \uC801\uBC1C\uB418\uBA74
+        \uC2DC\uBBFC\uC774 \uC2B9\uB9AC\uD569\uB2C8\uB2E4.\n\uCD5C\uC18C {0}\uBA85"
+      - 'The spy knows the word and helps the liar. If the spy is exposed, the citizens
+        win.
+
+        Minimum players: {0}'
+      - "\u95F4\u8C0D\u77E5\u9053\u8BCD\u8BED\u5E76\u5E2E\u52A9\u8BF4\u8C0E\u8005\u3002\u95F4\u8C0D\u88AB\u8BC6\u7834\u65F6\uFF0C\u5E02\u6C11\u83B7\u80DC\u3002\n\u81F3\u5C11{0}\u4EBA"
+      - "\u9593\u8ADC\u77E5\u9053\u8A5E\u8A9E\u4E26\u5E6B\u52A9\u8AAA\u8B0A\u8005\u3002\u9593\u8ADC\u88AB\u8B58\u7834\u6642\uFF0C\u5E02\u6C11\u7372\u52DD\u3002\n\u81F3\u5C11
+        {0} \u4EBA"
+      - "\u30B9\u30D1\u30A4\u306F\u5358\u8A9E\u3092\u77E5\u3063\u3066\u3044\u3066\u3001\u30E9\u30A4\u30A2\u30FC\u3092\u52A9\u3051\u307E\u3059\u3002\u30B9\u30D1\u30A4\u304C\u898B\u7834\u3089\u308C\u308B\u3068\u5E02\u6C11\u306E\u52DD\u5229\u3067\u3059\u3002\n\u6700\u4F4E{0}\u4EBA"
+      - "El esp\xEDa conoce la palabra y ayuda al mentiroso. Si descubren al esp\xEDa,
+        ganan los inocentes.\nM\xEDnimo de jugadores: {0}"
+      - "O espi\xE3o conhece a palavra e ajuda o mentiroso. Se o espi\xE3o for descoberto,
+        os inocentes vencem.\nM\xEDnimo de jogadores: {0}"
+      - "L\u2019espion conna\xEEt le mot et aide le menteur. Si l\u2019espion est
+        d\xE9masqu\xE9, les innocents gagnent.\nNombre minimum de joueurs : {0}"
+      - "Der Spion kennt das Wort und hilft dem L\xFCgner. Wird der Spion enttarnt,
+        gewinnen die Unschuldigen.\nMindestens {0} Spieler"
+      - 'Mata-mata mengetahui kata dan membantu pembohong. Jika mata-mata terbongkar,
+        pemain biasa menang.
+
+        Minimal {0} pemain'
+      - "\u091C\u093E\u0938\u0942\u0938 \u0936\u092C\u094D\u0926 \u091C\u093E\u0928\u0924\u093E
+        \u0939\u0948 \u0914\u0930 \u091D\u0942\u0920\u0947 \u0915\u0940 \u092E\u0926\u0926
+        \u0915\u0930\u0924\u093E \u0939\u0948\u0964 \u091C\u093E\u0938\u0942\u0938
+        \u0915\u0940 \u092A\u0939\u091A\u093E\u0928 \u0916\u0941\u0932\u0928\u0947
+        \u092A\u0930 \u0938\u093E\u092E\u093E\u0928\u094D\u092F \u0916\u093F\u0932\u093E\u0921\u093C\u0940
+        \u091C\u0940\u0924\u0924\u0947 \u0939\u0948\u0902\u0964\n\u0915\u092E \u0938\u0947
+        \u0915\u092E {0} \u0916\u093F\u0932\u093E\u0921\u093C\u0940"
+      - "\u064A\u0639\u0631\u0641 \u0627\u0644\u062C\u0627\u0633\u0648\u0633 \u0627\u0644\u0643\u0644\u0645\u0629
+        \u0648\u064A\u0633\u0627\u0639\u062F \u0627\u0644\u0643\u0627\u0630\u0628.
+        \u0625\u0630\u0627 \u0643\u064F\u0634\u0641\u062A \u0647\u0648\u064A\u0629
+        \u0627\u0644\u062C\u0627\u0633\u0648\u0633\u060C \u064A\u0641\u0648\u0632
+        \u0627\u0644\u0644\u0627\u0639\u0628\u0648\u0646 \u0627\u0644\u0639\u0627\u062F\u064A\u0648\u0646.\n\u0627\u0644\u062D\u062F
+        \u0627\u0644\u0623\u062F\u0646\u0649 \u0644\u0644\u0627\u0639\u0628\u064A\u0646:
+        {0}"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/65287J207Ja0IHswfeuqhSDCtyDsiqTtjIzsnbQgezF966qF
+      TermType: 0
+      Description: "\uB77C\uC774\uC5B4 {0}\uBA85 \xB7 \uC2A4\uD30C\uC774 {1}\uBA85"
+      Languages:
+      - "\uB77C\uC774\uC5B4 {0}\uBA85 \xB7 \uC2A4\uD30C\uC774 {1}\uBA85"
+      - "Liars: {0} \xB7 Spies: {1}"
+      - "\u8BF4\u8C0E\u8005{0}\u4EBA \xB7 \u95F4\u8C0D{1}\u4EBA"
+      - "\u8AAA\u8B0A\u8005 {0} \u4EBA \xB7 \u9593\u8ADC {1} \u4EBA"
+      - "\u30E9\u30A4\u30A2\u30FC{0}\u4EBA \xB7 \u30B9\u30D1\u30A4{1}\u4EBA"
+      - "Mentirosos: {0} \xB7 Esp\xEDas: {1}"
+      - "Mentirosos: {0} \xB7 Espi\xF5es: {1}"
+      - "Menteurs : {0} \xB7 Espions : {1}"
+      - "L\xFCgner: {0} \xB7 Spione: {1}"
+      - "Pembohong: {0} \xB7 Mata-mata: {1}"
+      - "\u091D\u0942\u0920\u0947: {0} \xB7 \u091C\u093E\u0938\u0942\u0938: {1}"
+      - "\u0627\u0644\u0643\u0627\u0630\u0628\u0648\u0646: {0} \xB7 \u0627\u0644\u062C\u0648\u0627\u0633\u064A\u0633:
+        {1}"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7Iqk7YyM7J20IOuqqOuTnCDCtyB7MH3rnbzsmrTrk5w
+      TermType: 0
+      Description: "\uC2A4\uD30C\uC774 \uBAA8\uB4DC \xB7 {0}\uB77C\uC6B4\uB4DC"
+      Languages:
+      - "\uC2A4\uD30C\uC774 \uBAA8\uB4DC \xB7 {0}\uB77C\uC6B4\uB4DC"
+      - "Spy mode \xB7 {0} rounds"
+      - "\u95F4\u8C0D\u6A21\u5F0F \xB7 {0}\u56DE\u5408"
+      - "\u9593\u8ADC\u6A21\u5F0F \xB7 {0} \u56DE\u5408"
+      - "\u30B9\u30D1\u30A4\u30E2\u30FC\u30C9 \xB7 {0}\u30E9\u30A6\u30F3\u30C9"
+      - "Modo esp\xEDa \xB7 Rondas {0}"
+      - "Modo espi\xE3o \xB7 Rodadas {0}"
+      - "Mode espion \xB7 Manches {0}"
+      - "Spionmodus \xB7 Runden {0}"
+      - "Mode mata-mata \xB7 Ronde {0}"
+      - "\u091C\u093E\u0938\u0942\u0938 \u092E\u094B\u0921 \xB7 \u0930\u093E\u0909\u0902\u0921
+        {0}"
+      - "\u0648\u0636\u0639 \u0627\u0644\u062C\u0627\u0633\u0648\u0633 \xB7 \u0627\u0644\u062C\u0648\u0644\u0627\u062A
+        {0}"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7Iqk7YyM7J20IOuqqOuTnCDCtyDrqqntkZwgezB97KCQ
+      TermType: 0
+      Description: "\uC2A4\uD30C\uC774 \uBAA8\uB4DC \xB7 \uBAA9\uD45C {0}\uC810"
+      Languages:
+      - "\uC2A4\uD30C\uC774 \uBAA8\uB4DC \xB7 \uBAA9\uD45C {0}\uC810"
+      - "Spy mode \xB7 Target {0} pts"
+      - "\u95F4\u8C0D\u6A21\u5F0F \xB7 \u76EE\u6807{0}\u5206"
+      - "\u9593\u8ADC\u6A21\u5F0F \xB7 \u76EE\u6A19 {0} \u5206"
+      - "\u30B9\u30D1\u30A4\u30E2\u30FC\u30C9 \xB7 \u76EE\u6A19{0}\u70B9"
+      - "Modo esp\xEDa \xB7 Objetivo {0} puntos"
+      - "Modo espi\xE3o \xB7 Meta {0} pontos"
+      - "Mode espion \xB7 Objectif {0} points"
+      - "Spionmodus \xB7 Ziel {0} Punkte"
+      - "Mode mata-mata \xB7 Target {0} poin"
+      - "\u091C\u093E\u0938\u0942\u0938 \u092E\u094B\u0921 \xB7 \u0932\u0915\u094D\u0937\u094D\u092F
+        {0} \u0905\u0902\u0915"
+      - "\u0648\u0636\u0639 \u0627\u0644\u062C\u0627\u0633\u0648\u0633 \xB7 \u0627\u0644\u0647\u062F\u0641
+        {0} \u0646\u0642\u0627\u0637"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7Iqk7YyM7J20IOuqqOuTnCDCtyB7MH3rnbzsmrTrk5wgwrcg64Kc7J6FIO2XiOyaqQ
+      TermType: 0
+      Description: "\uC2A4\uD30C\uC774 \uBAA8\uB4DC \xB7 {0}\uB77C\uC6B4\uB4DC \xB7
+        \uB09C\uC785 \uD5C8\uC6A9"
+      Languages:
+      - "\uC2A4\uD30C\uC774 \uBAA8\uB4DC \xB7 {0}\uB77C\uC6B4\uB4DC \xB7 \uB09C\uC785
+        \uD5C8\uC6A9"
+      - "Spy mode \xB7 {0} rounds \xB7 Mid-round join on"
+      - "\u95F4\u8C0D\u6A21\u5F0F \xB7 {0}\u56DE\u5408 \xB7 \u5141\u8BB8\u4E2D\u9014\u52A0\u5165"
+      - "\u9593\u8ADC\u6A21\u5F0F \xB7 {0} \u56DE\u5408 \xB7 \u5141\u8A31\u4E2D\u9014\u52A0\u5165"
+      - "\u30B9\u30D1\u30A4\u30E2\u30FC\u30C9 \xB7 {0}\u30E9\u30A6\u30F3\u30C9 \xB7
+        \u9014\u4E2D\u53C2\u52A0\u53EF"
+      - "Modo esp\xEDa \xB7 Rondas {0} \xB7 Entrada en curso: s\xED"
+      - "Modo espi\xE3o \xB7 Rodadas {0} \xB7 Entrada em andamento: sim"
+      - "Mode espion \xB7 Manches {0} \xB7 Arriv\xE9e en cours : oui"
+      - "Spionmodus \xB7 Runden {0} \xB7 Quereinstieg an"
+      - "Mode mata-mata \xB7 Ronde {0} \xB7 Gabung di tengah ronde: aktif"
+      - "\u091C\u093E\u0938\u0942\u0938 \u092E\u094B\u0921 \xB7 \u0930\u093E\u0909\u0902\u0921
+        {0} \xB7 \u092C\u0940\u091A \u092E\u0947\u0902 \u092A\u094D\u0930\u0935\u0947\u0936:
+        \u091A\u093E\u0932\u0942"
+      - "\u0648\u0636\u0639 \u0627\u0644\u062C\u0627\u0633\u0648\u0633 \xB7 \u0627\u0644\u062C\u0648\u0644\u0627\u062A
+        {0} \xB7 \u0627\u0644\u0627\u0646\u0636\u0645\u0627\u0645 \u0623\u062B\u0646\u0627\u0621
+        \u0627\u0644\u062C\u0648\u0644\u0629: \u0645\u0633\u0645\u0648\u062D"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7Iqk7YyM7J20IOuqqOuTnCDCtyB7MH3rnbzsmrTrk5wgwrcg64Kc7J6FIOygnO2VnA
+      TermType: 0
+      Description: "\uC2A4\uD30C\uC774 \uBAA8\uB4DC \xB7 {0}\uB77C\uC6B4\uB4DC \xB7
+        \uB09C\uC785 \uC81C\uD55C"
+      Languages:
+      - "\uC2A4\uD30C\uC774 \uBAA8\uB4DC \xB7 {0}\uB77C\uC6B4\uB4DC \xB7 \uB09C\uC785
+        \uC81C\uD55C"
+      - "Spy mode \xB7 {0} rounds \xB7 Mid-round join off"
+      - "\u95F4\u8C0D\u6A21\u5F0F \xB7 {0}\u56DE\u5408 \xB7 \u7981\u6B62\u4E2D\u9014\u52A0\u5165"
+      - "\u9593\u8ADC\u6A21\u5F0F \xB7 {0} \u56DE\u5408 \xB7 \u7981\u6B62\u4E2D\u9014\u52A0\u5165"
+      - "\u30B9\u30D1\u30A4\u30E2\u30FC\u30C9 \xB7 {0}\u30E9\u30A6\u30F3\u30C9 \xB7
+        \u9014\u4E2D\u53C2\u52A0\u4E0D\u53EF"
+      - "Modo esp\xEDa \xB7 Rondas {0} \xB7 Entrada en curso: no"
+      - "Modo espi\xE3o \xB7 Rodadas {0} \xB7 Entrada em andamento: n\xE3o"
+      - "Mode espion \xB7 Manches {0} \xB7 Arriv\xE9e en cours : non"
+      - "Spionmodus \xB7 Runden {0} \xB7 Quereinstieg aus"
+      - "Mode mata-mata \xB7 Ronde {0} \xB7 Gabung di tengah ronde: nonaktif"
+      - "\u091C\u093E\u0938\u0942\u0938 \u092E\u094B\u0921 \xB7 \u0930\u093E\u0909\u0902\u0921
+        {0} \xB7 \u092C\u0940\u091A \u092E\u0947\u0902 \u092A\u094D\u0930\u0935\u0947\u0936:
+        \u092C\u0902\u0926"
+      - "\u0648\u0636\u0639 \u0627\u0644\u062C\u0627\u0633\u0648\u0633 \xB7 \u0627\u0644\u062C\u0648\u0644\u0627\u062A
+        {0} \xB7 \u0627\u0644\u0627\u0646\u0636\u0645\u0627\u0645 \u0623\u062B\u0646\u0627\u0621
+        \u0627\u0644\u062C\u0648\u0644\u0629: \u0645\u0645\u0646\u0648\u0639"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7Iqk7YyM7J20IOuqqOuTnCDCtyDrqqntkZwgezB97KCQIMK3IOuCnOyehSDtl4jsmqk
+      TermType: 0
+      Description: "\uC2A4\uD30C\uC774 \uBAA8\uB4DC \xB7 \uBAA9\uD45C {0}\uC810 \xB7
+        \uB09C\uC785 \uD5C8\uC6A9"
+      Languages:
+      - "\uC2A4\uD30C\uC774 \uBAA8\uB4DC \xB7 \uBAA9\uD45C {0}\uC810 \xB7 \uB09C\uC785
+        \uD5C8\uC6A9"
+      - "Spy mode \xB7 Target {0} pts \xB7 Mid-round join on"
+      - "\u95F4\u8C0D\u6A21\u5F0F \xB7 \u76EE\u6807{0}\u5206 \xB7 \u5141\u8BB8\u4E2D\u9014\u52A0\u5165"
+      - "\u9593\u8ADC\u6A21\u5F0F \xB7 \u76EE\u6A19 {0} \u5206 \xB7 \u5141\u8A31\u4E2D\u9014\u52A0\u5165"
+      - "\u30B9\u30D1\u30A4\u30E2\u30FC\u30C9 \xB7 \u76EE\u6A19{0}\u70B9 \xB7 \u9014\u4E2D\u53C2\u52A0\u53EF"
+      - "Modo esp\xEDa \xB7 Objetivo {0} puntos \xB7 Entrada en curso: s\xED"
+      - "Modo espi\xE3o \xB7 Meta {0} pontos \xB7 Entrada em andamento: sim"
+      - "Mode espion \xB7 Objectif {0} points \xB7 Arriv\xE9e en cours : oui"
+      - "Spionmodus \xB7 Ziel {0} Punkte \xB7 Quereinstieg an"
+      - "Mode mata-mata \xB7 Target {0} poin \xB7 Gabung di tengah ronde: aktif"
+      - "\u091C\u093E\u0938\u0942\u0938 \u092E\u094B\u0921 \xB7 \u0932\u0915\u094D\u0937\u094D\u092F
+        {0} \u0905\u0902\u0915 \xB7 \u092C\u0940\u091A \u092E\u0947\u0902 \u092A\u094D\u0930\u0935\u0947\u0936:
+        \u091A\u093E\u0932\u0942"
+      - "\u0648\u0636\u0639 \u0627\u0644\u062C\u0627\u0633\u0648\u0633 \xB7 \u0627\u0644\u0647\u062F\u0641
+        {0} \u0646\u0642\u0627\u0637 \xB7 \u0627\u0644\u0627\u0646\u0636\u0645\u0627\u0645
+        \u0623\u062B\u0646\u0627\u0621 \u0627\u0644\u062C\u0648\u0644\u0629: \u0645\u0633\u0645\u0648\u062D"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7Iqk7YyM7J20IOuqqOuTnCDCtyDrqqntkZwgezB97KCQIMK3IOuCnOyehSDsoJztlZw
+      TermType: 0
+      Description: "\uC2A4\uD30C\uC774 \uBAA8\uB4DC \xB7 \uBAA9\uD45C {0}\uC810 \xB7
+        \uB09C\uC785 \uC81C\uD55C"
+      Languages:
+      - "\uC2A4\uD30C\uC774 \uBAA8\uB4DC \xB7 \uBAA9\uD45C {0}\uC810 \xB7 \uB09C\uC785
+        \uC81C\uD55C"
+      - "Spy mode \xB7 Target {0} pts \xB7 Mid-round join off"
+      - "\u95F4\u8C0D\u6A21\u5F0F \xB7 \u76EE\u6807{0}\u5206 \xB7 \u7981\u6B62\u4E2D\u9014\u52A0\u5165"
+      - "\u9593\u8ADC\u6A21\u5F0F \xB7 \u76EE\u6A19 {0} \u5206 \xB7 \u7981\u6B62\u4E2D\u9014\u52A0\u5165"
+      - "\u30B9\u30D1\u30A4\u30E2\u30FC\u30C9 \xB7 \u76EE\u6A19{0}\u70B9 \xB7 \u9014\u4E2D\u53C2\u52A0\u4E0D\u53EF"
+      - "Modo esp\xEDa \xB7 Objetivo {0} puntos \xB7 Entrada en curso: no"
+      - "Modo espi\xE3o \xB7 Meta {0} pontos \xB7 Entrada em andamento: n\xE3o"
+      - "Mode espion \xB7 Objectif {0} points \xB7 Arriv\xE9e en cours : non"
+      - "Spionmodus \xB7 Ziel {0} Punkte \xB7 Quereinstieg aus"
+      - "Mode mata-mata \xB7 Target {0} poin \xB7 Gabung di tengah ronde: nonaktif"
+      - "\u091C\u093E\u0938\u0942\u0938 \u092E\u094B\u0921 \xB7 \u0932\u0915\u094D\u0937\u094D\u092F
+        {0} \u0905\u0902\u0915 \xB7 \u092C\u0940\u091A \u092E\u0947\u0902 \u092A\u094D\u0930\u0935\u0947\u0936:
+        \u092C\u0902\u0926"
+      - "\u0648\u0636\u0639 \u0627\u0644\u062C\u0627\u0633\u0648\u0633 \xB7 \u0627\u0644\u0647\u062F\u0641
+        {0} \u0646\u0642\u0627\u0637 \xB7 \u0627\u0644\u0627\u0646\u0636\u0645\u0627\u0645
+        \u0623\u062B\u0646\u0627\u0621 \u0627\u0644\u062C\u0648\u0644\u0629: \u0645\u0645\u0646\u0648\u0639"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7KCc7Iuc7Ja066W8IOuqqOultOuKlCDrnbzsnbTslrTsl5Dqsowg6re466a87Jy866GcIO2ejO2KuOulvCDso7zrqbTshJwsIOyKpO2MjOydtOyduCDsgqzsi6TsnYQg7Iio6riw7IS47JqULiDsoIHrsJzrkJjrqbQg7Iuc66-8IO2MgOydtCDsirnrpqztlanri4jri6Qu
+      TermType: 0
+      Description: "\uC81C\uC2DC\uC5B4\uB97C \uBAA8\uB974\uB294 \uB77C\uC774\uC5B4\uC5D0\uAC8C
+        \uADF8\uB9BC\uC73C\uB85C \uD78C\uD2B8\uB97C \uC8FC\uBA74\uC11C, \uC2A4\uD30C\uC774\uC778
+        \uC0AC\uC2E4\uC744 \uC228\uAE30\uC138\uC694. \uC801\uBC1C\uB418\uBA74 \uC2DC\uBBFC
+        \uD300\uC774 \uC2B9\uB9AC\uD569\uB2C8\uB2E4."
+      Languages:
+      - "\uC81C\uC2DC\uC5B4\uB97C \uBAA8\uB974\uB294 \uB77C\uC774\uC5B4\uC5D0\uAC8C
+        \uADF8\uB9BC\uC73C\uB85C \uD78C\uD2B8\uB97C \uC8FC\uBA74\uC11C, \uC2A4\uD30C\uC774\uC778
+        \uC0AC\uC2E4\uC744 \uC228\uAE30\uC138\uC694. \uC801\uBC1C\uB418\uBA74 \uC2DC\uBBFC
+        \uD300\uC774 \uC2B9\uB9AC\uD569\uB2C8\uB2E4."
+      - Give the liar, who does not know the word, hints through your drawing while
+        hiding that you are the spy. If you are exposed, the citizen team wins.
+      - "\u7528\u753B\u4F5C\u5411\u4E0D\u77E5\u9053\u8BCD\u8BED\u7684\u8BF4\u8C0E\u8005\u63D0\u4F9B\u63D0\u793A\uFF0C\u540C\u65F6\u9690\u85CF\u4F60\u7684\u95F4\u8C0D\u8EAB\u4EFD\u3002\u5982\u679C\u88AB\u8BC6\u7834\uFF0C\u5E02\u6C11\u961F\u83B7\u80DC\u3002"
+      - "\u7528\u756B\u4F5C\u5411\u4E0D\u77E5\u9053\u8A5E\u8A9E\u7684\u8AAA\u8B0A\u8005\u63D0\u4F9B\u63D0\u793A\uFF0C\u540C\u6642\u96B1\u85CF\u4F60\u7684\u9593\u8ADC\u8EAB\u5206\u3002\u5982\u679C\u88AB\u8B58\u7834\uFF0C\u5E02\u6C11\u968A\u7372\u52DD\u3002"
+      - "\u5358\u8A9E\u3092\u77E5\u3089\u306A\u3044\u30E9\u30A4\u30A2\u30FC\u306B\u7D75\u3067\u30D2\u30F3\u30C8\u3092\u9001\u308A\u306A\u304C\u3089\u3001\u30B9\u30D1\u30A4\u3067\u3042\u308B\u3053\u3068\u3092\u96A0\u3057\u307E\u3057\u3087\u3046\u3002\u898B\u7834\u3089\u308C\u308B\u3068\u5E02\u6C11\u30C1\u30FC\u30E0\u306E\u52DD\u5229\u3067\u3059\u3002"
+      - "Da pistas con tu dibujo al mentiroso, que no conoce la palabra, sin revelar
+        que eres el esp\xEDa. Si te descubren, gana el equipo de inocentes."
+      - "D\xEA pistas pelo seu desenho ao mentiroso, que n\xE3o conhece a palavra,
+        sem revelar que voc\xEA \xE9 o espi\xE3o. Se for descoberto, o time dos inocentes
+        vence."
+      - "Donnez des indices au menteur, qui ne conna\xEEt pas le mot, gr\xE2ce \xE0
+        votre dessin sans r\xE9v\xE9ler que vous \xEAtes l\u2019espion. Si vous \xEAtes
+        d\xE9masqu\xE9, l\u2019\xE9quipe des innocents gagne."
+      - "Gib dem L\xFCgner, der das Wort nicht kennt, mit deiner Zeichnung Hinweise,
+        ohne deine Spionrolle zu verraten. Wirst du enttarnt, gewinnt das Team der
+        Unschuldigen."
+      - Berikan petunjuk lewat gambar kepada pembohong yang tidak tahu katanya, sambil
+        merahasiakan bahwa kamu mata-mata. Jika terbongkar, tim pemain biasa menang.
+      - "\u0936\u092C\u094D\u0926 \u0928 \u091C\u093E\u0928\u0928\u0947 \u0935\u093E\u0932\u0947
+        \u091D\u0942\u0920\u0947 \u0915\u094B \u0905\u092A\u0928\u0947 \u091A\u093F\u0924\u094D\u0930
+        \u0938\u0947 \u0938\u0902\u0915\u0947\u0924 \u0926\u0947\u0902 \u0914\u0930
+        \u0905\u092A\u0928\u0940 \u091C\u093E\u0938\u0942\u0938 \u0915\u0940 \u092A\u0939\u091A\u093E\u0928
+        \u091B\u093F\u092A\u093E\u090F\u0901\u0964 \u092A\u0939\u091A\u093E\u0928
+        \u0916\u0941\u0932\u0928\u0947 \u092A\u0930 \u0938\u093E\u092E\u093E\u0928\u094D\u092F
+        \u0916\u093F\u0932\u093E\u0921\u093C\u093F\u092F\u094B\u0902 \u0915\u0940
+        \u091F\u0940\u092E \u091C\u0940\u0924 \u091C\u093E\u0924\u0940 \u0939\u0948\u0964"
+      - "\u0642\u062F\u0651\u0645 \u0644\u0644\u0643\u0627\u0630\u0628 \u0627\u0644\u0630\u064A
+        \u0644\u0627 \u064A\u0639\u0631\u0641 \u0627\u0644\u0643\u0644\u0645\u0629
+        \u062A\u0644\u0645\u064A\u062D\u0627\u062A \u0639\u0628\u0631 \u0631\u0633\u0645\u0643\u060C
+        \u0645\u0639 \u0625\u062E\u0641\u0627\u0621 \u0623\u0646\u0643 \u0627\u0644\u062C\u0627\u0633\u0648\u0633.
+        \u0625\u0630\u0627 \u0643\u064F\u0634\u0641\u062A \u0647\u0648\u064A\u062A\u0643\u060C
+        \u064A\u0641\u0648\u0632 \u0641\u0631\u064A\u0642 \u0627\u0644\u0644\u0627\u0639\u0628\u064A\u0646
+        \u0627\u0644\u0639\u0627\u062F\u064A\u064A\u0646."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7KCc7Iuc7Ja07JeQIOunnuy2sCDqt7jrpqzqs6AsIOudvOydtOyWtOuCmCDsiqTtjIzsnbTrpbwg7LC-7JWEIO2IrO2RnO2VmOyEuOyalC4g7Iqk7YyM7J2064qUIOudvOydtOyWtOydmCDtjrjsnoXri4jri6Qu
+      TermType: 0
+      Description: "\uC81C\uC2DC\uC5B4\uC5D0 \uB9DE\uCDB0 \uADF8\uB9AC\uACE0, \uB77C\uC774\uC5B4\uB098
+        \uC2A4\uD30C\uC774\uB97C \uCC3E\uC544 \uD22C\uD45C\uD558\uC138\uC694. \uC2A4\uD30C\uC774\uB294
+        \uB77C\uC774\uC5B4\uC758 \uD3B8\uC785\uB2C8\uB2E4."
+      Languages:
+      - "\uC81C\uC2DC\uC5B4\uC5D0 \uB9DE\uCDB0 \uADF8\uB9AC\uACE0, \uB77C\uC774\uC5B4\uB098
+        \uC2A4\uD30C\uC774\uB97C \uCC3E\uC544 \uD22C\uD45C\uD558\uC138\uC694. \uC2A4\uD30C\uC774\uB294
+        \uB77C\uC774\uC5B4\uC758 \uD3B8\uC785\uB2C8\uB2E4."
+      - Draw to match the word, then find and vote for the liar or the spy. The spy
+        is on the liar team.
+      - "\u6839\u636E\u8BCD\u8BED\u4F5C\u753B\uFF0C\u627E\u51FA\u8BF4\u8C0E\u8005\u6216\u95F4\u8C0D\u5E76\u6295\u7968\u3002\u95F4\u8C0D\u5C5E\u4E8E\u8BF4\u8C0E\u8005\u4E00\u65B9\u3002"
+      - "\u6839\u64DA\u8A5E\u8A9E\u4F5C\u756B\uFF0C\u627E\u51FA\u8AAA\u8B0A\u8005\u6216\u9593\u8ADC\u4E26\u6295\u7968\u3002\u9593\u8ADC\u8207\u8AAA\u8B0A\u8005\u540C\u4E00\u9663\u71DF\u3002"
+      - "\u5358\u8A9E\u306B\u5408\u3046\u7D75\u3092\u63CF\u304D\u3001\u30E9\u30A4\u30A2\u30FC\u304B\u30B9\u30D1\u30A4\u3092\u898B\u3064\u3051\u3066\u6295\u7968\u3057\u307E\u3057\u3087\u3046\u3002\u30B9\u30D1\u30A4\u306F\u30E9\u30A4\u30A2\u30FC\u306E\u5473\u65B9\u3067\u3059\u3002"
+      - "Dibuja seg\xFAn la palabra, encuentra al mentiroso o al esp\xEDa y v\xF3talo.
+        El esp\xEDa est\xE1 en el equipo del mentiroso."
+      - "Desenhe de acordo com a palavra, encontre o mentiroso ou o espi\xE3o e vote
+        nele. O espi\xE3o est\xE1 no time do mentiroso."
+      - "Dessinez selon le mot, trouvez le menteur ou l\u2019espion et votez contre
+        lui. L\u2019espion est dans l\u2019\xE9quipe du menteur."
+      - "Zeichne passend zum Wort, finde den L\xFCgner oder den Spion und stimme
+        gegen ihn. Der Spion geh\xF6rt zum Team des L\xFCgners."
+      - Gambarlah sesuai kata, lalu temukan dan pilih pembohong atau mata-mata dalam
+        voting. Mata-mata berada di pihak pembohong.
+      - "\u0936\u092C\u094D\u0926 \u0915\u0947 \u0905\u0928\u0941\u0938\u093E\u0930
+        \u091A\u093F\u0924\u094D\u0930 \u092C\u0928\u093E\u090F\u0901, \u092B\u093F\u0930
+        \u091D\u0942\u0920\u0947 \u092F\u093E \u091C\u093E\u0938\u0942\u0938 \u0915\u094B
+        \u0922\u0942\u0901\u0922\u0915\u0930 \u0909\u0938\u0915\u0947 \u0932\u093F\u090F
+        \u0935\u094B\u091F \u0926\u0947\u0902\u0964 \u091C\u093E\u0938\u0942\u0938
+        \u091D\u0942\u0920\u0947 \u0915\u0940 \u091F\u0940\u092E \u092E\u0947\u0902
+        \u0939\u0948\u0964"
+      - "\u0627\u0631\u0633\u0645 \u0648\u0641\u0642\u064B\u0627 \u0644\u0644\u0643\u0644\u0645\u0629\u060C
+        \u062B\u0645 \u0627\u0639\u062B\u0631 \u0639\u0644\u0649 \u0627\u0644\u0643\u0627\u0630\u0628
+        \u0623\u0648 \u0627\u0644\u062C\u0627\u0633\u0648\u0633 \u0648\u0635\u0648\u0651\u062A
+        \u0636\u062F\u0647. \u0627\u0644\u062C\u0627\u0633\u0648\u0633 \u0641\u064A
+        \u0641\u0631\u064A\u0642 \u0627\u0644\u0643\u0627\u0630\u0628."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7Iqk7YyM7J207J2YIO2ejO2KuOulvCDssL7slYQg7KCc7Iuc7Ja066W8IOunnu2eiOqzoCDsoJXssrTrpbwg7Iio6riw7IS47JqULiDsiqTtjIzsnbTqsIAg7KCB67Cc65CY7Ja064-EIO2MqOuwsO2VqeuLiOuLpC4
+      TermType: 0
+      Description: "\uC2A4\uD30C\uC774\uC758 \uD78C\uD2B8\uB97C \uCC3E\uC544 \uC81C\uC2DC\uC5B4\uB97C
+        \uB9DE\uD788\uACE0 \uC815\uCCB4\uB97C \uC228\uAE30\uC138\uC694. \uC2A4\uD30C\uC774\uAC00
+        \uC801\uBC1C\uB418\uC5B4\uB3C4 \uD328\uBC30\uD569\uB2C8\uB2E4."
+      Languages:
+      - "\uC2A4\uD30C\uC774\uC758 \uD78C\uD2B8\uB97C \uCC3E\uC544 \uC81C\uC2DC\uC5B4\uB97C
+        \uB9DE\uD788\uACE0 \uC815\uCCB4\uB97C \uC228\uAE30\uC138\uC694. \uC2A4\uD30C\uC774\uAC00
+        \uC801\uBC1C\uB418\uC5B4\uB3C4 \uD328\uBC30\uD569\uB2C8\uB2E4."
+      - "Look for the spy\u2019s hints to figure out the word, and hide your identity.
+        You also lose if the spy is exposed."
+      - "\u5BFB\u627E\u95F4\u8C0D\u7684\u63D0\u793A\u6765\u731C\u51FA\u8BCD\u8BED\uFF0C\u5E76\u9690\u85CF\u81EA\u5DF1\u7684\u8EAB\u4EFD\u3002\u95F4\u8C0D\u88AB\u8BC6\u7834\u65F6\uFF0C\u4F60\u4E5F\u4F1A\u5931\u8D25\u3002"
+      - "\u5C0B\u627E\u9593\u8ADC\u7684\u63D0\u793A\u4F86\u731C\u51FA\u8A5E\u8A9E\uFF0C\u4E26\u96B1\u85CF\u81EA\u5DF1\u7684\u8EAB\u5206\u3002\u9593\u8ADC\u88AB\u8B58\u7834\u6642\uFF0C\u4F60\u4E5F\u6703\u843D\u6557\u3002"
+      - "\u30B9\u30D1\u30A4\u306E\u30D2\u30F3\u30C8\u304B\u3089\u5358\u8A9E\u3092\u63A8\u7406\u3057\u3001\u6B63\u4F53\u3092\u96A0\u3057\u307E\u3057\u3087\u3046\u3002\u30B9\u30D1\u30A4\u304C\u898B\u7834\u3089\u308C\u305F\u5834\u5408\u3082\u6557\u5317\u306B\u306A\u308A\u307E\u3059\u3002"
+      - "Busca las pistas del esp\xEDa para adivinar la palabra y oculta tu identidad.
+        Tambi\xE9n pierdes si descubren al esp\xEDa."
+      - "Procure as pistas do espi\xE3o para descobrir a palavra e esconda sua identidade.
+        Voc\xEA tamb\xE9m perde se o espi\xE3o for descoberto."
+      - "Rep\xE9rez les indices de l\u2019espion pour deviner le mot et cachez votre
+        identit\xE9. Vous perdez aussi si l\u2019espion est d\xE9masqu\xE9."
+      - "Achte auf die Hinweise des Spions, um das Wort herauszufinden, und verbirg
+        deine Identit\xE4t. Du verlierst auch, wenn der Spion enttarnt wird."
+      - Cari petunjuk dari mata-mata untuk menebak kata dan sembunyikan identitasmu.
+        Kamu juga kalah jika mata-mata terbongkar.
+      - "\u091C\u093E\u0938\u0942\u0938 \u0915\u0947 \u0938\u0902\u0915\u0947\u0924\u094B\u0902
+        \u0938\u0947 \u0936\u092C\u094D\u0926 \u0915\u093E \u0905\u0928\u0941\u092E\u093E\u0928
+        \u0932\u0917\u093E\u090F\u0901 \u0914\u0930 \u0905\u092A\u0928\u0940 \u092A\u0939\u091A\u093E\u0928
+        \u091B\u093F\u092A\u093E\u090F\u0901\u0964 \u091C\u093E\u0938\u0942\u0938
+        \u0915\u0940 \u092A\u0939\u091A\u093E\u0928 \u0916\u0941\u0932\u0928\u0947
+        \u092A\u0930 \u092D\u0940 \u0906\u092A \u0939\u093E\u0930 \u091C\u093E\u0924\u0947
+        \u0939\u0948\u0902\u0964"
+      - "\u0627\u0628\u062D\u062B \u0639\u0646 \u062A\u0644\u0645\u064A\u062D\u0627\u062A
+        \u0627\u0644\u062C\u0627\u0633\u0648\u0633 \u0644\u0645\u0639\u0631\u0641\u0629
+        \u0627\u0644\u0643\u0644\u0645\u0629 \u0648\u0623\u062E\u0641\u0650 \u0647\u0648\u064A\u062A\u0643.
+        \u062A\u062E\u0633\u0631 \u0623\u064A\u0636\u064B\u0627 \u0625\u0630\u0627
+        \u0643\u064F\u0634\u0641\u062A \u0647\u0648\u064A\u0629 \u0627\u0644\u062C\u0627\u0633\u0648\u0633."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/ezB964uY7J20IOudvOydtOyWtCDtjIDsnbTrnbzqs6Ag7IOd6rCB7ZWY64KY7JqUPw
+      TermType: 0
+      Description: "{0}\uB2D8\uC774 \uB77C\uC774\uC5B4 \uD300\uC774\uB77C\uACE0 \uC0DD\uAC01\uD558\uB098\uC694?"
+      Languages:
+      - "{0}\uB2D8\uC774 \uB77C\uC774\uC5B4 \uD300\uC774\uB77C\uACE0 \uC0DD\uAC01\uD558\uB098\uC694?"
+      - Do you think {0} is on the liar team?
+      - "\u4F60\u8BA4\u4E3A{0}\u5C5E\u4E8E\u8BF4\u8C0E\u8005\u4E00\u65B9\u5417\uFF1F"
+      - "\u4F60\u8A8D\u70BA{0}\u5C6C\u65BC\u8AAA\u8B0A\u8005\u9663\u71DF\u55CE\uFF1F"
+      - "{0}\u3055\u3093\u304C\u30E9\u30A4\u30A2\u30FC\u30C1\u30FC\u30E0\u3060\u3068\u601D\u3044\u307E\u3059\u304B\uFF1F"
+      - "\xBFCrees que {0} est\xE1 en el equipo del mentiroso?"
+      - "Voc\xEA acha que {0} est\xE1 no time do mentiroso?"
+      - "Pensez-vous que {0} fait partie de l\u2019\xE9quipe du menteur ?"
+      - "Glaubst du, dass {0} zum Team des L\xFCgners geh\xF6rt?"
+      - Menurutmu {0} berada di tim pembohong?
+      - "\u0915\u094D\u092F\u093E \u0906\u092A\u0915\u094B \u0932\u0917\u0924\u093E
+        \u0939\u0948 \u0915\u093F {0} \u091D\u0942\u0920\u0947 \u0915\u0940 \u091F\u0940\u092E
+        \u092E\u0947\u0902 \u0939\u0948?"
+      - "\u0647\u0644 \u062A\u0639\u062A\u0642\u062F \u0623\u0646 {0} \u0636\u0645\u0646
+        \u0641\u0631\u064A\u0642 \u0627\u0644\u0643\u0627\u0630\u0628\u061F"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/65287J207Ja0IO2MgCDrp57slYTsmpQ
+      TermType: 0
+      Description: "\uB77C\uC774\uC5B4 \uD300 \uB9DE\uC544\uC694"
+      Languages:
+      - "\uB77C\uC774\uC5B4 \uD300 \uB9DE\uC544\uC694"
+      - "They\u2019re on the liar team"
+      - "\u5C5E\u4E8E\u8BF4\u8C0E\u8005\u4E00\u65B9"
+      - "\u5C6C\u65BC\u8AAA\u8B0A\u8005\u9663\u71DF"
+      - "\u30E9\u30A4\u30A2\u30FC\u30C1\u30FC\u30E0\u3060\u3068\u601D\u3046"
+      - "Est\xE1 en el equipo del mentiroso"
+      - "Est\xE1 no time do mentiroso"
+      - "Dans l\u2019\xE9quipe du menteur"
+      - "Geh\xF6rt zum L\xFCgnerteam"
+      - Dia di tim pembohong
+      - "\u092F\u0939 \u091D\u0942\u0920\u0947 \u0915\u0940 \u091F\u0940\u092E \u092E\u0947\u0902
+        \u0939\u0948"
+      - "\u0636\u0645\u0646 \u0641\u0631\u064A\u0642 \u0627\u0644\u0643\u0627\u0630\u0628"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/65287J207Ja0IO2MgCDslYTri4jsl5DsmpQ
+      TermType: 0
+      Description: "\uB77C\uC774\uC5B4 \uD300 \uC544\uB2C8\uC5D0\uC694"
+      Languages:
+      - "\uB77C\uC774\uC5B4 \uD300 \uC544\uB2C8\uC5D0\uC694"
+      - "They\u2019re not on the liar team"
+      - "\u4E0D\u5C5E\u4E8E\u8BF4\u8C0E\u8005\u4E00\u65B9"
+      - "\u4E0D\u5C6C\u65BC\u8AAA\u8B0A\u8005\u9663\u71DF"
+      - "\u30E9\u30A4\u30A2\u30FC\u30C1\u30FC\u30E0\u3067\u306F\u306A\u3044\u3068\u601D\u3046"
+      - "No est\xE1 en el equipo del mentiroso"
+      - "N\xE3o est\xE1 no time do mentiroso"
+      - "Pas dans l\u2019\xE9quipe du menteur"
+      - "Geh\xF6rt nicht zum L\xFCgnerteam"
+      - Dia tidak di tim pembohong
+      - "\u092F\u0939 \u091D\u0942\u0920\u0947 \u0915\u0940 \u091F\u0940\u092E \u092E\u0947\u0902
+        \u0928\u0939\u0940\u0902 \u0939\u0948"
+      - "\u0644\u064A\u0633 \u0636\u0645\u0646 \u0641\u0631\u064A\u0642 \u0627\u0644\u0643\u0627\u0630\u0628"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/4piFIHswfSDCtyDsiqTtjIzsnbQ
+      TermType: 0
+      Description: "\u2605 {0} \xB7 \uC2A4\uD30C\uC774"
+      Languages:
+      - "\u2605 {0} \xB7 \uC2A4\uD30C\uC774"
+      - "\u2605 {0} \xB7 Spy"
+      - "\u2605 {0} \xB7 \u95F4\u8C0D"
+      - "\u2605 {0} \xB7 \u9593\u8ADC"
+      - "\u2605 {0} \xB7 \u30B9\u30D1\u30A4"
+      - "\u2605 {0} \xB7 Esp\xEDa"
+      - "\u2605 {0} \xB7 Espi\xE3o"
+      - "\u2605 {0} \xB7 Espion"
+      - "\u2605 {0} \xB7 Spion"
+      - "\u2605 {0} \xB7 Mata-mata"
+      - "\u2605 {0} \xB7 \u091C\u093E\u0938\u0942\u0938"
+      - "\u2605 {0} \xB7 \u0627\u0644\u062C\u0627\u0633\u0648\u0633"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/ezB9IMK3IOyKpO2MjOydtA
+      TermType: 0
+      Description: "{0} \xB7 \uC2A4\uD30C\uC774"
+      Languages:
+      - "{0} \xB7 \uC2A4\uD30C\uC774"
+      - "{0} \xB7 Spy"
+      - "{0} \xB7 \u95F4\u8C0D"
+      - "{0} \xB7 \u9593\u8ADC"
+      - "{0} \xB7 \u30B9\u30D1\u30A4"
+      - "{0} \xB7 Esp\xEDa"
+      - "{0} \xB7 Espi\xE3o"
+      - "{0} \xB7 Espion"
+      - "{0} \xB7 Spion"
+      - "{0} \xB7 Mata-mata"
+      - "{0} \xB7 \u091C\u093E\u0938\u0942\u0938"
+      - "{0} \xB7 \u0627\u0644\u062C\u0627\u0633\u0648\u0633"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/ezB97J2AfOyKpO2MjOydtOqwgHzrp57slZjsirXri4jri6Qu
+      TermType: 0
+      Description: "{0}\uC740|\uC2A4\uD30C\uC774\uAC00|\uB9DE\uC558\uC2B5\uB2C8\uB2E4."
+      Languages:
+      - "{0}\uC740|\uC2A4\uD30C\uC774\uAC00|\uB9DE\uC558\uC2B5\uB2C8\uB2E4."
+      - '{0}|was|the spy.'
+      - "{0}|\u7684\u8EAB\u4EFD|\u786E\u5B9E\u662F\u95F4\u8C0D\u3002"
+      - "{0}|\u7684\u8EAB\u5206|\u78BA\u5BE6\u662F\u9593\u8ADC\u3002"
+      - "{0}\u306F|\u30B9\u30D1\u30A4|\u3067\u3057\u305F\u3002"
+      - "{0}|result\xF3|ser el esp\xEDa."
+      - "{0}|na verdade,|era o espi\xE3o."
+      - "{0},|au final,|\xE9tait l\u2019espion."
+      - '{0}|war|der Spion.'
+      - '{0}|ternyata|adalah mata-mata.'
+      - "{0}|\u0915\u093E \u0915\u093F\u0930\u0926\u093E\u0930|\u091C\u093E\u0938\u0942\u0938
+        \u0925\u093E\u0964"
+      - "{0}|\u0641\u064A \u0647\u0630\u0647 \u0627\u0644\u062C\u0648\u0644\u0629\u060C|\u0643\u0627\u0646
+        \u0627\u0644\u062C\u0627\u0633\u0648\u0633."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/ezB964qUfOyKpO2MjOydtOqwgHzrp57slZjsirXri4jri6Qu
+      TermType: 0
+      Description: "{0}\uB294|\uC2A4\uD30C\uC774\uAC00|\uB9DE\uC558\uC2B5\uB2C8\uB2E4."
+      Languages:
+      - "{0}\uB294|\uC2A4\uD30C\uC774\uAC00|\uB9DE\uC558\uC2B5\uB2C8\uB2E4."
+      - '{0}|was|the spy.'
+      - "{0}|\u7684\u8EAB\u4EFD|\u786E\u5B9E\u662F\u95F4\u8C0D\u3002"
+      - "{0}|\u7684\u8EAB\u5206|\u78BA\u5BE6\u662F\u9593\u8ADC\u3002"
+      - "{0}\u306F|\u30B9\u30D1\u30A4|\u3067\u3057\u305F\u3002"
+      - "{0}|result\xF3|ser el esp\xEDa."
+      - "{0}|na verdade,|era o espi\xE3o."
+      - "{0},|au final,|\xE9tait l\u2019espion."
+      - '{0}|war|der Spion.'
+      - '{0}|ternyata|adalah mata-mata.'
+      - "{0}|\u0915\u093E \u0915\u093F\u0930\u0926\u093E\u0930|\u091C\u093E\u0938\u0942\u0938
+        \u0925\u093E\u0964"
+      - "{0}|\u0641\u064A \u0647\u0630\u0647 \u0627\u0644\u062C\u0648\u0644\u0629\u060C|\u0643\u0627\u0646
+        \u0627\u0644\u062C\u0627\u0633\u0648\u0633."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/65287J207Ja064qUIHswfSDCtyDsiqTtjIzsnbTripQgezF97J6F64uI64ukLg
+      TermType: 0
+      Description: "\uB77C\uC774\uC5B4\uB294 {0} \xB7 \uC2A4\uD30C\uC774\uB294 {1}\uC785\uB2C8\uB2E4."
+      Languages:
+      - "\uB77C\uC774\uC5B4\uB294 {0} \xB7 \uC2A4\uD30C\uC774\uB294 {1}\uC785\uB2C8\uB2E4."
+      - "The liar is {0} \xB7 the spy is {1}."
+      - "\u8BF4\u8C0E\u8005\u662F{0} \xB7 \u95F4\u8C0D\u662F{1}\u3002"
+      - "\u8AAA\u8B0A\u8005\u662F{0} \xB7 \u9593\u8ADC\u662F{1}\u3002"
+      - "\u30E9\u30A4\u30A2\u30FC\u306F{0}\u3001\u30B9\u30D1\u30A4\u306F{1}\u3067\u3059\u3002"
+      - "El mentiroso es {0} \xB7 el esp\xEDa es {1}."
+      - "O mentiroso \xE9 {0} \xB7 o espi\xE3o \xE9 {1}."
+      - "Le menteur est {0} \xB7 l\u2019espion est {1}."
+      - "Der L\xFCgner ist {0} \xB7 der Spion ist {1}."
+      - "Pembohong adalah {0} \xB7 mata-mata adalah {1}."
+      - "\u091D\u0942\u0920\u093E {0} \u0939\u0948 \xB7 \u091C\u093E\u0938\u0942\u0938
+        {1} \u0939\u0948\u0964"
+      - "\u0627\u0644\u0643\u0627\u0630\u0628 \u0647\u0648 {0} \xB7 \u0627\u0644\u062C\u0627\u0633\u0648\u0633
+        \u0647\u0648 {1}."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/65287J207Ja064qUIHswfSDCtyDsiqTtjIzsnbTripQgezF97J207JeI7Iq164uI64ukLg
+      TermType: 0
+      Description: "\uB77C\uC774\uC5B4\uB294 {0} \xB7 \uC2A4\uD30C\uC774\uB294 {1}\uC774\uC5C8\uC2B5\uB2C8\uB2E4."
+      Languages:
+      - "\uB77C\uC774\uC5B4\uB294 {0} \xB7 \uC2A4\uD30C\uC774\uB294 {1}\uC774\uC5C8\uC2B5\uB2C8\uB2E4."
+      - "The liar was {0} \xB7 the spy was {1}."
+      - "\u8BF4\u8C0E\u8005\u662F{0} \xB7 \u95F4\u8C0D\u662F{1}\u3002"
+      - "\u8AAA\u8B0A\u8005\u662F{0} \xB7 \u9593\u8ADC\u662F{1}\u3002"
+      - "\u30E9\u30A4\u30A2\u30FC\u306F{0}\u3001\u30B9\u30D1\u30A4\u306F{1}\u3067\u3057\u305F\u3002"
+      - "El mentiroso era {0} \xB7 el esp\xEDa era {1}."
+      - "O mentiroso era {0} \xB7 o espi\xE3o era {1}."
+      - "Le menteur \xE9tait {0} \xB7 l\u2019espion \xE9tait {1}."
+      - "Der L\xFCgner war {0} \xB7 der Spion war {1}."
+      - "Pembohongnya tadi {0} \xB7 mata-matanya {1}."
+      - "\u091D\u0942\u0920\u093E {0} \u0925\u093E \xB7 \u091C\u093E\u0938\u0942\u0938
+        {1} \u0925\u093E\u0964"
+      - "\u0643\u0627\u0646 \u0627\u0644\u0643\u0627\u0630\u0628 {0} \xB7 \u0648\u0643\u0627\u0646
+        \u0627\u0644\u062C\u0627\u0633\u0648\u0633 {1}."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/65287J207Ja07JmAIOyKpO2MjOydtOydmCDsoJXssrQ
+      TermType: 0
+      Description: "\uB77C\uC774\uC5B4\uC640 \uC2A4\uD30C\uC774\uC758 \uC815\uCCB4"
+      Languages:
+      - "\uB77C\uC774\uC5B4\uC640 \uC2A4\uD30C\uC774\uC758 \uC815\uCCB4"
+      - Identities of the liar and spy
+      - "\u8BF4\u8C0E\u8005\u4E0E\u95F4\u8C0D\u7684\u8EAB\u4EFD"
+      - "\u8AAA\u8B0A\u8005\u8207\u9593\u8ADC\u7684\u8EAB\u5206"
+      - "\u30E9\u30A4\u30A2\u30FC\u3068\u30B9\u30D1\u30A4\u306E\u6B63\u4F53"
+      - "Identidades del mentiroso y del esp\xEDa"
+      - "Identidades do mentiroso e do espi\xE3o"
+      - "Identit\xE9s du menteur et de l\u2019espion"
+      - "Identit\xE4ten des L\xFCgners und des Spions"
+      - Identitas pembohong dan mata-mata
+      - "\u091D\u0942\u0920\u0947 \u0914\u0930 \u091C\u093E\u0938\u0942\u0938 \u0915\u0940
+        \u092A\u0939\u091A\u093E\u0928"
+      - "\u0647\u0648\u064A\u062A\u0627 \u0627\u0644\u0643\u0627\u0630\u0628 \u0648\u0627\u0644\u062C\u0627\u0633\u0648\u0633"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7Jet7ZWgIOqzteqwnA
+      TermType: 0
+      Description: "\uC5ED\uD560 \uACF5\uAC1C"
+      Languages:
+      - "\uC5ED\uD560 \uACF5\uAC1C"
+      - Role reveal
+      - "\u8EAB\u4EFD\u516C\u5F00"
+      - "\u8EAB\u5206\u516C\u958B"
+      - "\u5F79\u5272\u516C\u958B"
+      - "Revelaci\xF3n de roles"
+      - "Revela\xE7\xE3o de pap\xE9is"
+      - "R\xE9v\xE9lation des r\xF4les"
+      - Rollenaufdeckung
+      - Pengungkapan peran
+      - "\u0915\u093F\u0930\u0926\u093E\u0930 \u0915\u093E \u0916\u0941\u0932\u093E\u0938\u093E"
+      - "\u0643\u0634\u0641 \u0627\u0644\u0623\u062F\u0648\u0627\u0631"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7JWE66y064-EIOyngOuqqeuQmOyngCDslYrslZjslrTsmpQuIOudvOydtOyWtOyXkOqyjCDsoJXri7Ug6riw7ZqM6rCAIOyeiOyWtOyalC4
+      TermType: 0
+      Description: "\uC544\uBB34\uB3C4 \uC9C0\uBAA9\uB418\uC9C0 \uC54A\uC558\uC5B4\uC694.
+        \uB77C\uC774\uC5B4\uC5D0\uAC8C \uC815\uB2F5 \uAE30\uD68C\uAC00 \uC788\uC5B4\uC694."
+      Languages:
+      - "\uC544\uBB34\uB3C4 \uC9C0\uBAA9\uB418\uC9C0 \uC54A\uC558\uC5B4\uC694. \uB77C\uC774\uC5B4\uC5D0\uAC8C
+        \uC815\uB2F5 \uAE30\uD68C\uAC00 \uC788\uC5B4\uC694."
+      - No one was nominated. The liar has a chance to guess the word.
+      - "\u6CA1\u6709\u4EBA\u88AB\u6307\u8BA4\u3002\u8BF4\u8C0E\u8005\u6709\u4E00\u6B21\u731C\u8BCD\u7684\u673A\u4F1A\u3002"
+      - "\u6C92\u6709\u4EBA\u88AB\u6307\u8A8D\u3002\u8AAA\u8B0A\u8005\u6709\u4E00\u6B21\u731C\u8A5E\u7684\u6A5F\u6703\u3002"
+      - "\u8AB0\u3082\u6307\u540D\u3055\u308C\u307E\u305B\u3093\u3067\u3057\u305F\u3002\u30E9\u30A4\u30A2\u30FC\u306B\u5358\u8A9E\u3092\u5F53\u3066\u308B\u30C1\u30E3\u30F3\u30B9\u304C\u3042\u308A\u307E\u3059\u3002"
+      - "No se ha se\xF1alado a nadie. El mentiroso tiene una oportunidad de adivinar
+        la palabra."
+      - "Ningu\xE9m foi indicado. O mentiroso tem uma chance de adivinhar a palavra."
+      - "Personne n\u2019a \xE9t\xE9 d\xE9sign\xE9. Le menteur peut tenter de deviner
+        le mot."
+      - "Niemand wurde beschuldigt. Der L\xFCgner darf versuchen, das Wort zu erraten."
+      - Tidak ada yang ditunjuk. Pembohong punya kesempatan menebak kata.
+      - "\u0915\u093F\u0938\u0940 \u0915\u094B \u0928\u093E\u092E\u093F\u0924 \u0928\u0939\u0940\u0902
+        \u0915\u093F\u092F\u093E \u0917\u092F\u093E\u0964 \u091D\u0942\u0920\u0947
+        \u0915\u094B \u0936\u092C\u094D\u0926 \u0915\u093E \u0905\u0928\u0941\u092E\u093E\u0928
+        \u0932\u0917\u093E\u0928\u0947 \u0915\u093E \u092E\u094C\u0915\u093E \u092E\u093F\u0932\u0947\u0917\u093E\u0964"
+      - "\u0644\u0645 \u064A\u064F\u0631\u0634\u0651\u064E\u062D \u0623\u062D\u062F.
+        \u0644\u062F\u0649 \u0627\u0644\u0643\u0627\u0630\u0628 \u0641\u0631\u0635\u0629
+        \u0644\u062A\u062E\u0645\u064A\u0646 \u0627\u0644\u0643\u0644\u0645\u0629."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7Iqk7YyM7J206rCAIOyngOuqqeuQmOyXiOyWtOyalC4g7Iuc66-8IO2MgOydtCDsirnrpqztlojslrTsmpQu
+      TermType: 0
+      Description: "\uC2A4\uD30C\uC774\uAC00 \uC9C0\uBAA9\uB418\uC5C8\uC5B4\uC694.
+        \uC2DC\uBBFC \uD300\uC774 \uC2B9\uB9AC\uD588\uC5B4\uC694."
+      Languages:
+      - "\uC2A4\uD30C\uC774\uAC00 \uC9C0\uBAA9\uB418\uC5C8\uC5B4\uC694. \uC2DC\uBBFC
+        \uD300\uC774 \uC2B9\uB9AC\uD588\uC5B4\uC694."
+      - The spy was nominated. The citizen team won.
+      - "\u95F4\u8C0D\u88AB\u6307\u8BA4\u4E86\u3002\u5E02\u6C11\u961F\u83B7\u80DC\u3002"
+      - "\u9593\u8ADC\u88AB\u6307\u8A8D\u4E86\u3002\u5E02\u6C11\u968A\u7372\u52DD\u3002"
+      - "\u30B9\u30D1\u30A4\u304C\u6307\u540D\u3055\u308C\u307E\u3057\u305F\u3002\u5E02\u6C11\u30C1\u30FC\u30E0\u306E\u52DD\u5229\u3067\u3059\u3002"
+      - "Se ha se\xF1alado al esp\xEDa. Gan\xF3 el equipo de inocentes."
+      - "O espi\xE3o foi indicado. O time dos inocentes venceu."
+      - "L\u2019espion a \xE9t\xE9 d\xE9sign\xE9. L\u2019\xE9quipe des innocents
+        a gagn\xE9."
+      - Der Spion wurde beschuldigt. Das Team der Unschuldigen hat gewonnen.
+      - Mata-mata telah ditunjuk. Tim pemain biasa menang.
+      - "\u091C\u093E\u0938\u0942\u0938 \u0915\u094B \u0928\u093E\u092E\u093F\u0924
+        \u0915\u093F\u092F\u093E \u0917\u092F\u093E\u0964 \u0938\u093E\u092E\u093E\u0928\u094D\u092F
+        \u0916\u093F\u0932\u093E\u0921\u093C\u093F\u092F\u094B\u0902 \u0915\u0940
+        \u091F\u0940\u092E \u091C\u0940\u0924 \u0917\u0908\u0964"
+      - "\u062A\u0645 \u062A\u0631\u0634\u064A\u062D \u0627\u0644\u062C\u0627\u0633\u0648\u0633.
+        \u0641\u0627\u0632 \u0641\u0631\u064A\u0642 \u0627\u0644\u0644\u0627\u0639\u0628\u064A\u0646
+        \u0627\u0644\u0639\u0627\u062F\u064A\u064A\u0646."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7KeA66qp7J20IOqwgOqysOuQmOyXiOyWtOyalC4g65287J207Ja07JeQ6rKMIOygleuLtSDquLDtmozqsIAg7J6I7Ja07JqULg
+      TermType: 0
+      Description: "\uC9C0\uBAA9\uC774 \uAC00\uACB0\uB418\uC5C8\uC5B4\uC694. \uB77C\uC774\uC5B4\uC5D0\uAC8C
+        \uC815\uB2F5 \uAE30\uD68C\uAC00 \uC788\uC5B4\uC694."
+      Languages:
+      - "\uC9C0\uBAA9\uC774 \uAC00\uACB0\uB418\uC5C8\uC5B4\uC694. \uB77C\uC774\uC5B4\uC5D0\uAC8C
+        \uC815\uB2F5 \uAE30\uD68C\uAC00 \uC788\uC5B4\uC694."
+      - The accusation was approved. The liar has a chance to guess the word.
+      - "\u6307\u8BA4\u83B7\u5F97\u901A\u8FC7\u3002\u8BF4\u8C0E\u8005\u6709\u4E00\u6B21\u731C\u8BCD\u7684\u673A\u4F1A\u3002"
+      - "\u6307\u8A8D\u7372\u5F97\u901A\u904E\u3002\u8AAA\u8B0A\u8005\u6709\u4E00\u6B21\u731C\u8A5E\u7684\u6A5F\u6703\u3002"
+      - "\u6307\u540D\u304C\u627F\u8A8D\u3055\u308C\u307E\u3057\u305F\u3002\u30E9\u30A4\u30A2\u30FC\u306B\u5358\u8A9E\u3092\u5F53\u3066\u308B\u30C1\u30E3\u30F3\u30B9\u304C\u3042\u308A\u307E\u3059\u3002"
+      - "La acusaci\xF3n fue aprobada. El mentiroso tiene una oportunidad de adivinar
+        la palabra."
+      - "A acusa\xE7\xE3o foi aprovada. O mentiroso tem uma chance de adivinhar a
+        palavra."
+      - "L\u2019accusation a \xE9t\xE9 approuv\xE9e. Le menteur peut tenter de deviner
+        le mot."
+      - "Die Beschuldigung wurde best\xE4tigt. Der L\xFCgner darf versuchen, das
+        Wort zu erraten."
+      - Penunjukan disetujui. Pembohong punya kesempatan menebak kata.
+      - "\u0906\u0930\u094B\u092A \u0938\u094D\u0935\u0940\u0915\u093E\u0930 \u0939\u094B
+        \u0917\u092F\u093E\u0964 \u091D\u0942\u0920\u0947 \u0915\u094B \u0936\u092C\u094D\u0926
+        \u0915\u093E \u0905\u0928\u0941\u092E\u093E\u0928 \u0932\u0917\u093E\u0928\u0947
+        \u0915\u093E \u092E\u094C\u0915\u093E \u092E\u093F\u0932\u0947\u0917\u093E\u0964"
+      - "\u062A\u0645\u062A \u0627\u0644\u0645\u0648\u0627\u0641\u0642\u0629 \u0639\u0644\u0649
+        \u0627\u0644\u0627\u062A\u0647\u0627\u0645. \u0644\u062F\u0649 \u0627\u0644\u0643\u0627\u0630\u0628
+        \u0641\u0631\u0635\u0629 \u0644\u062A\u062E\u0645\u064A\u0646 \u0627\u0644\u0643\u0644\u0645\u0629."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/65287J207Ja0IO2MgOydtCDsirnrpqztlojslrTsmpQu
+      TermType: 0
+      Description: "\uB77C\uC774\uC5B4 \uD300\uC774 \uC2B9\uB9AC\uD588\uC5B4\uC694."
+      Languages:
+      - "\uB77C\uC774\uC5B4 \uD300\uC774 \uC2B9\uB9AC\uD588\uC5B4\uC694."
+      - The liar team won.
+      - "\u8BF4\u8C0E\u8005\u961F\u83B7\u80DC\u3002"
+      - "\u8AAA\u8B0A\u8005\u968A\u7372\u52DD\u3002"
+      - "\u30E9\u30A4\u30A2\u30FC\u30C1\u30FC\u30E0\u306E\u52DD\u5229\u3067\u3059\u3002"
+      - "Gan\xF3 el equipo del mentiroso."
+      - O time do mentiroso venceu.
+      - "L\u2019\xE9quipe du menteur a gagn\xE9."
+      - "Das Team des L\xFCgners hat gewonnen."
+      - Tim pembohong menang.
+      - "\u091D\u0942\u0920\u0947 \u0915\u0940 \u091F\u0940\u092E \u091C\u0940\u0924
+        \u0917\u0908\u0964"
+      - "\u0641\u0627\u0632 \u0641\u0631\u064A\u0642 \u0627\u0644\u0643\u0627\u0630\u0628."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7Iuc66-8IO2MgOydtCDsirnrpqztlojslrTsmpQu
+      TermType: 0
+      Description: "\uC2DC\uBBFC \uD300\uC774 \uC2B9\uB9AC\uD588\uC5B4\uC694."
+      Languages:
+      - "\uC2DC\uBBFC \uD300\uC774 \uC2B9\uB9AC\uD588\uC5B4\uC694."
+      - The citizen team won.
+      - "\u5E02\u6C11\u961F\u83B7\u80DC\u3002"
+      - "\u5E02\u6C11\u968A\u7372\u52DD\u3002"
+      - "\u5E02\u6C11\u30C1\u30FC\u30E0\u306E\u52DD\u5229\u3067\u3059\u3002"
+      - "Gan\xF3 el equipo de inocentes."
+      - O time dos inocentes venceu.
+      - "L\u2019\xE9quipe des innocents a gagn\xE9."
+      - Das Team der Unschuldigen hat gewonnen.
+      - Tim pemain biasa menang.
+      - "\u0938\u093E\u092E\u093E\u0928\u094D\u092F \u0916\u093F\u0932\u093E\u0921\u093C\u093F\u092F\u094B\u0902
+        \u0915\u0940 \u091F\u0940\u092E \u091C\u0940\u0924 \u0917\u0908\u0964"
+      - "\u0641\u0627\u0632 \u0641\u0631\u064A\u0642 \u0627\u0644\u0644\u0627\u0639\u0628\u064A\u0646
+        \u0627\u0644\u0639\u0627\u062F\u064A\u064A\u0646."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7Iqk7YyM7J2064qUIHswfeyeheuLiOuLpC4
+      TermType: 0
+      Description: "\uC2A4\uD30C\uC774\uB294 {0}\uC785\uB2C8\uB2E4."
+      Languages:
+      - "\uC2A4\uD30C\uC774\uB294 {0}\uC785\uB2C8\uB2E4."
+      - The spy is {0}.
+      - "\u95F4\u8C0D\u662F{0}\u3002"
+      - "\u9593\u8ADC\u662F{0}\u3002"
+      - "\u30B9\u30D1\u30A4\u306F{0}\u3067\u3059\u3002"
+      - "El esp\xEDa es {0}."
+      - "O espi\xE3o \xE9 {0}."
+      - "L\u2019espion est {0}."
+      - Der Spion ist {0}.
+      - Mata-mata adalah {0}.
+      - "\u091C\u093E\u0938\u0942\u0938 {0} \u0939\u0948\u0964"
+      - "\u0627\u0644\u062C\u0627\u0633\u0648\u0633 \u0647\u0648 {0}."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7Iqk7YyM7J2064qUIHswfeydtOyXiOyKteuLiOuLpC4
+      TermType: 0
+      Description: "\uC2A4\uD30C\uC774\uB294 {0}\uC774\uC5C8\uC2B5\uB2C8\uB2E4."
+      Languages:
+      - "\uC2A4\uD30C\uC774\uB294 {0}\uC774\uC5C8\uC2B5\uB2C8\uB2E4."
+      - The spy was {0}.
+      - "\u95F4\u8C0D\u662F{0}\u3002"
+      - "\u9593\u8ADC\u662F{0}\u3002"
+      - "\u30B9\u30D1\u30A4\u306F{0}\u3067\u3057\u305F\u3002"
+      - "El esp\xEDa era {0}."
+      - "O espi\xE3o era {0}."
+      - "L\u2019espion \xE9tait {0}."
+      - Der Spion war {0}.
+      - Mata-matanya tadi {0}.
+      - "\u091C\u093E\u0938\u0942\u0938 {0} \u0925\u093E\u0964"
+      - "\u0643\u0627\u0646 \u0627\u0644\u062C\u0627\u0633\u0648\u0633 {0}."
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/7Iqk7YyM7J20IHswfeuqhQ
+      TermType: 0
+      Description: "\uC2A4\uD30C\uC774 {0}\uBA85"
+      Languages:
+      - "\uC2A4\uD30C\uC774 {0}\uBA85"
+      - 'Spies: {0}'
+      - "\u95F4\u8C0D{0}\u4EBA"
+      - "\u9593\u8ADC {0} \u4EBA"
+      - "\u30B9\u30D1\u30A4{0}\u4EBA"
+      - "Esp\xEDas: {0}"
+      - "Espi\xF5es: {0}"
+      - 'Espions : {0}'
+      - 'Spione: {0}'
+      - 'Mata-mata: {0}'
+      - "\u091C\u093E\u0938\u0942\u0938: {0}"
+      - "\u0627\u0644\u062C\u0648\u0627\u0633\u064A\u0633: {0}"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
+    - Term: UI/65287J207Ja0IO2MgCDrnbzsmrTrk5w
+      TermType: 0
+      Description: "\uB77C\uC774\uC5B4 \uD300 \uB77C\uC6B4\uB4DC"
+      Languages:
+      - "\uB77C\uC774\uC5B4 \uD300 \uB77C\uC6B4\uB4DC"
+      - Liar team rounds
+      - "\u8BF4\u8C0E\u8005\u961F\u56DE\u5408"
+      - "\u8AAA\u8B0A\u8005\u968A\u56DE\u5408"
+      - "\u30E9\u30A4\u30A2\u30FC\u30C1\u30FC\u30E0\u306E\u30E9\u30A6\u30F3\u30C9"
+      - Rondas del equipo del mentiroso
+      - Rodadas no time do mentiroso
+      - "Manches dans l\u2019\xE9quipe du menteur"
+      - "Runden im L\xFCgnerteam"
+      - Ronde tim pembohong
+      - "\u091D\u0942\u0920\u0947 \u0915\u0940 \u091F\u0940\u092E \u0915\u0947 \u0930\u093E\u0909\u0902\u0921"
+      - "\u062C\u0648\u0644\u0627\u062A \u0641\u0631\u064A\u0642 \u0627\u0644\u0643\u0627\u0630\u0628"
+      Flags: 000000000000000000000000
+      Languages_Touch: []
     CaseInsensitiveTerms: 0
     OnMissingTranslation: 0
     mTerm_AppName: 

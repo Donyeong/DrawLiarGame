@@ -1032,7 +1032,14 @@ namespace DrawLiar
             void RefreshSummaries()
             {
                 int limit=draft.Victory==VictoryMode.RoundCount?draft.RoundCount:draft.TargetScore;
-                if(draft.LiarMode==LiarMode.Mismatch)
+                if(draft.LiarMode==LiarMode.Spy)
+                {
+                    string source=draft.Victory==VictoryMode.RoundCount?
+                        draft.AllowMidRoundJoin?"스파이 모드 · {0}라운드 · 난입 허용":"스파이 모드 · {0}라운드 · 난입 제한":
+                        draft.AllowMidRoundJoin?"스파이 모드 · 목표 {0}점 · 난입 허용":"스파이 모드 · 목표 {0}점 · 난입 제한";
+                    SetText(rulesSummary,source,limit);
+                }
+                else if(draft.LiarMode==LiarMode.Mismatch)
                 {
                     string source=draft.Victory==VictoryMode.RoundCount?
                         draft.AllowMidRoundJoin?"미스매치 · {0}라운드 · 난입 허용":"미스매치 · {0}라운드 · 난입 제한":
@@ -1173,13 +1180,13 @@ namespace DrawLiar
                     var heading=Box(info,"mobile-room-top row");RawText(heading,room.Name,"player-name grow");Text(heading,room.IsInProgress?"진행 중":"대기 중","mobile-room-state");
                     var metadata=Box(info,"mobile-room-metadata row");Text(metadata,"{0} / {1}명","muted mobile-small mobile-room-meta",room.Players,room.MaxPlayers);
                     if(room.Spectators>0)Text(metadata,"관전 {0}명","muted mobile-small mobile-room-meta",room.Spectators);
-                    if(room.LiarMode!=LiarMode.Classic)Text(metadata,room.LiarMode==LiarMode.Optional?"불확정":"미스매치","muted mobile-small mobile-room-meta").name="room-liar-mode-"+room.Id;
+                    if(room.LiarMode!=LiarMode.Classic)Text(metadata,LiarModeTitle(room.LiarMode),"muted mobile-small mobile-room-meta").name="room-liar-mode-"+room.Id;
                     if(room.TopicLanguage!=ownTopicLanguage)RawText(metadata,TopicLanguageName(room.TopicLanguage),"muted mobile-small mobile-room-meta");
                 }
                 else
                 {
                     RawText(info,room.Name,"player-name");Text(info,room.IsInProgress?"{0} / {1}명 · 관전 {2}명 · 진행 중":"{0} / {1}명 · 관전 {2}명 · 대기 중","muted mobile-small",room.Players,room.MaxPlayers,room.Spectators);
-                    if(room.LiarMode!=LiarMode.Classic)Text(info,room.LiarMode==LiarMode.Optional?"불확정":"미스매치","muted mobile-small").name="room-liar-mode-"+room.Id;
+                    if(room.LiarMode!=LiarMode.Classic)Text(info,LiarModeTitle(room.LiarMode),"muted mobile-small").name="room-liar-mode-"+room.Id;
                     if(room.TopicLanguage!=ownTopicLanguage)RawText(info,TopicLanguageName(room.TopicLanguage),"muted mobile-small");
                 }
                 CreatePublicRoomTopics(info,room);
@@ -1747,7 +1754,9 @@ namespace DrawLiar
                 if(waiting)
                 {
                     SetText(_mobileRoundInfo,"{0} / {1}명",state.Players.Count(p=>!p.IsSpectator&&p.IsConnected),state.Settings.MaxPlayers);
-                    if(state.Settings.LiarMode==LiarMode.Mismatch)
+                    if(state.Settings.LiarMode==LiarMode.Spy)
+                        SetText(_mobileRoundHint,state.Settings.Victory==VictoryMode.RoundCount?"스파이 모드 · {0}라운드":"스파이 모드 · 목표 {0}점",state.Settings.Victory==VictoryMode.RoundCount?state.Settings.RoundCount:state.Settings.TargetScore);
+                    else if(state.Settings.LiarMode==LiarMode.Mismatch)
                         SetText(_mobileRoundHint,state.Settings.Victory==VictoryMode.RoundCount?"미스매치 · {0}라운드":"미스매치 · 목표 {0}점",state.Settings.Victory==VictoryMode.RoundCount?state.Settings.RoundCount:state.Settings.TargetScore);
                     else if(state.Settings.Victory==VictoryMode.RoundCount)SetText(_mobileRoundHint,"라이어 {0}명 · {1}라운드",state.Settings.LiarMode==LiarMode.Optional?(object)"0~1":state.Settings.LiarCount,state.Settings.RoundCount);
                     else SetText(_mobileRoundHint,"라이어 {0}명 · 목표 {1}점",state.Settings.LiarMode==LiarMode.Optional?(object)"0~1":state.Settings.LiarCount,state.Settings.TargetScore);
@@ -1902,7 +1911,7 @@ namespace DrawLiar
                 SetText(_playerScores[player.Id],"{0}점",player.Score);
                 SetText(label,!player.IsConnected?"연결 끊김":IsNominationPhase(state)?(player.HasVoted?"지목 완료":_hasSelectedPlayer&&player.Id==selectedPlayerId?"선택됨":""):
                     state.Phase==GamePhase.Rebuttal?(state.IsJudgmentCoinToss?"동전 던지기":state.HasAccused&&player.Id==state.AccusedPlayerId?"반론 중":player.HasJudged?"투표 완료":""):
-                    player.IsLiar&&!HasHiddenMismatchRole(state)&&!HideLiarIdentity(state)?"라이어":state.Phase==GamePhase.Drawing?(player.Id==state.ArtistId?"그리는 중":""):"");
+                    (player.IsLiar||player.IsSpy)&&!HasHiddenMismatchRole(state)&&!HideLiarIdentity(state)?player.IsSpy?"스파이":"라이어":state.Phase==GamePhase.Drawing?(player.Id==state.ArtistId?"그리는 중":""):"");
                 label.style.display=string.IsNullOrEmpty(label.text)?DisplayStyle.None:DisplayStyle.Flex;
             }
         }
@@ -1919,8 +1928,9 @@ namespace DrawLiar
                     {
                         var summary=Box(contextInfo,"room-settings-summary");summary.name="room-settings-summary";
                         Text(summary,"{0} / {1}명","context-name",state.Players.Count(p=>!p.IsSpectator&&p.IsConnected),state.Settings.MaxPlayers);
-                        if(state.Settings.LiarMode!=LiarMode.Classic)Text(summary,state.Settings.LiarMode==LiarMode.Optional?"불확정":"미스매치","muted");
-                        Text(summary,"라이어 {0}명","muted",state.Settings.LiarMode==LiarMode.Optional?(object)"0~1":state.Settings.LiarCount);
+                        if(state.Settings.LiarMode!=LiarMode.Classic)Text(summary,LiarModeTitle(state.Settings.LiarMode),"muted");
+                        if(state.Settings.LiarMode==LiarMode.Spy)Text(summary,"라이어 {0}명 · 스파이 {1}명","muted",1,1);
+                        else Text(summary,"라이어 {0}명","muted",state.Settings.LiarMode==LiarMode.Optional?(object)"0~1":state.Settings.LiarCount);
                         if(state.Settings.Victory==VictoryMode.RoundCount)Text(summary,"{0}라운드","muted",state.Settings.RoundCount);
                         else Text(summary,"목표 {0}점","muted",state.Settings.TargetScore);
                     }
@@ -1995,16 +2005,20 @@ namespace DrawLiar
         private static bool HasHiddenMismatchRole(RoomSnapshot state)=>state.Settings.LiarMode==LiarMode.Mismatch
             &&state.Phase>=GamePhase.RoleReveal&&state.Phase<=GamePhase.Voting;
         private string LocalRoleName(RoomSnapshot state)=>state.LocalIsSpectator?"관전":HasHiddenMismatchRole(state)
-            ||state.Settings.LiarMode==LiarMode.Mismatch&&HideLiarIdentity(state)?"제시어":state.LocalIsLiar?"라이어":"시민";
+            ||state.Settings.LiarMode==LiarMode.Mismatch&&HideLiarIdentity(state)?"제시어":state.LocalIsSpy?"스파이":state.LocalIsLiar?"라이어":"시민";
         private static string RoleInstructions(RoomSnapshot state)
         {
             if(state.LocalIsSpectator)return "그림과 토론을 지켜보며 누가 라이어인지 추측해 보세요.";
             if(HasHiddenMismatchRole(state))return "내 제시어에 맞춰 그리고, 다른 단어를 받은 사람을 찾아보세요. 나일 수도 있어요.";
+            if(state.LocalIsSpy)return "제시어를 모르는 라이어에게 그림으로 힌트를 주면서, 스파이인 사실을 숨기세요. 적발되면 시민 팀이 승리합니다.";
+            if(state.Settings.LiarMode==LiarMode.Spy)return state.LocalIsLiar?
+                "스파이의 힌트를 찾아 제시어를 맞히고 정체를 숨기세요. 스파이가 적발되어도 패배합니다.":
+                "제시어에 맞춰 그리고, 라이어나 스파이를 찾아 투표하세요. 스파이는 라이어의 편입니다.";
             if(state.LocalIsLiar)return "시민인 척 들키지 않게 그림을 그리고, 시민들의 그림을 보고 제시어를 맞혀 보세요.";
             if(state.Settings.LiarMode==LiarMode.Optional)return "제시어에 맞춰 그리고, 라이어를 찾아 투표하세요. 없다고 생각하면 ‘라이어 없음’을 선택하세요.";
             return "제시어에 맞춰 그림을 그리고, 단어를 모르는 라이어를 찾아 투표하세요.";
         }
-        private static string PhaseName(RoomSnapshot state)=>state.Phase==GamePhase.Rebuttal&&state.IsJudgmentCoinToss?"동전 던지기":state.Phase==GamePhase.Rebuttal&&IsNoLiarAccused(state)?"확인 투표":state.Phase==GamePhase.RoleReveal&&HasHiddenMismatchRole(state)?"제시어 확인":PhaseName(state.Phase);
+        private static string PhaseName(RoomSnapshot state)=>state.Phase==GamePhase.LiarReveal&&state.Settings.LiarMode==LiarMode.Spy?"역할 공개":state.Phase==GamePhase.Rebuttal&&state.IsJudgmentCoinToss?"동전 던지기":state.Phase==GamePhase.Rebuttal&&IsNoLiarAccused(state)?"확인 투표":state.Phase==GamePhase.RoleReveal&&HasHiddenMismatchRole(state)?"제시어 확인":PhaseName(state.Phase);
 
         private void RoleReveal(RoomSnapshot state)
         {

@@ -106,7 +106,7 @@ namespace DrawLiar
                 _identityShown = true;
                 if (_revealVerdictCard != null) _revealVerdictCard.style.display = DisplayStyle.None;
                 _revealIdentityCard.style.display = DisplayStyle.Flex;
-                SetText(_revealCaption, "라이어의 정체");
+                SetText(_revealCaption, network.State?.Settings.LiarMode == LiarMode.Spy ? "라이어와 스파이의 정체" : "라이어의 정체");
                 if (_presentationElapsed < _liarRevealPlan.IdentityStarts + .3f) Enter(_revealIdentityCard, 250, 12);
             }
             bool avatars = _presentationElapsed >= _liarRevealPlan.IdentityFinishes;

@@ -38,8 +38,10 @@ namespace DrawLiar
                 var accused = state.Players.FirstOrDefault(player => player.Id == state.AccusedPlayerId);
                 if (accused != null)
                 {
-                    plan.IsCorrectAccusation = accused.IsLiar;
-                    string key = accused.IsLiar
+                    plan.IsCorrectAccusation = accused.IsLiar || accused.IsSpy;
+                    string key = accused.IsSpy
+                        ? (HasFinalConsonant(accused.Name) ? "{0}은|스파이가|맞았습니다." : "{0}는|스파이가|맞았습니다.")
+                        : accused.IsLiar
                         ? (HasFinalConsonant(accused.Name) ? "{0}은|라이어가|맞았습니다." : "{0}는|라이어가|맞았습니다.")
                         : (HasFinalConsonant(accused.Name) ? "{0}은|라이어가|아니었습니다." : "{0}는|라이어가|아니었습니다.");
                     plan.Verdict = SplitVerdict(key, accused.Name);
@@ -51,6 +53,14 @@ namespace DrawLiar
                 ? DrawLocalization.Text("이번 라운드에는 라이어가 없습니다.")
                 : names.Length > 0 ? DrawLocalization.Format("라이어는 {0}입니다.", string.Join(", ", names))
                 : DrawLocalization.Format("라이어 {0}명", state.RevealedLiarCount);
+            if (state.Settings.LiarMode == LiarMode.Spy)
+            {
+                var spies = state.Players.Where(player => player.IsSpy).Select(player => player.Name).ToArray();
+                if (names.Length > 0 && spies.Length > 0)
+                    plan.Identity = DrawLocalization.Format("라이어는 {0} · 스파이는 {1}입니다.", string.Join(", ", names), string.Join(", ", spies));
+                else plan.Identity += "\n" + (spies.Length > 0
+                    ? DrawLocalization.Format("스파이는 {0}입니다.", string.Join(", ", spies)) : DrawLocalization.Format("스파이 {0}명", 1));
+            }
 
             float verdictTyping = plan.Verdict.Sum(text => DrawAnimatedText.MeasureDuration(text, .1f));
             float identityTyping = DrawAnimatedText.MeasureDuration(plan.Identity, .08f);

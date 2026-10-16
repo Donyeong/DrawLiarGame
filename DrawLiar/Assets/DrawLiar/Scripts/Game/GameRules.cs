@@ -75,6 +75,15 @@ namespace DrawLiar
                 : 0);
         }
 
+        public static int SpyRoundScore(bool liarTeam, bool spyCaught, bool liarCaught, bool correctGuess, ScoreRules rules)
+        {
+            bool liarTeamWon = !spyCaught && (!liarCaught || correctGuess);
+            if (!liarTeam) return liarTeamWon ? 0 : Math.Max(0, rules.CitizenCorrectVote);
+            if (!liarTeamWon) return 0;
+            return (liarCaught ? 0 : Math.Max(0, rules.LiarUncaught))
+                + (correctGuess ? Math.Max(0, rules.LiarCorrectGuess) : 0);
+        }
+
         public static bool ValidStroke(DrawStroke stroke, int version)
         {
             return stroke.CanvasVersion == version && InRange(stroke.X1, 0, 1) && InRange(stroke.Y1, 0, 1)

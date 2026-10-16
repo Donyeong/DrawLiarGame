@@ -36,6 +36,7 @@ namespace DrawLiar.Editor
             VerifyGuessResults();
             VerifyGuessAliases();
             VerifyRevealTimeline();
+            VerifySpyMode();
 #if UNITY_EDITOR
             UnityEngine.Debug.Log("DrawLiar game self-check PASS: 게임 모드, 승리 조건, 지목·찬반 합의, 점수, 비밀 상태, 재접속, 관전자, 타이머 검증");
 #else
@@ -52,6 +53,36 @@ namespace DrawLiar.Editor
             Scoring = new ScoreRules(),
             Topics = new[] { new TopicData { Name = "과일", Words = new[] { "사과" } } }
         };
+
+        private static void VerifySpyMode()
+        {
+            foreach (DrawingMode mode in Enum.GetValues(typeof(DrawingMode)))
+            {
+                var game = new GameSession(new RoomSettings { LiarMode = LiarMode.Spy, LiarCount = 7, Mode = mode,
+                    RoundCount = 1, RebuttalSeconds = 5 }, Data(), 131);
+                for (int id = 0; id < 4; id++) Check(game.Join(id, "P" + id, 0, 0), "스파이 검증 참가자를 입장시켜야 합니다.");
+                Check(game.Join(99, "관전", 0, 0, true, true) && game.Start(0) && game.Settings.LiarCount == 1,
+                    "스파이는 라이어 한 명과 별도 스파이 한 명으로 시작해야 합니다.");
+                int spy = Enumerable.Range(0, 4).Single(id => game.Snapshot(id, 0, 0).LocalIsSpy);
+                int liar = Enumerable.Range(0, 4).Single(id => game.Snapshot(id, 0, 0).LocalIsLiar);
+                Check(spy != liar && game.Snapshot(spy, 0, 0).Word == "사과" && game.Snapshot(liar, 0, 0).Word == ""
+                    && game.Snapshot(99, 0, 0).Word == "" && !game.Snapshot(99, 0, 0).LocalIsSpy
+                    && game.Snapshot(spy, 0, 0).Players.All(player => !player.IsSpy && !player.IsLiar),
+                    "스파이는 정답을 알되 상대 정체와 관전자 정답은 공개하지 않아야 합니다.");
+                double now = 100;
+                game.Tick(now);
+                while (game.Phase == GamePhase.Drawing) Check(game.EndTurn(game.ArtistId, now), "스파이도 정상 그림 차례를 가져야 합니다.");
+                NominateAll(game, spy, now); ApproveAll(game, now);
+                Check(game.Snapshot(99, 0, now).Players.Single(player => player.Id == spy) is { IsSpy: true, IsLiar: false, IsCaught: true },
+                    "스파이 적발은 라이어와 구분하여 공개해야 합니다.");
+                game.Tick(now += 100);
+                var result = game.Snapshot(0, 0, now);
+                Check(result.Phase == GamePhase.RoundResults && !game.Guess(spy, "사과", now) && !game.Guess(liar, "사과", now)
+                    && result.Players.Where(player => player.Id == spy || player.Id == liar).All(player => player.RoundPoints == 0)
+                    && result.Players.Where(player => !player.IsSpectator && player.Id != spy && player.Id != liar).All(player => player.RoundPoints == 2),
+                    "스파이 적발은 라이어 추측 없이 시민 팀 승리로 종료해야 합니다.");
+            }
+        }
 
         private static void VerifyRevealTimeline()
         {

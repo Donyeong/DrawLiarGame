@@ -207,7 +207,7 @@ namespace DrawLiar
             PublicProfileStat(grid, "최고 점수", stats.BestScore);
             PublicProfileStat(grid, "플레이 라운드", stats.RoundsPlayed);
             PublicProfileStat(grid, "시민 라운드", stats.CitizenRounds);
-            PublicProfileStat(grid, "라이어 라운드", stats.LiarRounds);
+            PublicProfileStat(grid, "라이어 팀 라운드", stats.LiarRounds);
             PublicProfileStat(grid, "정답 투표", stats.CorrectVotes);
             PublicProfileStat(grid, "정답 추측", stats.CorrectGuesses);
             Text(_profileBody, "최근 경기", "section-title");

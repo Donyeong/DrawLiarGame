@@ -499,8 +499,9 @@
 .app.mobile .create-room-panel .field { margin-bottom: 12px; }
 .app.mobile .create-mode { margin-bottom: 16px; }
 .app.mobile .create-modes .button { font-size: 14px; }
-.app.mobile .liar-mode-choices .button { min-height: 56px; margin-right: 8px; padding: 8px 6px; }
-.app.mobile .liar-mode-choices .button.mode-choice-last { margin-right: 0; }
+.app.mobile .liar-mode-choices { flex-wrap: wrap; }
+.app.mobile .liar-mode-choices .button { flex-basis: 40%; min-height: 56px; margin-right: 8px; margin-bottom: 8px; padding: 8px 6px; }
+.app.mobile .liar-mode-choices .button.mode-choice-pair-end { margin-right: 0; }
 .app.mobile .nomination-actions .nomination-none, .app.mobile .nomination-actions .nomination-submit { height: 44px; min-height: 44px; font-size: 14px; padding: 6px 8px; margin: 0 0 0 6px; }
 .app.mobile .create-section-fields { padding: 12px 10px 0; }
 .app.mobile .create-time-grid .field { margin-right: 2%; }

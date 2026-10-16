@@ -20,6 +20,15 @@ internal static partial class Integration
 
     public static async Task RunAsync(string[] args)
     {
+        if (args.Contains("--spy-only"))
+        {
+            DrawLiar.Editor.GameSelfCheck.Run();
+            await VerifySpyAsync();
+            await VerifyMismatchAsync();
+            await VerifyOptionalLiarAsync();
+            await VerifyMidRoundAsync();
+            return;
+        }
         if (args.Contains("--advertising-only") || args.Contains("--advertising-database-only"))
         {
             await VerifyAdvertisingAsync();
@@ -206,6 +215,7 @@ internal static partial class Integration
         await VerifyMatchDrawingCaptureAsync();
         await VerifyMidRoundAsync();
         await VerifyOptionalLiarAsync();
+        await VerifySpyAsync();
         await VerifyProfileRulesAsync();
         VerifyGuestCredentialRules();
         if (args.Contains("--lobby-chat-only"))

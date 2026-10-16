@@ -30,7 +30,8 @@ namespace DrawLiar
                 identity.Add(avatar);
                 BindProfileTarget(avatar, player.AccountId);
                 string template = state.Winners.Contains(player.Id)
-                    ? (player.IsLiar ? "★ {0} · 라이어" : "★ {0} · 시민") : (player.IsLiar ? "{0} · 라이어" : "{0} · 시민");
+                    ? (player.IsSpy ? "★ {0} · 스파이" : player.IsLiar ? "★ {0} · 라이어" : "★ {0} · 시민")
+                    : (player.IsSpy ? "{0} · 스파이" : player.IsLiar ? "{0} · 라이어" : "{0} · 시민");
                 DrawCosmeticPresentation.ApplyNickname(AddLevelBadge(Text(identity, template, "round-result-player-name", player.Name), player.Level, "result-" + player.Id, player.AccountId), player.Cosmetics);
                 Text(row, "{0}점 (+{1})", "player-score", player.Score, player.RoundPoints);
                 if (state.Phase == GamePhase.MatchResults || PhasePresentationElapsed() < .4f)
@@ -52,12 +53,13 @@ namespace DrawLiar
         private void RevealLiars(RoomSnapshot state)
         {
             if (state == null || state.Phase != GamePhase.LiarReveal) return;
-            var modal = Modal("라이어 공개", false);
+            var modal = Modal(PhaseName(state), false);
             BeginTextPresentation(state, true);
             modal.name = "liar-reveal-popup";
             var body = RoundResultBody(modal);
             _liarRevealPlan = _liarRevealPlan ?? DrawLiarRevealPlan.Create(state);
-            _revealCaption = Text(body, _liarRevealPlan.HasVerdict ? "지목 결과" : "라이어의 정체", "reveal-sequence-caption");
+            _revealCaption = Text(body, _liarRevealPlan.HasVerdict ? "지목 결과" : state.Settings.LiarMode == LiarMode.Spy
+                ? "라이어와 스파이의 정체" : "라이어의 정체", "reveal-sequence-caption");
             _revealCaption.name = "reveal-sequence-caption";
             if (_liarRevealPlan.HasVerdict)
             {
@@ -78,7 +80,7 @@ namespace DrawLiar
                 Text(_revealIdentityCard, "라이어 {0}명", "round-reveal-count", state.RevealedLiarCount).name = "revealed-liar-count";
             var identities = _revealAvatars = Box(body, "row reveal-liars");
             identities.style.display = DisplayStyle.None;
-            foreach (var player in state.Players.Where(player => player.IsLiar))
+            foreach (var player in state.Players.Where(player => player.IsLiar || player.IsSpy))
             {
                 var identity = Box(identities, "reveal-liar");
                 var avatar = DecoratedAvatar(player.AvatarColor, player.Accessory, player.Cosmetics);
@@ -86,6 +88,7 @@ namespace DrawLiar
                 identity.Add(avatar);
                 BindProfileTarget(avatar, player.AccountId);
                 LeveledName(identity, player.Name, player.Level, "player-name", "revealed-" + player.Id, player.AccountId, cosmetics: player.Cosmetics);
+                if (state.Settings.LiarMode == LiarMode.Spy) Text(identity, player.IsSpy ? "스파이" : "라이어", "rules");
                 Text(identity, player.IsCaught ? "지목됨" : "지목 안 됨", "rules");
             }
             _revealConfirm = Button(modal, "확인", CloseModal, "primary round-result-dismiss", DrawSound.UiConfirm);
@@ -111,6 +114,19 @@ namespace DrawLiar
             var names = state.Players.Where(player => player.IsLiar).Select(player => player.Name).ToArray();
             if (!noLiar && names.Length == 0 && state.RevealedLiarCount <= 0) return;
             var card = Box(parent, "round-reveal-card round-liar-card");
+            if (state.Settings.LiarMode == LiarMode.Spy)
+            {
+                var spies = state.Players.Where(player => player.IsSpy).Select(player => player.Name).ToArray();
+                if (names.Length > 0 && spies.Length > 0)
+                {
+                    string identity = L.Format("라이어는 {0} · 스파이는 {1}이었습니다.", string.Join(", ", names), string.Join(", ", spies));
+                    if (animate) PresentationText(card, identity, "round-reveal-statement", "results-liars", .6f, .025f);
+                    else Text(card, "라이어는 {0} · 스파이는 {1}이었습니다.", "round-reveal-statement", string.Join(", ", names), string.Join(", ", spies)).name = "results-liars";
+                    return;
+                }
+                Text(card, spies.Length > 0 ? "스파이는 {0}이었습니다." : "스파이 {0}명", "round-reveal-statement",
+                    spies.Length > 0 ? (object)string.Join(", ", spies) : 1).name = "results-spies";
+            }
             if (noLiar)
             {
                 card.AddToClassList("round-no-liar-card");

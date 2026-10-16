@@ -13395,6 +13395,584 @@
         "इनाम जाँचें",
         "التحقق من المكافأة"
       ]
+    },
+    {
+      "Key": "스파이",
+      "Values": [
+        "스파이",
+        "Spy",
+        "间谍",
+        "間諜",
+        "スパイ",
+        "Espía",
+        "Espião",
+        "Espion",
+        "Spion",
+        "Mata-mata",
+        "जासूस",
+        "الجاسوس"
+      ]
+    },
+    {
+      "Key": "스파이 모드",
+      "Values": [
+        "스파이 모드",
+        "Spy mode",
+        "间谍模式",
+        "間諜模式",
+        "スパイモード",
+        "Modo espía",
+        "Modo espião",
+        "Mode espion",
+        "Spionmodus",
+        "Mode mata-mata",
+        "जासूस मोड",
+        "وضع الجاسوس"
+      ]
+    },
+    {
+      "Key": "스파이는 제시어를 알고 라이어를 돕습니다. 스파이가 적발되면 시민이 승리합니다.",
+      "Values": [
+        "스파이는 제시어를 알고 라이어를 돕습니다. 스파이가 적발되면 시민이 승리합니다.",
+        "The spy knows the word and helps the liar. If the spy is exposed, the citizens win.",
+        "间谍知道词语并帮助说谎者。间谍被识破时，市民获胜。",
+        "間諜知道詞語並幫助說謊者。間諜被識破時，市民獲勝。",
+        "スパイは単語を知っていて、ライアーを助けます。スパイが見破られると市民の勝利です。",
+        "El espía conoce la palabra y ayuda al mentiroso. Si descubren al espía, ganan los inocentes.",
+        "O espião conhece a palavra e ajuda o mentiroso. Se o espião for descoberto, os inocentes vencem.",
+        "L’espion connaît le mot et aide le menteur. Si l’espion est démasqué, les innocents gagnent.",
+        "Der Spion kennt das Wort und hilft dem Lügner. Wird der Spion enttarnt, gewinnen die Unschuldigen.",
+        "Mata-mata mengetahui kata dan membantu pembohong. Jika mata-mata terbongkar, pemain biasa menang.",
+        "जासूस शब्द जानता है और झूठे की मदद करता है। जासूस की पहचान खुलने पर सामान्य खिलाड़ी जीतते हैं।",
+        "يعرف الجاسوس الكلمة ويساعد الكاذب. إذا كُشفت هوية الجاسوس، يفوز اللاعبون العاديون."
+      ]
+    },
+    {
+      "Key": "스파이는 제시어를 알고 라이어를 돕습니다. 스파이가 적발되면 시민이 승리합니다.\n최소 {0}명",
+      "Values": [
+        "스파이는 제시어를 알고 라이어를 돕습니다. 스파이가 적발되면 시민이 승리합니다.\n최소 {0}명",
+        "The spy knows the word and helps the liar. If the spy is exposed, the citizens win.\nMinimum players: {0}",
+        "间谍知道词语并帮助说谎者。间谍被识破时，市民获胜。\n至少{0}人",
+        "間諜知道詞語並幫助說謊者。間諜被識破時，市民獲勝。\n至少 {0} 人",
+        "スパイは単語を知っていて、ライアーを助けます。スパイが見破られると市民の勝利です。\n最低{0}人",
+        "El espía conoce la palabra y ayuda al mentiroso. Si descubren al espía, ganan los inocentes.\nMínimo de jugadores: {0}",
+        "O espião conhece a palavra e ajuda o mentiroso. Se o espião for descoberto, os inocentes vencem.\nMínimo de jogadores: {0}",
+        "L’espion connaît le mot et aide le menteur. Si l’espion est démasqué, les innocents gagnent.\nNombre minimum de joueurs : {0}",
+        "Der Spion kennt das Wort und hilft dem Lügner. Wird der Spion enttarnt, gewinnen die Unschuldigen.\nMindestens {0} Spieler",
+        "Mata-mata mengetahui kata dan membantu pembohong. Jika mata-mata terbongkar, pemain biasa menang.\nMinimal {0} pemain",
+        "जासूस शब्द जानता है और झूठे की मदद करता है। जासूस की पहचान खुलने पर सामान्य खिलाड़ी जीतते हैं।\nकम से कम {0} खिलाड़ी",
+        "يعرف الجاسوس الكلمة ويساعد الكاذب. إذا كُشفت هوية الجاسوس، يفوز اللاعبون العاديون.\nالحد الأدنى للاعبين: {0}"
+      ]
+    },
+    {
+      "Key": "라이어 {0}명 · 스파이 {1}명",
+      "Values": [
+        "라이어 {0}명 · 스파이 {1}명",
+        "Liars: {0} · Spies: {1}",
+        "说谎者{0}人 · 间谍{1}人",
+        "說謊者 {0} 人 · 間諜 {1} 人",
+        "ライアー{0}人 · スパイ{1}人",
+        "Mentirosos: {0} · Espías: {1}",
+        "Mentirosos: {0} · Espiões: {1}",
+        "Menteurs : {0} · Espions : {1}",
+        "Lügner: {0} · Spione: {1}",
+        "Pembohong: {0} · Mata-mata: {1}",
+        "झूठे: {0} · जासूस: {1}",
+        "الكاذبون: {0} · الجواسيس: {1}"
+      ]
+    },
+    {
+      "Key": "스파이 모드 · {0}라운드",
+      "Values": [
+        "스파이 모드 · {0}라운드",
+        "Spy mode · {0} rounds",
+        "间谍模式 · {0}回合",
+        "間諜模式 · {0} 回合",
+        "スパイモード · {0}ラウンド",
+        "Modo espía · Rondas {0}",
+        "Modo espião · Rodadas {0}",
+        "Mode espion · Manches {0}",
+        "Spionmodus · Runden {0}",
+        "Mode mata-mata · Ronde {0}",
+        "जासूस मोड · राउंड {0}",
+        "وضع الجاسوس · الجولات {0}"
+      ]
+    },
+    {
+      "Key": "스파이 모드 · 목표 {0}점",
+      "Values": [
+        "스파이 모드 · 목표 {0}점",
+        "Spy mode · Target {0} pts",
+        "间谍模式 · 目标{0}分",
+        "間諜模式 · 目標 {0} 分",
+        "スパイモード · 目標{0}点",
+        "Modo espía · Objetivo {0} puntos",
+        "Modo espião · Meta {0} pontos",
+        "Mode espion · Objectif {0} points",
+        "Spionmodus · Ziel {0} Punkte",
+        "Mode mata-mata · Target {0} poin",
+        "जासूस मोड · लक्ष्य {0} अंक",
+        "وضع الجاسوس · الهدف {0} نقاط"
+      ]
+    },
+    {
+      "Key": "스파이 모드 · {0}라운드 · 난입 허용",
+      "Values": [
+        "스파이 모드 · {0}라운드 · 난입 허용",
+        "Spy mode · {0} rounds · Mid-round join on",
+        "间谍模式 · {0}回合 · 允许中途加入",
+        "間諜模式 · {0} 回合 · 允許中途加入",
+        "スパイモード · {0}ラウンド · 途中参加可",
+        "Modo espía · Rondas {0} · Entrada en curso: sí",
+        "Modo espião · Rodadas {0} · Entrada em andamento: sim",
+        "Mode espion · Manches {0} · Arrivée en cours : oui",
+        "Spionmodus · Runden {0} · Quereinstieg an",
+        "Mode mata-mata · Ronde {0} · Gabung di tengah ronde: aktif",
+        "जासूस मोड · राउंड {0} · बीच में प्रवेश: चालू",
+        "وضع الجاسوس · الجولات {0} · الانضمام أثناء الجولة: مسموح"
+      ]
+    },
+    {
+      "Key": "스파이 모드 · {0}라운드 · 난입 제한",
+      "Values": [
+        "스파이 모드 · {0}라운드 · 난입 제한",
+        "Spy mode · {0} rounds · Mid-round join off",
+        "间谍模式 · {0}回合 · 禁止中途加入",
+        "間諜模式 · {0} 回合 · 禁止中途加入",
+        "スパイモード · {0}ラウンド · 途中参加不可",
+        "Modo espía · Rondas {0} · Entrada en curso: no",
+        "Modo espião · Rodadas {0} · Entrada em andamento: não",
+        "Mode espion · Manches {0} · Arrivée en cours : non",
+        "Spionmodus · Runden {0} · Quereinstieg aus",
+        "Mode mata-mata · Ronde {0} · Gabung di tengah ronde: nonaktif",
+        "जासूस मोड · राउंड {0} · बीच में प्रवेश: बंद",
+        "وضع الجاسوس · الجولات {0} · الانضمام أثناء الجولة: ممنوع"
+      ]
+    },
+    {
+      "Key": "스파이 모드 · 목표 {0}점 · 난입 허용",
+      "Values": [
+        "스파이 모드 · 목표 {0}점 · 난입 허용",
+        "Spy mode · Target {0} pts · Mid-round join on",
+        "间谍模式 · 目标{0}分 · 允许中途加入",
+        "間諜模式 · 目標 {0} 分 · 允許中途加入",
+        "スパイモード · 目標{0}点 · 途中参加可",
+        "Modo espía · Objetivo {0} puntos · Entrada en curso: sí",
+        "Modo espião · Meta {0} pontos · Entrada em andamento: sim",
+        "Mode espion · Objectif {0} points · Arrivée en cours : oui",
+        "Spionmodus · Ziel {0} Punkte · Quereinstieg an",
+        "Mode mata-mata · Target {0} poin · Gabung di tengah ronde: aktif",
+        "जासूस मोड · लक्ष्य {0} अंक · बीच में प्रवेश: चालू",
+        "وضع الجاسوس · الهدف {0} نقاط · الانضمام أثناء الجولة: مسموح"
+      ]
+    },
+    {
+      "Key": "스파이 모드 · 목표 {0}점 · 난입 제한",
+      "Values": [
+        "스파이 모드 · 목표 {0}점 · 난입 제한",
+        "Spy mode · Target {0} pts · Mid-round join off",
+        "间谍模式 · 目标{0}分 · 禁止中途加入",
+        "間諜模式 · 目標 {0} 分 · 禁止中途加入",
+        "スパイモード · 目標{0}点 · 途中参加不可",
+        "Modo espía · Objetivo {0} puntos · Entrada en curso: no",
+        "Modo espião · Meta {0} pontos · Entrada em andamento: não",
+        "Mode espion · Objectif {0} points · Arrivée en cours : non",
+        "Spionmodus · Ziel {0} Punkte · Quereinstieg aus",
+        "Mode mata-mata · Target {0} poin · Gabung di tengah ronde: nonaktif",
+        "जासूस मोड · लक्ष्य {0} अंक · बीच में प्रवेश: बंद",
+        "وضع الجاسوس · الهدف {0} نقاط · الانضمام أثناء الجولة: ممنوع"
+      ]
+    },
+    {
+      "Key": "제시어를 모르는 라이어에게 그림으로 힌트를 주면서, 스파이인 사실을 숨기세요. 적발되면 시민 팀이 승리합니다.",
+      "Values": [
+        "제시어를 모르는 라이어에게 그림으로 힌트를 주면서, 스파이인 사실을 숨기세요. 적발되면 시민 팀이 승리합니다.",
+        "Give the liar, who does not know the word, hints through your drawing while hiding that you are the spy. If you are exposed, the citizen team wins.",
+        "用画作向不知道词语的说谎者提供提示，同时隐藏你的间谍身份。如果被识破，市民队获胜。",
+        "用畫作向不知道詞語的說謊者提供提示，同時隱藏你的間諜身分。如果被識破，市民隊獲勝。",
+        "単語を知らないライアーに絵でヒントを送りながら、スパイであることを隠しましょう。見破られると市民チームの勝利です。",
+        "Da pistas con tu dibujo al mentiroso, que no conoce la palabra, sin revelar que eres el espía. Si te descubren, gana el equipo de inocentes.",
+        "Dê pistas pelo seu desenho ao mentiroso, que não conhece a palavra, sem revelar que você é o espião. Se for descoberto, o time dos inocentes vence.",
+        "Donnez des indices au menteur, qui ne connaît pas le mot, grâce à votre dessin sans révéler que vous êtes l’espion. Si vous êtes démasqué, l’équipe des innocents gagne.",
+        "Gib dem Lügner, der das Wort nicht kennt, mit deiner Zeichnung Hinweise, ohne deine Spionrolle zu verraten. Wirst du enttarnt, gewinnt das Team der Unschuldigen.",
+        "Berikan petunjuk lewat gambar kepada pembohong yang tidak tahu katanya, sambil merahasiakan bahwa kamu mata-mata. Jika terbongkar, tim pemain biasa menang.",
+        "शब्द न जानने वाले झूठे को अपने चित्र से संकेत दें और अपनी जासूस की पहचान छिपाएँ। पहचान खुलने पर सामान्य खिलाड़ियों की टीम जीत जाती है।",
+        "قدّم للكاذب الذي لا يعرف الكلمة تلميحات عبر رسمك، مع إخفاء أنك الجاسوس. إذا كُشفت هويتك، يفوز فريق اللاعبين العاديين."
+      ]
+    },
+    {
+      "Key": "제시어에 맞춰 그리고, 라이어나 스파이를 찾아 투표하세요. 스파이는 라이어의 편입니다.",
+      "Values": [
+        "제시어에 맞춰 그리고, 라이어나 스파이를 찾아 투표하세요. 스파이는 라이어의 편입니다.",
+        "Draw to match the word, then find and vote for the liar or the spy. The spy is on the liar team.",
+        "根据词语作画，找出说谎者或间谍并投票。间谍属于说谎者一方。",
+        "根據詞語作畫，找出說謊者或間諜並投票。間諜與說謊者同一陣營。",
+        "単語に合う絵を描き、ライアーかスパイを見つけて投票しましょう。スパイはライアーの味方です。",
+        "Dibuja según la palabra, encuentra al mentiroso o al espía y vótalo. El espía está en el equipo del mentiroso.",
+        "Desenhe de acordo com a palavra, encontre o mentiroso ou o espião e vote nele. O espião está no time do mentiroso.",
+        "Dessinez selon le mot, trouvez le menteur ou l’espion et votez contre lui. L’espion est dans l’équipe du menteur.",
+        "Zeichne passend zum Wort, finde den Lügner oder den Spion und stimme gegen ihn. Der Spion gehört zum Team des Lügners.",
+        "Gambarlah sesuai kata, lalu temukan dan pilih pembohong atau mata-mata dalam voting. Mata-mata berada di pihak pembohong.",
+        "शब्द के अनुसार चित्र बनाएँ, फिर झूठे या जासूस को ढूँढकर उसके लिए वोट दें। जासूस झूठे की टीम में है।",
+        "ارسم وفقًا للكلمة، ثم اعثر على الكاذب أو الجاسوس وصوّت ضده. الجاسوس في فريق الكاذب."
+      ]
+    },
+    {
+      "Key": "스파이의 힌트를 찾아 제시어를 맞히고 정체를 숨기세요. 스파이가 적발되어도 패배합니다.",
+      "Values": [
+        "스파이의 힌트를 찾아 제시어를 맞히고 정체를 숨기세요. 스파이가 적발되어도 패배합니다.",
+        "Look for the spy’s hints to figure out the word, and hide your identity. You also lose if the spy is exposed.",
+        "寻找间谍的提示来猜出词语，并隐藏自己的身份。间谍被识破时，你也会失败。",
+        "尋找間諜的提示來猜出詞語，並隱藏自己的身分。間諜被識破時，你也會落敗。",
+        "スパイのヒントから単語を推理し、正体を隠しましょう。スパイが見破られた場合も敗北になります。",
+        "Busca las pistas del espía para adivinar la palabra y oculta tu identidad. También pierdes si descubren al espía.",
+        "Procure as pistas do espião para descobrir a palavra e esconda sua identidade. Você também perde se o espião for descoberto.",
+        "Repérez les indices de l’espion pour deviner le mot et cachez votre identité. Vous perdez aussi si l’espion est démasqué.",
+        "Achte auf die Hinweise des Spions, um das Wort herauszufinden, und verbirg deine Identität. Du verlierst auch, wenn der Spion enttarnt wird.",
+        "Cari petunjuk dari mata-mata untuk menebak kata dan sembunyikan identitasmu. Kamu juga kalah jika mata-mata terbongkar.",
+        "जासूस के संकेतों से शब्द का अनुमान लगाएँ और अपनी पहचान छिपाएँ। जासूस की पहचान खुलने पर भी आप हार जाते हैं।",
+        "ابحث عن تلميحات الجاسوس لمعرفة الكلمة وأخفِ هويتك. تخسر أيضًا إذا كُشفت هوية الجاسوس."
+      ]
+    },
+    {
+      "Key": "{0}님이 라이어 팀이라고 생각하나요?",
+      "Values": [
+        "{0}님이 라이어 팀이라고 생각하나요?",
+        "Do you think {0} is on the liar team?",
+        "你认为{0}属于说谎者一方吗？",
+        "你認為{0}屬於說謊者陣營嗎？",
+        "{0}さんがライアーチームだと思いますか？",
+        "¿Crees que {0} está en el equipo del mentiroso?",
+        "Você acha que {0} está no time do mentiroso?",
+        "Pensez-vous que {0} fait partie de l’équipe du menteur ?",
+        "Glaubst du, dass {0} zum Team des Lügners gehört?",
+        "Menurutmu {0} berada di tim pembohong?",
+        "क्या आपको लगता है कि {0} झूठे की टीम में है?",
+        "هل تعتقد أن {0} ضمن فريق الكاذب؟"
+      ]
+    },
+    {
+      "Key": "라이어 팀 맞아요",
+      "Values": [
+        "라이어 팀 맞아요",
+        "They’re on the liar team",
+        "属于说谎者一方",
+        "屬於說謊者陣營",
+        "ライアーチームだと思う",
+        "Está en el equipo del mentiroso",
+        "Está no time do mentiroso",
+        "Dans l’équipe du menteur",
+        "Gehört zum Lügnerteam",
+        "Dia di tim pembohong",
+        "यह झूठे की टीम में है",
+        "ضمن فريق الكاذب"
+      ]
+    },
+    {
+      "Key": "라이어 팀 아니에요",
+      "Values": [
+        "라이어 팀 아니에요",
+        "They’re not on the liar team",
+        "不属于说谎者一方",
+        "不屬於說謊者陣營",
+        "ライアーチームではないと思う",
+        "No está en el equipo del mentiroso",
+        "Não está no time do mentiroso",
+        "Pas dans l’équipe du menteur",
+        "Gehört nicht zum Lügnerteam",
+        "Dia tidak di tim pembohong",
+        "यह झूठे की टीम में नहीं है",
+        "ليس ضمن فريق الكاذب"
+      ]
+    },
+    {
+      "Key": "★ {0} · 스파이",
+      "Values": [
+        "★ {0} · 스파이",
+        "★ {0} · Spy",
+        "★ {0} · 间谍",
+        "★ {0} · 間諜",
+        "★ {0} · スパイ",
+        "★ {0} · Espía",
+        "★ {0} · Espião",
+        "★ {0} · Espion",
+        "★ {0} · Spion",
+        "★ {0} · Mata-mata",
+        "★ {0} · जासूस",
+        "★ {0} · الجاسوس"
+      ]
+    },
+    {
+      "Key": "{0} · 스파이",
+      "Values": [
+        "{0} · 스파이",
+        "{0} · Spy",
+        "{0} · 间谍",
+        "{0} · 間諜",
+        "{0} · スパイ",
+        "{0} · Espía",
+        "{0} · Espião",
+        "{0} · Espion",
+        "{0} · Spion",
+        "{0} · Mata-mata",
+        "{0} · जासूस",
+        "{0} · الجاسوس"
+      ]
+    },
+    {
+      "Key": "{0}은|스파이가|맞았습니다.",
+      "Values": [
+        "{0}은|스파이가|맞았습니다.",
+        "{0}|was|the spy.",
+        "{0}|的身份|确实是间谍。",
+        "{0}|的身分|確實是間諜。",
+        "{0}は|スパイ|でした。",
+        "{0}|resultó|ser el espía.",
+        "{0}|na verdade,|era o espião.",
+        "{0},|au final,|était l’espion.",
+        "{0}|war|der Spion.",
+        "{0}|ternyata|adalah mata-mata.",
+        "{0}|का किरदार|जासूस था।",
+        "{0}|في هذه الجولة،|كان الجاسوس."
+      ]
+    },
+    {
+      "Key": "{0}는|스파이가|맞았습니다.",
+      "Values": [
+        "{0}는|스파이가|맞았습니다.",
+        "{0}|was|the spy.",
+        "{0}|的身份|确实是间谍。",
+        "{0}|的身分|確實是間諜。",
+        "{0}は|スパイ|でした。",
+        "{0}|resultó|ser el espía.",
+        "{0}|na verdade,|era o espião.",
+        "{0},|au final,|était l’espion.",
+        "{0}|war|der Spion.",
+        "{0}|ternyata|adalah mata-mata.",
+        "{0}|का किरदार|जासूस था।",
+        "{0}|في هذه الجولة،|كان الجاسوس."
+      ]
+    },
+    {
+      "Key": "라이어는 {0} · 스파이는 {1}입니다.",
+      "Values": [
+        "라이어는 {0} · 스파이는 {1}입니다.",
+        "The liar is {0} · the spy is {1}.",
+        "说谎者是{0} · 间谍是{1}。",
+        "說謊者是{0} · 間諜是{1}。",
+        "ライアーは{0}、スパイは{1}です。",
+        "El mentiroso es {0} · el espía es {1}.",
+        "O mentiroso é {0} · o espião é {1}.",
+        "Le menteur est {0} · l’espion est {1}.",
+        "Der Lügner ist {0} · der Spion ist {1}.",
+        "Pembohong adalah {0} · mata-mata adalah {1}.",
+        "झूठा {0} है · जासूस {1} है।",
+        "الكاذب هو {0} · الجاسوس هو {1}."
+      ]
+    },
+    {
+      "Key": "라이어는 {0} · 스파이는 {1}이었습니다.",
+      "Values": [
+        "라이어는 {0} · 스파이는 {1}이었습니다.",
+        "The liar was {0} · the spy was {1}.",
+        "说谎者是{0} · 间谍是{1}。",
+        "說謊者是{0} · 間諜是{1}。",
+        "ライアーは{0}、スパイは{1}でした。",
+        "El mentiroso era {0} · el espía era {1}.",
+        "O mentiroso era {0} · o espião era {1}.",
+        "Le menteur était {0} · l’espion était {1}.",
+        "Der Lügner war {0} · der Spion war {1}.",
+        "Pembohongnya tadi {0} · mata-matanya {1}.",
+        "झूठा {0} था · जासूस {1} था।",
+        "كان الكاذب {0} · وكان الجاسوس {1}."
+      ]
+    },
+    {
+      "Key": "라이어와 스파이의 정체",
+      "Values": [
+        "라이어와 스파이의 정체",
+        "Identities of the liar and spy",
+        "说谎者与间谍的身份",
+        "說謊者與間諜的身分",
+        "ライアーとスパイの正体",
+        "Identidades del mentiroso y del espía",
+        "Identidades do mentiroso e do espião",
+        "Identités du menteur et de l’espion",
+        "Identitäten des Lügners und des Spions",
+        "Identitas pembohong dan mata-mata",
+        "झूठे और जासूस की पहचान",
+        "هويتا الكاذب والجاسوس"
+      ]
+    },
+    {
+      "Key": "역할 공개",
+      "Values": [
+        "역할 공개",
+        "Role reveal",
+        "身份公开",
+        "身分公開",
+        "役割公開",
+        "Revelación de roles",
+        "Revelação de papéis",
+        "Révélation des rôles",
+        "Rollenaufdeckung",
+        "Pengungkapan peran",
+        "किरदार का खुलासा",
+        "كشف الأدوار"
+      ]
+    },
+    {
+      "Key": "아무도 지목되지 않았어요. 라이어에게 정답 기회가 있어요.",
+      "Values": [
+        "아무도 지목되지 않았어요. 라이어에게 정답 기회가 있어요.",
+        "No one was nominated. The liar has a chance to guess the word.",
+        "没有人被指认。说谎者有一次猜词的机会。",
+        "沒有人被指認。說謊者有一次猜詞的機會。",
+        "誰も指名されませんでした。ライアーに単語を当てるチャンスがあります。",
+        "No se ha señalado a nadie. El mentiroso tiene una oportunidad de adivinar la palabra.",
+        "Ninguém foi indicado. O mentiroso tem uma chance de adivinhar a palavra.",
+        "Personne n’a été désigné. Le menteur peut tenter de deviner le mot.",
+        "Niemand wurde beschuldigt. Der Lügner darf versuchen, das Wort zu erraten.",
+        "Tidak ada yang ditunjuk. Pembohong punya kesempatan menebak kata.",
+        "किसी को नामित नहीं किया गया। झूठे को शब्द का अनुमान लगाने का मौका मिलेगा।",
+        "لم يُرشَّح أحد. لدى الكاذب فرصة لتخمين الكلمة."
+      ]
+    },
+    {
+      "Key": "스파이가 지목되었어요. 시민 팀이 승리했어요.",
+      "Values": [
+        "스파이가 지목되었어요. 시민 팀이 승리했어요.",
+        "The spy was nominated. The citizen team won.",
+        "间谍被指认了。市民队获胜。",
+        "間諜被指認了。市民隊獲勝。",
+        "スパイが指名されました。市民チームの勝利です。",
+        "Se ha señalado al espía. Ganó el equipo de inocentes.",
+        "O espião foi indicado. O time dos inocentes venceu.",
+        "L’espion a été désigné. L’équipe des innocents a gagné.",
+        "Der Spion wurde beschuldigt. Das Team der Unschuldigen hat gewonnen.",
+        "Mata-mata telah ditunjuk. Tim pemain biasa menang.",
+        "जासूस को नामित किया गया। सामान्य खिलाड़ियों की टीम जीत गई।",
+        "تم ترشيح الجاسوس. فاز فريق اللاعبين العاديين."
+      ]
+    },
+    {
+      "Key": "지목이 가결되었어요. 라이어에게 정답 기회가 있어요.",
+      "Values": [
+        "지목이 가결되었어요. 라이어에게 정답 기회가 있어요.",
+        "The accusation was approved. The liar has a chance to guess the word.",
+        "指认获得通过。说谎者有一次猜词的机会。",
+        "指認獲得通過。說謊者有一次猜詞的機會。",
+        "指名が承認されました。ライアーに単語を当てるチャンスがあります。",
+        "La acusación fue aprobada. El mentiroso tiene una oportunidad de adivinar la palabra.",
+        "A acusação foi aprovada. O mentiroso tem uma chance de adivinhar a palavra.",
+        "L’accusation a été approuvée. Le menteur peut tenter de deviner le mot.",
+        "Die Beschuldigung wurde bestätigt. Der Lügner darf versuchen, das Wort zu erraten.",
+        "Penunjukan disetujui. Pembohong punya kesempatan menebak kata.",
+        "आरोप स्वीकार हो गया। झूठे को शब्द का अनुमान लगाने का मौका मिलेगा।",
+        "تمت الموافقة على الاتهام. لدى الكاذب فرصة لتخمين الكلمة."
+      ]
+    },
+    {
+      "Key": "라이어 팀이 승리했어요.",
+      "Values": [
+        "라이어 팀이 승리했어요.",
+        "The liar team won.",
+        "说谎者队获胜。",
+        "說謊者隊獲勝。",
+        "ライアーチームの勝利です。",
+        "Ganó el equipo del mentiroso.",
+        "O time do mentiroso venceu.",
+        "L’équipe du menteur a gagné.",
+        "Das Team des Lügners hat gewonnen.",
+        "Tim pembohong menang.",
+        "झूठे की टीम जीत गई।",
+        "فاز فريق الكاذب."
+      ]
+    },
+    {
+      "Key": "시민 팀이 승리했어요.",
+      "Values": [
+        "시민 팀이 승리했어요.",
+        "The citizen team won.",
+        "市民队获胜。",
+        "市民隊獲勝。",
+        "市民チームの勝利です。",
+        "Ganó el equipo de inocentes.",
+        "O time dos inocentes venceu.",
+        "L’équipe des innocents a gagné.",
+        "Das Team der Unschuldigen hat gewonnen.",
+        "Tim pemain biasa menang.",
+        "सामान्य खिलाड़ियों की टीम जीत गई।",
+        "فاز فريق اللاعبين العاديين."
+      ]
+    },
+    {
+      "Key": "스파이는 {0}입니다.",
+      "Values": [
+        "스파이는 {0}입니다.",
+        "The spy is {0}.",
+        "间谍是{0}。",
+        "間諜是{0}。",
+        "スパイは{0}です。",
+        "El espía es {0}.",
+        "O espião é {0}.",
+        "L’espion est {0}.",
+        "Der Spion ist {0}.",
+        "Mata-mata adalah {0}.",
+        "जासूस {0} है।",
+        "الجاسوس هو {0}."
+      ]
+    },
+    {
+      "Key": "스파이는 {0}이었습니다.",
+      "Values": [
+        "스파이는 {0}이었습니다.",
+        "The spy was {0}.",
+        "间谍是{0}。",
+        "間諜是{0}。",
+        "スパイは{0}でした。",
+        "El espía era {0}.",
+        "O espião era {0}.",
+        "L’espion était {0}.",
+        "Der Spion war {0}.",
+        "Mata-matanya tadi {0}.",
+        "जासूस {0} था।",
+        "كان الجاسوس {0}."
+      ]
+    },
+    {
+      "Key": "스파이 {0}명",
+      "Values": [
+        "스파이 {0}명",
+        "Spies: {0}",
+        "间谍{0}人",
+        "間諜 {0} 人",
+        "スパイ{0}人",
+        "Espías: {0}",
+        "Espiões: {0}",
+        "Espions : {0}",
+        "Spione: {0}",
+        "Mata-mata: {0}",
+        "जासूस: {0}",
+        "الجواسيس: {0}"
+      ]
+    },
+    {
+      "Key": "라이어 팀 라운드",
+      "Values": [
+        "라이어 팀 라운드",
+        "Liar team rounds",
+        "说谎者队回合",
+        "說謊者隊回合",
+        "ライアーチームのラウンド",
+        "Rondas del equipo del mentiroso",
+        "Rodadas no time do mentiroso",
+        "Manches dans l’équipe du menteur",
+        "Runden im Lügnerteam",
+        "Ronde tim pembohong",
+        "झूठे की टीम के राउंड",
+        "جولات فريق الكاذب"
+      ]
     }
   ]
 }

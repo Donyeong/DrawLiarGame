@@ -59,7 +59,8 @@ namespace DrawLiar
                 voteProgress = null;
                 var prompt = noLiarAccused
                     ? Text(_judgmentPanel, "라이어가 없다고 생각하나요?", "nomination-prompt")
-                    : Text(_judgmentPanel, "{0}님이 라이어라고 생각하나요?", "nomination-prompt", accusedName);
+                    : Text(_judgmentPanel, state.Settings.LiarMode == LiarMode.Spy
+                        ? "{0}님이 라이어 팀이라고 생각하나요?" : "{0}님이 라이어라고 생각하나요?", "nomination-prompt", accusedName);
                 prompt.name = noLiarAccused ? "judgment-no-liar-prompt" : "judgment-prompt";
                 prompt.style.minWidth = 0;
                 prompt.style.whiteSpace = WhiteSpace.Normal;
@@ -75,9 +76,9 @@ namespace DrawLiar
                 {
                     var actions = Box(_judgmentPanel, "row judgment-actions");
                     actions.style.minWidth = 0;
-                    var yes = Button(actions, noLiarAccused ? "라이어 없어요" : "라이어 맞아요", () => SubmitJudgment(true), "primary judgment-approve", DrawSound.UiConfirm);
+                    var yes = Button(actions, noLiarAccused ? "라이어 없어요" : state.Settings.LiarMode == LiarMode.Spy ? "라이어 팀 맞아요" : "라이어 맞아요", () => SubmitJudgment(true), "primary judgment-approve", DrawSound.UiConfirm);
                     yes.name = "judgment-approve";
-                    var no = Button(actions, noLiarAccused ? "라이어 있어요" : "라이어 아니에요", () => SubmitJudgment(false), "secondary judgment-reject", DrawSound.UiConfirm);
+                    var no = Button(actions, noLiarAccused ? "라이어 있어요" : state.Settings.LiarMode == LiarMode.Spy ? "라이어 팀 아니에요" : "라이어 아니에요", () => SubmitJudgment(false), "secondary judgment-reject", DrawSound.UiConfirm);
                     no.name = "judgment-reject";
                     foreach (var button in new[] { yes, no })
                     {

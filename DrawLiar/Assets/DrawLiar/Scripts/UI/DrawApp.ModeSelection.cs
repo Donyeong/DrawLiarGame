@@ -10,11 +10,13 @@ namespace DrawLiar
         private const string CLASSIC_MODE_TOOLTIP = "라이어는 제시어를 모릅니다. 그림을 보고 라이어를 찾으세요.\n최소 {0}명";
         private const string MISMATCH_MODE_TOOLTIP = "한 명에게만 다른 제시어가 주어집니다. 누구도 자신의 역할을 알 수 없습니다.\n최소 {0}명";
         private const string OPTIONAL_MODE_TOOLTIP = "라운드마다 라이어가 0명 또는 1명입니다. ‘라이어 없음’에도 투표할 수 있습니다.\n최소 {0}명";
+        private const string SPY_MODE_TOOLTIP = "스파이는 제시어를 알고 라이어를 돕습니다. 스파이가 적발되면 시민이 승리합니다.\n최소 {0}명";
         private const string RELAY_MODE_TOOLTIP = "같은 캔버스에 차례로 이어 그립니다.\n최소 {0}명";
         private const string INDIVIDUAL_MODE_TOOLTIP = "각자 캔버스에 차례로 그립니다. 토론 때 참가자의 그림을 비교하세요.\n최소 {0}명";
         private const string CLASSIC_MODE_DESCRIPTION = "라이어는 제시어를 모릅니다. 그림을 보고 라이어를 찾으세요.";
         private const string MISMATCH_MODE_DESCRIPTION = "한 명에게만 다른 제시어가 주어집니다. 누구도 자신의 역할을 알 수 없습니다.";
         private const string OPTIONAL_MODE_DESCRIPTION = "라운드마다 라이어가 0명 또는 1명입니다. ‘라이어 없음’에도 투표할 수 있습니다.";
+        private const string SPY_MODE_DESCRIPTION = "스파이는 제시어를 알고 라이어를 돕습니다. 스파이가 적발되면 시민이 승리합니다.";
         private const string RELAY_MODE_DESCRIPTION = "같은 캔버스에 차례로 이어 그립니다.";
         private const string INDIVIDUAL_MODE_DESCRIPTION = "각자 캔버스에 차례로 그립니다. 토론 때 참가자의 그림을 비교하세요.";
 
@@ -79,8 +81,9 @@ namespace DrawLiar
             if (_roomLiarMode == null || _roomDrawingMode == null) return;
             var liarMode = state.Settings.LiarMode;
             RefreshRoomModeBadge(_roomLiarMode,
-                liarMode == LiarMode.Mismatch ? "미스매치" : liarMode == LiarMode.Optional ? "불확정" : "일반",
-                liarMode == LiarMode.Mismatch ? MISMATCH_MODE_DESCRIPTION : liarMode == LiarMode.Optional ? OPTIONAL_MODE_DESCRIPTION : CLASSIC_MODE_DESCRIPTION);
+                LiarModeTitle(liarMode),
+                liarMode == LiarMode.Mismatch ? MISMATCH_MODE_DESCRIPTION : liarMode == LiarMode.Optional ? OPTIONAL_MODE_DESCRIPTION
+                    : liarMode == LiarMode.Spy ? SPY_MODE_DESCRIPTION : CLASSIC_MODE_DESCRIPTION);
             bool individual = state.Settings.Mode == DrawingMode.Individual;
             RefreshRoomModeBadge(_roomDrawingMode, individual ? "한 명씩 그리기" : "릴레이 그리기",
                 individual ? INDIVIDUAL_MODE_DESCRIPTION : RELAY_MODE_DESCRIPTION);
@@ -156,12 +159,17 @@ namespace DrawLiar
             AddLiarMode(LiarMode.Classic, "일반", "classic", CLASSIC_MODE_TOOLTIP);
             AddLiarMode(LiarMode.Mismatch, "미스매치", "mismatch", MISMATCH_MODE_TOOLTIP);
             AddLiarMode(LiarMode.Optional, "불확정", "optional", OPTIONAL_MODE_TOOLTIP);
+            AddLiarMode(LiarMode.Spy, "스파이", "spy", SPY_MODE_TOOLTIP);
             AddDrawingMode(DrawingMode.Relay, "릴레이 그리기", "relay");
             AddDrawingMode(DrawingMode.Individual, "한 명씩 그리기", "individual");
+            for (int index = 1; index < liarButtons.Count; index += 2) liarButtons[index].AddToClassList("mode-choice-pair-end");
             liarButtons[liarButtons.Count - 1].AddToClassList("mode-choice-last");
             drawingButtons[drawingButtons.Count - 1].AddToClassList("mode-choice-last");
             RefreshChoices();
         }
+
+        private static string LiarModeTitle(LiarMode mode) => mode == LiarMode.Mismatch ? "미스매치"
+            : mode == LiarMode.Optional ? "불확정" : mode == LiarMode.Spy ? "스파이 모드" : "일반";
 
         private void BindModeTooltip(VisualElement target)
         {
