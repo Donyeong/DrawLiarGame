@@ -54,6 +54,7 @@ internal static partial class Integration
             IsSpectator = spectator, SpectatorOnly = spectator, Profile = new ProfileData { AccountId = account, DisplayName = account } };
         Check(room.Join(host, Ticket("host"), 0) && room.Join(member, Ticket("member"), 0)
             && room.Join(third, Ticket("third"), 0) && room.Join(observer, Ticket("observer", true), 0), "DS 주제 검증 참가자를 준비해야 합니다.");
+        await WaitAsync(() => socket.LastState != null, 3);
         var settings = new RoomSettings { RoomName = "새주제방", Topics = new[] { added.Name }, LiarMode = LiarMode.Mismatch, RoundCount = 1 };
         int persisted = 0;
         ConfigureRoomRequest? wireRequest = null;
