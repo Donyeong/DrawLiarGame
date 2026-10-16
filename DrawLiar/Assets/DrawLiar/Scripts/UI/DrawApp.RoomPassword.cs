@@ -66,15 +66,39 @@ namespace DrawLiar
             popup.name = "room-password-overlay";
             var modal = Box(popup, "modal utility-popup room-password-popup");
             modal.name = "room-password-popup";
+            var mobileLayout = _mobileLayout;
+            void FitPopup()
+            {
+                if (_roomPasswordOverlay != popup || popup.panel == null) return;
+                bool mobile = mobileLayout != null && mobileLayout.IsMobile;
+                popup.style.left = mobile ? root.style.paddingLeft : StyleKeyword.Null;
+                popup.style.top = mobile ? root.style.paddingTop : StyleKeyword.Null;
+                popup.style.right = mobile ? root.style.paddingRight : StyleKeyword.Null;
+                popup.style.bottom = mobile ? root.style.paddingBottom : StyleKeyword.Null;
+            }
+            if (mobileLayout != null) mobileLayout.LayoutChanged += FitPopup;
+            popup.RegisterCallback<DetachFromPanelEvent>(evt =>
+            {
+                if (ReferenceEquals(evt.target, popup) && mobileLayout != null) mobileLayout.LayoutChanged -= FitPopup;
+            });
+            FitPopup();
             var heading = Box(modal, "row utility-popup-header");
             Text(heading, "비밀번호 입력", "utility-popup-title grow");
             IconButton(heading, "닫기", DrawUIIcon.Kind.Close, CancelRoomPasswordPrompt, "room-password-close");
-            RawText(modal, string.IsNullOrWhiteSpace(prompt.RoomName) ? DisplayRoomCode(prompt.RoomCode) : prompt.RoomName, "social-confirm-room");
-            var field = _roomPasswordField = RoomPasswordField(modal, "방 비밀번호", "", "room-password-input");
-            Text(modal, "비밀번호는 4~32자로 입력하세요.", "rules");
+            var scroll = DrawSmoothScroll.Create();
+            scroll.name = "room-password-scroll";
+            scroll.AddToClassList("room-password-scroll");
+            scroll.style.minHeight = 0; scroll.style.maxHeight = 280;
+            scroll.style.flexGrow = 0; scroll.style.flexShrink = 1; scroll.style.flexBasis = StyleKeyword.Auto;
+            modal.Add(scroll);
+            var body = Box(scroll, "room-password-body");
+            RawText(body, string.IsNullOrWhiteSpace(prompt.RoomName) ? DisplayRoomCode(prompt.RoomCode) : prompt.RoomName, "social-confirm-room");
+            var field = _roomPasswordField = RoomPasswordField(body, "방 비밀번호", "", "room-password-input");
+            Text(body, "비밀번호는 4~32자로 입력하세요.", "rules");
             if (!string.IsNullOrWhiteSpace(prompt.Error) && prompt.Error != "비밀번호가 필요한 방입니다.")
-                Text(modal, prompt.Error, "notice room-password-error").name = "room-password-error";
+                Text(body, prompt.Error, "notice room-password-error").name = "room-password-error";
             var actions = Box(modal, "row social-confirm-actions room-password-actions");
+            actions.style.flexShrink = 0;
             Button(actions, "취소", CancelRoomPasswordPrompt, "secondary grow", DrawSound.UiCancel).name = "room-password-cancel";
             void Submit()
             {

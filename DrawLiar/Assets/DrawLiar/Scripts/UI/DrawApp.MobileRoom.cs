@@ -47,12 +47,17 @@ namespace DrawLiar
             _mobileHud = _mobileRoundCard = _mobilePlayStage = _mobilePlaySide = null;
             _mobileRoundInfo = _mobileRoundHint = _mobileLiveRound = _mobileRosterTitle = null;
             _mobileRoomCode = null;
-            _mobileRoomScroll = _mobileRosterScroll = null;
         }
 
         private void ArrangeMobileRoom(RoomSnapshot state)
         {
             if (!IsMobile || _mobileWorkspace == null) return;
+            void Place(VisualElement element, VisualElement parent, int index)
+            {
+                if (element.parent == parent && parent.IndexOf(element) == index) return;
+                element.RemoveFromHierarchy();
+                parent.Insert(Mathf.Min(index, parent.childCount), element);
+            }
             bool waiting = state == null || state.Phase == GamePhase.Lobby;
             bool portrait = _mobileLayout.IsPortrait;
             bool landscapeNomination = !waiting && !portrait && IsNominationPhase(state);
@@ -60,12 +65,16 @@ namespace DrawLiar
             _mobileRoomStack.EnableInClassList("mobile-waiting", waiting);
             _mobileRoomStack.EnableInClassList("mobile-playing", !waiting);
             _mobileRoomStack.EnableInClassList("mobile-compact", !portrait || _mobileLayout.AvailableSize.y < 830);
+            var roundParent = waiting && !portrait ? _mobileHud : _mobileRoomStack;
+            if (_mobileRoundCard.parent != roundParent)
+            {
+                if (roundParent == _mobileHud) roundParent.Insert(0, _mobileRoundCard);
+                else roundParent.Insert(1, _mobileRoundCard);
+            }
             _mobileRoundCard.style.display = waiting ? DisplayStyle.Flex : DisplayStyle.None;
             _mobileLiveRound.style.display = waiting ? DisplayStyle.None : DisplayStyle.Flex;
             _mobilePlayStage.style.display = DisplayStyle.Flex;
             _mobilePlaySide.style.display = portrait ? DisplayStyle.None : DisplayStyle.Flex;
-            _mobileRoomScroll.style.display = waiting ? DisplayStyle.Flex : DisplayStyle.None;
-            _mobileRosterScroll.style.display = waiting ? DisplayStyle.Flex : DisplayStyle.None;
             if (!waiting && !portrait)
             {
                 if (_mobileSecret.parent != _mobileHud) _mobileHud.Insert(1, _mobileSecret);
@@ -73,22 +82,21 @@ namespace DrawLiar
             else if (_mobileSecret.parent != _mobileRoomStack) _mobileRoomStack.Insert(2, _mobileSecret);
             if (waiting)
             {
-                if (_mobileControls.parent != _mobileRoomScroll.contentContainer) _mobileRoomScroll.Add(_mobileControls);
-                if (_mobileRoster.parent != _mobileControls) _mobileControls.Add(_mobileRoster);
-                if (playerStrip.parent != _mobileRosterScroll.contentContainer) _mobileRosterScroll.Add(playerStrip);
+                if (_mobileControls.parent != _mobilePlayStage) _mobilePlayStage.Add(_mobileControls);
+                if (playerStrip.parent != _mobileRoster) _mobileRoster.Add(playerStrip);
                 if (_judgmentPanel.parent != _mobileActions) _mobileActions.Insert(0, _judgmentPanel);
                 var sideParent = portrait ? _mobileWorkspace : _mobilePlaySide;
-                if (_mobileRoomScroll.parent != sideParent) sideParent.Add(_mobileRoomScroll);
-                if (_mobileActions.parent != sideParent) sideParent.Add(_mobileActions);
+                Place(_mobileRoster, sideParent, portrait ? 2 : 0);
+                Place(_mobileActions, sideParent, portrait ? 3 : 1);
             }
             else
             {
                 if (_mobileControls.parent != _mobilePlayStage) _mobilePlayStage.Add(_mobileControls);
                 if (playerStrip.parent != _mobileRoster) _mobileRoster.Add(playerStrip);
                 var rosterParent = portrait ? _mobileWorkspace : _mobilePlaySide;
-                if (_mobileRoster.parent != rosterParent) rosterParent.Insert(0, _mobileRoster);
+                Place(_mobileRoster, rosterParent, 0);
                 var actionParent = portrait ? _mobileWorkspace : _mobilePlaySide;
-                if (_mobileActions.parent != actionParent) actionParent.Add(_mobileActions);
+                Place(_mobileActions, actionParent, portrait ? 3 : 1);
                 var judgmentParent = portrait ? _mobileActions : landscapeNomination
                     ? _mobileActions.Q<VisualElement>(className: "mobile-action-row") : _mobilePlayStage;
                 if (_judgmentPanel.parent != judgmentParent)
@@ -118,13 +126,13 @@ namespace DrawLiar
             if (_mobileRoomStack.ClassListContains("mobile-waiting"))
             {
                 SizeMobileWaitingPlayers();
-                _mobilePlayStage.style.height = _mobileLayout.IsPortrait
-                    ? new StyleLength(Mathf.Min(_mobileWorkspace.contentRect.width / DrawingSurface.AspectRatio, _mobileLayout.AvailableSize.y * .36f))
-                    : new StyleLength(StyleKeyword.Null);
+                _mobilePlayStage.style.height = StyleKeyword.Null;
                 SizeMobileCanvas();
                 return;
             }
             _mobilePlayStage.style.height = StyleKeyword.Null;
+            playerStrip.style.height = StyleKeyword.Null;
+            playerStrip.RemoveFromClassList("waiting-roster-compact");
             float width = _mobileRoster.contentRect.width;
             if (width > 0)
             {

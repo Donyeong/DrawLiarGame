@@ -30,7 +30,7 @@
  .app.mobile .lobby-chat-close { width: 72px; flex-shrink: 0; min-height: 48px; margin: 0; }
 .mobile .app-content { min-height: 0; min-width: 0; flex-basis: 0; position: relative; }
 .mobile .mobile-hidden { display: none; }
-.mobile .mobile-home-scroll, .mobile .mobile-controls-scroll { flex-grow: 1; flex-basis: 0; min-height: 0; min-width: 0; }
+.mobile .mobile-home-scroll { flex-grow: 1; flex-basis: 0; min-height: 0; min-width: 0; }
 .mobile .mobile-home { padding: 16px 20px 20px; min-width: 0; }
 .mobile .mobile-home > * { flex-shrink: 0; margin-bottom: 12px; }
 .mobile .mobile-login-screen { flex-grow: 1; min-height: 0; justify-content: center; padding: 24px 28px; }
@@ -221,7 +221,6 @@
 .mobile.in-game .context-title { font-size: 18px; color: #34304B; margin-bottom: 6px; }
 .mobile.in-game .context-label, .mobile.in-game .context-detail { color: #817A87; font-size: 13px; }
 .mobile.in-game .mobile-roster > .mobile-small { margin-bottom: 6px; font-size: 12px; }
-.mobile.in-game .mobile-roster-scroll { height: 84px; }
 .mobile.in-game .players-strip { height: 84px; flex-direction: row; }
 .mobile.in-game .player, .mobile.in-game .crowded .player { width: 124px; height: 84px; flex-basis: auto; flex-grow: 0; flex-shrink: 0; padding: 22px 8px 8px; border-radius: 12px; border-width: 1px; border-color: #E3DDD4; background-color: #FFFFFF; margin-right: 8px; }
 .mobile.in-game .player { transition-property: background-color, border-color; transition-duration: .12s; }
@@ -306,23 +305,26 @@
 .mobile-landscape .mobile-login-logo { width: 300px; height: 120px; }
 .mobile-landscape .mobile-login-actions { width: 46%; max-width: 420px; }
 .mobile-landscape .mobile-lobby { padding: 4px 20px 8px; }
-.mobile-landscape .mobile-lobby-profile { height: auto; min-height: 104px; margin-bottom: 8px; padding: 8px 12px; }
-.mobile-landscape .mobile-lobby-avatar, .mobile-landscape .mobile-lobby-avatar .lobby-avatar { width: 80px; height: 80px; }
+.mobile-landscape .mobile-lobby-profile { height: auto; min-height: 76px; margin-bottom: 8px; padding: 6px 12px; }
+.mobile-landscape .mobile-lobby-avatar, .mobile-landscape .mobile-lobby-avatar .lobby-avatar { width: 60px; height: 60px; }
+.mobile-landscape .mobile-lobby-avatar { margin-right: 12px; }
 .mobile-landscape .mobile-lobby-name { font-size: 20px; }
 .mobile-landscape .mobile-account-state { display: none; }
 .mobile-landscape .mobile-lobby-actions { position: absolute; top: 16px; right: 32px; width: 44%; margin: 0; }
 .mobile-landscape .mobile-lobby-actions .button { min-height: 64px; font-size: 16px; }
-.mobile-landscape .mobile-lobby-identity { max-width: 40%; }
-.mobile-landscape .mobile-room-list-heading { position: absolute; top: 116px; left: 20px; width: 44%; margin: 0; }
-.mobile-landscape .room-search { position: absolute; top: 116px; right: 32px; width: 44%; margin: 0; }
-.mobile-landscape .mobile-lobby-room-list { margin-top: 60px; }
+.mobile-landscape .mobile-lobby-identity { max-width: 40%; flex-direction: row; align-items: center; justify-content: flex-start; }
+.mobile-landscape .mobile-lobby-identity .level-name-row { flex-basis: 0; flex-grow: 1; flex-shrink: 1; margin-right: 8px; }
+.app.mobile-landscape .mobile-lobby-identity .mobile-customize { height: 44px; min-height: 44px; min-width: 88px; padding: 6px 10px; }
+.mobile-landscape .mobile-room-list-heading { position: absolute; top: 88px; left: 20px; width: 44%; margin: 0; }
+.mobile-landscape .room-search { position: absolute; top: 88px; right: 32px; width: 44%; margin: 0; }
+.mobile-landscape .mobile-lobby-room-list { margin-top: 56px; }
+.app.mobile-landscape .mobile-lobby-chat-open { width: 104px; min-width: 104px; height: 44px; min-height: 44px; margin: 0 8px 0 8px; padding: 6px 8px; font-size: 14px; }
 .mobile-landscape .mobile-profile-hero { min-height: 104px; margin-bottom: 8px; max-width: 760px; width: 94%; align-self: center; }
 .mobile-landscape .mobile-profile-preview, .mobile-landscape .mobile-profile-preview .lobby-avatar { width: 80px; height: 80px; }
 .mobile-landscape.in-game .mobile-room { padding: 8px 16px; }
 .mobile-landscape.in-game .mobile-round-card { display: none; }
 .mobile-landscape.in-game .mobile-workspace { flex-direction: row; }
 .mobile-landscape.in-game .canvas-frame { width: 50%; flex-basis: 0; flex-grow: 1; flex-shrink: 1; margin: 0 12px 0 0; }
-.mobile-landscape.in-game .mobile-controls-scroll { width: 48%; flex-basis: auto; flex-grow: 0; flex-shrink: 0; }
 .mobile-landscape.in-game .mobile-secret { flex-direction: row; align-items: center; min-height: 52px; margin: 0 0 8px; }
 .mobile-landscape.in-game .mobile-secret .topic { margin: 0 8px 0 0; flex-shrink: 0; }
 .mobile-landscape.in-game .mobile-role-line { flex-grow: 1; min-width: 0; }
@@ -348,42 +350,61 @@
 .mobile.keyboard-open .lobby-chat-modal .lobby-chat-composer { margin-top: 4px; }
 .app.mobile.keyboard-open .lobby-chat-modal .lobby-chat-composer, .app.mobile.keyboard-open .lobby-chat-modal .lobby-chat-input, .app.mobile.keyboard-open .lobby-chat-modal .lobby-chat-send, .app.mobile.keyboard-open .lobby-chat-modal .lobby-chat-close { height: 44px; min-height: 44px; }
 .mobile.in-game .mobile-waiting .mobile-workspace { flex-direction: column; }
-.mobile.in-game .mobile-waiting .mobile-play-stage { width: 100%; min-height: 0; flex-grow: 0; flex-shrink: 0; }
+.mobile.in-game .mobile-waiting .mobile-play-stage { width: 100%; min-height: 0; flex-grow: 1; flex-basis: 0; flex-shrink: 1; }
 .mobile.in-game .mobile-waiting .mobile-play-side { min-width: 0; min-height: 0; }
-.mobile.in-game .mobile-waiting .mobile-controls-scroll { width: 100%; flex-grow: 1; flex-basis: 0; min-height: 0; }
-.mobile.in-game .mobile-waiting .tool-row { margin-bottom: 4px; }
-.mobile.in-game .mobile-waiting .tool-row .button { height: 44px; min-height: 44px; padding: 2px 6px; font-size: 14px; margin-right: 6px; }
-.mobile.in-game .mobile-waiting .palette { width: 100%; height: auto; min-height: 40px; flex-wrap: wrap; margin-bottom: 4px; }
-.mobile.in-game .mobile-waiting .palette .swatch { width: 36px; height: 40px; min-width: 36px; min-height: 40px; margin: 0 2px 4px 0; padding: 0; }
-.mobile.in-game .mobile-waiting .mobile-roster-scroll { height: auto; min-height: 0; }
-.mobile.in-game .mobile-waiting .players-strip { width: 100%; max-width: 402px; height: auto; min-height: 0; flex-direction: row; flex-wrap: wrap; }
-.mobile.in-game .mobile-waiting .player, .mobile.in-game .mobile-waiting .crowded .player { width: 96px; height: 144px; min-height: 0; margin: 0 6px 6px 0; padding: 44px 4px 4px; border-radius: 12px; }
+.mobile.in-game .mobile-waiting .room-hud { min-height: 36px; height: 36px; margin-bottom: 4px; }
+.app.mobile.in-game .mobile-waiting .room-hud .button { height: 32px; min-height: 32px; max-height: 32px; padding: 2px 6px; font-size: 12px; border-bottom-width: 2px; }
+.app.mobile.in-game .mobile-waiting .room-hud .icon-button { width: 32px; min-width: 32px; max-width: 32px; padding: 6px; }
+.mobile.in-game .mobile-waiting .phase-bar { min-height: 32px; }
+.mobile.in-game .mobile-waiting .phase-title { font-size: 16px; }
+.mobile.in-game .mobile-waiting .mobile-round-card { padding: 3px 6px; min-height: 48px; margin-bottom: 4px; }
+.mobile.in-game .mobile-waiting .mobile-waiting-room-title { font-size: 14px; margin-bottom: 2px; }
+.mobile.in-game .mobile-waiting .mobile-card-title { font-size: 12px; }
+.mobile.in-game .mobile-waiting .mobile-round-card .mobile-small { font-size: 10px; margin-top: 2px; }
+.mobile.in-game .mobile-waiting .mobile-room-info-actions { flex-direction: row; align-items: center; }
+.app.mobile .mobile-waiting .mobile-room-info-actions .waiting-room-topics { margin: 0 0 0 6px; }
+.mobile.in-game .mobile-waiting .mobile-controls { flex-shrink: 0; }
+.mobile.in-game .mobile-waiting .tool-row { margin-bottom: 2px; }
+.app.mobile.in-game .mobile-waiting .tool-row .button { height: 32px; min-height: 32px; padding: 2px 4px; font-size: 12px; margin-right: 4px; border-bottom-width: 2px; }
+.mobile.in-game .mobile-waiting .palette { width: auto; height: 30px; min-height: 30px; flex-wrap: nowrap; margin-bottom: 2px; }
+.mobile.in-game .mobile-waiting .palette .swatch { width: 30px; height: 30px; min-width: 30px; min-height: 30px; margin: 0 2px 0 0; padding: 0; }
+.mobile.in-game .mobile-waiting .mobile-swatch-dot { width: 20px; height: 20px; border-radius: 10px; }
+.mobile.in-game .mobile-waiting .mobile-controls > * { margin-bottom: 2px; }
+.mobile.in-game .mobile-waiting .mobile-roster { width: 100%; flex-shrink: 0; }
+.mobile.in-game .mobile-waiting .players-strip { width: 100%; max-width: none; height: auto; min-height: 0; flex-direction: row; flex-wrap: wrap; }
+.mobile.in-game .mobile-waiting .player, .mobile.in-game .mobile-waiting .crowded .player { width: 96px; height: 104px; min-height: 72px; margin: 0 6px 6px 0; padding: 14px 4px 2px; border-radius: 10px; }
 .mobile.in-game .mobile-waiting .player > .row { flex-direction: column; align-items: center; justify-content: center; }
-.mobile.in-game .mobile-waiting .player .avatar, .mobile.in-game .mobile-waiting .crowded .player .avatar { width: 64px; height: 64px; margin: 0; }
-.mobile.in-game .mobile-waiting .player .grow { width: 100%; height: 28px; flex-grow: 0; flex-shrink: 0; }
-.mobile.in-game .mobile-waiting .player .player-name, .mobile.in-game .mobile-waiting .crowded .player .player-name { height: 16px; flex-shrink: 0; font-size: 12px; -unity-font-style: normal; -unity-text-align: middle-center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.mobile.in-game .mobile-waiting .player-status, .mobile.in-game .mobile-waiting .crowded .player-status { height: 12px; flex-shrink: 0; font-size: 11px; margin-top: 0; -unity-text-align: middle-center; }
-.mobile.in-game .mobile-waiting .player .player-summary { height: 12px; flex-shrink: 0; margin: 0; }
-.mobile.in-game .mobile-waiting .player .player-score { height: 12px; font-size: 11px; }
-.mobile.in-game .mobile-waiting .player .player-summary .player-status { margin-top: 0; flex-shrink: 1; }
-.mobile.in-game .mobile-waiting .mobile-roster > .mobile-small { display: flex; font-size: 15px; -unity-font-style: bold; color: #34304B; margin-bottom: 8px; }
-.mobile.in-game .mobile-waiting .mobile-bottom-actions { flex-direction: column; flex-shrink: 0; padding-top: 8px; }
-.mobile.in-game .mobile-waiting .phase-actions { width: 100%; margin-right: 0; }
-.mobile.in-game .mobile-waiting .phase-actions .button { margin-bottom: 8px; }
-.mobile.in-game .mobile-waiting .chat-open { width: 100%; }
+.mobile.in-game .mobile-waiting .player .avatar, .mobile.in-game .mobile-waiting .crowded .player .avatar { width: 56px; height: 56px; margin: 0; }
+.mobile.in-game .mobile-waiting .player .grow { width: 100%; height: 22px; flex-grow: 0; flex-shrink: 0; justify-content: center; }
+.mobile.in-game .mobile-waiting .player .player-name, .mobile.in-game .mobile-waiting .crowded .player .player-name { height: 20px; flex-shrink: 0; font-size: 13px; -unity-font-style: normal; -unity-text-align: middle-center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mobile.in-game .mobile-waiting .player .player-summary { display: none; }
+.mobile.in-game .mobile-waiting .player .account-level-badge { display: none; }
+.app.mobile.in-game .mobile-waiting .button.player-profile-button { width: 28px; min-width: 28px; height: 28px; min-height: 28px; flex-direction: column; justify-content: flex-start; align-items: flex-end; padding: 3px; }
+.mobile.in-game .mobile-waiting .player-profile-button .draw-ui-icon { width: 12px; height: 12px; }
+.mobile.in-game .mobile-waiting .mobile-roster > .mobile-small { display: flex; font-size: 14px; -unity-font-style: bold; color: #34304B; margin-bottom: 4px; }
+.mobile.in-game .mobile-waiting .mobile-bottom-actions { width: 100%; flex-direction: column; flex-shrink: 0; padding-top: 6px; }
+.app.mobile .mobile-waiting .mobile-action-row { width: 100%; min-width: 0; flex-direction: row; align-items: center; }
+.mobile.in-game .mobile-waiting .phase-actions { width: auto; flex-grow: 1; flex-basis: 0; min-width: 0; flex-direction: row; flex-wrap: wrap; margin-right: 6px; }
+.mobile.in-game .mobile-waiting .phase-actions .button { width: auto; min-width: 0; flex-grow: 1; flex-basis: 0; min-height: 32px; height: auto; margin: 0 4px 0 0; padding: 2px 4px; font-size: 12px; white-space: normal; border-bottom-width: 2px; }
+.mobile.in-game .mobile-waiting .phase-actions .room-status-label { flex-basis: 100%; min-width: 0; font-size: 12px; margin: 2px 0 0; }
+.mobile.in-game .mobile-waiting .chat-open { width: 80px; flex-shrink: 0; height: 32px; min-height: 32px; padding: 2px 4px; font-size: 12px; border-bottom-width: 2px; }
 .mobile-landscape.in-game .mobile-waiting .mobile-round-card { display: flex; }
-.mobile-landscape.in-game .mobile-waiting .mobile-room-info-actions { flex-direction: row; align-items: center; }
-.app.mobile-landscape .mobile-waiting .mobile-room-info-actions .waiting-room-topics { margin: 0 0 0 6px; }
+.mobile-landscape.in-game .mobile-waiting .room-hud { min-height: 36px; height: 36px; }
+.mobile-landscape.in-game .mobile-waiting .room-hud > .phase-bar { display: none; }
+.mobile-landscape.in-game .mobile-waiting .room-hud > .mobile-round-card { flex-grow: 1; flex-basis: 0; min-width: 0; margin: 0 8px 0 0; }
+.mobile-landscape.in-game .mobile-waiting .mobile-round-card { min-height: 36px; height: 36px; padding: 2px 6px; }
+.mobile-landscape.in-game .mobile-waiting .mobile-round-card > .grow { flex-direction: row; align-items: center; }
+.mobile-landscape.in-game .mobile-waiting .mobile-waiting-room-title { flex-grow: 1; flex-basis: 0; margin: 0 6px 0 0; font-size: 12px; }
+.mobile-landscape.in-game .mobile-waiting .mobile-card-title { flex-shrink: 0; margin: 0; font-size: 11px; }
+.mobile-landscape.in-game .mobile-waiting .mobile-round-card .mobile-small { max-width: 138px; margin: 0 0 0 6px; font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.app.mobile-landscape .mobile-waiting .mobile-room-info-actions .mobile-code-copy { width: 82px; min-width: 82px; }
+.app.mobile-landscape .mobile-waiting .mobile-room-info-actions .waiting-room-topics { width: auto; min-width: 68px; font-size: 11px; margin-left: 4px; }
 .mobile-landscape.in-game .mobile-waiting .mobile-workspace { flex-direction: row; align-items: stretch; }
 .mobile-landscape.in-game .mobile-waiting .mobile-play-stage { width: auto; flex-grow: 3; flex-basis: 0; flex-shrink: 1; margin-right: 8px; }
 .mobile-landscape.in-game .mobile-waiting .mobile-play-side { width: auto; flex-grow: 2; flex-basis: 0; }
-.mobile-landscape.in-game .mobile-waiting .mobile-controls-scroll { width: 100%; flex-grow: 1; flex-shrink: 1; flex-basis: 0; margin: 0; }
-.mobile-landscape.in-game .mobile-waiting .mobile-bottom-actions { width: 100%; padding-top: 4px; }
-.app.mobile.mobile-landscape .mobile-waiting .mobile-action-row { flex-direction: row; align-items: center; }
-.mobile-landscape.in-game .mobile-waiting .phase-actions { flex-grow: 1; flex-basis: 0; min-width: 0; margin-right: 6px; }
-.mobile-landscape.in-game .mobile-waiting .phase-actions .button { min-height: 44px; height: 44px; font-size: 14px; margin: 0 0 4px; }
-.mobile-landscape.in-game .mobile-waiting .phase-actions .muted { font-size: 12px; }
-.mobile-landscape.in-game .mobile-waiting .chat-open { width: 104px; height: 44px; min-height: 44px; padding: 4px; font-size: 14px; }
+.mobile-landscape.in-game .mobile-waiting .mobile-roster { flex-grow: 0; }
+.mobile-landscape.in-game .mobile-waiting .mobile-roster > .mobile-small { display: none; }
+.mobile-landscape.in-game .mobile-waiting .mobile-bottom-actions { margin-top: auto; padding-top: 4px; }
 .mobile .draw-button-scale { scale: 1 1; translate: 0 0; transition-property: background-color, border-color, scale, opacity; transition-duration: .10s; }
 .mobile .draw-button-scale.draw-pressed { scale: 0.94 0.94; transition-duration: .08s; }
 .mobile .draw-button-scale.draw-released { scale: 1.03 1.03; transition-duration: .07s; }
@@ -443,6 +464,56 @@
 .app.mobile-landscape .shop-cart-total { font-size: 12px; margin-bottom: 2px; }
 .app.mobile-landscape .shop-cart-status { font-size: 11px; margin-bottom: 4px; }
 .app.mobile-landscape .shop-page .shop-cart-buy { height: 40px; min-height: 40px; padding: 4px 8px; font-size: 14px; }
+.app.mobile .compact-shop { padding: 8px; }
+.app.mobile .compact-shop .shop-header { height: 44px; min-height: 44px; margin-bottom: 6px; align-items: center; }
+.app.mobile .compact-shop .shop-header .shop-back, .app.mobile .compact-shop .shop-header .shop-friends { display: none; }
+.app.mobile .compact-shop .shop-title { flex-grow: 0; margin: 0; font-size: 18px; }
+.app.mobile .compact-shop .shop-header .shop-settings { width: 44px; min-width: 44px; max-width: 44px; height: 44px; min-height: 44px; max-height: 44px; margin: 0; }
+.app.mobile .compact-shop .commerce-wallet { flex-grow: 1; flex-shrink: 1; flex-basis: 0; min-width: 0; min-height: 44px; flex-wrap: nowrap; margin: 0 6px; }
+.app.mobile .compact-shop .commerce-wallet .shop-coins, .app.mobile .compact-shop .commerce-wallet .shop-gems { flex-grow: 1; flex-shrink: 1; flex-basis: 0; width: auto; min-width: 0; height: 36px; padding: 4px; font-size: 12px; margin-right: 4px; white-space: normal; }
+.app.mobile .compact-shop .commerce-wallet .commerce-restore { display: none; }
+.app.mobile .compact-shop .commerce-tabs { min-height: 36px; margin-bottom: 6px; }
+.app.mobile .compact-shop .commerce-tabs .commerce-tab { min-height: 36px; height: 36px; padding: 4px; font-size: 12px; }
+.app.mobile .avatar-shop .shop-workspace { flex-direction: column; }
+.app.mobile .avatar-shop .shop-panel { padding: 8px; }
+.app.mobile .avatar-shop .shop-preview-panel { width: 100%; min-height: 0; margin: 0 0 6px; padding: 6px; }
+.app.mobile .avatar-shop .shop-preview-hero { min-height: 64px; flex-direction: row; align-items: center; }
+.app.mobile .avatar-shop .shop-preview-stage { width: 64px; height: 64px; margin: 0 8px 0 0; }
+.app.mobile .avatar-shop .shop-preview-stage .lobby-avatar { width: 64px; height: 64px; }
+.app.mobile .avatar-shop .shop-preview-controls { flex-grow: 1; flex-shrink: 1; flex-basis: 0; min-width: 0; flex-direction: row; align-items: center; }
+.mobile .avatar-shop .shop-preview-identity { flex-grow: 1; flex-shrink: 1; flex-basis: 0; min-width: 0; margin-right: 6px; }
+.app.mobile .avatar-shop .level-name-shop-profile-name { height: 22px; min-height: 22px; margin: 0 0 2px; }
+.app.mobile .avatar-shop .shop-profile-name { height: 22px; min-height: 22px; margin: 0; font-size: 14px; }
+.app.mobile .avatar-shop .shop-preview-controls .shop-preview-status { display: flex; min-height: 16px; margin: 0; font-size: 12px; }
+.app.mobile .avatar-shop .shop-preview-actions { flex-grow: 0; flex-shrink: 0; flex-direction: row; }
+.app.mobile .avatar-shop .shop-preview-actions .button { width: auto; min-width: 58px; height: 44px; min-height: 44px; padding: 4px 6px; font-size: 13px; white-space: normal; }
+.app.mobile .avatar-shop .shop-preview-actions .shop-preview-reset { margin: 0 6px 0 0; }
+.app.mobile .avatar-shop .shop-catalog { padding: 8px; }
+.app.mobile .avatar-shop .shop-filters { min-height: 36px; height: 36px; margin-bottom: 6px; align-items: center; }
+.mobile .avatar-shop .shop-filter-scroll { flex-grow: 1; flex-shrink: 1; flex-basis: 0; min-width: 0; height: 36px; margin-right: 6px; }
+.app.mobile .avatar-shop .shop-filter-scroll .part-tabs { min-width: 0; min-height: 36px; height: 36px; flex-grow: 0; flex-shrink: 0; flex-basis: auto; flex-wrap: nowrap; margin: 0; }
+.app.mobile .avatar-shop .shop-filters .part-tab { min-width: 58px; height: 36px; min-height: 36px; margin: 0 6px 0 0; padding: 4px 8px; font-size: 12px; }
+.app.mobile .avatar-shop .shop-filters .shop-refresh { width: 36px; min-width: 36px; max-width: 36px; height: 36px; min-height: 36px; max-height: 36px; }
+.app.mobile .avatar-shop .shop-grid .shop-entry { height: 180px; min-height: 180px; margin-bottom: 8px; padding: 6px; }
+.app.mobile .avatar-shop .shop-grid .shop-product { margin-bottom: 4px; }
+.app.mobile .avatar-shop .shop-grid .shop-item-preview { width: 80px; min-width: 80px; max-width: 80px; height: 80px; min-height: 80px; max-height: 80px; align-items: center; justify-content: center; padding: 0; margin: 0 0 2px; border-width: 1px; border-color: #E7DDC7; color: rgba(0, 0, 0, 0); background-color: #FFF9ED; overflow: hidden; }
+.app.mobile .avatar-shop .shop-grid .shop-item-image { width: 76px; min-width: 76px; height: 76px; min-height: 76px; margin: 0; }
+.app.mobile .avatar-shop .shop-grid .shop-item-name { height: 20px; min-height: 20px; margin: 0 0 2px; font-size: 14px; }
+.app.mobile .avatar-shop .shop-grid .shop-item-price { height: 18px; min-height: 18px; font-size: 13px; }
+.app.mobile .avatar-shop .shop-grid .shop-actions { height: 36px; min-height: 36px; }
+.app.mobile .avatar-shop .shop-grid .shop-actions .button { width: 100%; height: 36px; min-height: 36px; padding: 4px; font-size: 13px; white-space: normal; }
+.app.mobile .avatar-shop .shop-cart { flex-grow: 0; flex-shrink: 0; flex-basis: auto; min-height: 0; margin-top: 6px; padding-top: 6px; }
+.mobile .avatar-shop .shop-cart-summary { min-width: 0; min-height: 44px; align-items: center; }
+.mobile .avatar-shop .shop-cart-toggle { flex-grow: 1; flex-shrink: 1; flex-basis: 0; min-width: 0; margin: 0 6px 0 0; }
+.app.mobile .avatar-shop .shop-cart-toggle > .unity-foldout__toggle { min-height: 44px; margin: 0; padding: 4px 0; }
+.app.mobile .avatar-shop .shop-cart-toggle .unity-foldout__content { display: none; }
+.app.mobile .avatar-shop .shop-cart-toggle .shop-cart-total { min-width: 0; margin: 0; font-size: 12px; white-space: normal; }
+.app.mobile .avatar-shop .shop-cart-scroll { flex-grow: 0; flex-shrink: 0; flex-basis: auto; height: 108px; min-height: 54px; margin-top: 6px; }
+.app.mobile .avatar-shop .shop-cart-status { margin: 4px 0 0; font-size: 12px; }
+.app.mobile .avatar-shop .shop-cart-buy { width: auto; min-width: 88px; height: 44px; min-height: 44px; padding: 4px 8px; font-size: 13px; }
+.app.mobile .avatar-shop .shop-cart-remove { width: 44px; min-width: 44px; max-width: 44px; height: 44px; min-height: 44px; max-height: 44px; padding: 8px; }
+.mobile .shop-mobile-split { min-width: 0; min-height: 0; flex-basis: 0; flex-direction: column; align-items: stretch; }
+.mobile .shop-menu-rail { display: none; }
 .app.mobile .modal.utility-popup { width: 100%; max-width: 100%; height: 88%; max-height: 704px; min-height: 0; padding: 16px; border-width: 2px; border-color: #34304B; border-radius: 20px 20px 0 0; background-color: #FFFFFF; }
 .app.mobile .modal.public-profile-popup { max-height: 90%; }
 .app.mobile .modal.match-drawing-popup { width: 100%; max-width: 100%; height: 94%; max-height: 94%; min-height: 0; padding: 16px; align-self: center; border-radius: 16px; }
@@ -488,6 +559,16 @@
 .app.mobile .utility-popup .social-invite-send { min-width: 88px; padding: 8px; }
 .app.mobile .modal.social-confirm-popup { height: auto; padding: 20px; }
 .app.mobile .modal.room-password-popup { height: auto; padding: 20px; }
+.mobile .room-password-body > * { flex-shrink: 0; }
+.mobile .room-password-actions { margin-top: 8px; }
+.app.mobile.keyboard-open .modal.room-password-popup { height: 100%; max-height: 100%; padding: 8px 12px; }
+.app.mobile.keyboard-open .room-password-popup .utility-popup-header { height: 44px; min-height: 44px; margin-bottom: 4px; }
+.app.mobile.keyboard-open .room-password-popup .utility-popup-title { font-size: 18px; }
+.app.mobile.keyboard-open .room-password-popup .field { min-height: 66px; margin-bottom: 8px; }
+.app.mobile.keyboard-open .room-password-popup .unity-base-field__label { margin-bottom: 4px; font-size: 14px; }
+.app.mobile.keyboard-open .room-password-popup .unity-base-text-field__input { min-height: 44px; padding: 6px 10px; }
+.app.mobile.keyboard-open .room-password-popup .button { height: 44px; min-height: 44px; }
+.app.mobile.keyboard-open .room-password-popup .button.icon-button { width: 44px; min-width: 44px; max-width: 44px; height: 44px; min-height: 44px; max-height: 44px; }
 .app.mobile .create-room-page { padding: 12px 16px; }
 .app.mobile .create-room-panel { height: 100%; padding: 16px; }
 .app.mobile .create-room-heading { margin-bottom: 12px; }
@@ -512,7 +593,7 @@
 .app.mobile-landscape #create-room-name { flex-basis: 0; }
 .app.mobile-landscape #create-privacy { width: 240px; margin-left: 16px; }
 .mobile.in-game .mobile-live-round { font-size: 12px; color: #817A87; margin: 0; }
-.mobile.in-game .mobile-waiting .mobile-action-row { width: 100%; min-width: 0; flex-shrink: 0; flex-direction: column; }
+.mobile.in-game .mobile-waiting .mobile-action-row { width: 100%; min-width: 0; flex-shrink: 0; flex-direction: row; }
 .mobile.in-game .mobile-playing { padding: 8px 12px; }
 .mobile.in-game .mobile-playing .room-hud { height: 44px; min-height: 44px; margin-bottom: 4px; }
 .mobile.in-game .mobile-playing .phase-bar { height: 44px; min-height: 44px; flex-direction: column; align-items: flex-start; justify-content: center; }
@@ -545,7 +626,7 @@
 .mobile.in-game .mobile-playing .player { padding: 44px 4px 4px; margin: 0; flex-basis: auto; flex-grow: 0; flex-shrink: 0; }
 .mobile.in-game .button.player-profile-button { position: absolute; top: 0; right: 0; width: 44px; min-width: 44px; height: 44px; min-height: 44px; margin: 0; padding: 10px; border-width: 0; background-color: transparent; align-items: center; justify-content: center; color: #78679E; }
 .mobile.in-game .player-profile-button .draw-ui-icon { width: 20px; height: 20px; }
-.mobile.in-game .mobile-waiting .player { padding-top: 44px; }
+.mobile.in-game .mobile-waiting .player { padding-top: 14px; }
 .mobile.in-game .mobile-waiting .player.player-empty, .mobile.in-game .mobile-playing .player.player-empty { padding: 8px; align-items: center; justify-content: center; background-color: #F7F3EA; border-color: #E3DDD4; }
 .mobile.in-game .player.preview-player { border-width: 2px; border-color: #537F70; background-color: #EDF5EF; }
 .mobile.in-game .mobile-playing .player-host-badge { top: 4px; left: 4px; width: 32px; max-width: 32px; height: 16px; margin: 0; padding: 1px 2px; font-size: 10px; -unity-text-align: middle-center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -687,3 +768,70 @@
 .app.mobile-landscape .cosmetic-preview-controls { width: 100%; margin: 8px 0 0; flex-direction: column; flex-wrap: nowrap; }
 .app.mobile-landscape .cosmetic-preview-controls .button { flex-grow: 0; flex-basis: auto; min-height: 40px; }
 .app.mobile-landscape .cosmetic-categories .cosmetic-category { flex-basis: 20%; }
+.app.mobile .cosmetic-shop .cosmetic-catalog { padding: 8px; }
+.mobile .cosmetic-shop .cosmetic-filters { flex-shrink: 0; height: 36px; min-height: 36px; margin-bottom: 6px; align-items: center; }
+.mobile .cosmetic-shop .cosmetic-category-scroll { flex-grow: 1; flex-shrink: 1; flex-basis: 0; min-width: 0; height: 36px; margin-right: 6px; }
+.app.mobile .cosmetic-shop .cosmetic-categories { flex-wrap: nowrap; height: 36px; min-height: 36px; margin: 0; }
+.app.mobile .cosmetic-shop .cosmetic-categories .cosmetic-category { flex-grow: 0; flex-shrink: 0; flex-basis: auto; height: 36px; min-height: 36px; min-width: 80px; margin: 0 6px 0 0; padding: 4px 8px; font-size: 12px; white-space: nowrap; }
+.app.mobile .cosmetic-shop .cosmetic-filters .commerce-refresh { width: 36px; min-width: 36px; max-width: 36px; height: 36px; min-height: 36px; max-height: 36px; margin: 0; }
+.app.mobile .cosmetic-shop .cosmetic-scrolling-workspace { flex-direction: column; }
+.app.mobile .cosmetic-shop .cosmetic-scrolling-workspace > .cosmetic-grid { width: 100%; flex-grow: 0; flex-shrink: 0; flex-basis: auto; }
+.app.mobile .cosmetic-shop .cosmetic-product { min-height: 180px; height: 180px; padding: 6px; margin-bottom: 8px; }
+.app.mobile .cosmetic-shop .cosmetic-item-preview { width: 100%; min-width: 44px; height: 80px; min-height: 80px; margin: 0 0 4px; padding: 0; color: rgba(0, 0, 0, 0); background-color: #F7F3FC; border-width: 1px; border-color: #E4DBEF; }
+.app.mobile .cosmetic-shop .cosmetic-item-preview .cosmetic-product-preview { width: 100%; height: 78px; min-height: 78px; margin: 0; color: #34304B; }
+.app.mobile .cosmetic-shop .cosmetic-card-avatar { width: 72px; height: 72px; }
+.app.mobile .cosmetic-shop .cosmetic-card-nickname { font-size: 14px; }
+.app.mobile .cosmetic-shop .cosmetic-product .cosmetic-sample-bubble { padding: 6px; }
+.app.mobile .cosmetic-shop .cosmetic-product .cosmetic-chat-text { font-size: 12px; }
+.app.mobile .cosmetic-shop .cosmetic-product .commerce-product-name { height: 20px; min-height: 20px; margin: 0 0 2px; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.app.mobile .cosmetic-shop .cosmetic-product > .commerce-description { display: none; }
+.app.mobile .cosmetic-shop .cosmetic-product .commerce-price { height: 18px; min-height: 18px; padding: 0; margin: 0 0 4px; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.app.mobile .cosmetic-shop .cosmetic-product-actions { margin-top: auto; }
+.app.mobile .cosmetic-shop .cosmetic-product-actions .button { height: 36px; min-height: 36px; margin: 0; padding: 4px; font-size: 13px; }
+.app.mobile .modal.cosmetic-preview-popup { width: 94%; max-width: 640px; height: 85%; max-height: 85%; min-height: 0; padding: 16px; align-self: center; border-radius: 16px; }
+.mobile .cosmetic-preview-popup-scroll { flex-grow: 1; flex-shrink: 1; flex-basis: 0; min-height: 0; }
+.app.mobile .cosmetic-preview-popup > .title { flex-shrink: 0; margin-bottom: 8px; font-size: 20px; }
+.app.mobile .cosmetic-preview-popup .cosmetic-preview-panel { width: 100%; min-height: 0; margin: 0; padding: 10px; }
+.app.mobile .cosmetic-preview-popup .cosmetic-preview-controls .button { min-height: 44px; flex-basis: auto; font-size: 13px; }
+.app.mobile .cosmetic-preview-popup .cosmetic-preview-close { flex-shrink: 0; height: 44px; min-height: 44px; margin: 8px 0 0; padding: 4px; font-size: 14px; }
+.app.mobile-landscape .modal.cosmetic-preview-popup { height: 94%; max-height: 94%; padding: 12px; }
+.app.mobile-landscape .cosmetic-preview-popup .cosmetic-preview-panel { flex-direction: row; align-items: center; }
+.app.mobile-landscape .cosmetic-preview-popup .cosmetic-preview-identity { flex-grow: 1; flex-shrink: 1; flex-basis: 0; margin-right: 12px; }
+.app.mobile-landscape .cosmetic-preview-popup .cosmetic-preview-controls { width: 45%; margin-top: 0; }
+.app.mobile-landscape #cosmetic-confirm .cosmetic-product-preview { height: 60px; margin-bottom: 6px; }
+.app.mobile-landscape #cosmetic-confirm .cosmetic-card-avatar { width: 56px; height: 56px; }
+.app.mobile .shop-with-rail .shop-header { display: none; }
+.app.mobile .shop-with-rail .shop-mobile-split { flex-direction: row; }
+.app.mobile .shop-with-rail .shop-menu-rail { display: flex; width: 200px; min-width: 200px; max-width: 200px; flex-grow: 0; flex-shrink: 0; margin-right: 8px; }
+.mobile .shop-with-rail .shop-menu-content { min-width: 0; width: 100%; flex-shrink: 0; }
+.app.mobile .shop-with-rail .mobile-bottom-nav { width: 100%; min-height: 36px; height: 36px; margin: 0 0 6px; padding: 0; border-width: 0; background-color: rgba(0, 0, 0, 0); }
+.app.mobile .shop-with-rail .mobile-bottom-nav #lobby-nav-shop { display: none; }
+.app.mobile .shop-with-rail .mobile-bottom-nav .mobile-nav-item { height: 36px; min-height: 36px; margin: 0 4px 0 0; padding: 2px 4px; font-size: 12px; white-space: normal; }
+.app.mobile .shop-with-rail .mobile-bottom-nav .shop-settings { width: 36px; min-width: 36px; max-width: 36px; height: 36px; min-height: 36px; max-height: 36px; padding: 0; }
+.app.mobile .shop-with-rail .commerce-wallet { width: 100%; flex-grow: 0; flex-basis: auto; min-height: 30px; height: 30px; margin: 0 0 6px; }
+.app.mobile .shop-with-rail .commerce-wallet .shop-coins, .app.mobile .shop-with-rail .commerce-wallet .shop-gems { height: 30px; padding: 3px; font-size: 11px; margin: 0 4px 0 0; }
+.app.mobile .shop-with-rail .commerce-tabs { width: 100%; min-height: 0; flex-wrap: wrap; margin: 0 0 4px; }
+.app.mobile .shop-with-rail .commerce-tabs .commerce-tab { flex-grow: 1; flex-shrink: 0; flex-basis: 44%; min-width: 0; height: 36px; min-height: 36px; margin: 0 4px 4px 0; padding: 2px 4px; font-size: 12px; white-space: normal; }
+.app.mobile .shop-with-rail .shop-menu-content .shop-preview-panel { width: 100%; min-height: 0; margin: 0; padding: 6px; }
+.app.mobile .shop-with-rail .shop-preview-hero { min-height: 76px; }
+.app.mobile .shop-with-rail .shop-preview-stage, .app.mobile .shop-with-rail .shop-preview-stage .lobby-avatar { width: 48px; height: 48px; }
+.app.mobile .shop-with-rail .shop-preview-stage { margin-right: 6px; }
+.app.mobile .shop-with-rail .shop-preview-controls { min-height: 72px; flex-direction: column; align-items: stretch; }
+.app.mobile .shop-with-rail .shop-preview-identity { width: 100%; min-height: 34px; flex-grow: 0; flex-shrink: 0; flex-basis: auto; margin: 0 0 4px; }
+.app.mobile .shop-with-rail .level-name-shop-profile-name, .app.mobile .shop-with-rail .shop-profile-name { height: 18px; min-height: 18px; font-size: 12px; margin: 0; }
+.app.mobile .shop-with-rail .shop-preview-actions .button { flex-grow: 1; flex-shrink: 1; flex-basis: 0; min-width: 0; height: 32px; min-height: 32px; padding: 2px; font-size: 11px; }
+.app.mobile .shop-with-rail .shop-preview-actions .shop-preview-reset { margin-right: 4px; }
+.app.mobile .shop-with-rail .shop-cart { margin-top: 4px; padding-top: 4px; }
+.app.mobile .shop-with-rail .shop-cart-summary { min-height: 36px; }
+.app.mobile .shop-with-rail .shop-cart-toggle > .unity-foldout__toggle { min-height: 36px; }
+.app.mobile .shop-with-rail .shop-cart-toggle .shop-cart-total { font-size: 11px; }
+.app.mobile .shop-with-rail .shop-cart-buy { min-width: 64px; height: 36px; min-height: 36px; padding: 2px 4px; font-size: 12px; }
+.app.mobile .shop-with-rail .shop-cart-scroll { height: 88px; }
+.app.mobile .shop-with-rail .shop-workspace { width: auto; min-width: 0; flex-grow: 1; flex-basis: 0; flex-direction: column; }
+.app.mobile .shop-with-rail .shop-catalog { padding: 6px; }
+.app.mobile .shop-with-rail .cosmetic-catalog { width: auto; min-width: 0; max-width: none; flex-grow: 1; flex-basis: 0; align-self: stretch; padding: 6px; }
+.app.mobile .shop-with-rail .shop-filters, .app.mobile .shop-with-rail .cosmetic-filters { height: 36px; min-height: 36px; margin-bottom: 4px; }
+.app.mobile .shop-with-rail .shop-filter-scroll, .app.mobile .shop-with-rail .cosmetic-category-scroll { height: 36px; }
+.app.mobile .shop-with-rail .shop-filter-scroll .part-tabs, .app.mobile .shop-with-rail .cosmetic-categories { min-height: 32px; height: 32px; }
+.app.mobile .shop-with-rail .shop-filters .part-tab, .app.mobile .shop-with-rail .cosmetic-categories .cosmetic-category { height: 32px; min-height: 32px; min-width: 44px; margin-right: 4px; padding: 2px 6px; font-size: 11px; }
+.app.mobile .shop-with-rail .shop-filters .shop-refresh, .app.mobile .shop-with-rail .cosmetic-filters .commerce-refresh { width: 36px; min-width: 36px; max-width: 36px; height: 36px; min-height: 36px; max-height: 36px; }

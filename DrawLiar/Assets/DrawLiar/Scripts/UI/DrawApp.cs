@@ -75,8 +75,6 @@ namespace DrawLiar
         private VisualElement _mobileRoomStack, _mobileWorkspace, _mobileControls, _mobileSecret, _mobileCanvas, _mobileRoster, _mobileActions, _mobileChatSheet;
         private Label _mobileRoundInfo, _mobileRoundHint, _mobileLiveRound;
         private Button _mobileRoomCode;
-        private ScrollView _mobileRoomScroll;
-        private ScrollView _mobileRosterScroll;
         private Label _mobileRosterTitle;
         private int _chatTransitionVersion;
         private bool _backgroundRoomRefresh = true, _roomRefreshRunning;
@@ -390,7 +388,16 @@ namespace DrawLiar
             RoomSearch(page);
             publicRoomList=DrawSmoothScroll.Create(ScrollViewMode.Vertical);Classes(publicRoomList,"room-list lobby-room-list mobile-lobby-room-list");page.Add(publicRoomList);RefreshPublicRooms();
             RejoinBanner(page);
-            _mobileLobbyChatButton=Button(page,"로비 채팅",OpenLobbyChat,"secondary mobile-lobby-chat-open");_mobileLobbyChatButton.name="mobile-lobby-chat-open";
+            var chatButton=_mobileLobbyChatButton=Button(page,"로비 채팅",OpenLobbyChat,"secondary mobile-lobby-chat-open");chatButton.name="mobile-lobby-chat-open";
+            void ArrangeLobbyChat()
+            {
+                if(page.panel==null)return;
+                bool landscape=root.ClassListContains("mobile-landscape");
+                var parent=landscape?heading:page;
+                if(chatButton.parent==parent)return;
+                if(landscape)parent.Insert(1,chatButton);else parent.Add(chatButton);
+            }
+            page.RegisterCallback<GeometryChangedEvent>(_=>ArrangeLobbyChat());ArrangeLobbyChat();
             DrawUIMotion.Stagger(page,28,220,8);
         }
 
@@ -799,10 +806,27 @@ namespace DrawLiar
             else Button(header,"설정",()=>Navigate(LobbyScreen.Options),"secondary shop-settings").name="shop-settings";
             ShopCommerceNavigation(page);
             page.EnableInClassList("daily-reward-shop",_shopSection==ShopSection.DailyReward);
+            page.EnableInClassList("avatar-shop",_shopSection==ShopSection.Cosmetics);
+            page.EnableInClassList("cosmetic-shop",_shopSection==ShopSection.PremiumCosmetics);
+            page.EnableInClassList("compact-shop",_shopSection==ShopSection.Cosmetics||_shopSection==ShopSection.PremiumCosmetics);
+            if(IsMobile&&(_shopSection==ShopSection.Cosmetics||_shopSection==ShopSection.PremiumCosmetics))
+            {
+                var wallet=page.Q<VisualElement>(className:"commerce-wallet");
+                if(wallet!=null)
+                {
+                    header.Insert(2,wallet);
+                    var restore=wallet.Q<Button>(className:"commerce-restore");
+                    if(restore!=null)restore.style.display=DisplayStyle.None;
+                }
+            }
             if(_shopSection!=ShopSection.Cosmetics)
             {
                 CommerceCataloguePage(page);
-                if(IsMobile)MobileNavigation();
+                if(IsMobile)
+                {
+                    MobileNavigation();
+                    if(_shopSection==ShopSection.PremiumCosmetics)ArrangeCompactShop(page,_commerceCatalogue);
+                }
                 DrawUIMotion.Stagger(page,28,220,8);return;
             }
             var workspace=Box(page,"row shop-workspace grow");
@@ -811,23 +835,100 @@ namespace DrawLiar
             var profileName=LeveledName(hero,nickname,OwnLevel,"shop-profile-name","shop-profile-name",lobby.Profile?.AccountId,OwnSubscriberBadge);
             avatarStage=Box(hero,"shop-preview-stage");avatarStage.name="shop-preview-stage";UpdateLobbyAvatar(avatarColor,CurrentShopPreview());
             var previewControls=Box(hero,"shop-preview-controls");
-            if(IsMobile)previewControls.Add(profileName.parent);
-            _shopPreviewStatus=Text(previewControls,"착용 중","shop-preview-status");_shopPreviewStatus.name="shop-preview-status";
+            var previewIdentity=IsMobile?Box(previewControls,"shop-preview-identity"):previewControls;
+            if(IsMobile)previewIdentity.Add(profileName.parent);
+            _shopPreviewStatus=Text(previewIdentity,"착용 중","shop-preview-status");_shopPreviewStatus.name="shop-preview-status";
             var previewActions=Box(previewControls,"shop-preview-actions");
             _shopPreviewReset=Button(previewActions,"초기화",ResetShopPreview,"secondary shop-preview-reset",DrawSound.UiCancel);_shopPreviewReset.name="shop-preview-reset";
             Button(previewActions,"꾸미기",()=>Navigate(LobbyScreen.Customize),"secondary shop-customize").name="shop-customize";
             BuildShopCart(preview);
             var catalog=Box(workspace,"shop-panel shop-catalog grow");catalog.name="shop-catalog";
             var filters=Box(catalog,"row shop-filters");
-            PartTabs(filters,_shopPartFilter,SelectShopPart,true);
+            VisualElement filterContent=filters;
+            if(IsMobile)
+            {
+                var filterScroll=DrawSmoothScroll.Create(ScrollViewMode.Horizontal);filterScroll.AddToClassList("shop-filter-scroll");filters.Add(filterScroll);filterContent=filterScroll;
+            }
+            PartTabs(filterContent,_shopPartFilter,SelectShopPart,true);
+            if(filterContent is ScrollView filterView)KeepShopFilterSelectionVisible(filterView,"part-selected");
             IconButton(filters,"새로고침",DrawUIIcon.Kind.Refresh,()=>Run(lobby.RefreshShopAsync),"shop-refresh");
             var scroll=DrawSmoothScroll.Create();scroll.name="shop-scroll";scroll.AddToClassList("shop-scroll");catalog.Add(scroll);
             shopList=Box(scroll,"shop-grid");shopList.name="shop-list";
             var grid=shopList;
             scroll.contentViewport.RegisterCallback<GeometryChangedEvent>(_=>SizeShopGrid(grid,scroll.contentViewport.contentRect.width));
             RefreshShop();
-            if(IsMobile)MobileNavigation();
+            if(IsMobile){MobileNavigation();ArrangeCompactShop(page,workspace,preview);}
             DrawUIMotion.Stagger(page,28,220,8);
+        }
+
+        private void ArrangeCompactShop(VisualElement page,VisualElement catalogue,VisualElement preview=null)
+        {
+            var header=page.Q<VisualElement>(className:"shop-header");
+            var wallet=page.Q<VisualElement>(className:"commerce-wallet");
+            var tabs=page.Q<VisualElement>(className:"commerce-tabs");
+            var navigation=content.Children().FirstOrDefault(element=>element.ClassListContains("mobile-bottom-nav"));
+            var settings=header?.Q<Button>("shop-settings");
+            if(header==null||wallet==null||tabs==null||navigation==null||catalogue==null)return;
+            var split=Box(page,"row shop-mobile-split grow");
+            var rail=DrawSmoothScroll.Create();rail.name="shop-menu-rail";rail.AddToClassList("shop-menu-rail");split.Add(rail);
+            var menu=Box(rail,"shop-menu-content");
+            split.Add(catalogue);
+            bool arranging=false;
+            void Arrange()
+            {
+                if(arranging||page.panel==null)return;
+                arranging=true;
+                try
+                {
+                    bool landscape=root.ClassListContains("mobile-landscape");
+                    page.EnableInClassList("shop-with-rail",landscape);
+                    if(landscape)
+                    {
+                        if(navigation.parent!=menu)menu.Insert(0,navigation);
+                        if(settings!=null&&settings.parent!=navigation)navigation.Add(settings);
+                        if(wallet.parent!=menu)menu.Insert(1,wallet);
+                        if(tabs.parent!=menu)menu.Insert(2,tabs);
+                        if(preview!=null&&preview.parent!=menu)menu.Add(preview);
+                    }
+                    else
+                    {
+                        if(navigation.parent!=content)content.Add(navigation);
+                        if(settings!=null&&settings.parent!=header)header.Add(settings);
+                        if(wallet.parent!=header)header.Insert(2,wallet);
+                        if(tabs.parent!=page)page.Insert(page.IndexOf(split),tabs);
+                        if(preview!=null&&preview.parent!=catalogue)catalogue.Insert(0,preview);
+                    }
+                }
+                finally{arranging=false;}
+            }
+            page.RegisterCallback<GeometryChangedEvent>(_=>Arrange());
+            Arrange();
+        }
+
+        private static void KeepShopFilterSelectionVisible(ScrollView scroll,string selectedClass)
+        {
+            bool pending=false;
+            void RevealSelection()
+            {
+                if(pending)return;
+                pending=true;
+                scroll.schedule.Execute(()=>
+                {
+                    pending=false;
+                    if(scroll.panel==null)return;
+                    var selected=scroll.contentContainer.Q<Button>(className:selectedClass);
+                    if(selected?.panel==scroll.panel)scroll.ScrollTo(selected);
+                }).StartingIn(1);
+            }
+            void RevealIfResized(GeometryChangedEvent evt)
+            {
+                if(evt.oldRect.size!=evt.newRect.size)RevealSelection();
+            }
+            scroll.RegisterCallback<AttachToPanelEvent>(evt=>{if(ReferenceEquals(evt.target,scroll))RevealSelection();});
+            scroll.contentViewport.RegisterCallback<GeometryChangedEvent>(RevealIfResized);
+            scroll.contentContainer.RegisterCallback<GeometryChangedEvent>(RevealIfResized);
+            scroll.contentContainer.Query<Button>().ForEach(button=>button.RegisterCallback<GeometryChangedEvent>(RevealIfResized));
+            RevealSelection();
         }
 
         private void SelectShopPart(int slot)
@@ -845,8 +946,8 @@ namespace DrawLiar
         private void SizeShopGrid(VisualElement grid,float width)
         {
             if(grid?.panel==null||width<=0)return;
-            float gap=IsMobile?12:16;
-            int columns=IsMobile?Mathf.Clamp(Mathf.FloorToInt((width+gap)/180),2,4):Mathf.Clamp(Mathf.FloorToInt((width+gap)/226),3,4);
+            float gap=IsMobile?8:16;
+            int columns=IsMobile?MobileShopColumns(width,gap):Mathf.Clamp(Mathf.FloorToInt((width+gap)/226),3,4);
             // 픽셀 반올림 후에도 마지막 카드가 같은 줄에 들어가도록 여유를 둔다.
             float cardWidth=Mathf.Max(0,Mathf.Floor((width-gap*(columns-1))/columns)-1);
             int index=0;
@@ -857,11 +958,20 @@ namespace DrawLiar
             }
         }
 
+        private int MobileShopColumns(float width,float gap)
+        {
+            bool landscape=root.ClassListContains("mobile-landscape");
+            float minimum=landscape?180:160;
+            if(landscape&&Screen.width>0&&root.layout.width>0)minimum=Mathf.Max(minimum,144*root.layout.width/Screen.width);
+            return Mathf.Clamp(Mathf.FloorToInt((width+gap)/(minimum+gap)),landscape?1:2,landscape?4:2);
+        }
+
         private static void SizeShopActions(VisualElement card,VisualElement actions)
         {
             if(actions?.panel==null||actions.contentRect.width<=0)return;
-            float buttonWidth=(actions.contentRect.width-8)/2;
-            bool stacked=actions.Query<Button>().ToList().Any(button=>
+            var buttons=actions.Query<Button>().ToList();
+            float buttonWidth=(actions.contentRect.width-8*Mathf.Max(0,buttons.Count-1))/Mathf.Max(1,buttons.Count);
+            bool stacked=buttons.Count>1&&buttons.Any(button=>
                 button.MeasureTextSize(button.text,0,VisualElement.MeasureMode.Undefined,0,VisualElement.MeasureMode.Undefined).x>
                 buttonWidth-button.resolvedStyle.paddingLeft-button.resolvedStyle.paddingRight-button.resolvedStyle.borderLeftWidth-button.resolvedStyle.borderRightWidth);
             card.EnableInClassList("shop-actions-stacked",stacked);actions.EnableInClassList("shop-actions-stacked",stacked);
@@ -884,12 +994,18 @@ namespace DrawLiar
                 var row=Box(shopList,"shop-entry");row.userData=product;
                 row.EnableInClassList("shop-owned",owned);
                 var summary=Box(row,"shop-product");
-                var image=new AvatarElement(avatarColor,product.Accessory);SetTooltip(image,product.Name);image.AddToClassList("shop-item-image");summary.Add(image);
-                var info=Box(summary,"shop-item-info");Text(info,product.Name,"shop-item-name");
+                Button tryOn=null;
+                VisualElement imageParent=summary;
+                if(IsMobile)
+                {
+                    tryOn=Button(summary,"입혀보기",()=>PreviewShopProduct(product),"secondary shop-try-on shop-item-preview");tryOn.name="shop-preview-"+product.Id;SetTooltip(tryOn,"입혀보기");imageParent=tryOn;
+                }
+                var image=new AvatarElement(avatarColor,product.Accessory);SetTooltip(image,product.Name);image.AddToClassList("shop-item-image");image.pickingMode=IsMobile?PickingMode.Ignore:PickingMode.Position;imageParent.Add(image);
+                var info=Box(summary,"shop-item-info");var productName=Text(info,product.Name,"shop-item-name");SetTooltip(productName,product.Name);
                 if(owned)Text(info,"보유 중","shop-item-price muted");else Text(info,"{0} 코인","shop-item-price muted",product.Price);
                 var actions=Box(row,"row shop-actions");
                 actions.RegisterCallback<GeometryChangedEvent>(_=>SizeShopActions(row,actions));
-                var tryOn=Button(actions,"입혀보기",()=>PreviewShopProduct(product),"secondary grow shop-try-on");tryOn.name="shop-preview-"+product.Id;
+                if(!IsMobile){tryOn=Button(actions,"입혀보기",()=>PreviewShopProduct(product),"secondary grow shop-try-on");tryOn.name="shop-preview-"+product.Id;}
                 bool equipped=owned&&AvatarParts.IsEquipped(lobby.Profile?.Accessory??0,product.Accessory);
                 var apply=Button(actions,owned?(equipped?"장착 중":"장착하기"):"구매",()=>Run(async()=>
                 {
@@ -1317,14 +1433,14 @@ namespace DrawLiar
             _mobileWorkspace=Box(_mobileRoomStack,"mobile-workspace");_mobilePlayStage=Box(_mobileWorkspace,"mobile-play-stage");
             _mobileCanvas=Box(_mobilePlayStage,"canvas-frame");_mobilePlaySide=Box(_mobileWorkspace,"mobile-play-side");
             surface=new DrawingSurface(network,lobby);_mobileCanvas.Add(surface);CreateAccusedSpotlight(_mobileCanvas);CreateDrawingPreviewName(_mobileCanvas);_mobileCanvas.RegisterCallback<GeometryChangedEvent>(_=>SizeMobileCanvas());
-            _mobileRoomScroll=DrawSmoothScroll.Create(ScrollViewMode.Vertical);_mobileRoomScroll.AddToClassList("mobile-controls-scroll");_mobileWorkspace.Add(_mobileRoomScroll);
-            _mobileControls=Box(_mobileRoomScroll,"mobile-controls");CreateDrawingTools(_mobileControls);contextInfo=Box(_mobileControls,"context-info");
+            _mobileControls=Box(_mobilePlayStage,"mobile-controls");CreateDrawingTools(_mobileControls);contextInfo=Box(_mobileControls,"context-info");
             _mobileRoster=Box(_mobileControls,"mobile-roster");_mobileRosterTitle=Text(_mobileRoster,"참가자","muted mobile-small");
-            _mobileRosterScroll=DrawSmoothScroll.Create(ScrollViewMode.Horizontal);_mobileRosterScroll.AddToClassList("mobile-roster-scroll");_mobileRoster.Add(_mobileRosterScroll);playerStrip=Box(_mobileRosterScroll,"players players-strip");
-            _mobileRosterScroll.contentViewport.RegisterCallback<GeometryChangedEvent>(_=>SizeMobileWaitingPlayers());
+            playerStrip=Box(_mobileRoster,"players players-strip");
             _mobileActions=Box(_mobileWorkspace,"mobile-bottom-actions");CreateJudgmentPanel(_mobileActions);var actionRow=Box(_mobileActions,"mobile-action-row");phaseActions=Box(actionRow,"phase-actions");chatOpen=Button(actionRow,"채팅 열기",OpenChat,"secondary chat-open");
             _mobileWorkspace.RegisterCallback<GeometryChangedEvent>(_=>RefreshMobileRoomGeometry());
             _mobileRoster.RegisterCallback<GeometryChangedEvent>(_=>RefreshMobileRoomGeometry());
+            _mobileControls.RegisterCallback<GeometryChangedEvent>(_=>RefreshMobileRoomGeometry());
+            _mobileActions.RegisterCallback<GeometryChangedEvent>(_=>RefreshMobileRoomGeometry());
             _mobileChatSheet=Box(content,"overlay mobile-chat-layer");_mobileChatSheet.style.display=DisplayStyle.None;
             var sheet=Box(_mobileChatSheet,"modal mobile-chat-sheet");var chatHeading=Box(sheet,"row mobile-page-heading");Text(chatHeading,"채팅","title grow");Button(chatHeading,"닫기",CloseChat,"secondary mobile-back",DrawSound.UiCancel);
             chatHistory=DrawSmoothScroll.Create(ScrollViewMode.Vertical);chatHistory.AddToClassList("chat-history");sheet.Add(chatHistory);
@@ -1398,19 +1514,28 @@ namespace DrawLiar
         private void SizeMobileWaitingPlayers()
         {
             if(!IsMobile||_mobileRoomStack==null||!_mobileRoomStack.ClassListContains("mobile-waiting")||playerStrip?.panel==null)return;
-            float width=_mobileRosterScroll.contentViewport.contentRect.width;
-            if(width<=0)return;
-            const int COLUMNS=4;
-            const float GAP=6,MAX_CARD_WIDTH=96,CARD_HEIGHT=144;
-            float gridWidth=Mathf.Min(width,COLUMNS*MAX_CARD_WIDTH+GAP*(COLUMNS-1));
-            float cardWidth=Mathf.Max(0,Mathf.Floor((gridWidth-GAP*(COLUMNS-1))/COLUMNS)-1);
-            float avatarSize=Mathf.Min(64,Mathf.Max(0,cardWidth-10));
+            float width=playerStrip.contentRect.width;
+            if(!float.IsFinite(width)||width<=0)return;
+            const float GAP=6;
+            int columns=Mathf.Clamp(Mathf.FloorToInt((width+GAP)/78),2,8);
+            if(width<620)columns=Mathf.Min(columns,4);
+            int rows=Mathf.Max(1,Mathf.CeilToInt(playerStrip.childCount/(float)columns));
+            float cardWidth=Mathf.Max(0,Mathf.Floor((width-GAP*(columns-1))/columns)-1);
+            bool portrait=_mobileLayout.IsPortrait;
+            float actionsHeight=float.IsFinite(_mobileActions.layout.height)?Mathf.Max(32,_mobileActions.layout.height):32;
+            float titleHeight=_mobileRosterTitle.resolvedStyle.display==DisplayStyle.None?0:
+                (float.IsFinite(_mobileRosterTitle.layout.height)?Mathf.Max(18,_mobileRosterTitle.layout.height):18)+4;
+            float drawingHeight=portrait?(float.IsFinite(_mobileControls.layout.height)?Mathf.Max(64,_mobileControls.layout.height):64)+96:0;
+            float available=_mobileWorkspace.contentRect.height-actionsHeight-titleHeight-drawingHeight-12-GAP*(rows-1);
+            float cardHeight=Mathf.Clamp(Mathf.Floor(available/rows),72,portrait?104:96);
+            playerStrip.style.height=rows*cardHeight+GAP*(rows-1);
+            float avatarSize=Mathf.Min(portrait?56:48,Mathf.Max(28,Mathf.Min(cardWidth-12,cardHeight-40)));
             int index=0;
             foreach(var card in playerStrip.Children())
             {
-                card.style.width=cardWidth;card.style.height=CARD_HEIGHT;
-                card.style.marginRight=++index%COLUMNS==0?0:GAP;
-                card.style.marginBottom=index<=playerStrip.childCount-(playerStrip.childCount%COLUMNS==0?COLUMNS:playerStrip.childCount%COLUMNS)?GAP:0;
+                card.style.width=cardWidth;card.style.height=cardHeight;
+                card.style.marginRight=++index%columns==0?0:GAP;
+                card.style.marginBottom=index<=playerStrip.childCount-(playerStrip.childCount%columns==0?columns:playerStrip.childCount%columns)?GAP:0;
                 var avatar=card.Q<AvatarElement>();
                 if(avatar!=null){avatar.style.width=avatarSize;avatar.style.height=avatarSize;}
             }
@@ -1744,12 +1869,6 @@ namespace DrawLiar
                 _mobileRoomStack.EnableInClassList("mobile-playing",!waiting);
                 _mobileCanvas.style.display=DisplayStyle.Flex;
                 _mobileSecret.style.display=waiting?DisplayStyle.None:DisplayStyle.Flex;
-                var rosterMode=ScrollViewMode.Vertical;
-                if(_mobileRosterScroll.mode!=rosterMode)
-                {
-                    _mobileRosterScroll.mode=rosterMode;
-                    _mobileRosterScroll.scrollOffset=Vector2.zero;_mobileRoomScroll.scrollOffset=Vector2.zero;
-                }
                 SetText(_mobileRosterTitle,"참가자");
                 if(waiting)
                 {
@@ -1822,7 +1941,6 @@ namespace DrawLiar
         private void Players(RoomSnapshot state)
         {
             ClearDrawingPreview();
-            int previousCount=playerCards.Count;
             playerStrip?.Clear();_pcLeftPlayers?.Clear();_pcRightPlayers?.Clear();playerCards.Clear();playerStatuses.Clear();_playerScores.Clear();_playerVoteStacks.Clear();
             bool currentPlayersOnly=state.Phase==GamePhase.RoundResults||state.Phase==GamePhase.MatchResults;
             var players=state.Players.Where(p=>!p.IsSpectator&&(!currentPlayersOnly||p.IsConnected)).ToArray();
@@ -1860,6 +1978,7 @@ namespace DrawLiar
                     var current=network.State;var player=current?.Players.FirstOrDefault(value=>value.Id==p.Id);if(player==null)return;
                     if(IsMobile)
                     {
+                        if(current.Phase==GamePhase.Lobby){OpenPublicProfile(player.AccountId,card);return;}
                         if(_previewAuthorId==player.Id)ClearDrawingPreview();else PreviewAuthorDrawing(player.Id);
                         RefreshDrawingInteractions(current);
                     }
@@ -1878,8 +1997,6 @@ namespace DrawLiar
             if(IsMobile)
             {
                 RefreshMobileRoomGeometry();
-                if(state.Phase==GamePhase.Lobby&&players.Length!=previousCount)
-                {_mobileRosterScroll.scrollOffset=Vector2.zero;_mobileRoomScroll.scrollOffset=Vector2.zero;}
             }
         }
         private void RefreshPlayerStates(RoomSnapshot state)
@@ -2299,7 +2416,7 @@ namespace DrawLiar
                 Rect cardBounds=card.worldBound;
                 if(IsMobile)
                 {
-                    var viewport=_mobileRoomStack.ClassListContains("mobile-waiting")?_mobileRosterScroll?.contentViewport:_mobileRoster;
+                    var viewport=_mobileRoster;
                     visible&=viewport!=null&&viewport.worldBound.Overlaps(cardBounds);
                 }
                 bubble.style.display=visible?DisplayStyle.Flex:DisplayStyle.None;

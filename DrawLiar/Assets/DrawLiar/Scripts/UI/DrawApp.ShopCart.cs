@@ -16,6 +16,8 @@ namespace DrawLiar
         private ScrollView _shopCartScroll;
         private Label _shopCartEmpty, _shopCartTotal, _shopCartStatus;
         private Button _shopCartBuy;
+        private Foldout _shopCartToggle;
+        private bool _shopCartExpanded;
         private bool _shopBatchPurchasing;
 
         private sealed class ShopPreviewItem
@@ -29,6 +31,7 @@ namespace DrawLiar
         {
             _shopPreviewParts.Clear();
             _shopPreviewProductIds.Clear();
+            _shopCartExpanded = false;
         }
 
         private void RemoveShopPreviewPart(AvatarPartSlot slot)
@@ -43,6 +46,7 @@ namespace DrawLiar
             _shopCartScroll = null;
             _shopCartEmpty = _shopCartTotal = _shopCartStatus = null;
             _shopCartBuy = null;
+            _shopCartToggle = null;
             _shopCartKey = null;
         }
 
@@ -50,7 +54,24 @@ namespace DrawLiar
         {
             _shopCartPanel = Box(parent, "shop-cart");
             _shopCartPanel.name = "shop-cart";
-            Text(_shopCartPanel, "입혀본 아이템", "shop-cart-heading");
+            VisualElement summary = null;
+            if (IsMobile)
+            {
+                summary = Box(_shopCartPanel, "row shop-cart-summary");
+                _shopCartToggle = new Foldout { value = _shopCartExpanded, text = L.Text("입혀본 아이템"), name = "shop-cart-toggle" };
+                _shopCartToggle.AddToClassList("shop-cart-toggle");
+                SetTooltip(_shopCartToggle, "입혀본 아이템");
+                summary.Add(_shopCartToggle);
+                _shopCartTotal = _shopCartToggle.Q<Label>(className: "unity-foldout__text");
+                _shopCartTotal.AddToClassList("shop-cart-total");
+                _shopCartToggle.RegisterValueChangedCallback(evt =>
+                {
+                    if (!ReferenceEquals(evt.target, _shopCartToggle)) return;
+                    _shopCartExpanded = evt.newValue;
+                    RefreshShopCart();
+                });
+            }
+            else Text(_shopCartPanel, "입혀본 아이템", "shop-cart-heading");
             _shopCartEmpty = Text(_shopCartPanel, "아직 입혀본 아이템이 없어요.", "shop-cart-empty");
             _shopCartScroll = DrawSmoothScroll.Create(ScrollViewMode.Vertical);
             _shopCartScroll.name = "shop-cart-scroll";
@@ -58,10 +79,10 @@ namespace DrawLiar
             _shopCartPanel.Add(_shopCartScroll);
             _shopCartList = Box(_shopCartScroll, "shop-cart-list");
             _shopCartList.name = "shop-cart-list";
-            var footer = Box(_shopCartPanel, "shop-cart-footer");
-            _shopCartTotal = Text(footer, "새 아이템 {0}개 · 총 {1} 코인", "shop-cart-total", 0, 0);
+            var footer = IsMobile ? summary : Box(_shopCartPanel, "shop-cart-footer");
+            if (!IsMobile) _shopCartTotal = Text(footer, "새 아이템 {0}개 · 총 {1} 코인", "shop-cart-total", 0, 0);
             _shopCartTotal.name = "shop-cart-total";
-            _shopCartStatus = Text(footer, "", "shop-cart-status");
+            _shopCartStatus = Text(IsMobile ? _shopCartPanel : footer, "", "shop-cart-status");
             _shopCartStatus.name = "shop-cart-status";
             _shopCartBuy = Button(footer, "일괄 구매", () => Run(PurchaseShopPreviewAsync), "primary shop-cart-buy", DrawSound.UiConfirm);
             _shopCartBuy.name = "shop-cart-buy";
@@ -142,7 +163,10 @@ namespace DrawLiar
             }
             _shopCartPanel.style.display = IsMobile && items.Length == 0 ? DisplayStyle.None : DisplayStyle.Flex;
             _shopCartEmpty.style.display = items.Length == 0 ? DisplayStyle.Flex : DisplayStyle.None;
-            _shopCartScroll.style.display = items.Length == 0 ? DisplayStyle.None : DisplayStyle.Flex;
+            if (items.Length == 0) _shopCartExpanded = false;
+            _shopCartScroll.style.display = items.Length > 0 && (!IsMobile || _shopCartExpanded) ? DisplayStyle.Flex : DisplayStyle.None;
+            _shopCartToggle?.SetValueWithoutNotify(_shopCartExpanded);
+            _shopCartToggle?.SetEnabled(!busy);
             SetText(_shopCartTotal, "새 아이템 {0}개 · 총 {1} 코인", pending.Length, total);
             bool available = pending.All(item => item.Available);
             bool affordable = (lobby.Profile?.Coins ?? 0) >= total;

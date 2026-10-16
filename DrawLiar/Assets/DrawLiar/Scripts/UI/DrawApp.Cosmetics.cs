@@ -33,21 +33,37 @@ namespace DrawLiar
                 _commerceCatalogue.Add(scroll);
                 catalogueBody = Box(scroll, "cosmetic-scroll-body");
             }
-            var heading = Box(catalogueBody, "row commerce-heading");
-            Text(heading, "보석 장식", "section-title grow");
-            IconButton(heading, "새로고침", DrawUIIcon.Kind.Refresh, () => Run(() => lobby.RefreshCommerceAsync()), "commerce-refresh");
-            Text(catalogueBody, "한 번 구매하면 계속 사용할 수 있어요.", "commerce-description cosmetic-permanent");
-            var categories = Box(catalogueBody, "row cosmetic-categories");
+            VisualElement categoryParent = catalogueBody;
+            if (IsMobile)
+            {
+                var filters = Box(_commerceCatalogue, "row cosmetic-filters");
+                _commerceCatalogue.Insert(0, filters);
+                var categoryScroll = DrawSmoothScroll.Create(ScrollViewMode.Horizontal);
+                categoryScroll.AddToClassList("cosmetic-category-scroll");
+                filters.Add(categoryScroll);
+                categoryParent = categoryScroll;
+                IconButton(filters, "새로고침", DrawUIIcon.Kind.Refresh, () => Run(() => lobby.RefreshCommerceAsync()), "commerce-refresh");
+            }
+            else
+            {
+                var heading = Box(catalogueBody, "row commerce-heading");
+                Text(heading, "보석 장식", "section-title grow");
+                IconButton(heading, "새로고침", DrawUIIcon.Kind.Refresh, () => Run(() => lobby.RefreshCommerceAsync()), "commerce-refresh");
+                Text(catalogueBody, "한 번 구매하면 계속 사용할 수 있어요.", "commerce-description cosmetic-permanent");
+            }
+            var categories = Box(categoryParent, "row cosmetic-categories");
             foreach (string category in CosmeticRules.Categories)
             {
                 var tab = Button(categories, CosmeticCategoryName(category), () => SelectCosmeticCategory(category), "secondary cosmetic-category");
                 tab.name = "cosmetic-category-" + category;
                 tab.userData = category;
             }
+            if (categoryParent is ScrollView categoryView) KeepShopFilterSelectionVisible(categoryView, "commerce-selected");
             if (IsMobile)
             {
                 var workspace = Box(catalogueBody, "row cosmetic-workspace cosmetic-scrolling-workspace");
                 _cosmeticPreview = Box(workspace, "cosmetic-preview-panel");
+                _cosmeticPreview.style.display = DisplayStyle.None;
                 _cosmeticGrid = Box(workspace, "row commerce-grid cosmetic-grid");
             }
             else
@@ -111,14 +127,27 @@ namespace DrawLiar
             var card = Box(parent, "commerce-product cosmetic-product");
             card.name = "cosmetic-product-" + product.Id;
             card.userData = product;
-            var visual = Box(card, "cosmetic-product-preview");
+            VisualElement visualParent = card;
+            if (IsMobile)
+            {
+                var preview = Button(card, "미리보기", () => PreviewCosmeticProduct(product), "secondary cosmetic-try-on cosmetic-item-preview");
+                preview.name = "cosmetic-preview-" + product.Id;
+                SetTooltip(preview, "미리보기");
+                visualParent = preview;
+            }
+            var visual = Box(visualParent, "cosmetic-product-preview");
+            if (IsMobile) visual.pickingMode = PickingMode.Ignore;
             CosmeticProductPreview(visual, product);
-            Text(card, product.Name, "commerce-product-name");
+            var productName = Text(card, product.Name, "commerce-product-name");
+            SetTooltip(productName, product.Name);
             Text(card, product.Description, "commerce-description");
-            Text(card, lobby.OwnsCosmetic(product.Id) ? "보유 중" : "영구 소장 · {0} 보석", "commerce-price", product.PricePaidGems);
+            Text(card, lobby.OwnsCosmetic(product.Id) ? "보유 중" : IsMobile ? "{0} 보석" : "영구 소장 · {0} 보석", "commerce-price", product.PricePaidGems);
             var actions = Box(card, "cosmetic-product-actions");
-            var preview = Button(actions, "미리보기", () => PreviewCosmeticProduct(product), "secondary cosmetic-try-on");
-            preview.name = "cosmetic-preview-" + product.Id;
+            if (!IsMobile)
+            {
+                var preview = Button(actions, "미리보기", () => PreviewCosmeticProduct(product), "secondary cosmetic-try-on");
+                preview.name = "cosmetic-preview-" + product.Id;
+            }
             var action = Button(actions, "구매", () => UseCosmeticProduct(product), "primary cosmetic-product-action", DrawSound.UiConfirm);
             action.name = "cosmetic-buy-" + product.Id;
             action.userData = product;
@@ -161,9 +190,47 @@ namespace DrawLiar
             _cosmeticPreviewId = product.Id;
             RefreshCosmeticPreview();
             RefreshCosmeticControls();
+            if (IsMobile)
+            {
+                ShowMobileCosmeticPreview();
+                return;
+            }
             var scroll = _cosmeticPreview?.GetFirstAncestorOfType<ScrollView>();
             if (scroll != null)
                 scroll.scrollOffset = new Vector2(0, Mathf.Max(0, _cosmeticPreview.worldBound.y - scroll.contentContainer.worldBound.y));
+        }
+
+        private void ShowMobileCosmeticPreview()
+        {
+            var preview = _cosmeticPreview;
+            var owner = _cosmeticGrid?.parent;
+            if (preview?.panel == null || owner?.panel == null) return;
+            var modal = Modal("미리보기", false);
+            modal.name = "cosmetic-preview-popup";
+            modal.AddToClassList("cosmetic-preview-popup");
+            var scroll = DrawSmoothScroll.Create();
+            scroll.AddToClassList("cosmetic-preview-popup-scroll");
+            modal.Add(scroll);
+            var description = Text(scroll, CosmeticRules.Find(_cosmeticPreviewId)?.Description ?? "", "commerce-description");
+            description.name = "cosmetic-preview-description";
+            preview.style.display = DisplayStyle.Flex;
+            scroll.Add(preview);
+            Button(modal, "닫기", CloseModal, "secondary cosmetic-preview-close", DrawSound.UiCancel).name = "cosmetic-preview-close";
+            modal.RegisterCallback<DetachFromPanelEvent>(evt =>
+            {
+                if (!ReferenceEquals(evt.target, modal) || _cosmeticPreview != preview || preview.hierarchy.parent != scroll.contentContainer) return;
+                preview.style.display = DisplayStyle.None;
+                root.schedule.Execute(() =>
+                {
+                    if (_cosmeticPreview != preview || preview.hierarchy.parent != scroll.contentContainer) return;
+                    if (owner.panel != null) owner.Insert(0, preview);
+                    else
+                    {
+                        preview.RemoveFromHierarchy();
+                        _cosmeticPreview = null;
+                    }
+                }).StartingIn(1);
+            });
         }
 
         private void RefreshCosmeticPreview()
@@ -171,6 +238,12 @@ namespace DrawLiar
             if (_cosmeticPreview?.panel == null) return;
             _cosmeticPreview.Clear();
             var product = CosmeticRules.Find(_cosmeticPreviewId);
+            var description = overlay?.Q<Label>("cosmetic-preview-description");
+            if (description != null)
+            {
+                SetText(description, product?.Description ?? "");
+                description.style.display = product == null ? DisplayStyle.None : DisplayStyle.Flex;
+            }
             var loadout = CosmeticPreviewLoadout(product);
             var identity = Box(_cosmeticPreview, "cosmetic-preview-identity");
             var avatar = new AvatarElement(lobby.Profile?.AvatarColor ?? avatarColor, lobby.Profile?.Accessory ?? accessory);
@@ -236,6 +309,7 @@ namespace DrawLiar
             var preview = Box(modal, "cosmetic-product-preview");
             CosmeticProductPreview(preview, product);
             Text(modal, "{0} 구매 · {1} 보석", "commerce-confirm-description", L.Text(product.Name), product.PricePaidGems);
+            Text(modal, product.Description, "commerce-description cosmetic-confirm-effect");
             Text(modal, "한 번 구매하면 계속 사용할 수 있어요.", "commerce-description");
             var actions = Box(modal, "cosmetic-confirm-actions");
             void Purchase(bool equip) => Run(async () =>
@@ -293,14 +367,15 @@ namespace DrawLiar
             float width = IsMobile ? _cosmeticGrid?.contentRect.width ?? 0
                 : _cosmeticGrid?.GetFirstAncestorOfType<ScrollView>()?.contentViewport.contentRect.width ?? 0;
             if (width <= 0) return;
-            const float GAP = 12;
-            int columns = width >= 760 ? 3 : width >= 410 ? 2 : 1;
-            float cardWidth = Mathf.Max(0, Mathf.Floor((width - GAP * (columns - 1)) / columns) - 1);
+            float gap = IsMobile ? 8 : 12;
+            int columns = IsMobile ? MobileShopColumns(width, gap)
+                : width >= 760 ? 3 : width >= 410 ? 2 : 1;
+            float cardWidth = Mathf.Max(0, Mathf.Floor((width - gap * (columns - 1)) / columns) - 1);
             int index = 0;
             foreach (var card in _cosmeticGrid.Children().Where(element => element.ClassListContains("cosmetic-product")))
             {
                 card.style.width = cardWidth;
-                card.style.marginRight = index++ % columns == columns - 1 ? 0 : GAP;
+                card.style.marginRight = index++ % columns == columns - 1 ? 0 : gap;
             }
         }
     }
