@@ -424,7 +424,12 @@ namespace DrawLiar
             if(!lobby.CanRejoin)return;
             var banner=Box(parent,"row rejoin-banner");banner.name="rejoin-banner";
             Text(banner,"방 연결이 끊겼어요.","rejoin-banner-text grow");
-            Button(banner,"다시 연결",()=>{banner.RemoveFromHierarchy();Run(lobby.RejoinAsync);},"primary").name="rejoin-room";
+            Button(banner,"다시 연결",()=>Run(async()=>
+            {
+                banner.SetEnabled(false);
+                try{await lobby.RejoinAsync();}
+                finally{if(lobby.CanRejoin)banner.SetEnabled(true);else banner.RemoveFromHierarchy();}
+            }),"primary").name="rejoin-room";
             Button(banner,"닫기",()=>{lobby.DismissRejoin();banner.RemoveFromHierarchy();},"secondary",DrawSound.UiCancel).name="rejoin-dismiss";
         }
 

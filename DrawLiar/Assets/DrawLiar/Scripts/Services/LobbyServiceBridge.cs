@@ -144,11 +144,15 @@ namespace DrawLiar
 
         public void DismissRejoin() => _rejoinRoomId = "";
 
-        public Task RejoinAsync()
+        // 강퇴로 막혔을 때만 재연결 안내를 닫는다. RoomUnavailable은 데디케이티드가 잠시 멈춰도 오므로 다시 시도할 수 있게 남긴다.
+        public async Task RejoinAsync()
         {
-            string roomId = _rejoinRoomId;
-            _rejoinRoomId = "";
-            return JoinLobbyAsync(roomId, _rejoinAsSpectator);
+            try { await JoinLobbyAsync(_rejoinRoomId, _rejoinAsSpectator); }
+            catch (ApiRequestException exception) when (exception.Code == "RoomKicked")
+            {
+                _rejoinRoomId = "";
+                throw;
+            }
         }
 
         private void StartLobbyChat()
