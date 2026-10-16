@@ -11,7 +11,7 @@ internal static partial class Integration
             && products.Where(product => product.Kind == CommerceRules.PAID_GEMS).Select(product => product.PaidGems).SequenceEqual(new[] { 100, 550, 1200 }),
             "보석 충전 세 가지와 구독, 꾸미기 스무 가지는 고유 상품 ID를 사용해야 합니다.");
         Check(AvatarParts.CreateShopProducts().Single(product => product.Id == "painter").Name == "화가 세트"
-            && products.Single(product => product.Id == CommerceRules.PAINTER_PRODUCT_ID) is { Name: "화가 세트", PricePaidGems: 300, SubscriptionDays: 30 },
+            && products.Single(product => product.Id == CommerceRules.PAINTER_PRODUCT_ID) is { Name: "화가패스", PricePaidGems: 300, SubscriptionDays: 30 },
             "코인 코스튬 화가 세트와 30일 구독 상품은 영구적으로 분리해야 합니다.");
         Check(CommerceRules.ExtendSubscription(null, now, 30) == now.AddDays(30)
             && CommerceRules.ExtendSubscription(now.AddDays(-1), now, 30) == now.AddDays(30)

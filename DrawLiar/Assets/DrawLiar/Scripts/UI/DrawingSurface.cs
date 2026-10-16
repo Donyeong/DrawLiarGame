@@ -11,6 +11,7 @@ namespace DrawLiar
         private readonly Texture2D texture;
         private readonly Color32[] pixels = new Color32[Width*Height];
         private readonly DrawNetworkManager network;
+        private readonly LobbyServiceBridge _commerce;
         private bool drawing, dirty;
         private int capturedPointer=-1;
         private Vector2 last;
@@ -37,13 +38,14 @@ namespace DrawLiar
         public Color32 BrushColor = new Color32(40,43,39,255);
         public float BrushSize = .009f;
         public bool Eraser;
-        public bool PressureEnabled = DrawBrushSettings.PressureEnabled;
+        public bool PressureEnabled => _commerce?.IsPainterSubscriber == true && DrawBrushSettings.PressureEnabled;
         public bool HasAuthorPreview => _previewAuthorId.HasValue;
         public static float AspectRatio => Width/(float)Height;
 
-        public DrawingSurface(DrawNetworkManager manager)
+        public DrawingSurface(DrawNetworkManager manager, LobbyServiceBridge commerce)
         {
             network = manager;
+            _commerce = commerce;
             name="drawing-surface";
             AddToClassList("drawing-surface");
             texture=new Texture2D(Width,Height,TextureFormat.RGBA32,false) { filterMode=FilterMode.Bilinear };
@@ -213,6 +215,9 @@ namespace DrawLiar
         private void Emit(Vector2 point,float pressure,bool samplePressure=true)
         {
             if(!network.CanDraw||HasAuthorPreview) { StopDrawing();return; }
+            bool subscriber=_commerce?.IsPainterSubscriber==true;
+            BrushColor=DrawBrushSettings.ResolveColor(BrushColor,subscriber);
+            if(!subscriber)_lastBrushSize=BrushSize;
             float size=samplePressure?DrawBrushSettings.ResolveSize(BrushSize,PressureEnabled,_pressurePointer,pressure,Eraser):_lastBrushSize;
             var stroke=new DrawStroke { X1=last.x,Y1=last.y,X2=point.x,Y2=point.y,StartSize=_lastBrushSize,Size=size,R=BrushColor.r,G=BrushColor.g,B=BrushColor.b,Eraser=Eraser,CanvasVersion=network.CanvasVersion };
             network.SendStroke(stroke);last=point;_lastBrushSize=size;lastSend=Time.unscaledTime;
@@ -226,31 +231,7 @@ namespace DrawLiar
 
         private void Rasterize(DrawStroke stroke,Color32[] target,float expansion)
         {
-            var a=new Vector2(stroke.X1*Width,(1-stroke.Y1)*Height);
-            var b=new Vector2(stroke.X2*Width,(1-stroke.Y2)*Height);
-            float startSize=stroke.StartSize>0?stroke.StartSize:stroke.Size;
-            float startRadius=Mathf.Clamp(startSize*Width*.5f,1,48)+expansion;
-            float endRadius=Mathf.Clamp(stroke.Size*Width*.5f,1,48)+expansion;
-            var count=Mathf.Max(1,Mathf.CeilToInt(Vector2.Distance(a,b)/Mathf.Max(1,Mathf.Min(startRadius,endRadius)*.4f)));
-            var color=expansion>0?new Color32(120,103,158,255):stroke.Eraser?PaperColor:new Color32(stroke.R,stroke.G,stroke.B,255);
-            for(var step=0;step<=count;step++)
-            {
-                float progress=step/(float)count;
-                var point=Vector2.Lerp(a,b,progress);
-                float radius=Mathf.Lerp(startRadius,endRadius,progress);
-                var x0=Mathf.Max(0,Mathf.FloorToInt(point.x-radius-1));var x1=Mathf.Min(Width-1,Mathf.CeilToInt(point.x+radius+1));
-                var y0=Mathf.Max(0,Mathf.FloorToInt(point.y-radius-1));var y1=Mathf.Min(Height-1,Mathf.CeilToInt(point.y+radius+1));
-                for(var y=y0;y<=y1;y++)for(var x=x0;x<=x1;x++)
-                {
-                    var distance=Vector2.Distance(new Vector2(x,y),point);
-                    var alpha=Mathf.Clamp01(radius+.5f-distance);
-                    if(alpha>0)
-                    {
-                        int index=y*Width+x;
-                        target[index]=Color32.Lerp(target[index],color,alpha);
-                    }
-                }
-            }
+            DrawDrawingRenderer.Rasterize(stroke,target,expansion);
         }
 
         private void RenderPreview()

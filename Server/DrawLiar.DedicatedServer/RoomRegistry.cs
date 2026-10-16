@@ -184,13 +184,19 @@ internal sealed class RoomRegistry : BackgroundService
 
 internal sealed class MatchResultOutbox : IDisposable
 {
+    private const long MAX_BATCH_BYTES = 64L * 1024 * 1024;
+    private const long MAX_FILE_BYTES = DrawingReplayRules.MAX_REQUEST_BYTES + 4096;
     private sealed class Entry
     {
-        public MatchResultRequest Result { get; set; } = new();
+        public MatchResultRequest? Result { get; set; }
         public int Failures { get; set; }
         public DateTimeOffset NextAttemptUtc { get; set; }
         [System.Text.Json.Serialization.JsonIgnore]
         public bool Persisted { get; set; }
+        [System.Text.Json.Serialization.JsonIgnore]
+        public string MatchId { get; set; } = "";
+        [System.Text.Json.Serialization.JsonIgnore]
+        public long StoredLength { get; set; }
     }
 
     private readonly object _gate = new();
@@ -222,13 +228,13 @@ internal sealed class MatchResultOutbox : IDisposable
             Entry? entry;
             try
             {
-                entry = JsonSerializer.Deserialize<Entry>(File.ReadAllBytes(file), GameplayWire.Json);
+                entry = ReadEntry(file);
                 if (entry?.Result == null || string.IsNullOrWhiteSpace(entry.Result.MatchId)
                     || !string.Equals(file, FilePath(entry.Result.MatchId), StringComparison.Ordinal)
                         && !string.Equals(file, FilePath(entry.Result.MatchId) + ".tmp", StringComparison.Ordinal))
                     throw new JsonException();
             }
-            catch (JsonException)
+            catch (Exception exception) when (exception is JsonException or InvalidDataException)
             {
                 File.Move(file, Path.Combine(_quarantine, Path.GetFileName(file) + ".corrupt-" + Guid.NewGuid().ToString("N")));
                 _storageError("CorruptOutboxEntry");
@@ -241,32 +247,71 @@ internal sealed class MatchResultOutbox : IDisposable
                 continue;
             }
             if (file.EndsWith(".tmp", StringComparison.Ordinal)) File.Move(file, FilePath(entry.Result.MatchId));
+            entry.MatchId = entry.Result.MatchId;
+            entry.StoredLength = new FileInfo(FilePath(entry.MatchId)).Length;
+            entry.Result = null;
             entry.Persisted = true;
-            _entries.Add(entry.Result.MatchId, entry);
+            _entries.Add(entry.MatchId, entry);
         }
+    }
+
+    private static Entry ReadEntry(string file)
+    {
+        using var stream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.Read);
+        if (stream.Length > MAX_FILE_BYTES) throw new InvalidDataException();
+        var entry = JsonSerializer.Deserialize<Entry>(stream, GameplayWire.Json);
+        if (entry?.Result == null || string.IsNullOrWhiteSpace(entry.Result.MatchId)) throw new JsonException();
+        return entry;
+    }
+
+    private MatchResultRequest ReadResult(Entry entry)
+    {
+        var result = ReadEntry(FilePath(entry.MatchId)).Result!;
+        if (result.MatchId != entry.MatchId) throw new JsonException();
+        return result;
     }
 
     private void Persist(Entry entry)
     {
-        string destination = FilePath(entry.Result.MatchId);
+        string destination = FilePath(entry.MatchId);
+        var persisted = new Entry
+        {
+            Result = entry.Result ?? ReadResult(entry), Failures = entry.Failures, NextAttemptUtc = entry.NextAttemptUtc
+        };
         using (var file = new FileStream(destination + ".tmp", FileMode.Create, FileAccess.Write, FileShare.None,
             4096, FileOptions.WriteThrough))
         {
-            JsonSerializer.Serialize(file, entry, GameplayWire.Json);
+            JsonSerializer.Serialize(file, persisted, GameplayWire.Json);
             file.Flush(true);
         }
         File.Move(destination + ".tmp", destination, true);
+        entry.StoredLength = new FileInfo(destination).Length;
+        entry.Result = null;
         entry.Persisted = true;
     }
 
     private void TryPersist(Entry entry)
     {
         try { Persist(entry); }
-        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or JsonException or InvalidDataException)
         {
             entry.Persisted = false;
             _storageError(exception.GetType().Name);
+            if (entry.Result == null) RemoveUnreadable(entry, exception);
         }
+    }
+
+    private void RemoveUnreadable(Entry entry, Exception exception)
+    {
+        if (exception is not (JsonException or InvalidDataException or FileNotFoundException or DirectoryNotFoundException)) return;
+        string file = FilePath(entry.MatchId);
+        try
+        {
+            if (File.Exists(file)) File.Move(file, Path.Combine(_quarantine, Path.GetFileName(file) + ".corrupt-" + Guid.NewGuid().ToString("N")));
+            _entries.Remove(entry.MatchId);
+        }
+        catch (Exception failure) when (failure is IOException or UnauthorizedAccessException)
+        { _storageError(failure.GetType().Name); }
     }
 
     public bool CanRecord(int capacity)
@@ -279,7 +324,7 @@ internal sealed class MatchResultOutbox : IDisposable
         lock (_gate)
         {
             if (_entries.ContainsKey(result.MatchId)) return;
-            var entry = new Entry { Result = result };
+            var entry = new Entry { Result = result, MatchId = result.MatchId };
             _entries.Add(result.MatchId, entry);
             TryPersist(entry);
         }
@@ -289,9 +334,27 @@ internal sealed class MatchResultOutbox : IDisposable
     {
         lock (_gate)
         {
-            foreach (var entry in _entries.Values.Where(entry => !entry.Persisted)) TryPersist(entry);
-            return _entries.Values.Where(entry => entry.Persisted && entry.NextAttemptUtc <= now)
-                .OrderBy(entry => entry.NextAttemptUtc).Take(64).Select(entry => entry.Result).ToArray();
+            foreach (var entry in _entries.Values.Where(entry => !entry.Persisted).ToArray()) TryPersist(entry);
+            var results = new List<MatchResultRequest>();
+            long selectedBytes = 0;
+            foreach (var entry in _entries.Values.Where(entry => entry.Persisted && entry.NextAttemptUtc <= now)
+                .OrderBy(entry => entry.NextAttemptUtc).Take(64).ToArray())
+            {
+                if (results.Count != 0 && entry.StoredLength > MAX_BATCH_BYTES - selectedBytes) break;
+                try
+                {
+                    results.Add(ReadResult(entry));
+                    selectedBytes += entry.StoredLength;
+                }
+                catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or JsonException or InvalidDataException)
+                {
+                    entry.Persisted = false;
+                    _storageError(exception.GetType().Name);
+                    RemoveUnreadable(entry, exception);
+                }
+                if (selectedBytes >= MAX_BATCH_BYTES) break;
+            }
+            return results.ToArray();
         }
     }
 

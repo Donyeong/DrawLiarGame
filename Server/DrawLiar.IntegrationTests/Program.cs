@@ -20,6 +20,29 @@ internal static partial class Integration
 
     public static async Task RunAsync(string[] args)
     {
+        if (args.Contains("--advertising-only") || args.Contains("--advertising-database-only"))
+        {
+            await VerifyAdvertisingAsync();
+            if (args.Contains("--advertising-database-only")) await VerifyAdvertisingDatabaseAsync();
+            return;
+        }
+        if (args.Contains("--match-replay-only"))
+        {
+            await VerifyMatchDrawingCaptureAsync();
+            return;
+        }
+        if (args.Contains("--match-replay-database-only"))
+        {
+            await VerifyMatchDrawingDatabaseAsync();
+            return;
+        }
+        if (args.Contains("--chat-filter-only"))
+        {
+            VerifyChatProfanityFilter();
+            await VerifyLobbyChatAsync();
+            await VerifyChatProfanityWireAsync();
+            return;
+        }
         if (args.Contains("--server-reliability-only"))
         {
             await VerifyLobbyChatThrottleAsync();
@@ -167,6 +190,9 @@ internal static partial class Integration
             return;
         }
         DrawLiar.Editor.GameSelfCheck.Run();
+        await VerifyAdvertisingAsync();
+        VerifyChatProfanityFilter();
+        await VerifyChatProfanityWireAsync();
         VerifyAccountLevelRules();
         VerifyAvatarPartRules();
         VerifyCosmeticRules();
@@ -177,6 +203,7 @@ internal static partial class Integration
         await VerifyConsensusWireAsync();
         await VerifyCoinTossWireAsync();
         await VerifyDrawingHistoryAsync();
+        await VerifyMatchDrawingCaptureAsync();
         await VerifyMidRoundAsync();
         await VerifyOptionalLiarAsync();
         await VerifyProfileRulesAsync();

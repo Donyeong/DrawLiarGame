@@ -14,6 +14,8 @@ app.UseWebSockets(new WebSocketOptions { KeepAliveInterval = TimeSpan.FromSecond
 app.MapGet("/health", (MainRegistration registration) => registration.IsReady ? Results.Ok(new { Status = "Ready" }) : Results.StatusCode(503));
 var database = app.Services.GetRequiredService<ServerDatabase>();
 var commerce = new CommerceService(database);
+using var advertisingHttp = new HttpClient { Timeout = TimeSpan.FromSeconds(10) };
+var advertising = new AdvertisingService(database, new AdvertisingSettings(app.Configuration), new AdMobSsvVerifier(advertisingHttp));
 string nodeId = app.Configuration["GameServer:NodeId"] ?? throw new InvalidOperationException("GameServer:NodeId가 필요합니다.");
 Task<ServerSession> Authenticate(HttpContext context) => database.AuthenticateAsync(ServerRuntime.Bearer(context), "game:" + nodeId);
 var lobbyChat = new LobbyChatHub(async (token, cancellation) =>
@@ -28,6 +30,10 @@ app.MapPost("/api/session/logout", (Func<HttpContext, Task<IResult>>)(async cont
 app.MapGet("/api/profile", (Func<HttpContext, Task<ProfileData>>)(async context => await database.ProfileAsync((await Authenticate(context)).AccountId)));
 app.MapGet("/api/matches/{matchId}/reward", async (HttpContext context, string matchId) =>
     await database.MatchRewardAsync((await Authenticate(context)).AccountId, matchId, context.RequestAborted));
+app.MapGet("/api/matches/{matchId}/drawings", async (HttpContext context, string matchId) =>
+    await database.MatchDrawingsAsync((await Authenticate(context)).AccountId, matchId, context.RequestAborted));
+app.MapGet("/api/matches/{matchId}/drawings/{round:int}", async (HttpContext context, string matchId, int round) =>
+    await database.MatchDrawingAsync((await Authenticate(context)).AccountId, matchId, round, context.RequestAborted));
 app.MapGet("/api/profiles/{accountId}", async (HttpContext context, string accountId) =>
     await database.PublicProfileAsync((await Authenticate(context)).AccountId, ServerRuntime.AccountId(accountId), context.RequestAborted));
 app.MapPatch("/api/profile", async (HttpContext context, UpdateProfileRequest request) => await database.UpdateProfileAsync((await Authenticate(context)).AccountId, request));
@@ -57,6 +63,25 @@ app.MapGet("/api/payments/orders", (Func<HttpContext, Task<CommerceOrdersRespons
     await database.CommerceOrdersAsync((await Authenticate(context)).AccountId, context.RequestAborted)));
 app.MapPost("/api/profile/subscriber-badge", async (HttpContext context, SubscriberBadgeRequest request) =>
     await database.SetSubscriberBadgeAsync((await Authenticate(context)).AccountId, request.ShowBadge, context.RequestAborted));
+app.MapGet("/api/ads", async (HttpContext context, string? platform) =>
+    await advertising.StatusAsync((await Authenticate(context)).AccountId, platform ?? "", context.RequestAborted));
+app.MapPost("/api/ads/rewards/begin", async (HttpContext context, AdsRewardBeginRequest request) =>
+{
+    var session = await Authenticate(context);
+    return await advertising.BeginAsync(session.AccountId, session.Hash, request, context.RequestAborted);
+});
+app.MapGet("/api/ads/rewards/{ticket}", async (HttpContext context, string ticket, string? platform) =>
+    await advertising.RewardAsync((await Authenticate(context)).AccountId, platform ?? "", ticket, context.RequestAborted));
+app.MapPost("/api/ads/rewards/complete-web", async (HttpContext context, AdsRewardCompleteRequest request) =>
+{
+    var session = await Authenticate(context);
+    return await advertising.CompleteWebAsync(session.AccountId, session.Hash, request, context.RequestAborted);
+});
+app.MapGet("/api/ads/admob/ssv", async (HttpContext context) =>
+{
+    await advertising.VerifyAdMobAsync(context.Request.QueryString.Value ?? "", context.RequestAborted);
+    return Results.Ok();
+});
 app.MapPost("/api/profile/cosmetics", async (HttpContext context, CosmeticEquipRequest request) =>
     await database.EquipCosmeticAsync((await Authenticate(context)).AccountId, request, context.RequestAborted));
 app.MapGet("/api/topic-workshop", async (HttpContext context, string? language, bool? mine, int? offset, int? limit, string? search, string? sort) =>
@@ -93,6 +118,16 @@ app.MapPost("/internal/rooms/kick", async (HttpContext context, KickRoomRequest 
 });
 app.MapPost("/internal/dedicated/register", async (HttpContext context, RegisterDedicatedRequest request) => { ServerRuntime.RequireCluster(context, app.Configuration); await database.RegisterDedicatedAsync(request, app.Environment.IsDevelopment()); return Results.NoContent(); });
 app.MapPost("/internal/dedicated/heartbeat", async (HttpContext context, DedicatedHeartbeatRequest request) => { ServerRuntime.RequireCluster(context, app.Configuration); return await database.DedicatedHeartbeatAsync(request); });
+app.Use(async (context, next) =>
+{
+    if (context.Request.Method == "POST" && context.Request.Path == "/internal/dedicated/matches")
+    {
+        ServerRuntime.RequireCluster(context, app.Configuration);
+        var limit = context.Features.Get<Microsoft.AspNetCore.Http.Features.IHttpMaxRequestBodySizeFeature>();
+        if (limit is { IsReadOnly: false }) limit.MaxRequestBodySize = DrawingReplayRules.MAX_REQUEST_BYTES;
+    }
+    await next(context);
+});
 app.MapPost("/internal/dedicated/matches", async (HttpContext context, MatchResultRequest request) =>
 {
     ServerRuntime.RequireCluster(context, app.Configuration);

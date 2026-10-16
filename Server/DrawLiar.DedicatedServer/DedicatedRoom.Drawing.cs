@@ -2,6 +2,51 @@ namespace DrawLiar.DedicatedServer;
 
 internal sealed partial class DedicatedRoom
 {
+    private void SessionChangedLocked()
+    {
+        _dirty = true;
+        if (_session.Phase == GamePhase.Lobby || _session.Phase == GamePhase.RoleReveal && _session.Round == 1)
+        {
+            _roundDrawings.Clear();
+            _roundDrawingBytes = 0;
+            _lastCapturedRound = 0;
+            _drawingsIncomplete = false;
+            return;
+        }
+        if (_session.Phase != GamePhase.RoundResults || _lastCapturedRound >= _session.Round) return;
+        _lastCapturedRound = _session.Round;
+        if (_session.Round > DrawingReplayRules.MAX_ROUNDS || _roundDrawingBytes >= DrawingReplayRules.MAX_COMPRESSED_MATCH_BYTES)
+        {
+            _drawingsIncomplete = true;
+            return;
+        }
+        var state = _session.Snapshot(-1, -1, 0);
+        var source = _session.Settings.Mode == DrawingMode.Individual ? _drawingHistory : _canvas;
+        var accounts = _playerIds.ToDictionary(pair => pair.Value, pair => pair.Key);
+        var drawing = new RoundDrawingData
+        {
+            Round = state.Round, Topic = state.Topic, Word = state.Word,
+            Players = state.DrawingOrder.Select(id => new ReplayPlayerData
+            {
+                PlayerId = id, AccountId = accounts.GetValueOrDefault(id, ""), DisplayName = _session.PlayerName(id)
+            }).ToArray(),
+            Strokes = source.Select(stroke => new ReplayStrokeData
+            {
+                X1 = stroke.X1, Y1 = stroke.Y1, X2 = stroke.X2, Y2 = stroke.Y2,
+                Size = stroke.Size, StartSize = stroke.StartSize, R = stroke.R, G = stroke.G, B = stroke.B,
+                Eraser = stroke.Eraser, AuthorPlayerId = stroke.AuthorPlayerId
+            }).ToArray()
+        };
+        if (!DrawLiar.Server.DrawingArchiveCodec.TryEncode(drawing, out var archive)
+            || archive.Payload.LongLength > DrawingReplayRules.MAX_COMPRESSED_MATCH_BYTES - _roundDrawingBytes)
+        {
+            _drawingsIncomplete = true;
+            return;
+        }
+        _roundDrawings.Add(archive);
+        _roundDrawingBytes += archive.Payload.LongLength;
+    }
+
     private void ClearCanvasLocked()
     {
         if (_drawingEpoch != _session.DrawingEpoch)

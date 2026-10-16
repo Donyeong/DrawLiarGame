@@ -35,6 +35,7 @@ namespace DrawLiar
         {
             if (!IsAuthenticated || !CommerceLoaded || product == null || IsBusy || _loggingOut) return false;
             if (!(Commerce.Products ?? Array.Empty<CommerceProduct>()).Any(candidate => candidate?.Id == product.Id)) return false;
+            if (product.Kind != CommerceRules.COSMETIC && !DrawPlatformPaymentProviders.IsPurchasePlatformSupported) return false;
             return product.Kind == CommerceRules.PAINTER_SUBSCRIPTION || product.Kind == CommerceRules.COSMETIC
                 ? product.PricePaidGems > 0 && Profile.PaidGems >= product.PricePaidGems
                     && (product.Kind != CommerceRules.COSMETIC || !OwnsCosmetic(product.Id))
@@ -79,6 +80,10 @@ namespace DrawLiar
             if (!CommerceLoaded) throw new InvalidOperationException(DrawLocalization.Text("현재 구매할 수 없는 아이템이 있어요."));
             var product = (Commerce.Products ?? Array.Empty<CommerceProduct>()).FirstOrDefault(candidate => candidate?.Id == productId);
             if (product == null) throw new InvalidOperationException(DrawLocalization.Text("현재 구매할 수 없는 아이템이 있어요."));
+            if (product.Kind != CommerceRules.COSMETIC && !DrawPlatformPaymentProviders.IsPurchasePlatformSupported)
+                throw new InvalidOperationException(Application.platform == RuntimePlatform.WebGLPlayer
+                    ? DrawLocalization.Text("웹에서는 구매할 수 없습니다. PC(Steam) 또는 모바일(Play Store)에서 구매해 주세요.")
+                    : DrawLocalization.Text("현재 결제를 이용할 수 없습니다."));
             string session = _gameSession, account = Profile.AccountId;
             if (product.Kind == CommerceRules.PAINTER_SUBSCRIPTION || product.Kind == CommerceRules.COSMETIC)
             {

@@ -262,12 +262,13 @@ internal static partial class Integration
         public GameConnection Host => _peers[0].Connection;
         public GameConnection Observer => _peers[3].Connection;
         public RoomSnapshot State => _peers[0].Socket.LastState!;
+        public readonly List<MatchResultRequest> CapturedReports = new();
         public double Now;
-        public DrawingFixture(DrawingMode mode)
+        public DrawingFixture(DrawingMode mode, int roundCount = 1)
         {
             _roomData = new ServerRoomData { RoomId = Guid.NewGuid().ToString(), OwnerAccountId = "host", Settings = new ServerRoomSettings
-            { Mode = (int)mode, Topics = new[] { "과일" }, RoleSeconds = 3, DrawSeconds = 180, DiscussionSeconds = 5, RevealSeconds = 3, GuessSeconds = 5, ResultSeconds = 5, RoundCount = 1 } };
-            Room = new DedicatedRoom(_roomData, new GameData { Topics = new[] { new TopicData { Name = "과일", Words = new[] { "사과" } } } }, Array.Empty<ServerTopicData>(), 0, () => { });
+            { Mode = (int)mode, Topics = new[] { "과일" }, RoleSeconds = 3, DrawSeconds = 180, DiscussionSeconds = 5, RevealSeconds = 3, GuessSeconds = 5, ResultSeconds = 5, RoundCount = roundCount } };
+            Room = new DedicatedRoom(_roomData, new GameData { Topics = new[] { new TopicData { Name = "과일", Words = new[] { "사과" } } } }, Array.Empty<ServerTopicData>(), 0, () => { }, matchCompleted: CapturedReports.Add);
             foreach (string account in new[] { "host", "second", "third", "observer" }) Add(account, account == "observer");
         }
         private (GameConnection Connection, DrawingSocket Socket) Add(string account, bool spectator)

@@ -236,7 +236,7 @@ internal static partial class Integration
         CheckFields(json.RootElement.GetProperty("Stats"), "MatchesPlayed", "MatchesWon", "TotalScore", "BestScore", "RoundsPlayed",
             "CitizenRounds", "LiarRounds", "CorrectVotes", "CorrectGuesses");
         foreach (var match in json.RootElement.GetProperty("RecentMatches").EnumerateArray())
-            CheckFields(match, "MatchId", "PlayedAt", "Score", "Rank", "PlayerCount", "Mode", "Won", "RoundCount");
+            CheckFields(match, "MatchId", "PlayedAt", "Score", "Rank", "PlayerCount", "Mode", "Won", "RoundCount", "CanViewDrawings", "DrawingExpiresAt");
     }
 
     private static MatchResultRequest ProfileMatchFixture(Guid[] accounts, Guid roomId, DateTimeOffset playedAt, int index) => new()

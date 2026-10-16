@@ -120,6 +120,7 @@ namespace DrawLiar
 
         private void OnEnable()
         {
+            AttachAdvertisingEvents();
             L.LanguageChanged+=OnLanguageChanged;
             AttachSocialEvents();
             AttachRoomPasswordEvents();
@@ -135,6 +136,7 @@ namespace DrawLiar
         }
         private void OnDisable()
         {
+            DetachAdvertisingEvents();
             ResetTextPresentation();
             ClearJudgmentCoinToss();
             HideModeTooltip();
@@ -161,6 +163,7 @@ namespace DrawLiar
             network=GetComponent<DrawNetworkManager>();
             lobby=GetComponent<LobbyServiceBridge>();
             lobby.Initialize(network);
+            AttachAdvertisingEvents();
             draft.TopicLanguage=ServerRoomSettings.NormalizeTopicLanguage(L.CurrentLanguageCode);
             draft.Topics=GameDataStore.Load(topicLanguage:draft.TopicLanguage).Topics.Select(t=>t.Name).ToArray();
             nickname=PlayerPrefs.GetString("DrawLiar.Name","동글이"+UnityEngine.Random.Range(10,99));
@@ -224,6 +227,7 @@ namespace DrawLiar
             root.schedule.Execute(RefreshRoomsInBackground).Every(1000);
             root.schedule.Execute(RefreshSocialControls).Every(1000);
             root.schedule.Execute(RefreshCommerceControls).Every(1000);
+            root.schedule.Execute(RefreshAdvertisingControls).Every(1000);
 #if UNITY_WEBGL && !UNITY_EDITOR
             if(lobby.HasPendingRoomInvite)Run(async()=>
             {
@@ -345,7 +349,9 @@ namespace DrawLiar
                         var customizeHeading=Box(body,"row spread customize-heading");
                         Text(customizeHeading,"커스터마이징","screen-title");
                         if(!IsMobile||Application.platform==RuntimePlatform.WebGLPlayer)
-                            Button(customizeHeading,"상점",()=>{Navigate(LobbyScreen.Shop);Run(lobby.RefreshShopAsync);},"secondary").name="customize-shop";
+                        {
+                            var customizeShop=Button(customizeHeading,"상점",()=>{Navigate(LobbyScreen.Shop);Run(lobby.RefreshShopAsync);},"secondary");customizeShop.name="customize-shop";AddDailyAdRewardDot(customizeShop);
+                        }
                         ProfileForm(body);break;
                 }
         }
@@ -404,7 +410,7 @@ namespace DrawLiar
             LeveledName(profile,nickname,OwnLevel,"pc-lobby-name","pc-lobby-name",lobby.Profile?.AccountId,OwnSubscriberBadge);Text(profile,lobby.Profile?.HasGoogleAccount==true?"Google":"게스트","pc-lobby-account");
             Button(profile,"꾸미기",()=>Navigate(LobbyScreen.Customize),"secondary pc-lobby-customize");
             var services=Box(sidebar,"pc-lobby-card pc-lobby-services");
-            Button(services,"상점",()=>{Navigate(LobbyScreen.Shop);Run(lobby.RefreshShopAsync);},"secondary");
+            var shop=Button(services,"상점",()=>{Navigate(LobbyScreen.Shop);Run(lobby.RefreshShopAsync);},"secondary");shop.name="lobby-shop";AddDailyAdRewardDot(shop);
             Button(services,"친구",()=>Navigate(LobbyScreen.Friends),"secondary");
             Button(services,"내 계정",()=>Navigate(LobbyScreen.Account),"secondary pc-lobby-service-last");
             var main=Box(workspace,"pc-lobby-main grow");main.name="pc-lobby-main";
@@ -660,6 +666,7 @@ namespace DrawLiar
             },"mobile-nav-item grow");
             button.name="lobby-nav-"+destination.ToString().ToLowerInvariant();
             button.EnableInClassList("mobile-nav-selected",selected);
+            if(destination==LobbyScreen.Shop)AddDailyAdRewardDot(button);
         }
 
         private static string LobbyTitle(LobbyScreen screen)
@@ -686,6 +693,9 @@ namespace DrawLiar
 
         private void OnProfileChanged()
         {
+            RefreshAdvertisingControls();
+            if(_matchDrawingOverlay!=null&&(!lobby.IsAuthenticated||_matchDrawingAccount!=lobby.Profile?.AccountId))CloseMatchDrawings(false);
+            RefreshPainterDrawingControls();
             if(_guessAccountId!=null&&_guessAccountId!=lobby.Profile?.AccountId)ResetGuessingInput(true);
             if(_roomCustomizeAccountId!=null&&_roomCustomizeAccountId!=lobby.Profile?.AccountId)CloseRoomCustomization(false,true);
             ClearRoomPasswordSecrets();
@@ -788,6 +798,7 @@ namespace DrawLiar
             if(IsMobile)IconButton(header,"설정",DrawUIIcon.Kind.Settings,()=>Navigate(LobbyScreen.Options),"shop-settings");
             else Button(header,"설정",()=>Navigate(LobbyScreen.Options),"secondary shop-settings").name="shop-settings";
             ShopCommerceNavigation(page);
+            page.EnableInClassList("daily-reward-shop",_shopSection==ShopSection.DailyReward);
             if(_shopSection!=ShopSection.Cosmetics)
             {
                 CommerceCataloguePage(page);
@@ -1258,7 +1269,7 @@ namespace DrawLiar
             var stage=Box(workspace,"pc-canvas-stage");stage.name="pc-canvas-stage";
             _pcLeftPlayers=Box(stage,"pc-player-rail pc-player-left");_pcLeftPlayers.name="pc-player-left";
             var center=_pcCenter=Box(stage,"center pc-game-center");center.name="pc-game-center";
-            var frame=Box(center,"canvas-frame pc-canvas-frame");frame.name="pc-game-canvas";surface=new DrawingSurface(network);frame.Add(surface);
+            var frame=Box(center,"canvas-frame pc-canvas-frame");frame.name="pc-game-canvas";surface=new DrawingSurface(network,lobby);frame.Add(surface);
             frame.RegisterCallback<GeometryChangedEvent>(_=>{surface.FitTo(frame.contentRect.size);RefreshPcRoomGeometry(frame);});
             workspace.RegisterCallback<GeometryChangedEvent>(_=>RefreshPcRoomGeometry(frame));
             stage.RegisterCallback<GeometryChangedEvent>(_=>RefreshPcRoomGeometry(frame));
@@ -1298,7 +1309,7 @@ namespace DrawLiar
             BindMobileSecretDetails();
             _mobileWorkspace=Box(_mobileRoomStack,"mobile-workspace");_mobilePlayStage=Box(_mobileWorkspace,"mobile-play-stage");
             _mobileCanvas=Box(_mobilePlayStage,"canvas-frame");_mobilePlaySide=Box(_mobileWorkspace,"mobile-play-side");
-            surface=new DrawingSurface(network);_mobileCanvas.Add(surface);CreateAccusedSpotlight(_mobileCanvas);CreateDrawingPreviewName(_mobileCanvas);_mobileCanvas.RegisterCallback<GeometryChangedEvent>(_=>SizeMobileCanvas());
+            surface=new DrawingSurface(network,lobby);_mobileCanvas.Add(surface);CreateAccusedSpotlight(_mobileCanvas);CreateDrawingPreviewName(_mobileCanvas);_mobileCanvas.RegisterCallback<GeometryChangedEvent>(_=>SizeMobileCanvas());
             _mobileRoomScroll=DrawSmoothScroll.Create(ScrollViewMode.Vertical);_mobileRoomScroll.AddToClassList("mobile-controls-scroll");_mobileWorkspace.Add(_mobileRoomScroll);
             _mobileControls=Box(_mobileRoomScroll,"mobile-controls");CreateDrawingTools(_mobileControls);contextInfo=Box(_mobileControls,"context-info");
             _mobileRoster=Box(_mobileControls,"mobile-roster");_mobileRosterTitle=Text(_mobileRoster,"참가자","muted mobile-small");
@@ -1323,6 +1334,7 @@ namespace DrawLiar
 
         private void OnMobileLayoutChanged()
         {
+            RefreshAdvertisingControls();
 #if UNITY_WEBGL && !UNITY_EDITOR
             if(_webRenderedMode!=IsMobile)
             {
@@ -1543,6 +1555,7 @@ namespace DrawLiar
         private void RoomShortcut(KeyDownEvent e)
         {
             if(e.keyCode!=KeyCode.Escape)return;
+            if(_matchDrawingOverlay!=null){CloseMatchDrawings();e.StopImmediatePropagation();return;}
             if(_profileKickOverlay!=null){ClosePublicProfileKick();e.StopImmediatePropagation();return;}
             if(_workshopPreviewOverlay!=null){CloseWorkshopPreview();e.StopImmediatePropagation();return;}
             if(_roomPasswordOverlay!=null)return;
@@ -2473,11 +2486,14 @@ namespace DrawLiar
             OnTopicWorkshopLanguageChanged();
             RefreshCommerceView();
             DrawLocalizedTypography.Apply(root);
-            if(_profileOverlay!=null)BeginPublicProfileLoad();
+            if(_profileOverlay!=null&&_matchDrawingOverlay==null)BeginPublicProfileLoad();
+            RefreshMatchDrawingText();
+            RefreshAdvertisingControls();
             shopList?.schedule.Execute(()=>shopList?.Query<VisualElement>(className:"shop-entry").ForEach(card=>SizeShopActions(card,card.Q<VisualElement>(className:"shop-actions")))).StartingIn(1);
         }
         private void OnDestroy()
         {
+            DetachAdvertisingEvents();
             ResetTextPresentation();
             ClearJudgmentCoinToss();
             HideModeTooltip();

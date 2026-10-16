@@ -167,6 +167,7 @@ namespace DrawLiar
         private void Update()
         {
             _lobbyChat.Drain();
+            PollAdvertising();
             PollPendingMatchRewards();
             if (IsAuthenticated && !_loggingOut && !_lobbyChatPaused && !IsBusy && !_socialPolling
                 && Time.realtimeSinceStartupAsDouble >= _nextSocialPoll)
@@ -615,6 +616,7 @@ namespace DrawLiar
         public Task LogoutAsync() => RunAsync(async () =>
         {
             _loggingOut = true;
+            ResetAdvertising();
             ResetCommerce();
             ++_socialRevision;
             StopLobbyChat(true);
@@ -653,9 +655,10 @@ namespace DrawLiar
             profile.Level = AccountLevelRules.GetLevel(profile.Experience);
             profile.OwnedCosmetics = CosmeticRules.SanitizeOwned(profile.OwnedCosmetics);
             profile.Cosmetics = CosmeticRules.KeepOwned(profile.Cosmetics, profile.OwnedCosmetics);
-            if (Profile?.AccountId != profile.AccountId) { ResetTopicWorkshop(); ResetMatchRewards(); ResetCommerce(); }
+            if (Profile?.AccountId != profile.AccountId) { ResetTopicWorkshop(); ResetMatchRewards(); ResetCommerce(); ResetAdvertising(); }
             Profile = profile;
             CaptureCommerceClock(profile.ServerTimeUnixSeconds);
+            ObserveAdvertisingProfile();
             ++_rewardProfileRevision;
             ProfileChanged?.Invoke();
         }
@@ -741,6 +744,14 @@ namespace DrawLiar
             if (code.StartsWith("TopicWorkshop", StringComparison.Ordinal)) return TopicWorkshopErrorMessage(code);
             switch (code)
             {
+                case "AdsUnavailable": return "광고를 이용할 수 없습니다.";
+                case "AdRewardExpired": return "광고 보상이 만료되었습니다. 다시 시도해 주세요.";
+                case "AdRewardNotReady": return "광고 보상을 확인하고 있습니다. 잠시 후 다시 확인해 주세요.";
+                case "InvalidAdReward":
+                case "AdRewardNotFound":
+                case "AdRewardLimit":
+                case "InvalidAdVerification":
+                case "AdTransactionAlreadyClaimed": return "광고를 불러오지 못했습니다. 잠시 후 다시 시도하세요.";
                 case "InvalidGuestCredential": return "게스트 인증 정보를 확인할 수 없습니다. Google 연동 계정은 Google로 로그인하세요.";
                 case "ExternalLoginRequired": return "Google에 연동된 계정입니다. Google로 로그인해 주세요.";
                 case "InvalidCredentials": return "인증 정보를 확인하세요.";
@@ -748,6 +759,9 @@ namespace DrawLiar
                 case "BlockedPlayer": return "차단한 플레이어입니다. 차단을 해제한 뒤 다시 시도하세요.";
                 case "ReportLimit": return "오늘은 더 이상 신고할 수 없습니다. 내일 다시 시도하세요.";
                 case "InvalidReport": return "신고 내용을 확인하세요.";
+                case "DrawingReplayExpired": return "그림 보관기간이 만료되었습니다.";
+                case "DrawingReplayUnavailable": return "보관된 그림이 없습니다.";
+                case "DrawingReplayForbidden": return "이 경기의 참가자만 그림을 볼 수 있습니다.";
                 case "PlayerUnavailable": return "플레이어를 찾지 못했습니다.";
                 case "AlreadyExists": return "이미 추가한 항목입니다.";
                 case "RoomUnavailable": return "방을 찾지 못했습니다. 방 코드를 확인하세요.";
@@ -808,6 +822,7 @@ namespace DrawLiar
 
         private void OnDestroy()
         {
+            ResetAdvertising();
             DisposeCommerce();
             _googleCancellation?.Cancel();
             _socialCancellation.Cancel();

@@ -7,6 +7,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\DrawLiar.Shared\DrawLiar.Shared.csproj" />
+    <ProjectReference Include="..\DrawLiar.GameServer\DrawLiar.GameServer.csproj" ReferenceOutputAssembly="false" />
     <Compile Include="..\..\DrawLiar\Assets\DrawLiar\Scripts\Game\GameModels.cs" Link="GameModels.cs" />
     <Compile Include="..\..\DrawLiar\Assets\DrawLiar\Scripts\Game\GameRules.cs" Link="GameRules.cs" />
     <Compile Include="..\..\DrawLiar\Assets\DrawLiar\Scripts\Game\GameSession.cs" Link="GameSession.cs" />

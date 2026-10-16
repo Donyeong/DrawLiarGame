@@ -185,6 +185,7 @@ namespace DrawLiar
             if (message == null || message.Id <= _latestMessageId || string.IsNullOrEmpty(message.AccountId)
                 || message.AccountId.Length > 128 || string.IsNullOrEmpty(message.DisplayName) || message.DisplayName.Length > 64
                 || string.IsNullOrWhiteSpace(message.Text) || message.Text.Length > MAXIMUM_TEXT_LENGTH) return;
+            message.Text = ChatProfanityFilter.Mask(message.Text);
             _latestMessageId = message.Id;
             _messages.Add(message);
             if (_messages.Count > MAXIMUM_HISTORY) _messages.RemoveAt(0);

@@ -34,7 +34,7 @@ namespace DrawLiar
             if (subscriber)
             {
                 var badge = new DrawSubscriberBadge { name = "subscriber-badge-" + locator, userData = accountId };
-                label.parent.Add(badge); SetTooltip(badge, "화가 세트 구독자");
+                label.parent.Add(badge); SetTooltip(badge, "화가패스 구독자");
             }
             return label;
         }

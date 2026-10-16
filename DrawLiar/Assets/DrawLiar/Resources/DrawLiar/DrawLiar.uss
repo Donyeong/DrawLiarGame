@@ -22,7 +22,7 @@
 .player .level-name-player-name .level-tier-5 .account-level-number { font-size: 6px; }
 .friend-profile-identity .level-name-row { flex-grow: 1; flex-basis: 0; }
 .level-name-public-profile-name { max-width: 100%; margin-bottom: 8px; }
-.level-name-round-result-player-name { flex-grow: 1; min-width: 0; }
+.level-name-round-result-player-name { flex-grow: 1; flex-shrink: 1; min-width: 0; }
 .level-name-guess-result-name { min-width: 0; }
 .level-name-room-moderation-name { flex-basis: 0; min-width: 0; margin-right: 8px; }
 .level-name-accused-name { max-width: 90%; margin-top: 8px; }
@@ -300,7 +300,7 @@
 .in-game .chatbar { display: none; height: 40px; min-height: 40px; flex-shrink: 0; flex-direction: row; align-items: center; }
 .in-game .chat-input { flex-grow: 1; min-width: 0; height: 40px; margin-right: 6px; }
 .in-game .chat-input .unity-base-text-field__input { min-width: 0; padding: 6px; font-size: 14px; }
-.in-game .chatbar .button { width: 56px; height: 40px; min-height: 40px; padding: 4px; font-size: 14px; }
+.in-game .chatbar .button { min-width: 56px; height: 40px; min-height: 40px; flex-shrink: 0; padding: 4px 2px; font-size: 14px; }
 .in-game .players-strip { height: 100px; flex-shrink: 0; flex-direction: row; }
 .in-game .player { flex-grow: 1; flex-shrink: 1; flex-basis: 0; min-width: 0; height: 100px; margin: 0 16px 0 0; padding: 16px; background-color: transparent; border-width: 1px; border-color: transparent; border-radius: 3px; transition-property: background-color, border-color; transition-duration: .12s; }
 .in-game .player > .row { flex-grow: 1; min-width: 0; }
@@ -666,7 +666,14 @@
 .app .modal.public-profile-popup { width: 760px; height: 720px; max-width: 94%; max-height: 90%; }
 .public-profile-footer { flex-shrink: 0; min-width: 0; margin-top: 16px; align-items: stretch; }
 .app .public-profile-footer .button { flex-basis: 0; flex-grow: 1; min-width: 0; height: auto; min-height: 48px; margin: 0; white-space: normal; }
-.app .public-profile-footer .public-profile-kick { margin-right: 8px; }
+.app .public-profile-footer .public-profile-kick, .app .public-profile-footer .public-profile-report { margin-right: 8px; }
+.public-profile-report-area { min-width: 0; flex-shrink: 0; margin-bottom: 20px; }
+.report-form { width: 100%; min-width: 0; flex-shrink: 0; }
+.app .report-form .field.report-detail { height: auto; min-height: 128px; }
+.app .report-form .report-detail .unity-base-text-field__input { min-height: 96px; white-space: normal; }
+.report-actions { min-width: 0; margin-top: 8px; }
+.app .report-actions .button { flex-basis: 0; min-width: 0; min-height: 48px; margin: 0 8px 0 0; white-space: normal; }
+.app .report-actions #report-submit { margin-right: 0; }
 .app .modal.profile-kick-popup { width: 480px; height: auto; min-height: 0; max-height: 90%; }
 .profile-kick-scroll { min-height: 0; max-height: 240px; flex-shrink: 1; }
 .profile-kick-question { min-width: 0; margin: 12px 0; font-size: 20px; white-space: normal; }
@@ -698,6 +705,21 @@
 .public-profile-stat { width: 31%; flex-shrink: 0; min-height: 76px; margin: 0 2% 10px 0; padding: 10px 12px; border-width: 1px; border-color: #E7DDC7; border-radius: 10px; background-color: #FFF9ED; }
 .public-profile-stat-value { margin: 0 0 4px; padding: 0; font-size: 22px; -unity-font-style: bold; color: #34304B; }
 .public-profile-match { flex-shrink: 0; margin-bottom: 10px; padding: 12px; border-width: 1px; border-color: #E7DDC7; border-radius: 10px; background-color: #FFF9ED; }
+.app .public-profile-match .match-drawing-open { margin-top: 10px; }
+.app .modal.match-drawing-popup { width: 1100px; max-width: 96%; height: 90%; max-height: 900px; min-height: 0; }
+.match-drawing-body { flex-basis: 0; min-width: 0; min-height: 0; }
+.match-drawing-details { min-width: 0; flex-shrink: 0; }
+.match-drawing-expiry { flex-shrink: 0; margin: 0 0 10px; padding: 0; font-size: 14px; color: #736957; white-space: normal; }
+.match-drawing-controls { min-width: 0; flex-shrink: 0; }
+.app .match-drawing-controls .field { flex-basis: 0; flex-grow: 1; min-width: 0; min-height: 72px; margin: 0 12px 8px 0; }
+.app .match-drawing-controls #match-drawing-author { margin-right: 0; }
+.match-drawing-caption { flex-shrink: 0; margin: 0 0 5px; padding: 0; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.match-drawing-frame { flex-basis: 0; min-width: 0; min-height: 120px; align-items: center; justify-content: center; overflow: hidden; background-color: #F7F3EA; }
+.match-drawing-image { flex-shrink: 0; background-color: white; border-width: 1px; border-color: #E3DDD4; }
+.match-drawing-status { min-height: 20px; max-height: 60px; flex-shrink: 0; margin: 8px 0; padding: 0; color: #736957; font-size: 14px; white-space: normal; overflow: hidden; }
+.match-drawing-actions { min-width: 0; flex-shrink: 0; }
+.app .match-drawing-actions .button { flex-basis: 0; flex-grow: 1; min-width: 0; min-height: 48px; height: auto; margin: 0 8px 0 0; padding: 8px; white-space: normal; }
+.app .match-drawing-actions #match-drawing-close { margin-right: 0; }
 .public-profile-match-summary { margin: 8px 0; }
 .public-profile-match-summary > Label { margin: 0; padding: 0; font-size: 17px; }
 .public-profile-match-score { -unity-font-style: bold; }
@@ -901,6 +923,16 @@
 .commerce-catalog { width: 100%; max-width: 1160px; min-height: 0; align-self: center; }
 .commerce-heading { flex-shrink: 0; align-items: center; margin-bottom: 12px; }
 .commerce-content { width: 100%; min-width: 0; }
+.daily-reward-entry { position: relative; }
+.draw-red-dot { position: absolute; top: 5px; right: 5px; width: 11px; min-width: 11px; max-width: 11px; height: 11px; min-height: 11px; max-height: 11px; flex-shrink: 0; border-radius: 8px; border-width: 2px; border-color: #FFF9ED; background-color: #E75B60; }
+.daily-reward-product { width: 100%; max-width: 560px; min-height: 0; align-self: center; }
+.daily-reward-heading { min-width: 0; align-items: center; }
+.daily-reward-heading .commerce-product-name { min-width: 0; padding-right: 20px; }
+.daily-reward-heading .draw-red-dot { top: 8px; }
+.daily-reward-amount { margin: 0 0 12px; color: #615383; font-size: 26px; -unity-font-style: bold; white-space: normal; }
+.daily-reward-status { margin: 8px 0 12px; color: #736957; font-size: 15px; white-space: normal; }
+.app .daily-reward-claim { height: auto; min-height: 48px; margin-top: 12px; padding: 10px 16px; white-space: normal; }
+.app .daily-reward-privacy { height: auto; min-height: 44px; margin-top: 8px; padding: 8px 12px; font-size: 14px; white-space: normal; }
 .commerce-grid { flex-wrap: wrap; min-width: 0; align-items: stretch; }
 .commerce-product { flex-grow: 0; flex-shrink: 0; min-height: 260px; margin-bottom: 16px; padding: 24px; border-width: 1px; border-color: #E7DDC7; border-radius: 14px; background-color: #FFF9ED; }
 .commerce-product .commerce-product-symbol { width: 56px; min-width: 56px; max-width: 56px; height: 56px; min-height: 56px; max-height: 56px; margin-bottom: 12px; flex-shrink: 0; }

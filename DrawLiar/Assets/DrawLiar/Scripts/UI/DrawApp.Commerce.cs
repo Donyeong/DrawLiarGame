@@ -9,7 +9,7 @@ namespace DrawLiar
 {
     public sealed partial class DrawApp
     {
-        private enum ShopSection { Cosmetics, PremiumCosmetics, Gems, Subscription }
+        private enum ShopSection { Cosmetics, PremiumCosmetics, Gems, Subscription, DailyReward }
         private ShopSection _shopSection;
         private VisualElement _commerceCatalogue;
         private bool _commerceEventsAttached;
@@ -45,11 +45,14 @@ namespace DrawLiar
 
         private void ShopCommerceNavigation(VisualElement page)
         {
+            if (_shopSection == ShopSection.DailyReward && !DrawAdvertisingProviders.IsSupportedPlatform)
+                _shopSection = ShopSection.Cosmetics;
             var wallet = Box(page, "row commerce-wallet");
             Text(wallet, "{0} 코인", "shop-coins", lobby.Profile?.Coins ?? 0);
             Text(wallet, "{0} 보석", "shop-gems", lobby.Profile?.PaidGems ?? 0);
             var restore = Button(wallet, "구매 복원", () => Run(() => lobby.RestoreCommerceAsync()), "secondary commerce-restore");
             restore.name = "commerce-restore";
+            restore.style.display = DrawPlatformPaymentProviders.IsPurchasePlatformSupported ? DisplayStyle.Flex : DisplayStyle.None;
             var tabs = Box(page, "row commerce-tabs");
             void Tab(ShopSection section, string title, string locator)
             {
@@ -61,11 +64,13 @@ namespace DrawLiar
                 }, "secondary commerce-tab");
                 button.name = "shop-section-" + locator;
                 button.EnableInClassList("commerce-selected", _shopSection == section);
+                if (section == ShopSection.DailyReward) AddDailyAdRewardDot(button);
             }
             Tab(ShopSection.Cosmetics, "코스튬", "cosmetics");
             Tab(ShopSection.PremiumCosmetics, "장식", "premium-cosmetics");
             Tab(ShopSection.Gems, "보석", "gems");
             Tab(ShopSection.Subscription, "구독", "subscription");
+            if (DrawAdvertisingProviders.IsSupportedPlatform) Tab(ShopSection.DailyReward, "무료 보석", "daily-reward");
             RefreshCommerceControls();
         }
 
@@ -75,13 +80,44 @@ namespace DrawLiar
             var panel = Box(page, "shop-panel commerce-catalog grow");
             panel.name = "commerce-catalog";
             var header = Box(panel, "row commerce-heading");
-            Text(header, _shopSection == ShopSection.Gems ? "보석 충전" : "화가 세트 구독", "section-title grow");
-            IconButton(header, "새로고침", DrawUIIcon.Kind.Refresh, () => Run(() => lobby.RefreshCommerceAsync()), "commerce-refresh");
+            Text(header, _shopSection == ShopSection.DailyReward ? "무료 보석" : _shopSection == ShopSection.Gems ? "보석 충전" : "화가패스 구독", "section-title grow");
+            var refresh = IconButton(header, "새로고침", DrawUIIcon.Kind.Refresh, () =>
+            {
+                if (_shopSection == ShopSection.DailyReward) Run(() => lobby.RefreshAdvertisingAsync());
+                else Run(() => lobby.RefreshCommerceAsync());
+            }, "commerce-refresh");
             var scroll = DrawSmoothScroll.Create();
             scroll.AddToClassList("shop-scroll"); panel.Add(scroll);
             _commerceCatalogue = Box(scroll, "commerce-content");
             _commerceCatalogue.name = "commerce-content";
             RefreshCommerceView();
+            if (_shopSection == ShopSection.DailyReward)
+            {
+                var wallet = page.Q<VisualElement>(className: "commerce-wallet");
+                bool arranging = false;
+                void ArrangeDailyRewardShop()
+                {
+                    if (arranging || wallet == null || page.panel == null) return;
+                    arranging = true;
+                    try
+                    {
+                        bool compact = IsMobile && root.ClassListContains("mobile-landscape");
+                        if (compact)
+                        {
+                            if (wallet.parent != scroll.contentContainer) scroll.contentContainer.Insert(0, wallet);
+                            if (refresh.parent != wallet) wallet.Add(refresh);
+                        }
+                        else
+                        {
+                            if (wallet.parent != page) page.Insert(1, wallet);
+                            if (refresh.parent != header) header.Add(refresh);
+                        }
+                    }
+                    finally { arranging = false; }
+                }
+                page.RegisterCallback<GeometryChangedEvent>(_ => ArrangeDailyRewardShop());
+                ArrangeDailyRewardShop();
+            }
         }
 
         private void RefreshCommerceView()
@@ -95,7 +131,16 @@ namespace DrawLiar
                 else
                 {
                     _commerceCatalogue.Clear();
+                    if (_shopSection == ShopSection.DailyReward)
+                    {
+                        DailyAdRewardCard(_commerceCatalogue);
+                        RefreshSubscriptionControls();
+                        RefreshCommerceControls();
+                        return;
+                    }
                     if (_shopSection == ShopSection.Subscription) SubscriberSettings(_commerceCatalogue, false);
+                    if (Application.platform == RuntimePlatform.WebGLPlayer)
+                        Text(_commerceCatalogue, "웹에서는 구매할 수 없습니다. PC(Steam) 또는 모바일(Play Store)에서 구매해 주세요.", "commerce-description");
                     var grid = Box(_commerceCatalogue, "row commerce-grid");
                     var products = lobby.Commerce?.Products ?? Array.Empty<CommerceProduct>();
                     foreach (var product in products.Where(product => product != null &&
@@ -125,15 +170,23 @@ namespace DrawLiar
                 Text(card, product.Name, "commerce-product-name");
                 Text(card, "구독 기간 {0}일", "commerce-description", product.SubscriptionDays);
                 Text(card, "프로필에 구독자 뱃지를 표시할 수 있어요.", "commerce-description");
+                Text(card, "구독 중에는 필압과 추가 팔레트를 사용할 수 있어요.", "commerce-description");
+                Text(card, "구독 중에는 광고가 표시되지 않아요.", "commerce-description");
+                if (DrawAdvertisingProviders.IsSupportedPlatform)
+                    Text(card, "매일 무료 보석을 광고 없이 받을 수 있어요.", "commerce-description");
                 Text(card, "구독 중 구매하면 남은 기간에 {0}일이 추가됩니다.", "commerce-description", product.SubscriptionDays);
             }
             var price = RawText(card, lobby.CommercePrice(product), "commerce-price");
             price.name = "commerce-price-" + product.Id;
+            if (!DrawPlatformPaymentProviders.IsPurchasePlatformSupported && product.Kind == CommerceRules.PAID_GEMS)
+                price.style.display = DisplayStyle.None;
             var buy = Button(card, product.Kind == CommerceRules.PAINTER_SUBSCRIPTION && lobby.IsPainterSubscriber ? "기간 연장" : "구매",
                 () => ConfirmCommercePurchase(product), "primary commerce-buy", DrawSound.UiConfirm);
             buy.name = "commerce-buy-" + product.Id; buy.userData = product;
             buy.SetEnabled(lobby.CanPurchaseCommerce(product));
-            if (product.Kind == CommerceRules.PAINTER_SUBSCRIPTION && (lobby.Profile?.PaidGems ?? 0) < product.PricePaidGems)
+            buy.style.display = DrawPlatformPaymentProviders.IsPurchasePlatformSupported ? DisplayStyle.Flex : DisplayStyle.None;
+            if (DrawPlatformPaymentProviders.IsPurchasePlatformSupported && product.Kind == CommerceRules.PAINTER_SUBSCRIPTION
+                && (lobby.Profile?.PaidGems ?? 0) < product.PricePaidGems)
                 Text(card, "보석이 부족합니다.", "commerce-description commerce-insufficient");
         }
 
@@ -156,7 +209,7 @@ namespace DrawLiar
             if (!lobby.CanPurchaseCommerce(product) || runningAction) return;
             if (product.Kind == CommerceRules.COSMETIC) { ConfirmCosmeticPurchase(product); return; }
             string account = lobby.Profile.AccountId;
-            var modal = Modal(product.Kind == CommerceRules.PAINTER_SUBSCRIPTION ? "화가 세트 구독" : "보석 충전");
+            var modal = Modal(product.Kind == CommerceRules.PAINTER_SUBSCRIPTION ? "화가패스 구독" : "보석 충전");
             modal.name = "commerce-confirm";
             if (product.Kind == CommerceRules.PAINTER_SUBSCRIPTION)
                 Text(modal, "{0} 보석으로 {1}일 구독을 구매할까요?", "commerce-confirm-description", product.PricePaidGems, product.SubscriptionDays);
@@ -183,7 +236,7 @@ namespace DrawLiar
             if (lobby.Profile == null) return;
             var card = Box(parent, "subscriber-settings"); card.name = "subscriber-settings"; card.userData = lobby.Profile.AccountId;
             var heading = Box(card, "row subscriber-heading");
-            Text(heading, "화가 세트", "grow subscriber-title");
+            Text(heading, "화가패스", "grow subscriber-title");
             Text(heading, "", "subscriber-status");
             Text(card, "", "subscriber-expiry");
             Text(card, "", "subscriber-remaining");
@@ -229,6 +282,7 @@ namespace DrawLiar
         private void RefreshSubscriptionControls()
         {
             if (root == null) return;
+            RefreshPainterDrawingControls();
             root.Query<VisualElement>(className: "subscriber-settings").ForEach(RefreshSubscriberSettings);
             string account = lobby.Profile?.AccountId;
             if (string.IsNullOrEmpty(account)) return;
@@ -237,7 +291,7 @@ namespace DrawLiar
                 {
                     if (level.userData as string != account || level.parent.Q<DrawSubscriberBadge>() != null) return;
                     var badge = new DrawSubscriberBadge { name = "subscriber-badge-" + level.name, userData = account };
-                    level.parent.Add(badge); SetTooltip(badge, "화가 세트 구독자");
+                    level.parent.Add(badge); SetTooltip(badge, "화가패스 구독자");
                 });
             root.Query<DrawSubscriberBadge>().ForEach(badge =>
             {
@@ -257,6 +311,71 @@ namespace DrawLiar
             root.Query<Button>(className: "commerce-restore").ForEach(button => button.SetEnabled(!runningAction && !lobby.IsBusy && lobby.IsPlatformPaymentAvailable));
             RefreshCosmeticControls();
             RefreshSubscriptionControls();
+            RefreshDailyAdRewardView();
+        }
+
+        private void AddDailyAdRewardDot(VisualElement target)
+        {
+            if (!DrawAdvertisingProviders.IsSupportedPlatform) return;
+            target.AddToClassList("daily-reward-entry");
+            target.Add(new DrawRedDot());
+            RefreshDailyAdRewardDot(target);
+        }
+
+        private void RefreshDailyAdRewardDot(VisualElement target)
+        {
+            target.Q<DrawRedDot>()?.SetVisible(DrawAdvertisingProviders.IsSupportedPlatform
+                && lobby.CanClaimDailyAdReward && !lobby.IsDailyAdRewardBusy);
+        }
+
+        private void DailyAdRewardCard(VisualElement parent)
+        {
+            if (!DrawAdvertisingProviders.IsSupportedPlatform) return;
+            var card = Box(parent, "commerce-product daily-reward-product");
+            card.name = "daily-ad-reward";
+            var gem = new DrawPremiumGem(); gem.AddToClassList("commerce-product-symbol"); card.Add(gem);
+            var heading = Box(card, "row daily-reward-heading");
+            Text(heading, "무료 보석", "commerce-product-name grow");
+            AddDailyAdRewardDot(heading);
+            Text(card, "", "daily-reward-amount");
+            Text(card, "", "commerce-description daily-reward-description");
+            Text(card, "매일 00:00 UTC에 초기화됩니다.", "commerce-description daily-reward-reset");
+            Text(card, "", "daily-reward-status");
+            var claim = Button(card, "광고 보고 받기", () => Run(() => lobby.ClaimDailyAdRewardAsync()), "primary daily-reward-claim", DrawSound.UiConfirm);
+            claim.name = "daily-ad-reward-claim";
+            Button(card, "광고 개인정보 설정", () => Run(() => lobby.ShowAdPrivacyOptionsAsync()), "secondary daily-reward-privacy").name = "daily-ad-reward-privacy";
+            RefreshDailyAdRewardView();
+        }
+
+        private void RefreshDailyAdRewardView()
+        {
+            if (root == null || lobby == null) return;
+            root.Query<VisualElement>(className: "daily-reward-entry").ForEach(RefreshDailyAdRewardDot);
+            var card = root.Q<VisualElement>("daily-ad-reward");
+            if (card == null) return;
+            card.style.display = DrawAdvertisingProviders.IsSupportedPlatform ? DisplayStyle.Flex : DisplayStyle.None;
+            var state = lobby.Advertisements;
+            bool ready = lobby.CanClaimDailyAdReward;
+            bool busy = lobby.IsDailyAdRewardBusy;
+            bool pending = lobby.IsDailyAdRewardPending;
+            bool claimed = state?.ClaimedToday == true;
+            bool adsRemoved = state?.AdsRemoved == true;
+            int gems = state?.RewardPaidGems ?? 0;
+            var amount = card.Q<Label>(className: "daily-reward-amount");
+            amount.style.display = gems > 0 ? DisplayStyle.Flex : DisplayStyle.None;
+            SetText(amount, "보석 {0}개", gems);
+            var description = card.Q<Label>(className: "daily-reward-description");
+            description.style.display = gems > 0 ? DisplayStyle.Flex : DisplayStyle.None;
+            SetText(description, adsRemoved ? "화가패스 구독 중에는 광고 없이 매일 보석 {0}개를 받을 수 있어요." : "하루 한 번 광고를 보고 보석 {0}개를 받으세요.", gems);
+            var status = card.Q<Label>(className: "daily-reward-status");
+            SetText(status, busy || pending ? "보상 확인 중…" : claimed ? "오늘 수령 완료" : ready ? "" : "광고 준비 중");
+            status.style.display = busy || pending || claimed || !ready ? DisplayStyle.Flex : DisplayStyle.None;
+            var claim = card.Q<Button>("daily-ad-reward-claim");
+            SetText(claim, busy ? "보상 확인 중…" : claimed ? "오늘 수령 완료" : pending ? "보상 확인" : adsRemoved ? "무료로 받기" : "광고 보고 받기");
+            claim.SetEnabled(ready && !busy && !runningAction && !lobby.IsBusy);
+            var privacy = card.Q<Button>("daily-ad-reward-privacy");
+            privacy.style.display = DrawAdvertisingProviders.IsSupportedPlatform && !adsRemoved && lobby.RequiresAdPrivacyOptions ? DisplayStyle.Flex : DisplayStyle.None;
+            privacy.SetEnabled(!busy && !runningAction && !lobby.IsBusy);
         }
     }
 }

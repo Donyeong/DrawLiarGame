@@ -78,7 +78,11 @@ public sealed partial class ServerDatabase
                     player.AccountId, player.Score, player.Rank, player.Won, player.RoundsPlayed, player.CitizenRounds,
                     player.LiarRounds, player.CorrectVotes, player.CorrectGuesses
                 }).ToArray()
-            } : normalized;
+            } : new
+            {
+                normalized.NodeId, normalized.RoomId, normalized.MatchId, normalized.PlayedAt, normalized.Mode, normalized.RoundCount,
+                normalized.Players
+            };
         return ServerRuntime.Hash(JsonSerializer.Serialize(payload, ServerRuntime.Json));
     }
 }

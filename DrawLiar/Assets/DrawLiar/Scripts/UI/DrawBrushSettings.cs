@@ -25,6 +25,14 @@ namespace DrawLiar
         public static IReadOnlyList<Color32> Palette => _palette;
         public static bool PressureEnabled => PlayerPrefs.GetInt(PRESSURE_KEY, 1) != 0;
 
+        public static Color32 ResolveColor(Color32 color, bool painterSubscriber)
+        {
+            if (painterSubscriber) return color;
+            for (int index = 0; index < BASE_COLOR_COUNT; index++)
+                if (_palette[index].Equals(color)) return color;
+            return _palette[0];
+        }
+
         public static void SetPressureEnabled(bool enabled)
         {
             PlayerPrefs.SetInt(PRESSURE_KEY, enabled ? 1 : 0);

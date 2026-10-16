@@ -127,9 +127,26 @@ internal static partial class Integration
         await second.WaitClosedAsync();
         await using var last = await LobbyPeer.OpenAsync(address, firstToken);
         Check((await last.WaitAsync(message => message.Type == "history")).MemberCount == 1, "인증 해제된 세션은 접속 인원에서 제거해야 합니다.");
+        await using (var audience = await LobbyPeer.OpenAsync(address, firstToken))
+        {
+            await audience.WaitAsync(message => message.Type == "history");
+            clock.Advance(TimeSpan.FromSeconds(11));
+            await last.SendAsync(new LobbyChatEnvelope { Type = "chat", Text = "그림 시발 fUcK", RequestId = "filtered" });
+            var filtered = await last.WaitAsync(message => message.Type == "chat" && message.RequestId == "filtered");
+            var delivered = await audience.WaitAsync(message => message.Type == "chat");
+            Check(filtered.Message.Text == "그림 ** ****" && delivered.Message.Text == filtered.Message.Text
+                && delivered.Message.Id == filtered.Message.Id && delivered.RequestId == "",
+                "로비 비속어는 서버에서 가린 뒤 발신 확인과 다른 연결에 같은 메시지로 전달해야 합니다.");
+        }
+        await using (var restored = await LobbyPeer.OpenAsync(address, firstToken))
+        {
+            var filteredHistory = await restored.WaitAsync(message => message.Type == "history");
+            Check(filteredHistory.Messages.Last().Text == "그림 ** ****" && filteredHistory.Messages.Length == LobbyChatHub.HISTORY_LIMIT,
+                "로비 재접속 기록에는 비속어 원문 대신 가린 메시지만 보관해야 합니다.");
+        }
         await last.SendBytesAsync(new byte[4096], WebSocketMessageType.Binary);
         Check((await last.WaitAsync(message => message.Type == "notice")).Code == "InvalidChat", "잘못된 프레임을 종료하고 다른 참가자의 연결은 보호해야 합니다.");
-        Report("로비 WebSocket 인증·만료·계정 위조 거부·분할 프레임·다중 접속 인원·서버 발언 확인·계정별 속도 제한·50개 순서 복원·프로필 갱신·로그아웃 연결 종료 검증");
+        Report("로비 WebSocket 인증·만료·계정 위조 거부·분할 프레임·다중 접속 인원·서버 발언 확인·계정별 속도 제한·50개 순서 복원·비속어 방송/기록 가림·프로필 갱신·로그아웃 연결 종료 검증");
         await app.StopAsync();
     }
 

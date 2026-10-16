@@ -13,6 +13,10 @@ internal sealed partial class DedicatedRoom
     private readonly Dictionary<string, GameConnection> _connections = new(StringComparer.Ordinal);
     private readonly List<DrawStroke> _canvas = new();
     private readonly List<DrawStroke> _drawingHistory = new();
+    private readonly List<RoundDrawingArchiveData> _roundDrawings = new();
+    private long _roundDrawingBytes;
+    private int _lastCapturedRound;
+    private bool _drawingsIncomplete;
     private int _drawingEpoch;
     private readonly HashSet<string> _admittedIds = new(StringComparer.Ordinal);
     private readonly Dictionary<string, double> _reconnectUntil = new(StringComparer.Ordinal);
@@ -60,6 +64,7 @@ internal sealed partial class DedicatedRoom
             {
                 NodeId = nodeId, RoomId = RoomId, MatchId = completed.MatchId, PlayedAt = DateTimeOffset.UtcNow.ToString("O"),
                 Mode = (int)completed.Mode, RoundCount = completed.RoundCount,
+                DrawingArchives = _roundDrawings.ToArray(), DrawingsIncomplete = _drawingsIncomplete,
                 Players = completed.Players.Select(player => new MatchPlayerResult
                 {
                     AccountId = accounts[player.PlayerId], Score = player.Score, Rank = player.Rank, Won = player.Won,
@@ -68,8 +73,9 @@ internal sealed partial class DedicatedRoom
                     WeightedRoundParticipants = player.WeightedRoundParticipants, WeightedRoundScore = player.WeightedRoundScore
                 }).ToArray()
             });
+            _roundDrawings.Clear();
         };
-        _session.Changed += () => _dirty = true;
+        _session.Changed += SessionChangedLocked;
         _session.CanvasCleared += ClearCanvasLocked;
     }
 
@@ -302,7 +308,7 @@ internal sealed partial class DedicatedRoom
     {
         text = GameRules.CleanText(text, 160);
         if (text.Length == 0 || !connection.AcceptChat(now)) return false;
-        var line = new ChatLine { PlayerId = connection.PlayerId, Name = _session.PlayerName(connection.PlayerId), Text = text,
+        var line = new ChatLine { PlayerId = connection.PlayerId, Name = _session.PlayerName(connection.PlayerId), Text = ChatProfanityFilter.Mask(text),
             Level = _session.PlayerLevel(connection.PlayerId), Cosmetics = _session.PlayerCosmetics(connection.PlayerId) };
         var envelope = new GameplayEnvelope { Type = "chat", Line = line, Sequence = ++_sequence };
         bool spectatorOnly = _session.Phase != GamePhase.Lobby && _session.Phase != GamePhase.MatchResults

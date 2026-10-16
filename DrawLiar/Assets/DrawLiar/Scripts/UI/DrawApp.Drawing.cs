@@ -44,7 +44,6 @@ namespace DrawLiar
             }
             _paletteButton=Button(IsMobile?toolRow:drawingTools,"팔레트",BrushPalette,IsMobile?"secondary mobile-last":"secondary");
             _paletteButton.name="brush-palette-open";SetTooltip(_paletteButton,"더 많은 색상");
-            _paletteButton.style.display=DisplayStyle.None;
             Text(drawingTools,"굵기","secret-label");var sizes=Box(drawingTools,"brush-sizes");
             foreach(var width in new[]{5,11,24})
             {
@@ -55,13 +54,41 @@ namespace DrawLiar
             surface.BrushSize=11/1200f;
             if(!IsMobile){_pressureButton=CreatePressureToggle(drawingTools);_pressureButton.style.minWidth=94;_pressureButton.style.marginLeft=10;}
             CreateClearOwnDrawingConfirmation();
+            RefreshPainterDrawingControls();
             RefreshBrushControls();
         }
 
         private void SelectBrushColor(Color32 color)
         {
             if(surface==null)return;
-            surface.BrushColor=color;surface.Eraser=false;RefreshBrushControls();
+            surface.BrushColor=DrawBrushSettings.ResolveColor(color,lobby?.IsPainterSubscriber==true);surface.Eraser=false;RefreshBrushControls();
+        }
+
+        private void RefreshPainterDrawingControls()
+        {
+            if(surface==null)return;
+            bool subscriber=lobby?.IsPainterSubscriber==true;
+            var color=DrawBrushSettings.ResolveColor(surface.BrushColor,subscriber);
+            if(!color.Equals(surface.BrushColor))
+            {
+                surface.CancelDrawing();surface.BrushColor=color;
+                RefreshBrushControls();
+            }
+            void ShowTool(VisualElement tool)
+            {
+                if(tool==null)return;
+                var display=new StyleEnum<DisplayStyle>(subscriber?DisplayStyle.Flex:DisplayStyle.None);
+                if(_clearOwnHiddenTools.ContainsKey(tool))_clearOwnHiddenTools[tool]=display;
+                else tool.style.display=display;
+            }
+            ShowTool(_paletteButton);
+            if(root!=null)root.Query<Button>("brush-pressure-toggle").ForEach(button=>
+            {
+                ShowTool(button);
+                SetText(button,surface.PressureEnabled?"필압 끄기":"필압 켜기");
+                button.EnableInClassList("tool-selected",surface.PressureEnabled);
+            });
+            if(!subscriber&&overlay?.Q<VisualElement>("brush-palette-popup")!=null)CloseModal();
         }
 
         private void RefreshBrushControls()
@@ -72,7 +99,11 @@ namespace DrawLiar
             _paletteButton?.EnableInClassList("tool-selected",!surface.Eraser&&!DrawBrushSettings.Palette.Take(DrawBrushSettings.BASE_COLOR_COUNT).Contains(surface.BrushColor));
             if(drawingTools!=null)foreach(var choice in drawingTools.Query<Button>(className:"brush-size-option").ToList())
                 choice.EnableInClassList("selected",choice.userData is float size&&Mathf.Approximately(size,surface.BrushSize));
-            if(_pressureButton!=null)SetText(_pressureButton,surface.PressureEnabled?"필압 끄기":"필압 켜기");
+            if(_pressureButton!=null)
+            {
+                SetText(_pressureButton,surface.PressureEnabled?"필압 끄기":"필압 켜기");
+                _pressureButton.EnableInClassList("tool-selected",surface.PressureEnabled);
+            }
         }
 
         private Button CreatePressureToggle(VisualElement parent)
@@ -80,18 +111,20 @@ namespace DrawLiar
             Button button=null;
             button=Button(parent,surface.PressureEnabled?"필압 끄기":"필압 켜기",()=>
             {
-                surface.CancelDrawing();surface.PressureEnabled=!surface.PressureEnabled;
-                DrawBrushSettings.SetPressureEnabled(surface.PressureEnabled);
+                if(lobby?.IsPainterSubscriber!=true)return;
+                surface.CancelDrawing();DrawBrushSettings.SetPressureEnabled(!surface.PressureEnabled);
                 SetText(button,surface.PressureEnabled?"필압 끄기":"필압 켜기");
                 button.EnableInClassList("tool-selected",surface.PressureEnabled);RefreshBrushControls();
             },"secondary");
             button.name="brush-pressure-toggle";button.EnableInClassList("tool-selected",surface.PressureEnabled);
+            button.style.display=lobby?.IsPainterSubscriber==true?DisplayStyle.Flex:DisplayStyle.None;
             SetTooltip(button,"필압을 지원하는 펜의 누르는 세기에 따라 선 굵기가 달라집니다.");
             return button;
         }
 
         private void BrushPalette()
         {
+            if(surface==null||lobby?.IsPainterSubscriber!=true)return;
             var modal=Modal("팔레트");modal.name="brush-palette-popup";
             var grid=Box(modal,"brush-expanded-palette");grid.name="brush-expanded-palette";
             grid.style.flexDirection=FlexDirection.Row;grid.style.flexWrap=Wrap.Wrap;grid.style.justifyContent=Justify.Center;

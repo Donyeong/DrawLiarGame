@@ -33,6 +33,20 @@ namespace DrawLiar
         public const string GOOGLE_PLAY = "GooglePlay";
         private static readonly Dictionary<string, IDrawPlatformPaymentProvider> PROVIDERS = new Dictionary<string, IDrawPlatformPaymentProvider>(StringComparer.Ordinal);
 
+        public static bool IsPurchasePlatformSupported
+        {
+            get
+            {
+#if UNITY_WEBGL && !UNITY_EDITOR
+                return false;
+#elif UNITY_STANDALONE || UNITY_ANDROID || UNITY_EDITOR
+                return true;
+#else
+                return false;
+#endif
+            }
+        }
+
         public static void Register(IDrawPlatformPaymentProvider provider)
         {
             if (provider == null || (provider.Id != STEAM && provider.Id != GOOGLE_PLAY))

@@ -82,6 +82,8 @@ namespace DrawLiar
         public int Mode;
         public bool Won;
         public int RoundCount;
+        public bool CanViewDrawings;
+        public string DrawingExpiresAt = "";
     }
     [Serializable] public sealed class MatchRewardPolicy
     {
@@ -105,6 +107,8 @@ namespace DrawLiar
         public int Mode;
         public int RoundCount;
         public MatchPlayerResult[] Players = Array.Empty<MatchPlayerResult>();
+        public RoundDrawingArchiveData[] DrawingArchives = Array.Empty<RoundDrawingArchiveData>();
+        public bool DrawingsIncomplete;
     }
     [Serializable] public sealed class MatchPlayerResult
     {

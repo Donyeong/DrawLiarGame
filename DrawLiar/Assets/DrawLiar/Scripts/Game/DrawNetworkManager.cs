@@ -434,7 +434,11 @@ namespace DrawLiar
                     case "stroke": if (CurrentDrawingFrame(message)) ReceiveStroke(message.Stroke); break;
                     case "clearOwn": ReceiveClearOwn(message); break;
                     case "authorDrawing": ReceiveAuthorDrawing(message); break;
-                    case "chat": ChatReceived?.Invoke(message.Line); break;
+                    case "chat":
+                        var chatLine = message.Line;
+                        chatLine.Text = ChatProfanityFilter.Mask(chatLine.Text);
+                        ChatReceived?.Invoke(chatLine);
+                        break;
                     case "notice": Notice?.Invoke(message.Text); break;
                     case "configured": RoomConfigurationReceived?.Invoke(message); break;
                     case "profile-refreshed": ProfileRefreshReceived?.Invoke(message); break;

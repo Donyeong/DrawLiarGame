@@ -1,0 +1,28 @@
+apply plugin: 'com.android.library'
+
+def advertisingEnabled = providers.gradleProperty('drawliarAdvertisingEnabled').getOrElse('false').toBoolean()
+
+dependencies {
+    if (advertisingEnabled) {
+        implementation 'com.google.android.gms:play-services-ads:25.5.0'
+        implementation 'com.google.android.ump:user-messaging-platform:4.0.0'
+    }
+}
+
+android {
+    namespace 'com.rascallab.drawliar.ads'
+    compileSdk getProperty('unity.compileSdkVersion') as int
+    buildToolsVersion getProperty('unity.buildToolsVersion')
+
+    defaultConfig {
+        minSdk getProperty('unity.minSdkVersion') as int
+        targetSdk getProperty('unity.targetSdkVersion') as int
+    }
+
+    sourceSets {
+        main {
+            manifest.srcFile 'AndroidManifest.xml'
+            java.srcDirs = advertisingEnabled ? ['src/main/java'] : []
+        }
+    }
+}

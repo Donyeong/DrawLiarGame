@@ -20,6 +20,7 @@ namespace DrawLiar
         private float _keyboardHeight, _keyboardTop;
         private VisualElement _focusedField;
         private Vector4 _padding = new Vector4(-1, -1, -1, -1);
+        private float _bottomReservedPixels;
 #if UNITY_WEBGL && !UNITY_EDITOR
         private readonly float[] _browserKeyboardMetrics = new float[3];
 #endif
@@ -39,6 +40,7 @@ namespace DrawLiar
         public bool IsMobile { get; private set; }
         public bool IsPortrait { get; private set; }
         public Vector2 AvailableSize { get; private set; }
+        public bool IsKeyboardOpen => _keyboardOpen;
         public event Action LayoutChanged;
 
         public MobileUILayout(VisualElement root, PanelSettings panelSettings, bool forceMobilePreview = false)
@@ -47,6 +49,7 @@ namespace DrawLiar
             _panelSettings = panelSettings ?? throw new ArgumentNullException(nameof(panelSettings));
             _pcReferenceResolution = panelSettings.referenceResolution;
             _pcMatch = panelSettings.match;
+            _pcPaddingBottom = root.style.paddingBottom;
             _editorMobilePreview = Application.isEditor && forceMobilePreview;
 #if UNITY_EDITOR
             _editorTestMode = (EditorTestMode)Mathf.Clamp(UnityEditor.SessionState.GetInt(EDITOR_TEST_MODE_KEY, 0), 0, 2);
@@ -67,6 +70,15 @@ namespace DrawLiar
             _refreshing = true;
             try { RefreshLayout(); }
             finally { _refreshing = false; }
+        }
+
+        public void SetBottomReservedPixels(float pixels)
+        {
+            pixels = Mathf.Max(0, pixels);
+            if (Mathf.Abs(_bottomReservedPixels - pixels) < .5f) return;
+            _bottomReservedPixels = pixels;
+            _geometryDirty = true;
+            Refresh();
         }
 
         private void RefreshLayout()
@@ -142,7 +154,8 @@ namespace DrawLiar
                 _pcReferenceResolution = _panelSettings.referenceResolution;
                 _pcMatch = _panelSettings.match;
                 _pcPaddingLeft = _root.style.paddingLeft; _pcPaddingTop = _root.style.paddingTop;
-                _pcPaddingRight = _root.style.paddingRight; _pcPaddingBottom = _root.style.paddingBottom;
+                _pcPaddingRight = _root.style.paddingRight;
+                if (_bottomReservedPixels <= 0) _pcPaddingBottom = _root.style.paddingBottom;
             }
             else if (!mobile && IsMobile)
             {
@@ -193,6 +206,12 @@ namespace DrawLiar
                 padding = new Vector4(Mathf.Max(0, topLeft.x - screenStart.x), Mathf.Max(0, topLeft.y - screenStart.y, keyboardTop),
                     Mathf.Max(0, screenEnd.x - bottomRight.x), Mathf.Max(0, screenEnd.y - bottomRight.y, keyboardBottom));
             }
+            if (_bottomReservedPixels > 0)
+            {
+                float reserved = screenEnd.y - RuntimePanelUtils.ScreenToPanel(_root.panel,
+                    new Vector2(0, Mathf.Max(0, _screenHeight - _bottomReservedPixels))).y;
+                padding.w = Mathf.Max(padding.w, reserved);
+            }
             Vector2 available = new Vector2(Mathf.Max(0, screenEnd.x - screenStart.x - padding.x - padding.z), Mathf.Max(0, screenEnd.y - screenStart.y - padding.y - padding.w));
             bool changed = (padding - _padding).sqrMagnitude > .01f || (available - AvailableSize).sqrMagnitude > .01f;
             if (!changed) return false;
@@ -202,6 +221,7 @@ namespace DrawLiar
                 _root.style.paddingLeft = padding.x; _root.style.paddingTop = padding.y;
                 _root.style.paddingRight = padding.z; _root.style.paddingBottom = padding.w;
             }
+            else _root.style.paddingBottom = _bottomReservedPixels > 0 ? new StyleLength(padding.w) : _pcPaddingBottom;
             return true;
         }
 

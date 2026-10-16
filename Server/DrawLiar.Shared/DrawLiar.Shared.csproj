@@ -2,12 +2,15 @@
   <PropertyGroup><TargetFramework>net10.0</TargetFramework><ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable></PropertyGroup>
   <ItemGroup><FrameworkReference Include="Microsoft.AspNetCore.App" /><PackageReference Include="Npgsql" Version="10.0.3" /><PackageReference Include="Google.Apis.Auth" Version="1.74.0" /></ItemGroup>
   <ItemGroup><Compile Include="../../DrawLiar/Assets/DrawLiar/Scripts/Services/ServerContracts.cs" Link="ServerContracts.cs" /></ItemGroup>
+  <ItemGroup><Compile Include="../../DrawLiar/Assets/DrawLiar/Scripts/Services/DrawingReplayContracts.cs" Link="DrawingReplayContracts.cs" /><Compile Include="../../DrawLiar/Assets/DrawLiar/Scripts/Game/DrawingReplayRules.cs" Link="DrawingReplayRules.cs" /></ItemGroup>
   <ItemGroup><Compile Include="../../DrawLiar/Assets/DrawLiar/Scripts/Services/CommerceContracts.cs" Link="CommerceContracts.cs" /><Compile Include="../../DrawLiar/Assets/DrawLiar/Scripts/Game/CommerceRules.cs" Link="CommerceRules.cs" /></ItemGroup>
+  <ItemGroup><Compile Include="../../DrawLiar/Assets/DrawLiar/Scripts/Services/AdsContracts.cs" Link="AdsContracts.cs" /><Compile Include="../../DrawLiar/Assets/DrawLiar/Scripts/Game/AdsRules.cs" Link="AdsRules.cs" /></ItemGroup>
   <ItemGroup><Compile Include="../../DrawLiar/Assets/DrawLiar/Scripts/Game/AvatarParts.cs" Link="AvatarParts.cs" /></ItemGroup>
   <ItemGroup><Compile Include="../../DrawLiar/Assets/DrawLiar/Scripts/Game/CosmeticRules.cs" Link="CosmeticRules.cs" /></ItemGroup>
   <ItemGroup><Compile Include="../../DrawLiar/Assets/DrawLiar/Scripts/Game/TopicWorkshopRules.cs" Link="TopicWorkshopRules.cs" /></ItemGroup>
   <ItemGroup><Compile Include="../../DrawLiar/Assets/DrawLiar/Scripts/Game/MatchRewardRules.cs" Link="MatchRewardRules.cs" /></ItemGroup>
   <ItemGroup><Compile Include="../../DrawLiar/Assets/DrawLiar/Scripts/Game/AccountLevelRules.cs" Link="AccountLevelRules.cs" /></ItemGroup>
+  <ItemGroup><Compile Include="../../DrawLiar/Assets/DrawLiar/Scripts/Game/ChatProfanityFilter.cs" Link="ChatProfanityFilter.cs" /></ItemGroup>
   <ItemGroup><EmbeddedResource Include="Database/*.sql" /><EmbeddedResource Include="../../DrawLiar/Assets/DrawLiar/Resources/DrawLiar/GameData.json" LogicalName="DrawLiar.BuiltInGameData.json" /></ItemGroup>
   <ItemGroup><EmbeddedResource Include="../../DrawLiar/Assets/DrawLiar/Resources/DrawLiar/TopicWorkshopPolicy.json" LogicalName="DrawLiar.TopicWorkshopPolicy.json" /></ItemGroup>
   <ItemGroup><EmbeddedResource Include="../../DrawLiar/Assets/DrawLiar/Resources/DrawLiar/MatchRewardPolicy.json" LogicalName="DrawLiar.MatchRewardPolicy.json" /></ItemGroup>

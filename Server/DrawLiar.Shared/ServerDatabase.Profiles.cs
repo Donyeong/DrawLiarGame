@@ -53,17 +53,22 @@ public sealed partial class ServerDatabase
         }
         var recent = new List<ProfileMatchData>();
         await using (var command = Command(connection, transaction, """
-            SELECT m."MatchId",m."PlayedAt",a."Score",a."Rank",m."PlayerCount",m."Mode",a."Won",m."RoundCount"
+            SELECT m."MatchId",m."PlayedAt",a."Score",a."Rank",m."PlayerCount",m."Mode",a."Won",m."RoundCount",
+                m."DrawingExpiresAt", COALESCE(m."DrawingExpiresAt">now(),false)
+                    AND EXISTS (SELECT 1 FROM "AccountMatch" own WHERE own."MatchId"=m."MatchId" AND own."AccountId"=$2)
+                    AND EXISTS (SELECT 1 FROM "MatchRoundDrawing" d WHERE d."MatchId"=m."MatchId" AND d."ExpiresAt">now())
             FROM "AccountMatch" a JOIN "MatchRecord" m ON m."MatchId"=a."MatchId"
             WHERE a."AccountId"=$1 ORDER BY m."PlayedAt" DESC,m."MatchId" DESC LIMIT 10
-            """, target))
+            """, target, requester))
         await using (var reader = await command.ExecuteReaderAsync(cancellationToken))
             while (await reader.ReadAsync(cancellationToken))
                 recent.Add(new ProfileMatchData
                 {
                     MatchId = reader.GetGuid(0).ToString(), PlayedAt = ServerRuntime.Timestamp(reader.GetFieldValue<DateTimeOffset>(1)),
                     Score = reader.GetInt32(2), Rank = reader.GetInt32(3), PlayerCount = reader.GetInt32(4),
-                    Mode = reader.GetInt32(5), Won = reader.GetBoolean(6), RoundCount = reader.GetInt32(7)
+                    Mode = reader.GetInt32(5), Won = reader.GetBoolean(6), RoundCount = reader.GetInt32(7),
+                    DrawingExpiresAt = reader.IsDBNull(8) ? "" : ServerRuntime.Timestamp(reader.GetFieldValue<DateTimeOffset>(8)),
+                    CanViewDrawings = reader.GetBoolean(9)
                 });
         profile.RecentMatches = recent.ToArray();
         await transaction.CommitAsync(cancellationToken);
@@ -78,17 +83,24 @@ public sealed partial class ServerDatabase
         Guid matchId = Guid.Parse(normalized.MatchId), roomId = Guid.Parse(normalized.RoomId);
         DateTimeOffset playedAt = DateTimeOffset.Parse(normalized.PlayedAt);
         string payloadHash = MatchPayloadHash(normalized);
+        PreparedDrawing[] drawings = PrepareDrawings(normalized);
+        string? drawingHash = DrawingPayloadHash(drawings, normalized.DrawingsIncomplete);
+        DateTimeOffset? drawingExpiresAt = drawingHash == null ? null : playedAt.AddDays(_drawingReplayRetentionDays);
         await using var connection = await _source.OpenConnectionAsync(cancellationToken);
         await using var transaction = await connection.BeginTransactionAsync(cancellationToken);
         await using (var command = Command(connection, transaction,
             "SELECT pg_advisory_xact_lock(hashtextextended($1,0))", "match:" + normalized.MatchId))
             await command.ExecuteNonQueryAsync(cancellationToken);
         await using (var command = Command(connection, transaction,
-            "SELECT \"PayloadHash\" FROM \"MatchRecord\" WHERE \"MatchId\"=$1", matchId))
+            "SELECT \"PayloadHash\",\"DrawingPayloadHash\" FROM \"MatchRecord\" WHERE \"MatchId\"=$1", matchId))
+        await using (var reader = await command.ExecuteReaderAsync(cancellationToken))
         {
-            if (await command.ExecuteScalarAsync(cancellationToken) is string existing)
+            if (await reader.ReadAsync(cancellationToken))
             {
-                if (!ServerRuntime.FixedEquals(existing, payloadHash)) throw new ApiException("MatchResultConflict", 409);
+                string? existingDrawingHash = reader.IsDBNull(1) ? null : reader.GetString(1);
+                if (!ServerRuntime.FixedEquals(reader.GetString(0), payloadHash) || existingDrawingHash != drawingHash)
+                    throw new ApiException("MatchResultConflict", 409);
+                await reader.DisposeAsync();
                 await transaction.CommitAsync(cancellationToken);
                 return;
             }
@@ -104,9 +116,10 @@ public sealed partial class ServerDatabase
             if (Convert.ToInt64(await command.ExecuteScalarAsync(cancellationToken)) != accounts.Length)
                 throw new ApiException("InvalidMatchParticipant", 403);
         await using (var command = Command(connection, transaction, """
-            INSERT INTO "MatchRecord" ("MatchId","RoomId","PlayedAt","PlayerCount","Mode","RoundCount","PayloadHash")
-            VALUES ($1,$2,$3,$4,$5,$6,$7)
-            """, matchId, roomId, playedAt, accounts.Length, normalized.Mode, normalized.RoundCount, payloadHash))
+            INSERT INTO "MatchRecord" ("MatchId","RoomId","PlayedAt","PlayerCount","Mode","RoundCount","PayloadHash","DrawingPayloadHash","DrawingExpiresAt","DrawingRetentionDays","DrawingsIncomplete")
+            VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
+            """, matchId, roomId, playedAt, accounts.Length, normalized.Mode, normalized.RoundCount, payloadHash,
+                drawingHash, drawingExpiresAt, drawingHash == null ? null : _drawingReplayRetentionDays, normalized.DrawingsIncomplete))
             await command.ExecuteNonQueryAsync(cancellationToken);
         foreach (var player in normalized.Players)
         {
@@ -119,6 +132,7 @@ public sealed partial class ServerDatabase
                 player.RoundsPlayed, player.CitizenRounds, player.LiarRounds, player.CorrectVotes, player.CorrectGuesses, reward.Coins, reward.Experience);
             await command.ExecuteNonQueryAsync(cancellationToken);
         }
+        await StoreDrawingsAsync(connection, transaction, matchId, drawings, drawingExpiresAt, cancellationToken);
         await transaction.CommitAsync(cancellationToken);
     }
 
@@ -161,7 +175,8 @@ public sealed partial class ServerDatabase
         {
             NodeId = request.NodeId, RoomId = roomId.ToString(), MatchId = matchId.ToString(),
             PlayedAt = ServerRuntime.Timestamp(playedAt.ToUniversalTime()), Mode = request.Mode, RoundCount = request.RoundCount,
-            Players = players.OrderBy(player => player.AccountId, StringComparer.Ordinal).ToArray()
+            Players = players.OrderBy(player => player.AccountId, StringComparer.Ordinal).ToArray(),
+            DrawingArchives = request.DrawingArchives, DrawingsIncomplete = request.DrawingsIncomplete
         };
     }
 }

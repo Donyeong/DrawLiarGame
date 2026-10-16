@@ -16,6 +16,8 @@ namespace DrawLiar
         private int _profileVersion;
         private bool _profileActionBusy;
         private PublicProfileData _loadedPublicProfile;
+        private VisualElement _profileReportArea;
+        private Button _profileReportButton;
         private VisualElement _profileKickOverlay;
         private Button _profileKickButton, _profileKickConfirm;
         private bool _profileKickBusy;
@@ -91,6 +93,8 @@ namespace DrawLiar
             var footer = Box(modal, "row public-profile-footer");
             _profileKickButton = Button(footer, "강퇴", OpenPublicProfileKick, "danger grow public-profile-kick");
             _profileKickButton.name = "public-profile-kick";
+            _profileReportButton = Button(footer, "신고", OpenPublicProfileReport, "secondary grow public-profile-report");
+            _profileReportButton.name = "public-profile-report";
             Button(footer, _utilityPopupScreen == LobbyScreen.Friends ? "친구 목록으로" : "닫기",
                 () => ClosePublicProfile(), "secondary grow utility-popup-close", DrawSound.UiCancel).name = "public-profile-close";
             popup.focusable = true;
@@ -139,12 +143,14 @@ namespace DrawLiar
             CancelPublicProfileRequest();
             _profileActionBusy = false;
             _loadedPublicProfile = null;
+            _profileReportArea = null;
             _profileCancellation = CancellationTokenSource.CreateLinkedTokenSource(destroyCancellationToken);
             int version = ++_profileVersion;
             var popup = _profileOverlay;
             var token = _profileCancellation.Token;
             _profileBody.Clear();
             Text(_profileBody, "프로필을 불러오는 중…", "public-profile-message");
+            RefreshPublicProfileActions();
             _ = LoadPublicProfileAsync(popup, version, token);
         }
 
@@ -188,6 +194,9 @@ namespace DrawLiar
             if (profile.AccountId == lobby.Profile?.AccountId) AccountExperience(_profileBody);
             var actions = Box(_profileBody, "row public-profile-friend-actions");
             RenderPublicProfileFriendship(actions, profile);
+            _profileReportArea = Box(_profileBody, "public-profile-report-area");
+            _profileReportArea.name = "public-profile-report-area";
+            _profileReportArea.style.display = DisplayStyle.None;
             Text(_profileBody, "통산 전적", "section-title");
             var stats = profile.Stats ?? new ProfileStatsData();
             var grid = Box(_profileBody, "row public-profile-stat-grid");
@@ -217,6 +226,7 @@ namespace DrawLiar
                 var detail = Box(card, "row public-profile-match-detail");
                 Text(detail, match.Mode == (int)DrawingMode.Individual ? "한 명씩 그리기" : "릴레이 그리기", "grow public-profile-label");
                 Text(detail, "{0}라운드", "public-profile-label", match.RoundCount);
+                MatchDrawingHistoryAction(card, match);
             }
         }
 
@@ -275,11 +285,73 @@ namespace DrawLiar
             else if (_profileBlockConfirmAccount == id)
                 Button(actions, "차단 확인", () => { _profileBlockConfirmAccount = null; StartPublicProfileFriendAction(() => lobby.SetBlockedAsync(id, true)); }, "danger").name = "public-profile-block-confirm";
             else Button(actions, "차단", () => { _profileBlockConfirmAccount = id; Rerender(); Toast("차단하면 친구 관계가 끊기고 채팅이 보이지 않습니다. 한 번 더 누르면 차단합니다."); }, "secondary").name = "public-profile-block";
-            Button(actions, "신고", () =>
+        }
+
+        private bool CanReportPublicProfile => _profileOverlay != null && lobby.IsAuthenticated
+            && lobby.Profile?.AccountId == _profileViewerAccountId && _loadedPublicProfile?.AccountId == _profileAccountId
+            && _profileAccountId != _profileViewerAccountId;
+
+        private void OpenPublicProfileReport()
+        {
+            if (!CanReportPublicProfile || _profileActionBusy || _profileKickBusy || lobby.IsBusy
+                || _profileReportArea == null || _profileReportArea.childCount > 0) return;
+            var area = _profileReportArea;
+            area.style.display = DisplayStyle.Flex;
+            Text(area, "신고", "section-title");
+            RenderReportForm(area, _profileAccountId, PlayerReportRequest.REASON_ABUSE, "", ClosePublicProfileReport,
+                request => SubmitPublicProfileReport(request, area));
+            RefreshPublicProfileActions();
+            area.schedule.Execute(() =>
             {
-                actions.Clear();
-                RenderReportForm(actions, id, PlayerReportRequest.REASON_ABUSE, "", Rerender, request => StartPublicProfileFriendAction(() => lobby.ReportAsync(request)));
-            }, "secondary").name = "public-profile-report";
+                if (area != _profileReportArea || area.panel == null) return;
+                area.GetFirstAncestorOfType<ScrollView>()?.ScrollTo(area);
+                area.Q<DropdownField>("report-reason")?.Focus();
+            });
+        }
+
+        private void ClosePublicProfileReport()
+        {
+            if (_profileReportArea == null) return;
+            _profileReportArea.Clear();
+            _profileReportArea.style.display = DisplayStyle.None;
+            RefreshPublicProfileActions();
+            _profileReportButton?.Focus();
+        }
+
+        private void SubmitPublicProfileReport(PlayerReportRequest request, VisualElement area)
+        {
+            if (!CanReportPublicProfile || request.TargetAccountId != _profileAccountId || area != _profileReportArea
+                || area.panel == null || _profileActionBusy || _profileKickBusy || lobby.IsBusy) return;
+            _profileActionBusy = true;
+            RefreshPublicProfileActions();
+            _ = PublicProfileReportAsync(request, area, _profileOverlay, _profileVersion, _profileCancellation.Token);
+        }
+
+        private async Task PublicProfileReportAsync(PlayerReportRequest request, VisualElement area, VisualElement popup, int version, CancellationToken token)
+        {
+            try
+            {
+                await lobby.ReportAsync(request);
+                if (!IsCurrentPublicProfile(popup, version, token) || area != _profileReportArea) return;
+                _profileActionBusy = false;
+                ClosePublicProfileReport();
+                Toast(DrawLocalization.Text("신고를 접수했습니다. 검토 후 조치합니다."));
+            }
+            catch (Exception exception)
+            {
+                if (!IsCurrentPublicProfile(popup, version, token) || area != _profileReportArea) return;
+                DrawAudio.Instance?.Play(DrawSound.UiError);
+                Toast(LobbyServiceBridge.UserFacingMessage(exception));
+            }
+            finally
+            {
+                if (IsCurrentPublicProfile(popup, version, token))
+                {
+                    _profileActionBusy = false;
+                    RefreshPublicProfileFriendship();
+                    RefreshPublicProfileActions();
+                }
+            }
         }
 
         private static readonly string[] REPORT_REASON_LABELS = { "욕설·비하", "부적절한 그림", "부적절한 닉네임", "도배·광고", "부적절한 주제", "기타" };
@@ -294,8 +366,9 @@ namespace DrawLiar
             Choice(form, "신고 사유", REPORT_REASON_LABELS, Math.Max(0, Array.IndexOf(PlayerReportRequest.REASONS, defaultReason)),
                 index => request.Reason = PlayerReportRequest.REASONS[index]).name = "report-reason";
             var detail = Field(form, "자세한 내용 (선택)", ""); detail.name = "report-detail"; detail.multiline = true; detail.maxLength = PlayerReportRequest.MAX_CONTEXT_LENGTH;
+            detail.AddToClassList("report-detail");
             detail.RegisterValueChangedCallback(evt => { if (ReferenceEquals(evt.target, detail)) request.Context = evt.newValue; });
-            var buttons = Box(form, "row");
+            var buttons = Box(form, "row report-actions");
             Button(buttons, "취소", cancel, "secondary grow", DrawSound.UiCancel).name = "report-cancel";
             Button(buttons, "신고하기", () => submit(request), "danger grow").name = "report-submit";
         }
@@ -304,6 +377,13 @@ namespace DrawLiar
         {
             _profileBody?.Q<VisualElement>(className: "public-profile-friend-actions")?.Query<Button>()
                 .ForEach(button => button.SetEnabled(!_profileActionBusy && !_profileKickBusy && !lobby.IsBusy));
+            _profileReportArea?.SetEnabled(!_profileActionBusy && !_profileKickBusy && !lobby.IsBusy);
+            if (_profileReportButton != null)
+            {
+                _profileReportButton.style.display = _profileAccountId != lobby.Profile?.AccountId ? DisplayStyle.Flex : DisplayStyle.None;
+                _profileReportButton.SetEnabled(CanReportPublicProfile && !_profileActionBusy && !_profileKickBusy && !lobby.IsBusy
+                    && (_profileReportArea == null || _profileReportArea.childCount == 0));
+            }
             RefreshPublicProfileKick();
         }
 
@@ -649,6 +729,7 @@ namespace DrawLiar
 
         private void ClosePublicProfile(bool restoreFocus = true)
         {
+            CloseMatchDrawings(false);
             ClosePublicProfileKick(false, true);
             CancelPublicProfileRequest();
             ++_profileVersion;
@@ -660,6 +741,7 @@ namespace DrawLiar
             _profileAccountId = _profileViewerAccountId = null;
             _profileActionBusy = false;
             _profileKickButton = null;
+            _profileReportButton = null; _profileReportArea = null;
             _loadedPublicProfile = null;
             if (popup == null) return;
             DrawUIMotion.HideModal(popup, modal);

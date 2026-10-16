@@ -165,7 +165,7 @@ public sealed class LobbyChatHub
             var message = new LobbyChatMessage
             {
                 Id = ++_sequence, AccountId = connection.AccountId.ToString(), DisplayName = displayName,
-                Text = text, SentAt = ServerRuntime.Timestamp(now), Level = Math.Clamp(level, 1, AccountLevelRules.MAX_LEVEL),
+                Text = ChatProfanityFilter.Mask(text), SentAt = ServerRuntime.Timestamp(now), Level = Math.Clamp(level, 1, AccountLevelRules.MAX_LEVEL),
                 Cosmetics = CosmeticRules.Sanitize(cosmetics!)
             };
             _history.Enqueue(message);

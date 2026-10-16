@@ -17,7 +17,7 @@ namespace DrawLiar
             GemProduct("gems-100", "보석 100개", 100),
             GemProduct("gems-550", "보석 550개", 550),
             GemProduct("gems-1200", "보석 1,200개", 1200),
-            new CommerceProduct { Id = PAINTER_PRODUCT_ID, Name = "화가 세트", Kind = PAINTER_SUBSCRIPTION,
+            new CommerceProduct { Id = PAINTER_PRODUCT_ID, Name = "화가패스", Kind = PAINTER_SUBSCRIPTION,
                 PricePaidGems = 300, SubscriptionDays = SUBSCRIPTION_DAYS }
         }.Concat(CosmeticRules.CreateProducts()).ToArray();
 

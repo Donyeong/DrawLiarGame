@@ -10133,20 +10133,37 @@
       ]
     },
     {
-      "Key": "화가 세트 구독",
+      "Key": "화가패스 구독",
       "Values": [
-        "화가 세트 구독",
-        "Painter set subscription",
-        "画家套装订阅",
-        "畫家套裝訂閱",
-        "画家セットのサブスクリプション",
-        "Suscripción al conjunto de pintor",
-        "Assinatura do kit de pintor",
-        "Abonnement au kit de peintre",
-        "Malerset-Abonnement",
-        "Langganan set pelukis",
-        "चित्रकार सेट सदस्यता",
-        "اشتراك طقم الرسام"
+        "화가패스 구독",
+        "Painter Pass subscription",
+        "画家通行证订阅",
+        "畫家通行證訂閱",
+        "画家パスのサブスクリプション",
+        "Suscripción al Pase de pintor",
+        "Assinatura do Passe de Pintor",
+        "Abonnement au Pass peintre",
+        "Malerpass-Abonnement",
+        "Langganan Pass Pelukis",
+        "चित्रकार पास सदस्यता",
+        "اشتراك بطاقة الرسام"
+      ]
+    },
+    {
+      "Key": "화가패스",
+      "Values": [
+        "화가패스",
+        "Painter Pass",
+        "画家通行证",
+        "畫家通行證",
+        "画家パス",
+        "Pase de pintor",
+        "Passe de Pintor",
+        "Pass peintre",
+        "Malerpass",
+        "Pass Pelukis",
+        "चित्रकार पास",
+        "بطاقة الرسام"
       ]
     },
     {
@@ -10215,6 +10232,40 @@
         "Kamu bisa menampilkan lencana pelanggan di profil.",
         "आप अपनी प्रोफ़ाइल पर सदस्यता बैज दिखा सकते हैं।",
         "يمكنك عرض شارة المشترك في ملفك الشخصي."
+      ]
+    },
+    {
+      "Key": "구독 중에는 필압과 추가 팔레트를 사용할 수 있어요.",
+      "Values": [
+        "구독 중에는 필압과 추가 팔레트를 사용할 수 있어요.",
+        "Use pen pressure and extra palettes while your subscription is active.",
+        "订阅有效期间可使用压感和额外调色板。",
+        "訂閱有效期間可使用壓感和額外調色盤。",
+        "サブスクリプション中は筆圧と追加パレットを使用できます。",
+        "Usa la presión del lápiz y paletas adicionales con tu suscripción activa.",
+        "Use pressão da caneta e paletas extras enquanto sua assinatura estiver ativa.",
+        "Profitez de la pression du stylet et de palettes supplémentaires pendant votre abonnement.",
+        "Nutze Stiftdruck und zusätzliche Paletten während deines aktiven Abonnements.",
+        "Gunakan tekanan pena dan palet tambahan selama langganan aktif.",
+        "सदस्यता सक्रिय रहने पर पेन दबाव और अतिरिक्त रंग पैलेट का उपयोग करें।",
+        "استخدم ضغط القلم ولوحات ألوان إضافية أثناء سريان اشتراكك."
+      ]
+    },
+    {
+      "Key": "웹에서는 구매할 수 없습니다. PC(Steam) 또는 모바일(Play Store)에서 구매해 주세요.",
+      "Values": [
+        "웹에서는 구매할 수 없습니다. PC(Steam) 또는 모바일(Play Store)에서 구매해 주세요.",
+        "Purchases are unavailable on the web. Please purchase on PC (Steam) or mobile (Play Store).",
+        "网页版无法购买。请在 PC（Steam）或移动端（Play Store）购买。",
+        "網頁版無法購買。請在 PC（Steam）或行動版（Play Store）購買。",
+        "ウェブでは購入できません。PC（Steam）またはモバイル（Play Store）で購入してください。",
+        "No se puede comprar en la web. Compra en PC (Steam) o móvil (Play Store).",
+        "As compras não estão disponíveis na web. Compre no PC (Steam) ou celular (Play Store).",
+        "Les achats sont indisponibles sur le web. Achetez sur PC (Steam) ou mobile (Play Store).",
+        "Im Web sind keine Käufe möglich. Bitte kaufe auf PC (Steam) oder Mobilgerät (Play Store).",
+        "Pembelian tidak tersedia di web. Silakan beli di PC (Steam) atau ponsel (Play Store).",
+        "वेब पर खरीदारी उपलब्ध नहीं है। कृपया PC (Steam) या मोबाइल (Play Store) पर खरीदें।",
+        "الشراء غير متاح على الويب. يرجى الشراء على الكمبيوتر (Steam) أو الجوال (Play Store)."
       ]
     },
     {
@@ -10405,20 +10456,20 @@
       ]
     },
     {
-      "Key": "화가 세트 구독자",
+      "Key": "화가패스 구독자",
       "Values": [
-        "화가 세트 구독자",
-        "Painter set subscriber",
-        "画家套装订阅者",
-        "畫家套裝訂閱者",
-        "画家セットのサブスク会員",
-        "Suscriptor del conjunto de pintor",
-        "Assinante do kit de pintor",
-        "Abonné au kit de peintre",
-        "Malerset-Abonnent",
-        "Pelanggan set pelukis",
-        "चित्रकार सेट सदस्य",
-        "مشترك طقم الرسام"
+        "화가패스 구독자",
+        "Painter Pass subscriber",
+        "画家通行证订阅者",
+        "畫家通行證訂閱者",
+        "画家パスのサブスク会員",
+        "Suscriptor del Pase de pintor",
+        "Assinante do Passe de Pintor",
+        "Abonné au Pass peintre",
+        "Malerpass-Abonnent",
+        "Pelanggan Pass Pelukis",
+        "चित्रकार पास सदस्य",
+        "مشترك بطاقة الرسام"
       ]
     },
     {
@@ -12550,17 +12601,17 @@
       "Key": "새 메시지 {0}개",
       "Values": [
         "새 메시지 {0}개",
-        "{0} new messages",
+        "New messages: {0}",
         "{0}条新消息",
         "{0}則新訊息",
         "新しいメッセージ {0}件",
-        "{0} mensajes nuevos",
-        "{0} novas mensagens",
-        "{0} nouveaux messages",
-        "{0} neue Nachrichten",
+        "Mensajes nuevos: {0}",
+        "Novas mensagens: {0}",
+        "Nouveaux messages : {0}",
+        "Neue Nachrichten: {0}",
         "{0} pesan baru",
-        "{0} नए संदेश",
-        "{0} رسائل جديدة"
+        "नए संदेश: {0}",
+        "رسائل جديدة: {0}"
       ]
     },
     {
@@ -12646,6 +12697,703 @@
         "Sambungkan lagi",
         "फिर से जोड़ें",
         "إعادة الاتصال"
+      ]
+    },
+    {
+      "Key": "그림 다시보기",
+      "Values": [
+        "그림 다시보기",
+        "View drawings",
+        "查看画作",
+        "查看畫作",
+        "絵を見返す",
+        "Ver dibujos",
+        "Ver desenhos",
+        "Voir les dessins",
+        "Zeichnungen ansehen",
+        "Lihat gambar",
+        "चित्र देखें",
+        "عرض الرسومات"
+      ]
+    },
+    {
+      "Key": "그림을 불러오는 중…",
+      "Values": [
+        "그림을 불러오는 중…",
+        "Loading drawing…",
+        "正在加载画作…",
+        "正在載入畫作…",
+        "絵を読み込み中…",
+        "Cargando dibujo…",
+        "Carregando desenho…",
+        "Chargement du dessin…",
+        "Zeichnung wird geladen…",
+        "Memuat gambar…",
+        "चित्र लोड हो रहा है…",
+        "جارٍ تحميل الرسم…"
+      ]
+    },
+    {
+      "Key": "그림을 불러오지 못했습니다.",
+      "Values": [
+        "그림을 불러오지 못했습니다.",
+        "Could not load the drawing.",
+        "无法加载画作。",
+        "無法載入畫作。",
+        "絵を読み込めませんでした。",
+        "No se pudo cargar el dibujo.",
+        "Não foi possível carregar o desenho.",
+        "Impossible de charger le dessin.",
+        "Die Zeichnung konnte nicht geladen werden.",
+        "Gagal memuat gambar.",
+        "चित्र लोड नहीं हो सका।",
+        "تعذّر تحميل الرسم."
+      ]
+    },
+    {
+      "Key": "보관된 그림이 없습니다.",
+      "Values": [
+        "보관된 그림이 없습니다.",
+        "No saved drawings.",
+        "没有已保存的画作。",
+        "沒有已儲存的畫作。",
+        "保存された絵がありません。",
+        "No hay dibujos guardados.",
+        "Não há desenhos salvos.",
+        "Aucun dessin enregistré.",
+        "Keine gespeicherten Zeichnungen.",
+        "Tidak ada gambar tersimpan.",
+        "कोई चित्र सहेजा नहीं गया है।",
+        "لا توجد رسومات محفوظة."
+      ]
+    },
+    {
+      "Key": "그림 보관기간이 만료되었습니다.",
+      "Values": [
+        "그림 보관기간이 만료되었습니다.",
+        "This drawing has expired.",
+        "此画作的保存期限已到。",
+        "此畫作的儲存期限已到。",
+        "絵の保存期間が終了しました。",
+        "El plazo de conservación del dibujo ha vencido.",
+        "O prazo de armazenamento do desenho expirou.",
+        "La durée de conservation du dessin a expiré.",
+        "Die Aufbewahrungsfrist der Zeichnung ist abgelaufen.",
+        "Masa penyimpanan gambar telah berakhir.",
+        "चित्र की संग्रह अवधि समाप्त हो गई है।",
+        "انتهت مدة الاحتفاظ بالرسم."
+      ]
+    },
+    {
+      "Key": "보관 종료: {0}",
+      "Values": [
+        "보관 종료: {0}",
+        "Available until: {0}",
+        "保存至：{0}",
+        "儲存至：{0}",
+        "保存期限：{0}",
+        "Disponible hasta: {0}",
+        "Disponível até: {0}",
+        "Disponible jusqu’au : {0}",
+        "Verfügbar bis: {0}",
+        "Tersedia hingga: {0}",
+        "इस तारीख तक उपलब्ध: {0}",
+        "متاح حتى: {0}"
+      ]
+    },
+    {
+      "Key": "일부 라운드의 그림이 보관되지 않았습니다.",
+      "Values": [
+        "일부 라운드의 그림이 보관되지 않았습니다.",
+        "Drawings from some rounds were not saved.",
+        "部分回合的画作未保存。",
+        "部分回合的畫作未儲存。",
+        "一部のラウンドの絵は保存されていません。",
+        "Los dibujos de algunas rondas no se guardaron.",
+        "Os desenhos de algumas rodadas não foram salvos.",
+        "Les dessins de certaines manches n’ont pas été enregistrés.",
+        "Die Zeichnungen einiger Runden wurden nicht gespeichert.",
+        "Gambar dari beberapa ronde tidak tersimpan.",
+        "कुछ राउंड के चित्र सहेजे नहीं गए।",
+        "لم تُحفظ رسومات بعض الجولات."
+      ]
+    },
+    {
+      "Key": "이미지로 저장",
+      "Values": [
+        "이미지로 저장",
+        "Save as image",
+        "保存为图片",
+        "另存為圖片",
+        "画像として保存",
+        "Guardar como imagen",
+        "Salvar como imagem",
+        "Enregistrer en image",
+        "Als Bild speichern",
+        "Simpan sebagai gambar",
+        "चित्र के रूप में सहेजें",
+        "حفظ كصورة"
+      ]
+    },
+    {
+      "Key": "이미지를 저장하는 중…",
+      "Values": [
+        "이미지를 저장하는 중…",
+        "Saving image…",
+        "正在保存图片…",
+        "正在儲存圖片…",
+        "画像を保存中…",
+        "Guardando imagen…",
+        "Salvando imagem…",
+        "Enregistrement de l’image…",
+        "Bild wird gespeichert…",
+        "Menyimpan gambar…",
+        "चित्र सहेजा जा रहा है…",
+        "جارٍ حفظ الصورة…"
+      ]
+    },
+    {
+      "Key": "이미지를 저장했습니다: {0}",
+      "Values": [
+        "이미지를 저장했습니다: {0}",
+        "Image saved: {0}",
+        "图片已保存：{0}",
+        "圖片已儲存：{0}",
+        "画像を保存しました：{0}",
+        "Imagen guardada: {0}",
+        "Imagem salva: {0}",
+        "Image enregistrée : {0}",
+        "Bild gespeichert: {0}",
+        "Gambar disimpan: {0}",
+        "चित्र सहेजा गया: {0}",
+        "حُفظت الصورة: {0}"
+      ]
+    },
+    {
+      "Key": "사진 갤러리에 저장했습니다.",
+      "Values": [
+        "사진 갤러리에 저장했습니다.",
+        "Saved to your photo gallery.",
+        "已保存到相册。",
+        "已儲存到相簿。",
+        "フォトギャラリーに保存しました。",
+        "Guardado en la galería de fotos.",
+        "Salvo na galeria de fotos.",
+        "Enregistré dans la galerie photo.",
+        "In der Fotogalerie gespeichert.",
+        "Disimpan ke galeri foto.",
+        "फ़ोटो गैलरी में सहेजा गया।",
+        "حُفظت الصورة في معرض الصور."
+      ]
+    },
+    {
+      "Key": "이미지 다운로드를 시작했습니다.",
+      "Values": [
+        "이미지 다운로드를 시작했습니다.",
+        "Image download started.",
+        "图片下载已开始。",
+        "圖片下載已開始。",
+        "画像のダウンロードを開始しました。",
+        "Se inició la descarga de la imagen.",
+        "O download da imagem foi iniciado.",
+        "Le téléchargement de l’image a commencé.",
+        "Der Bilddownload wurde gestartet.",
+        "Unduhan gambar dimulai.",
+        "चित्र डाउनलोड शुरू हो गया है।",
+        "بدأ تنزيل الصورة."
+      ]
+    },
+    {
+      "Key": "이미지를 저장하지 못했습니다.",
+      "Values": [
+        "이미지를 저장하지 못했습니다.",
+        "Could not save the image.",
+        "无法保存图片。",
+        "無法儲存圖片。",
+        "画像を保存できませんでした。",
+        "No se pudo guardar la imagen.",
+        "Não foi possível salvar a imagem.",
+        "Impossible d’enregistrer l’image.",
+        "Das Bild konnte nicht gespeichert werden.",
+        "Gagal menyimpan gambar.",
+        "चित्र सहेजा नहीं जा सका।",
+        "تعذّر حفظ الصورة."
+      ]
+    },
+    {
+      "Key": "전체 그림",
+      "Values": [
+        "전체 그림",
+        "Full drawing",
+        "完整画作",
+        "完整畫作",
+        "全体の絵",
+        "Dibujo completo",
+        "Desenho completo",
+        "Dessin complet",
+        "Gesamtes Bild",
+        "Gambar lengkap",
+        "पूरा चित्र",
+        "الرسم الكامل"
+      ]
+    },
+    {
+      "Key": "작성자",
+      "Values": [
+        "작성자",
+        "Artist",
+        "绘画者",
+        "繪畫者",
+        "描いた人",
+        "Autor",
+        "Autor",
+        "Auteur",
+        "Zeichner",
+        "Penggambar",
+        "चित्रकार",
+        "الرسّام"
+      ]
+    },
+    {
+      "Key": "주제: {0}",
+      "Values": [
+        "주제: {0}",
+        "Topic: {0}",
+        "主题：{0}",
+        "主題：{0}",
+        "テーマ：{0}",
+        "Tema: {0}",
+        "Tema: {0}",
+        "Thème : {0}",
+        "Thema: {0}",
+        "Tema: {0}",
+        "विषय: {0}",
+        "الموضوع: {0}"
+      ]
+    },
+    {
+      "Key": "제시어: {0}",
+      "Values": [
+        "제시어: {0}",
+        "Word: {0}",
+        "词语：{0}",
+        "詞語：{0}",
+        "お題：{0}",
+        "Palabra: {0}",
+        "Palavra: {0}",
+        "Mot : {0}",
+        "Wort: {0}",
+        "Kata: {0}",
+        "शब्द: {0}",
+        "الكلمة: {0}"
+      ]
+    },
+    {
+      "Key": "이 경기의 참가자만 그림을 볼 수 있습니다.",
+      "Values": [
+        "이 경기의 참가자만 그림을 볼 수 있습니다.",
+        "Only participants in this match can view the drawings.",
+        "仅本场比赛的参与者可以查看画作。",
+        "僅本場比賽的參與者可以查看畫作。",
+        "この試合の参加者のみ絵を見ることができます。",
+        "Solo los participantes de esta partida pueden ver los dibujos.",
+        "Somente participantes desta partida podem ver os desenhos.",
+        "Seuls les participants à cette partie peuvent voir les dessins.",
+        "Nur Teilnehmer dieses Spiels können die Zeichnungen ansehen.",
+        "Hanya peserta pertandingan ini yang dapat melihat gambar.",
+        "केवल इस मैच के प्रतिभागी चित्र देख सकते हैं।",
+        "يمكن للمشاركين في هذه المباراة فقط عرض الرسومات."
+      ]
+    },
+    {
+      "Key": "{0}. {1}",
+      "Values": [
+        "{0}. {1}",
+        "{0}. {1}",
+        "{0}. {1}",
+        "{0}. {1}",
+        "{0}. {1}",
+        "{0}. {1}",
+        "{0}. {1}",
+        "{0}. {1}",
+        "{0}. {1}",
+        "{0}. {1}",
+        "{0}. {1}",
+        "{0}. {1}"
+      ]
+    },
+    {
+      "Key": "무료 보석",
+      "Values": [
+        "무료 보석",
+        "Free gems",
+        "免费宝石",
+        "免費寶石",
+        "無料ジェム",
+        "Gemas gratis",
+        "Gemas grátis",
+        "Gemmes gratuites",
+        "Kostenlose Edelsteine",
+        "Permata gratis",
+        "मुफ़्त रत्न",
+        "جواهر مجانية"
+      ]
+    },
+    {
+      "Key": "구독 중에는 광고가 표시되지 않아요.",
+      "Values": [
+        "구독 중에는 광고가 표시되지 않아요.",
+        "Ads are removed while your subscription is active.",
+        "订阅有效期间不显示广告。",
+        "訂閱有效期間不顯示廣告。",
+        "サブスクリプション中は広告が表示されません。",
+        "Tu suscripción activa elimina los anuncios.",
+        "Os anúncios são removidos enquanto sua assinatura estiver ativa.",
+        "Les publicités sont supprimées pendant votre abonnement.",
+        "Während deines aktiven Abonnements wird keine Werbung angezeigt.",
+        "Iklan dihapus selama langganan aktif.",
+        "सदस्यता सक्रिय रहने पर विज्ञापन नहीं दिखाए जाते।",
+        "تتم إزالة الإعلانات أثناء سريان اشتراكك."
+      ]
+    },
+    {
+      "Key": "매일 무료 보석을 광고 없이 받을 수 있어요.",
+      "Values": [
+        "매일 무료 보석을 광고 없이 받을 수 있어요.",
+        "Claim free gems every day without watching an ad.",
+        "每天无需观看广告即可领取免费宝石。",
+        "每天無需觀看廣告即可領取免費寶石。",
+        "毎日、広告を見ずに無料ジェムを受け取れます。",
+        "Recibe gemas gratis cada día sin ver un anuncio.",
+        "Resgate gemas grátis todos os dias sem assistir a um anúncio.",
+        "Recevez chaque jour des gemmes gratuites sans regarder de publicité.",
+        "Erhalte täglich kostenlose Edelsteine, ohne Werbung anzusehen.",
+        "Klaim permata gratis setiap hari tanpa menonton iklan.",
+        "बिना विज्ञापन देखे हर दिन मुफ़्त रत्न पाएँ।",
+        "احصل على جواهر مجانية يوميًا دون مشاهدة إعلان."
+      ]
+    },
+    {
+      "Key": "매일 00:00 UTC에 초기화됩니다.",
+      "Values": [
+        "매일 00:00 UTC에 초기화됩니다.",
+        "Resets daily at 00:00 UTC.",
+        "每日 UTC 00:00 重置。",
+        "每日 UTC 00:00 重置。",
+        "毎日 UTC 00:00 にリセットされます。",
+        "Se reinicia cada día a las 00:00 UTC.",
+        "Reinicia diariamente às 00:00 UTC.",
+        "Réinitialisation chaque jour à 00:00 UTC.",
+        "Wird täglich um 00:00 UTC zurückgesetzt.",
+        "Direset setiap hari pukul 00.00 UTC.",
+        "हर दिन 00:00 UTC पर रीसेट होता है।",
+        "تُعاد يوميًا الساعة 00:00 بتوقيت UTC."
+      ]
+    },
+    {
+      "Key": "화가패스 구독 중에는 광고 없이 매일 보석 {0}개를 받을 수 있어요.",
+      "Values": [
+        "화가패스 구독 중에는 광고 없이 매일 보석 {0}개를 받을 수 있어요.",
+        "With Painter Pass, claim gems daily without an ad: {0}.",
+        "订阅画家通行证后，每天无需观看广告即可领取宝石：{0}。",
+        "訂閱畫家通行證後，每天無需觀看廣告即可領取寶石：{0}。",
+        "画家パスのサブスクリプション中は、広告を見ずに毎日ジェム {0} 個を受け取れます。",
+        "Con el Pase de pintor, recibe gemas cada día sin ver un anuncio: {0}.",
+        "Com o Passe de Pintor, resgate gemas diariamente sem anúncio: {0}.",
+        "Avec le Pass peintre, recevez des gemmes chaque jour sans publicité : {0}.",
+        "Mit dem Malerpass erhältst du täglich Edelsteine ohne Werbung: {0}.",
+        "Dengan Pass Pelukis, klaim permata harian tanpa iklan: {0}.",
+        "चित्रकार पास के साथ, बिना विज्ञापन हर दिन रत्न पाएँ: {0}।",
+        "مع بطاقة الرسام، احصل على جواهر يوميًا دون إعلان: {0}."
+      ]
+    },
+    {
+      "Key": "하루 한 번 광고를 보고 보석 {0}개를 받으세요.",
+      "Values": [
+        "하루 한 번 광고를 보고 보석 {0}개를 받으세요.",
+        "Watch an ad once a day to receive gems: {0}.",
+        "每天观看一次广告，领取宝石：{0}。",
+        "每天觀看一次廣告，領取寶石：{0}。",
+        "1日1回、広告を見てジェム {0} 個を受け取りましょう。",
+        "Mira un anuncio una vez al día y recibe gemas: {0}.",
+        "Assista a um anúncio uma vez por dia para receber gemas: {0}.",
+        "Regardez une publicité une fois par jour pour recevoir des gemmes : {0}.",
+        "Sieh dir einmal täglich eine Werbung an und erhalte Edelsteine: {0}.",
+        "Tonton iklan sekali sehari untuk menerima permata: {0}.",
+        "दिन में एक बार विज्ञापन देखें और रत्न पाएँ: {0}।",
+        "شاهد إعلانًا مرة يوميًا لتحصل على جواهر: {0}."
+      ]
+    },
+    {
+      "Key": "보상 확인 중…",
+      "Values": [
+        "보상 확인 중…",
+        "Checking reward…",
+        "正在确认奖励…",
+        "正在確認獎勵…",
+        "報酬を確認中…",
+        "Comprobando recompensa…",
+        "Verificando recompensa…",
+        "Vérification de la récompense…",
+        "Belohnung wird geprüft…",
+        "Memeriksa hadiah…",
+        "इनाम की पुष्टि की जा रही है…",
+        "جارٍ التحقق من المكافأة…"
+      ]
+    },
+    {
+      "Key": "오늘 수령 완료",
+      "Values": [
+        "오늘 수령 완료",
+        "Claimed today",
+        "今日已领取",
+        "今日已領取",
+        "本日受取済み",
+        "Ya recibido hoy",
+        "Resgatado hoje",
+        "Déjà reçu aujourd’hui",
+        "Heute erhalten",
+        "Sudah diklaim hari ini",
+        "आज प्राप्त कर लिया",
+        "تم الاستلام اليوم"
+      ]
+    },
+    {
+      "Key": "광고 준비 중",
+      "Values": [
+        "광고 준비 중",
+        "Preparing ad",
+        "广告准备中",
+        "廣告準備中",
+        "広告を準備中",
+        "Preparando anuncio",
+        "Preparando anúncio",
+        "Préparation de la publicité",
+        "Werbung wird vorbereitet",
+        "Menyiapkan iklan",
+        "विज्ञापन तैयार हो रहा है",
+        "جارٍ تجهيز الإعلان"
+      ]
+    },
+    {
+      "Key": "무료로 받기",
+      "Values": [
+        "무료로 받기",
+        "Claim for free",
+        "免费领取",
+        "免費領取",
+        "無料で受け取る",
+        "Recibir gratis",
+        "Resgatar grátis",
+        "Recevoir gratuitement",
+        "Kostenlos erhalten",
+        "Klaim gratis",
+        "मुफ़्त पाएँ",
+        "استلام مجانًا"
+      ]
+    },
+    {
+      "Key": "광고 보고 받기",
+      "Values": [
+        "광고 보고 받기",
+        "Watch ad and claim",
+        "看广告领取",
+        "看廣告領取",
+        "広告を見て受け取る",
+        "Ver anuncio y recibir",
+        "Ver anúncio e resgatar",
+        "Voir la publicité et recevoir",
+        "Werbung ansehen und erhalten",
+        "Tonton iklan dan klaim",
+        "विज्ञापन देखकर पाएँ",
+        "شاهد إعلانًا واستلم"
+      ]
+    },
+    {
+      "Key": "광고 개인정보 설정",
+      "Values": [
+        "광고 개인정보 설정",
+        "Ad privacy settings",
+        "广告隐私设置",
+        "廣告隱私設定",
+        "広告のプライバシー設定",
+        "Privacidad de anuncios",
+        "Privacidade dos anúncios",
+        "Confidentialité publicitaire",
+        "Datenschutz für Werbung",
+        "Pengaturan privasi iklan",
+        "विज्ञापन गोपनीयता सेटिंग",
+        "إعدادات خصوصية الإعلانات"
+      ]
+    },
+    {
+      "Key": "광고 보기",
+      "Values": [
+        "광고 보기",
+        "Watch ad",
+        "观看广告",
+        "觀看廣告",
+        "広告を見る",
+        "Ver anuncio",
+        "Ver anúncio",
+        "Voir la publicité",
+        "Werbung ansehen",
+        "Tonton iklan",
+        "विज्ञापन देखें",
+        "مشاهدة إعلان"
+      ]
+    },
+    {
+      "Key": "광고를 불러오지 못했습니다. 잠시 후 다시 시도하세요.",
+      "Values": [
+        "광고를 불러오지 못했습니다. 잠시 후 다시 시도하세요.",
+        "Could not load the ad. Please try again shortly.",
+        "无法加载广告，请稍后重试。",
+        "無法載入廣告，請稍後重試。",
+        "広告を読み込めませんでした。しばらくしてから再試行してください。",
+        "No se pudo cargar el anuncio. Inténtalo de nuevo en breve.",
+        "Não foi possível carregar o anúncio. Tente novamente em instantes.",
+        "Impossible de charger la publicité. Réessayez dans un instant.",
+        "Die Werbung konnte nicht geladen werden. Versuche es in Kürze erneut.",
+        "Iklan tidak dapat dimuat. Coba lagi sebentar lagi.",
+        "विज्ञापन लोड नहीं हो सका। थोड़ी देर बाद फिर कोशिश करें।",
+        "تعذّر تحميل الإعلان. حاول مجددًا بعد قليل."
+      ]
+    },
+    {
+      "Key": "광고를 끝까지 시청하면 보석을 받을 수 있어요.",
+      "Values": [
+        "광고를 끝까지 시청하면 보석을 받을 수 있어요.",
+        "Watch the entire ad to receive gems.",
+        "完整观看广告即可领取宝石。",
+        "完整觀看廣告即可領取寶石。",
+        "広告を最後まで見るとジェムを受け取れます。",
+        "Mira el anuncio completo para recibir gemas.",
+        "Assista ao anúncio inteiro para receber gemas.",
+        "Regardez la publicité en entier pour recevoir des gemmes.",
+        "Sieh dir die Werbung vollständig an, um Edelsteine zu erhalten.",
+        "Tonton iklan hingga selesai untuk menerima permata.",
+        "रत्न पाने के लिए पूरा विज्ञापन देखें।",
+        "شاهد الإعلان بالكامل لتحصل على جواهر."
+      ]
+    },
+    {
+      "Key": "광고 보상을 확인하고 있습니다. 잠시 후 다시 확인해 주세요.",
+      "Values": [
+        "광고 보상을 확인하고 있습니다. 잠시 후 다시 확인해 주세요.",
+        "Your ad reward is being verified. Please check again shortly.",
+        "正在验证广告奖励，请稍后再次确认。",
+        "正在驗證廣告獎勵，請稍後再次確認。",
+        "広告報酬を確認しています。しばらくしてから再度ご確認ください。",
+        "Se está verificando tu recompensa. Vuelve a consultar en breve.",
+        "Sua recompensa do anúncio está sendo verificada. Confira novamente em instantes.",
+        "Votre récompense publicitaire est en cours de vérification. Revenez dans un instant.",
+        "Deine Werbebelohnung wird geprüft. Sieh in Kürze erneut nach.",
+        "Hadiah iklan sedang diverifikasi. Periksa lagi sebentar lagi.",
+        "आपके विज्ञापन इनाम की जाँच हो रही है। थोड़ी देर बाद फिर जाँचें।",
+        "جارٍ التحقق من مكافأة الإعلان. تحقق مجددًا بعد قليل."
+      ]
+    },
+    {
+      "Key": "보석 {0}개를 받았습니다.",
+      "Values": [
+        "보석 {0}개를 받았습니다.",
+        "Gems received: {0}.",
+        "已获得宝石：{0}。",
+        "已獲得寶石：{0}。",
+        "ジェム {0} 個を受け取りました。",
+        "Gemas recibidas: {0}.",
+        "Gemas recebidas: {0}.",
+        "Gemmes reçues : {0}.",
+        "Erhaltene Edelsteine: {0}.",
+        "Permata diterima: {0}.",
+        "प्राप्त रत्न: {0}।",
+        "الجواهر المستلمة: {0}."
+      ]
+    },
+    {
+      "Key": "오늘 무료 보석을 이미 받았습니다.",
+      "Values": [
+        "오늘 무료 보석을 이미 받았습니다.",
+        "You have already claimed today’s free gems.",
+        "今日免费宝石已领取。",
+        "今日免費寶石已領取。",
+        "本日の無料ジェムは受取済みです。",
+        "Ya recibiste las gemas gratis de hoy.",
+        "Você já resgatou as gemas grátis de hoje.",
+        "Vous avez déjà reçu les gemmes gratuites du jour.",
+        "Du hast die heutigen kostenlosen Edelsteine bereits erhalten.",
+        "Kamu sudah mengklaim permata gratis hari ini.",
+        "आप आज के मुफ़्त रत्न पहले ही प्राप्त कर चुके हैं।",
+        "لقد استلمت الجواهر المجانية لهذا اليوم بالفعل."
+      ]
+    },
+    {
+      "Key": "광고 보상이 만료되었습니다. 다시 시도해 주세요.",
+      "Values": [
+        "광고 보상이 만료되었습니다. 다시 시도해 주세요.",
+        "The ad reward has expired. Please try again.",
+        "广告奖励已过期，请重试。",
+        "廣告獎勵已過期，請重試。",
+        "広告報酬の有効期限が切れました。再試行してください。",
+        "La recompensa del anuncio ha caducado. Inténtalo de nuevo.",
+        "A recompensa do anúncio expirou. Tente novamente.",
+        "La récompense publicitaire a expiré. Réessayez.",
+        "Die Werbebelohnung ist abgelaufen. Versuche es erneut.",
+        "Hadiah iklan telah kedaluwarsa. Coba lagi.",
+        "विज्ञापन इनाम की अवधि समाप्त हो गई है। फिर कोशिश करें।",
+        "انتهت صلاحية مكافأة الإعلان. حاول مجددًا."
+      ]
+    },
+    {
+      "Key": "광고를 이용할 수 없습니다.",
+      "Values": [
+        "광고를 이용할 수 없습니다.",
+        "Ads are unavailable.",
+        "广告暂不可用。",
+        "廣告暫不可用。",
+        "広告を利用できません。",
+        "Los anuncios no están disponibles.",
+        "Os anúncios estão indisponíveis.",
+        "Les publicités sont indisponibles.",
+        "Werbung ist nicht verfügbar.",
+        "Iklan tidak tersedia.",
+        "विज्ञापन उपलब्ध नहीं हैं।",
+        "الإعلانات غير متاحة."
+      ]
+    },
+    {
+      "Key": "광고 개인정보 설정을 불러오지 못했습니다.",
+      "Values": [
+        "광고 개인정보 설정을 불러오지 못했습니다.",
+        "Could not load ad privacy settings.",
+        "无法加载广告隐私设置。",
+        "無法載入廣告隱私設定。",
+        "広告のプライバシー設定を読み込めませんでした。",
+        "No se pudo cargar la privacidad de anuncios.",
+        "Não foi possível carregar a privacidade dos anúncios.",
+        "Impossible de charger les paramètres de confidentialité publicitaire.",
+        "Die Datenschutzeinstellungen für Werbung konnten nicht geladen werden.",
+        "Pengaturan privasi iklan tidak dapat dimuat.",
+        "विज्ञापन गोपनीयता सेटिंग लोड नहीं हो सकीं।",
+        "تعذّر تحميل إعدادات خصوصية الإعلانات."
+      ]
+    },
+    {
+      "Key": "보상 확인",
+      "Values": [
+        "보상 확인",
+        "Check reward",
+        "确认奖励",
+        "確認獎勵",
+        "報酬を確認",
+        "Comprobar recompensa",
+        "Verificar recompensa",
+        "Vérifier la récompense",
+        "Belohnung prüfen",
+        "Periksa hadiah",
+        "इनाम जाँचें",
+        "التحقق من المكافأة"
       ]
     }
   ]

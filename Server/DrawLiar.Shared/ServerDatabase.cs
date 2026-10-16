@@ -24,6 +24,9 @@ public sealed partial class ServerDatabase : IDisposable
             ?? throw new InvalidOperationException("ConnectionStrings:DrawLiarDatabase가 필요합니다.");
         _ = _workshopPolicy.Value;
         _ = _matchRewardPolicy.Value;
+        _drawingReplayRetentionDays = configuration.GetValue<int?>("DrawingReplay:RetentionDays") ?? DrawingReplayRules.DEFAULT_RETENTION_DAYS;
+        if (_drawingReplayRetentionDays is < 1 or > DrawingReplayRules.MAX_RETENTION_DAYS)
+            throw new InvalidOperationException("DrawingReplay:RetentionDays는 1~365일이어야 합니다.");
         _source = NpgsqlDataSource.Create(connectionString);
     }
 
@@ -112,6 +115,7 @@ public sealed partial class ServerDatabase : IDisposable
             await challenges.ExecuteNonQueryAsync(cancellationToken);
         await using (var friends = Command(connection, transaction, friendsSql, EXPIRY_CLEANUP_BATCH_SIZE, DateTimeOffset.UtcNow - _friendRequestLifetime))
             await friends.ExecuteNonQueryAsync(cancellationToken);
+        await CleanupDrawingReplaysAsync(connection, transaction, cancellationToken);
         await transaction.CommitAsync(cancellationToken);
     }
 
