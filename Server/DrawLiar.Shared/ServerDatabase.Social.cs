@@ -97,6 +97,7 @@ public sealed partial class ServerDatabase
             WHERE NOT "RoomInvitation"."Pending" OR "RoomInvitation"."ExpiresAt"<=now()
             """, id, roomId, session.AccountId, target))
             await insert.ExecuteNonQueryAsync(cancellationToken);
+        await LogActivity(connection, transaction, "RoomInvite", session.AccountId, targetAccountId: target, roomId: roomId, cancellationToken: cancellationToken);
         RoomInvitationData invitation;
         await using (var read = Command(connection, transaction, INVITATION_SELECT + " AND i.\"Id\"=$2", target, id))
         await using (var reader = await read.ExecuteReaderAsync(cancellationToken))
@@ -132,6 +133,7 @@ public sealed partial class ServerDatabase
         }
         await using (var respond = Command(connection, transaction, "UPDATE \"RoomInvitation\" SET \"Pending\"=false,\"RespondedAt\"=now() WHERE \"Id\"=$1", id))
             await respond.ExecuteNonQueryAsync(cancellationToken);
+        await LogActivity(connection, transaction, "RoomInviteRespond", session.AccountId, new { Accept = accept }, sender, roomId, cancellationToken: cancellationToken);
         await transaction.CommitAsync(cancellationToken);
         return assignment;
     }

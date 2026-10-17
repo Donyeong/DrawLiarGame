@@ -49,6 +49,7 @@ public sealed partial class ServerDatabase
             throw new ApiException("RoomKickTargetUnavailable", 409);
         await Execute(connection, transaction,
             "INSERT INTO \"RoomKick\" (\"RoomId\",\"AccountId\",\"KickedByAccountId\",\"OperationId\") VALUES ($1,$2,$3,$4)", roomId, targetId, ownerId, operation);
+        await LogActivity(connection, transaction, "RoomKick", ownerId, targetAccountId: targetId, roomId: roomId, cancellationToken: cancellationToken);
         await Execute(connection, transaction, "DELETE FROM \"JoinTicket\" WHERE \"RoomId\"=$1 AND \"AccountId\"=$2", roomId, targetId);
         await Execute(connection, transaction, "DELETE FROM \"RoomAdmission\" WHERE \"RoomId\"=$1 AND \"AccountId\"=$2", roomId, targetId);
         await Execute(connection, transaction,

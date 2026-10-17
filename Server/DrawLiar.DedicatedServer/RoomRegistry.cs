@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using DrawLiar.Server;
 using Microsoft.Extensions.Logging;
 
 namespace DrawLiar.DedicatedServer;
@@ -10,17 +11,25 @@ internal sealed class RoomRegistry : BackgroundService
 {
     private readonly object _gate = new();
     private const int MAX_PENDING_RESULTS = 2048;
+    private const int MAX_PENDING_ACTIVITIES = 8192;
     private readonly MatchResultOutbox _outbox;
     private readonly Dictionary<string, DedicatedRoom> _rooms = new(StringComparer.Ordinal);
     private readonly SemaphoreSlim _statusChanged = new(0, 1);
     private readonly GameData _data;
     private readonly int _capacity;
     private readonly string _nodeId;
+    private readonly ILogger<RoomRegistry>? _logger;
+    // 방 잠금 안에서 호출되므로 다른 잠금을 잡지 않는 별도 잠금을 쓴다.
+    private readonly object _activityGate = new();
+    private readonly Queue<(long Sequence, RoomActivityData Activity)> _activities = new();
+    private long _activitySequence;
+    private bool _activityOverflowed;
 
     public static double Now => Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
 
     public RoomRegistry(IConfiguration configuration, ILogger<RoomRegistry>? logger = null)
     {
+        _logger = logger;
         _capacity = Math.Clamp(configuration.GetValue("Dedicated:Capacity", 32), 1, 128);
         _nodeId = configuration["Dedicated:NodeId"] ?? "dedicated-1";
         string path = configuration["Dedicated:GameDataPath"] ?? Path.Combine(AppContext.BaseDirectory, "GameData.json");
@@ -73,7 +82,7 @@ internal sealed class RoomRegistry : BackgroundService
             {
                 if (_rooms.Count >= _capacity) return null;
                 _rooms[ticket.Room.RoomId] = room = new DedicatedRoom(ticket.Room, _data, ticket.CustomTopics, Now,
-                    NotifyStatusChanged, CanRecordMatch, QueueResult);
+                    NotifyStatusChanged, CanRecordMatch, QueueResult, QueueActivity);
                 created = true;
             }
             if (room.Join(connection, ticket, Now)) return room;
@@ -110,6 +119,39 @@ internal sealed class RoomRegistry : BackgroundService
     }
 
     public void RetryResult(string matchId) => _outbox.Retry(matchId, DateTimeOffset.UtcNow);
+
+    // ponytail: 방 활동 로그는 메모리에만 보관한다. 게임서버 장애 중 상한을 넘거나 프로세스가 끝나면 오래된 기록부터 잃는다.
+    internal void QueueActivity(RoomActivityData activity)
+    {
+        lock (_activityGate)
+        {
+            if (_activities.Count >= MAX_PENDING_ACTIVITIES)
+            {
+                _activities.Dequeue();
+                if (!_activityOverflowed) _logger?.LogWarning("전송 대기 방 활동 로그가 상한을 넘어 오래된 기록을 버립니다.");
+                _activityOverflowed = true;
+            }
+            _activities.Enqueue((++_activitySequence, activity));
+        }
+    }
+
+    public (long LastSequence, RoomActivityData[] Entries) PendingActivities(int limit)
+    {
+        lock (_activityGate)
+        {
+            var batch = _activities.Take(limit).ToArray();
+            return (batch.Length == 0 ? 0 : batch[^1].Sequence, batch.Select(entry => entry.Activity).ToArray());
+        }
+    }
+
+    public void AcknowledgeActivities(long lastSequence)
+    {
+        lock (_activityGate)
+        {
+            while (_activities.TryPeek(out var entry) && entry.Sequence <= lastSequence) _activities.Dequeue();
+            _activityOverflowed = false;
+        }
+    }
 
     public void QuarantineResult(string matchId, int status) => _outbox.Quarantine(matchId, status);
 

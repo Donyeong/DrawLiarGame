@@ -35,6 +35,12 @@ internal static partial class Integration
             await VerifyMidRoundAsync();
             return;
         }
+        if (args.Contains("--activity-log-only") || args.Contains("--activity-log-database-only"))
+        {
+            await VerifyRoomActivityWireAsync();
+            if (args.Contains("--activity-log-database-only")) await VerifyActivityLogDatabaseAsync();
+            return;
+        }
         if (args.Contains("--mail-database-only"))
         {
             await VerifyMailDatabaseAsync();
@@ -230,6 +236,7 @@ internal static partial class Integration
         await VerifyCoinTossWireAsync();
         await VerifyDrawingHistoryAsync();
         await VerifyMatchDrawingCaptureAsync();
+        await VerifyRoomActivityWireAsync();
         await VerifyMidRoundAsync();
         await VerifyOptionalLiarAsync();
         await VerifySpyAsync();

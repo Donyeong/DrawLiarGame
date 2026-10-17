@@ -137,6 +137,8 @@ public sealed partial class ServerDatabase : ICommerceRepository
                 VALUES ($1,$2,$3,$4,$5,$6)
                 """, stored.AccountId, orderId, stored.Product.Id, CommerceRules.PAID_GEMS, stored.Product.PaidGems, balance))
                 await ledger.ExecuteNonQueryAsync(cancellationToken);
+            await LogActivity(connection, transaction, "Payment", stored.AccountId,
+                new { ProductId = stored.Product.Id, stored.Order.Provider, stored.Product.PaidGems }, cancellationToken: cancellationToken);
             var completed = DateTimeOffset.UtcNow;
             await using (var finish = Command(connection, transaction,
                 "UPDATE \"CommerceOrder\" SET \"State\"='Completed',\"CompletedAt\"=$2 WHERE \"OrderId\"=$1", orderId, completed))
@@ -198,6 +200,8 @@ public sealed partial class ServerDatabase : ICommerceRepository
                 VALUES ($1,$2,$3,$4,$5,$6,$7)
                 """, accountId, operationId, product.Id, product.Kind, -product.PricePaidGems, balance, newExpiry);
             await ledger.ExecuteNonQueryAsync(cancellationToken);
+            await LogActivity(connection, transaction, "Purchase", accountId, new { ProductIds = new[] { product.Id }, PaidGems = product.PricePaidGems },
+                cancellationToken: cancellationToken);
         }
         var profile = await ReadProfile(connection, transaction, accountId);
         await transaction.CommitAsync(cancellationToken);
@@ -214,6 +218,7 @@ public sealed partial class ServerDatabase : ICommerceRepository
             WHERE "Id"=$1 AND (NOT $2 OR "SubscriptionExpiresAt">now())
             """, accountId, showBadge))
             if (await badge.ExecuteNonQueryAsync(cancellationToken) != 1) throw new ApiException("SubscriptionRequired", 403);
+        await LogActivity(connection, transaction, "SubscriberBadge", accountId, new { ShowBadge = showBadge }, cancellationToken: cancellationToken);
         var profile = await ReadProfile(connection, transaction, accountId);
         await transaction.CommitAsync(cancellationToken);
         return profile;

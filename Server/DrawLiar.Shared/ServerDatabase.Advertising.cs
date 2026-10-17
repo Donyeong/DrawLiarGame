@@ -166,6 +166,8 @@ public sealed partial class ServerDatabase
                 VALUES ($1,$2,$3,'AdvertisingReward',$4,$5)
                 """, ticket.AccountId, ticket.Id, AdsRules.PRODUCT_ID, ticket.RewardPaidGems, balance))
                 await ledger.ExecuteNonQueryAsync(cancellationToken);
+            await LogActivity(connection, transaction, "AdReward", ticket.AccountId, new { PaidGems = ticket.RewardPaidGems, ticket.Platform, ticket.Provider },
+                cancellationToken: cancellationToken);
         }
         await using (var finish = Command(connection, transaction,
             "UPDATE \"AdRewardTicket\" SET \"State\"='Completed',\"CompletedAt\"=$2 WHERE \"Id\"=$1", ticket.Id, now))

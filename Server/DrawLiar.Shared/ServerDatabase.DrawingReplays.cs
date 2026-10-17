@@ -34,7 +34,14 @@ public sealed partial class ServerDatabase
             IsPartial = metadata.IsPartial, Rounds = rounds.ToArray() };
     }
 
-    public async Task<MatchDrawingResponse> MatchDrawingAsync(Guid accountId, string matchId, int round, CancellationToken cancellationToken = default)
+    public Task<MatchDrawingResponse> MatchDrawingAsync(Guid accountId, string matchId, int round, CancellationToken cancellationToken = default) =>
+        ReadMatchDrawingAsync(accountId, matchId, round, cancellationToken);
+
+    // 운영툴은 참가 여부와 관계없이 같은 보관 그림을 조회한다.
+    public Task<MatchDrawingResponse> AdminMatchDrawingAsync(string matchId, int round, CancellationToken cancellationToken = default) =>
+        ReadMatchDrawingAsync(null, matchId, round, cancellationToken);
+
+    private async Task<MatchDrawingResponse> ReadMatchDrawingAsync(Guid? accountId, string matchId, int round, CancellationToken cancellationToken)
     {
         Guid id = ParseDrawingMatchId(matchId);
         if (round is < 1 or > DrawingReplayRules.MAX_ROUNDS) throw new ApiException("InvalidDrawingRound");
@@ -57,15 +64,16 @@ public sealed partial class ServerDatabase
         Guid.TryParse(matchId, out Guid id) && id != Guid.Empty ? id : throw new ApiException("InvalidMatch");
 
     private static async Task<(DateTimeOffset ExpiresAt, int RetentionDays, bool IsPartial)> RequireDrawingAccessAsync(NpgsqlConnection connection,
-        NpgsqlTransaction transaction, Guid accountId, Guid matchId, CancellationToken cancellationToken)
+        NpgsqlTransaction transaction, Guid? accountId, Guid matchId, CancellationToken cancellationToken)
     {
         await using var command = Command(connection, transaction, """
             SELECT m."DrawingExpiresAt",m."DrawingRetentionDays",m."DrawingExpiresAt">clock_timestamp(),m."DrawingsIncomplete"
-            FROM "MatchRecord" m JOIN "AccountMatch" a ON a."MatchId"=m."MatchId" AND a."AccountId"=$2
-            WHERE m."MatchId"=$1
+            FROM "MatchRecord" m WHERE m."MatchId"=$1
+                AND ($2::uuid IS NULL OR EXISTS (SELECT 1 FROM "AccountMatch" a WHERE a."MatchId"=m."MatchId" AND a."AccountId"=$2))
             """, matchId, accountId);
         await using var reader = await command.ExecuteReaderAsync(cancellationToken);
-        if (!await reader.ReadAsync(cancellationToken)) throw new ApiException("DrawingReplayForbidden", 403);
+        if (!await reader.ReadAsync(cancellationToken))
+            throw accountId == null ? new ApiException("DrawingReplayUnavailable", 404) : new ApiException("DrawingReplayForbidden", 403);
         if (reader.IsDBNull(0)) throw new ApiException("DrawingReplayUnavailable", 404);
         if (!reader.GetBoolean(2)) throw new ApiException("DrawingReplayExpired", 410);
         return (reader.GetFieldValue<DateTimeOffset>(0), reader.GetInt32(1), reader.GetBoolean(3));

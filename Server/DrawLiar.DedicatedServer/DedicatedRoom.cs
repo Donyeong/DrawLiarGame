@@ -1,3 +1,5 @@
+using DrawLiar.Server;
+
 namespace DrawLiar.DedicatedServer;
 
 internal sealed partial class DedicatedRoom
@@ -22,6 +24,7 @@ internal sealed partial class DedicatedRoom
     private readonly Dictionary<string, double> _reconnectUntil = new(StringComparer.Ordinal);
     private readonly Action _statusChanged;
     private readonly Func<bool> _canRecordMatch;
+    private readonly Action<RoomActivityData> _activity;
     private string _ownerAccountId;
     private int _nextPlayerId = 1;
     private long _sequence;
@@ -38,10 +41,11 @@ internal sealed partial class DedicatedRoom
     public string RoomId { get; }
 
     public DedicatedRoom(ServerRoomData room, GameData data, ServerTopicData[] customTopics, double now, Action statusChanged,
-        Func<bool>? canRecordMatch = null, Action<MatchResultRequest>? matchCompleted = null)
+        Func<bool>? canRecordMatch = null, Action<MatchResultRequest>? matchCompleted = null, Action<RoomActivityData>? activity = null)
     {
         _statusChanged = statusChanged;
         _canRecordMatch = canRecordMatch ?? (() => true);
+        _activity = activity ?? (_ => { });
         _builtInData = data;
         _customTopics = DrawLiar.Server.ServerDatabase.MergeCustomTopics(null, customTopics);
         RoomId = room.RoomId;
@@ -117,6 +121,7 @@ internal sealed partial class DedicatedRoom
             QueueReplayLocked(connection, now);
             BroadcastSnapshotsLocked(now);
             _statusChanged();
+            _activity(new RoomActivityData("RoomEnter", RoomId, ticket.AccountId, Spectator: _session.IsSpectator(playerId)));
             return true;
         }
     }
@@ -127,6 +132,7 @@ internal sealed partial class DedicatedRoom
         {
             if (!_connections.TryGetValue(connection.AccountId, out var current) || current != connection) return;
             _connections.Remove(connection.AccountId);
+            _activity(new RoomActivityData("RoomLeave", RoomId, connection.AccountId, Voluntary: connection.LeftVoluntarily));
             _session.Disconnect(connection.PlayerId, now, !connection.LeftVoluntarily);
             RemoveUnusedPlayerIdsLocked();
             if (connection.LeftVoluntarily) _reconnectUntil.Remove(connection.AccountId);
@@ -196,7 +202,7 @@ internal sealed partial class DedicatedRoom
                 "vote" => envelope.BallotVersion == _session.BallotVersion && _session.Vote(connection.PlayerId, envelope.Target, now),
                 "judge" => envelope.BallotVersion == _session.BallotVersion
                     && _session.Judge(connection.PlayerId, envelope.Target, envelope.Approve, now),
-                "guess" => _session.Guess(connection.PlayerId, envelope.Text, now),
+                "guess" => GuessLocked(connection, envelope.Text, now),
                 "chat" => ChatLocked(connection, envelope.Text, now),
                 _ => false
             };
@@ -286,8 +292,18 @@ internal sealed partial class DedicatedRoom
         if (!host || _configurationPending || _configurationSyncRequired || !_canRecordMatch()) return false;
         foreach (var connection in _connections.Values.Where(connection => !connection.IsAlive).ToArray())
             Disconnect(connection, now);
-        return _connections.Values.Count(connection => connection.IsAlive && !_session.IsSpectator(connection.PlayerId))
-            >= GameRules.MinimumPlayers(_session.Settings.LiarMode) && _session.Start(now);
+        if (_connections.Values.Count(connection => connection.IsAlive && !_session.IsSpectator(connection.PlayerId))
+            < GameRules.MinimumPlayers(_session.Settings.LiarMode) || !_session.Start(now)) return false;
+        _activity(new RoomActivityData("MatchStart", RoomId, _ownerAccountId, _session.Snapshot(-1, -1, now).MatchId));
+        return true;
+    }
+
+    // 정답 입력은 채팅 필터를 적용하지 않은 원문으로 남긴다.
+    private bool GuessLocked(GameConnection connection, string? text, double now)
+    {
+        if (!_session.Guess(connection.PlayerId, text, now)) return false;
+        _activity(new RoomActivityData("RoomGuess", RoomId, connection.AccountId, Text: GameRules.CleanText(text, 40)));
+        return true;
     }
 
     private bool ReturnToLobbyLocked(bool host)
@@ -311,6 +327,7 @@ internal sealed partial class DedicatedRoom
         if (text.Length == 0 || !connection.AcceptChat(now)) return false;
         var line = new ChatLine { PlayerId = connection.PlayerId, Name = _session.PlayerName(connection.PlayerId), Text = ChatProfanityFilter.Mask(text),
             Level = _session.PlayerLevel(connection.PlayerId), Cosmetics = _session.PlayerCosmetics(connection.PlayerId) };
+        _activity(new RoomActivityData("RoomChat", RoomId, connection.AccountId, Text: line.Text));
         var envelope = new GameplayEnvelope { Type = "chat", Line = line, Sequence = ++_sequence };
         bool spectatorOnly = _session.Phase != GamePhase.Lobby && _session.Phase != GamePhase.MatchResults
             && _session.Snapshot(connection.PlayerId, -1, now).LocalIsSpectator;

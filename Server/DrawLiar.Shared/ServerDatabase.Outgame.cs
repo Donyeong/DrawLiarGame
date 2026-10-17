@@ -32,6 +32,7 @@ public sealed partial class ServerDatabase
             if (changed != 1) throw new ApiException("InsufficientCoins", 409);
             await Execute(connection, transaction, "INSERT INTO \"OwnedAccessory\" (\"AccountId\",\"Accessory\") VALUES ($1,$2)", accountId, product.Accessory);
             await Execute(connection, transaction, "INSERT INTO \"PurchaseReceipt\" (\"AccountId\",\"OperationId\",\"ProductId\") VALUES ($1,$2,$3)", accountId, operationId, product.Id);
+            await LogActivity(connection, transaction, "Purchase", accountId, new { ProductIds = new[] { product.Id }, Coins = product.Price });
         }
         var profile = await ReadProfile(connection, transaction, accountId);
         await transaction.CommitAsync();
@@ -70,6 +71,7 @@ public sealed partial class ServerDatabase
         await LockFriendAccounts(connection, transaction, accountId, target);
         if (await Scalar(connection, transaction, "SELECT 1 FROM \"Account\" WHERE \"Id\"=$1 AND NOT \"IsBanned\"", target) == null) throw new ApiException("AccountNotFound", 404);
         if (await IsBlockingAsync(connection, transaction, accountId, target)) throw new ApiException("BlockedPlayer", 409);
+        await LogActivity(connection, transaction, "FriendRequest", accountId, targetAccountId: target);
         // 상대가 나를 차단했으면 차단 사실을 알리지 않고 요청을 전달하지 않는다.
         if (await IsBlockingAsync(connection, transaction, target, accountId))
         {
@@ -125,6 +127,7 @@ public sealed partial class ServerDatabase
             : "DELETE FROM \"Friendship\" WHERE \"FromAccountId\"=$2 AND \"ToAccountId\"=$1 AND NOT \"Accepted\" AND \"CreatedAt\">$3";
         if (await Execute(connection, transaction, sql, accountId, sender, cutoff) != 1)
             throw new ApiException("FriendRequestNotFound", 404);
+        await LogActivity(connection, transaction, "FriendRespond", accountId, new { Accept = accept }, sender);
         await transaction.CommitAsync();
     }
 
@@ -138,6 +141,7 @@ public sealed partial class ServerDatabase
             "DELETE FROM \"Friendship\" WHERE \"FromAccountId\"=$1 AND \"ToAccountId\"=$2 AND NOT \"Accepted\" AND \"CreatedAt\">$3",
             accountId, target, DateTimeOffset.UtcNow - _friendRequestLifetime);
         if (await command.ExecuteNonQueryAsync(cancellationToken) != 1) throw new ApiException("FriendRequestNotFound", 404);
+        await LogActivity(connection, transaction, "FriendCancel", accountId, targetAccountId: target, cancellationToken: cancellationToken);
         await transaction.CommitAsync(cancellationToken);
     }
 
@@ -146,7 +150,8 @@ public sealed partial class ServerDatabase
         await using var connection = await _source.OpenConnectionAsync();
         await using var transaction = await connection.BeginTransactionAsync();
         await LockFriendAccounts(connection, transaction, accountId, target);
-        await Execute(connection, transaction, "DELETE FROM \"Friendship\" WHERE (\"FromAccountId\"=$1 AND \"ToAccountId\"=$2) OR (\"FromAccountId\"=$2 AND \"ToAccountId\"=$1)", accountId, target);
+        if (await Execute(connection, transaction, "DELETE FROM \"Friendship\" WHERE (\"FromAccountId\"=$1 AND \"ToAccountId\"=$2) OR (\"FromAccountId\"=$2 AND \"ToAccountId\"=$1)", accountId, target) > 0)
+            await LogActivity(connection, transaction, "FriendRemove", accountId, targetAccountId: target);
         await transaction.CommitAsync();
     }
 
@@ -169,12 +174,13 @@ public sealed partial class ServerDatabase
         return profiles.ToArray();
     }
 
-    public async Task AdminBanAsync(Guid accountId, bool isBanned)
+    public async Task AdminBanAsync(Guid accountId, bool isBanned, string admin)
     {
         await using var connection = await _source.OpenConnectionAsync();
         await using var transaction = await connection.BeginTransactionAsync();
         if (await Execute(connection, transaction, "UPDATE \"Account\" SET \"IsBanned\"=$2 WHERE \"Id\"=$1", accountId, isBanned) != 1) throw new ApiException("AccountNotFound", 404);
         if (isBanned) await Execute(connection, transaction, "DELETE FROM \"Session\" WHERE \"AccountId\"=$1", accountId);
+        await LogActivity(connection, transaction, "AdminBan", null, new { IsBanned = isBanned, Admin = admin }, accountId);
         await transaction.CommitAsync();
     }
 }

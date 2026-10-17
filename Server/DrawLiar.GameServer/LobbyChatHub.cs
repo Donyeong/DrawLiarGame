@@ -23,14 +23,16 @@ public sealed class LobbyChatHub
     private readonly Queue<LobbyChatMessage> _history = new();
     private readonly SemaphoreSlim _slots = new(512, 512);
     private readonly Func<string, CancellationToken, Task<LobbyChatIdentity>> _authenticate;
+    private readonly Func<Guid, string, CancellationToken, Task>? _record;
     private readonly TimeProvider _clock;
     private readonly TimeSpan _validationInterval;
     private long _sequence;
 
     public LobbyChatHub(Func<string, CancellationToken, Task<LobbyChatIdentity>> authenticate,
-        TimeProvider? clock = null, TimeSpan? validationInterval = null)
+        TimeProvider? clock = null, TimeSpan? validationInterval = null, Func<Guid, string, CancellationToken, Task>? record = null)
     {
         _authenticate = authenticate;
+        _record = record;
         _clock = clock ?? TimeProvider.System;
         _validationInterval = validationInterval ?? TimeSpan.FromSeconds(15);
     }
@@ -106,7 +108,9 @@ public sealed class LobbyChatHub
                     identity = await _authenticate(connection.Token, connection.ReadCancellation);
                     if (identity.AccountId != connection.AccountId || identity.ExpiresAt <= _clock.GetUtcNow())
                         throw new ApiException("Unauthorized", 401);
-                    Publish(connection, identity.DisplayName, identity.Level, identity.Cosmetics, text, request.RequestId);
+                    string masked = ChatProfanityFilter.Mask(text);
+                    if (_record != null) await _record(connection.AccountId, masked, connection.ReadCancellation);
+                    Publish(connection, identity.DisplayName, identity.Level, identity.Cosmetics, masked, request.RequestId);
                 }
             }
             catch (ApiException exception) when (exception.Status is 401 or 403) { connection.Stop("InvalidSession"); }
@@ -165,7 +169,7 @@ public sealed class LobbyChatHub
             var message = new LobbyChatMessage
             {
                 Id = ++_sequence, AccountId = connection.AccountId.ToString(), DisplayName = displayName,
-                Text = ChatProfanityFilter.Mask(text), SentAt = ServerRuntime.Timestamp(now), Level = Math.Clamp(level, 1, AccountLevelRules.MAX_LEVEL),
+                Text = text, SentAt = ServerRuntime.Timestamp(now), Level = Math.Clamp(level, 1, AccountLevelRules.MAX_LEVEL),
                 Cosmetics = CosmeticRules.Sanitize(cosmetics!)
             };
             _history.Enqueue(message);

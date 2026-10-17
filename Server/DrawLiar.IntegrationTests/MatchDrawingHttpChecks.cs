@@ -73,7 +73,17 @@ internal static partial class Integration
             using (var content = new StringContent(body, Encoding.UTF8, "application/json"))
             using (var response = await clusterClient.PostAsync("/internal/dedicated/matches", content))
                 Check(response.StatusCode == HttpStatusCode.NoContent, "인증된 경기 결과 경로만 128KiB를 넘는 그림 보고서를 수락해야 합니다.");
-            Report("실제 GameServer HTTP 그림 API 인증·참가자 조회·미참가자 거부·no-store·인증 후 경기 본문 한도 확장 검증");
+            string activity = JsonSerializer.Serialize(new RoomActivityBatchRequest(request.NodeId,
+                new[] { new RoomActivityData("RoomChat", request.RoomId, participant.ToString(), Text: "HTTP 활동") }), DrawLiar.DedicatedServer.GameplayWire.Json);
+            using (var content = new StringContent(activity, Encoding.UTF8, "application/json"))
+            using (var response = await client.PostAsync("/internal/dedicated/activity", content))
+                Check(response.StatusCode == HttpStatusCode.Unauthorized, "방 활동 기록은 클러스터 인증을 요구해야 합니다.");
+            using (var content = new StringContent(activity, Encoding.UTF8, "application/json"))
+            using (var response = await clusterClient.PostAsync("/internal/dedicated/activity", content))
+                Check(response.StatusCode == HttpStatusCode.NoContent
+                    && (await database.AdminRoomLogsAsync(Guid.Parse(request.RoomId), 0)).Entries.Any(entry => entry.Kind == "RoomChat" && entry.Detail.Contains("HTTP 활동")),
+                    "데디케이티드 직렬화 형식의 방 활동 기록을 실제 게임서버가 저장해야 합니다.");
+            Report("실제 GameServer HTTP 그림 API 인증·참가자 조회·미참가자 거부·no-store·인증 후 경기 본문 한도 확장·방 활동 수신 검증");
         }
         catch (Exception exception)
         {

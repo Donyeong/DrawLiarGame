@@ -52,6 +52,41 @@
 <section data-panel="reports" aria-label="신고 관리" hidden>
     <div class="card"><div class="card-header"><h2 class="card-title">처리 대기 신고</h2><span id="reports-count" class="ms-auto text-secondary small"></span></div><div class="table-responsive"><table class="table table-vcenter card-table reports-table"><thead><tr><th>접수</th><th>사유</th><th>대상</th><th>신고자</th><th>내용</th><th>관련 ID</th><th>관리</th></tr></thead><tbody id="reports"></tbody></table></div></div>
 </section>
+<dialog id="log-dialog" class="log-dialog" aria-labelledby="log-title">
+    <header class="log-dialog-header">
+        <button id="log-back" class="btn btn-white" type="button" hidden>뒤로</button>
+        <h2 id="log-title" class="card-title">로그</h2>
+        <button id="log-close" class="btn btn-white" type="button">닫기</button>
+    </header>
+    <div class="log-dialog-body">
+        <div id="log-status" class="alert" role="status" aria-live="polite" hidden></div>
+        <section id="log-matches" aria-labelledby="log-matches-title" hidden>
+            <h3 id="log-matches-title" class="card-title mb-3">경기·라운드 그림</h3>
+            <div id="log-match-list" class="log-match-list"></div>
+        </section>
+        <section id="log-drawing" class="log-drawing" aria-labelledby="log-drawing-title" hidden>
+            <h3 id="log-drawing-title" class="card-title mb-3">라운드 그림</h3>
+            <div id="drawing-status" class="alert" role="status" aria-live="polite" hidden></div>
+            <div id="drawing-content" hidden>
+                <p id="drawing-summary"></p>
+                <div class="log-drawing-filter">
+                    <label class="form-label mb-0" for="drawing-author">작성자</label>
+                    <select id="drawing-author" class="form-select"><option value="">전체</option></select>
+                </div>
+                <canvas id="drawing-canvas" width="1200" height="800">라운드 그림을 표시하려면 캔버스를 지원하는 브라우저를 사용하세요.</canvas>
+            </div>
+        </section>
+        <div class="table-responsive">
+            <table class="log-table table table-vcenter">
+                <thead><tr><th scope="col">시각</th><th scope="col">유형</th><th scope="col">계정</th><th scope="col">내용</th><th scope="col">관련</th></tr></thead>
+                <tbody id="log-entries"></tbody>
+            </table>
+        </div>
+    </div>
+    <footer class="log-dialog-footer">
+        <button id="log-more" class="btn btn-white" type="button" hidden>이전 기록 더 보기</button>
+    </footer>
+</dialog>
 @section Scripts {
     <script src="console.js" defer></script>
 }

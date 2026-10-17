@@ -108,7 +108,13 @@ api.MapGet("/session", (HttpContext context, IAntiforgery antiforgery) => new
     CsrfToken = antiforgery.GetAndStoreTokens(context).RequestToken
 });
 api.MapGet("/accounts", (string? search) => database.AdminAccountsAsync(search));
-api.MapPatch("/accounts/{accountId}/ban", async (string accountId, AdminAccountAction request) => { await database.AdminBanAsync(ServerRuntime.AccountId(accountId), request.IsBanned); return Results.NoContent(); });
+api.MapPatch("/accounts/{accountId}/ban", async (HttpContext context, string accountId, AdminAccountAction request) =>
+{
+    await database.AdminBanAsync(ServerRuntime.AccountId(accountId), request.IsBanned, context.User.Identity!.Name!);
+    return Results.NoContent();
+});
+api.MapGet("/accounts/{accountId}/logs", (HttpContext context, string accountId, long? before) =>
+    database.AdminAccountLogsAsync(ServerRuntime.AccountId(accountId), before ?? 0, context.RequestAborted));
 api.MapGet("/mail", (Func<HttpContext, Task<AdminMailData[]>>)(context => database.AdminMailsAsync(context.RequestAborted)));
 api.MapPost("/mail", (HttpContext context, AdminMailRequest request) => database.AdminSendMailAsync(request, context.RequestAborted));
 api.MapPost("/mail/{mailId}/cancel", async (HttpContext context, string mailId) =>
@@ -118,6 +124,10 @@ api.MapPost("/mail/{mailId}/cancel", async (HttpContext context, string mailId) 
     return Results.NoContent();
 });
 api.MapGet("/rooms", (string? search) => database.RoomsAsync(search, true));
+api.MapGet("/rooms/{roomId}/logs", (HttpContext context, string roomId, long? before) =>
+    database.AdminRoomLogsAsync(Guid.TryParse(roomId, out var id) ? id : throw new ApiException("InvalidRoom"), before ?? 0, context.RequestAborted));
+api.MapGet("/matches/{matchId}/drawings/{round:int}", (HttpContext context, string matchId, int round) =>
+    database.AdminMatchDrawingAsync(matchId, round, context.RequestAborted));
 api.MapGet("/reports", (string? status) => database.AdminReportsAsync(string.IsNullOrEmpty(status) ? null : status));
 api.MapPatch("/reports/{reportId}", async (string reportId, AdminReportAction request) => { await database.AdminSetReportStatusAsync(ServerRuntime.AccountId(reportId), request.Status); return Results.NoContent(); });
 api.MapGet("/client-versions", () => database.AdminClientVersionsAsync());

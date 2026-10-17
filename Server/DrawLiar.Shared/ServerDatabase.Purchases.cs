@@ -54,6 +54,8 @@ public sealed partial class ServerDatabase
                 await using var record = Command(connection, transaction,
                     "INSERT INTO \"PurchaseReceipt\" (\"AccountId\",\"OperationId\",\"ProductId\") VALUES ($1,$2,$3)", accountId, operationId, receipt);
                 await record.ExecuteNonQueryAsync(cancellationToken);
+                await LogActivity(connection, transaction, "Purchase", accountId,
+                    new { ProductIds = purchases.Select(product => product.Id).ToArray(), Coins = price }, cancellationToken: cancellationToken);
             }
         }
 

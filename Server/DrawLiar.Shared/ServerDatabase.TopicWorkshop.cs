@@ -87,6 +87,7 @@ public sealed partial class ServerDatabase
             """, id, accountId, normalized.Name, normalized.LanguageCode, JsonSerializer.Serialize(normalized.Words, ServerRuntime.Json)))
             createdAt = await command.ExecuteScalarAsync(cancellationToken) is DateTime timestamp
                 ? new DateTimeOffset(timestamp) : throw new ApiException("TopicWorkshopNameConflict", 409);
+        await LogActivity(connection, transaction, "WorkshopPublish", accountId, new { TopicId = id, normalized.Name }, cancellationToken: cancellationToken);
         await transaction.CommitAsync(cancellationToken);
         return new TopicWorkshopDetailResponse
         {
@@ -159,6 +160,7 @@ public sealed partial class ServerDatabase
             : "DELETE FROM \"TopicWorkshopRecommendation\" WHERE \"TopicId\"=$1 AND \"AccountId\"=$2";
         await using (var command = Command(connection, transaction, mutation, id, accountId))
             await command.ExecuteNonQueryAsync(cancellationToken);
+        await LogActivity(connection, transaction, "WorkshopRecommend", accountId, new { TopicId = id, Recommended = isRecommended }, cancellationToken: cancellationToken);
         TopicWorkshopEntry entry;
         await using (var command = Command(connection, transaction, """
             SELECT t."Id",t."CreatorAccountId",a."DisplayName",t."Name",t."LanguageCode",jsonb_array_length(t."Words"),t."DownloadCount",t."CreatedAt",
@@ -185,6 +187,7 @@ public sealed partial class ServerDatabase
         await using (var command = Command(connection, transaction,
             "DELETE FROM \"TopicWorkshop\" WHERE \"Id\"=$1 AND \"CreatorAccountId\"=$2", id, accountId))
             if (await command.ExecuteNonQueryAsync(cancellationToken) != 1) throw new ApiException("TopicWorkshopUnavailable", 404);
+        await LogActivity(connection, transaction, "WorkshopDelete", accountId, new { TopicId = id }, cancellationToken: cancellationToken);
         await transaction.CommitAsync(cancellationToken);
     }
 

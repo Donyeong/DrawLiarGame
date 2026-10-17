@@ -39,6 +39,7 @@ public sealed partial class ServerDatabase
             "UPDATE \"Account\" SET \"Cosmetics\"=$2::jsonb WHERE \"Id\"=$1", accountId,
             JsonSerializer.Serialize(profile.Cosmetics, ServerRuntime.Json)))
             await equip.ExecuteNonQueryAsync(cancellationToken);
+        await LogActivity(connection, transaction, "CosmeticEquip", accountId, new { request.Category, request.ProductId }, cancellationToken: cancellationToken);
         await transaction.CommitAsync(cancellationToken);
         return profile;
     }
@@ -69,5 +70,6 @@ public sealed partial class ServerDatabase
             VALUES ($1,$2,$3,$4,$5,$6)
             """, accountId, operationId, product.Id, product.Kind, -price, balance);
         await ledger.ExecuteNonQueryAsync(cancellationToken);
+        await LogActivity(connection, transaction, "Purchase", accountId, new { ProductIds = new[] { product.Id }, PaidGems = price }, cancellationToken: cancellationToken);
     }
 }

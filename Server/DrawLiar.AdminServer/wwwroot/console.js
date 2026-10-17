@@ -4,14 +4,42 @@ let csrfToken = '';
 let loadVersion = 0;
 let sessionExpired = false;
 let mailSending = false;
+let logVersion = 0;
+let drawingVersion = 0;
+let logView = null;
+let logLoading = false;
+let drawingLoading = false;
+let activeDrawing = null;
+const logHistory = [];
 const REPORT_REASONS = { Abuse: '욕설·비하', Drawing: '부적절한 그림', Nickname: '부적절한 닉네임', Spam: '도배·광고', Topic: '부적절한 주제', Other: '기타' };
+const LOG_KINDS = {
+  Login: '로그인', Logout: '로그아웃', GoogleLink: 'Google 계정 연동', ProfileUpdate: '프로필 변경', CosmeticEquip: '꾸미기 착용', SubscriberBadge: '구독 뱃지 설정', LobbyChat: '로비 채팅',
+  RoomCreate: '방 생성', RoomEnter: '방 입장', RoomLeave: '방 퇴장', RoomChat: '방 채팅', RoomGuess: '정답 입력', RoomConfigure: '방 설정 변경', RoomKick: '강퇴',
+  RoomInvite: '방 초대', RoomInviteRespond: '초대 응답', MatchStart: '경기 시작', MatchReward: '경기 보상',
+  MailClaim: '우편 수령', AdReward: '광고 보상', Purchase: '상품 구매', Payment: '결제 완료',
+  FriendRequest: '친구 요청', FriendCancel: '친구 요청 취소', FriendRespond: '친구 요청 응답', FriendRemove: '친구 삭제', Block: '차단', Unblock: '차단 해제', Report: '신고',
+  WorkshopPublish: '창작마당 게시', WorkshopDelete: '창작마당 삭제', WorkshopRecommend: '창작마당 추천', AdminBan: '운영자 차단 변경'
+};
+const LOG_DETAIL_LABELS = {
+  Method: '로그인 방식', Platform: '플랫폼', Version: '버전', DisplayName: '닉네임', Category: '분류', ProductId: '상품', ProductIds: '상품', ShowBadge: '뱃지 표시',
+  RoomCode: '방 코드', RoomName: '방 이름', Spectator: '관전', Voluntary: '직접 나감', Coins: '코인', PaidGems: '보석', Experience: '경험치', Score: '점수', Rank: '순위',
+  Won: '우승', Count: '개수', Provider: '제공자', Accept: '수락', Reason: '사유', TopicId: '주제 ID', Name: '이름', Recommended: '추천', IsBanned: '차단', Admin: '운영자', Text: '내용'
+};
+const LOG_CHAT_KINDS = new Set(['LobbyChat', 'RoomChat', 'RoomGuess']);
+const LOG_REWARD_KINDS = new Set(['MatchReward', 'MailClaim', 'AdReward', 'Payment']);
+const LOG_MODERATION_KINDS = new Set(['RoomKick', 'Report', 'Block', 'AdminBan']);
 const API_ERRORS = {
   InvalidMail: '받는 계정, 제목, 보상과 유효 기간을 확인하세요.',
   AccountNotFound: '받는 계정 ID를 확인하세요. 존재하지 않는 계정이 있습니다.',
   MailUnavailable: '우편을 찾을 수 없습니다.',
   InvalidClientVersion: '버전(0.1.0 형식)과 HTTPS 주소를 확인하세요. 강제 버전은 일반 버전보다 높을 수 없습니다.',
   InvalidCsrfToken: '페이지를 새로 고친 후 다시 시도하세요.',
-  HttpsRequired: 'HTTPS 주소로 접속하세요.'
+  HttpsRequired: 'HTTPS 주소로 접속하세요.',
+  DrawingReplayUnavailable: '보관된 그림이 없습니다.',
+  DrawingReplayExpired: '그림 보관기간이 만료되었습니다.',
+  InvalidAccount: 'ID 형식을 확인하세요.',
+  InvalidRoom: 'ID 형식을 확인하세요.',
+  InvalidMatch: 'ID 형식을 확인하세요.'
 };
 const SECTIONS = {
   overview: ['운영 현황', 'Operations'], versions: ['클라이언트 버전', 'Operations'], rooms: ['방 모니터링', 'Operations'],
@@ -25,6 +53,15 @@ const mailForm = document.getElementById('mail-form');
 const mailRecipients = document.getElementById('mail-recipients');
 const mailAll = document.getElementById('mail-all');
 const mailConfirmation = document.getElementById('mail-confirm');
+const logDialog = document.getElementById('log-dialog');
+const logEntries = document.getElementById('log-entries');
+const logStatus = document.getElementById('log-status');
+const logMore = document.getElementById('log-more');
+const logBack = document.getElementById('log-back');
+const logClose = document.getElementById('log-close');
+const drawingStatus = document.getElementById('drawing-status');
+const drawingAuthor = document.getElementById('drawing-author');
+const drawingCanvas = document.getElementById('drawing-canvas');
 
 function setStatus(message, tone = 'info') {
   statusElement.className = `alert alert-${tone}`;
@@ -41,6 +78,8 @@ function expireSession() {
   sessionExpired = true;
   csrfToken = '';
   ++loadVersion;
+  if (logDialog.open) logDialog.close();
+  clearLogDialog();
   for (const id of ['client-versions', 'accounts', 'rooms', 'reports', 'mails']) document.getElementById(id).replaceChildren();
   for (const element of document.querySelectorAll('[id^="metric-"], [id$="-count"], #admin-name, #overview-updated')) element.textContent = '';
   mailForm.reset();
@@ -116,6 +155,276 @@ function badge(cell, label, tone) {
   element.className = `badge bg-${tone}-lt`;
   element.textContent = label;
   cell.replaceChildren(element);
+}
+
+function setDialogStatus(element, message = '', tone = 'info') {
+  element.className = `alert alert-${tone}`;
+  element.textContent = message;
+  element.hidden = !message;
+}
+
+function updateLogControls() {
+  const busy = logLoading || drawingLoading;
+  for (const control of logDialog.querySelectorAll('button')) {
+    if (control !== logClose) control.disabled = busy;
+  }
+  drawingAuthor.disabled = busy;
+  logBack.hidden = logHistory.length === 0;
+  logMore.hidden = !logView || (logView.loaded ? !logView.nextBefore : logLoading);
+  logMore.textContent = logView?.loaded ? '이전 기록 더 보기' : '다시 시도';
+}
+
+function clearLogDrawing() {
+  ++drawingVersion;
+  drawingLoading = false;
+  activeDrawing = null;
+  document.getElementById('log-drawing').hidden = true;
+  document.getElementById('log-drawing-title').textContent = '라운드 그림';
+  document.getElementById('drawing-content').hidden = true;
+  document.getElementById('drawing-summary').textContent = '';
+  drawingAuthor.replaceChildren();
+  const context = drawingCanvas.getContext('2d');
+  if (context) context.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+  setDialogStatus(drawingStatus);
+}
+
+function clearLogDialog() {
+  ++logVersion;
+  logView = null;
+  logLoading = false;
+  logHistory.length = 0;
+  logEntries.replaceChildren();
+  document.getElementById('log-title').textContent = '';
+  document.getElementById('log-match-list').replaceChildren();
+  document.getElementById('log-matches').hidden = true;
+  setDialogStatus(logStatus);
+  clearLogDrawing();
+  updateLogControls();
+}
+
+function logButton(label, kind, id, name = '') {
+  const control = button(label, 'outline-primary');
+  control.disabled = !id;
+  control.addEventListener('click', () => openLogs(kind, id, name));
+  return control;
+}
+
+function openLogs(kind, id, name = '', remember = true) {
+  if (!id || sessionExpired) return;
+  if (remember && logDialog.open && logView) {
+    if (logView.kind === kind && logView.id === id) return;
+    logHistory.push({ kind: logView.kind, id: logView.id, name: logView.name });
+  } else if (!logDialog.open) {
+    logHistory.length = 0;
+  }
+  ++logVersion;
+  logView = { kind, id, name, loaded: false, nextBefore: 0, count: 0 };
+  logLoading = false;
+  logEntries.replaceChildren();
+  logEntries.closest('.table-responsive').scrollLeft = 0;
+  document.getElementById('log-title').textContent = kind === 'room' ? `방 로그 · ${id.slice(0, 8)}` : `유저 로그 · ${name || id}`;
+  document.getElementById('log-match-list').replaceChildren();
+  document.getElementById('log-matches').hidden = kind !== 'room';
+  clearLogDrawing();
+  if (!logDialog.open) logDialog.showModal();
+  loadLogPage();
+}
+
+async function loadLogPage() {
+  if (!logView || logLoading || drawingLoading || sessionExpired || logView.loaded && !logView.nextBefore) return;
+  const view = logView;
+  const version = logVersion;
+  const append = view.loaded;
+  const resource = view.kind === 'room' ? 'rooms' : 'accounts';
+  const query = append ? `?before=${encodeURIComponent(view.nextBefore)}` : '';
+  logLoading = true;
+  setDialogStatus(logStatus, append ? '이전 기록을 불러오는 중입니다.' : '로그를 불러오는 중입니다.');
+  updateLogControls();
+  try {
+    const result = await request(`api/${resource}/${encodeURIComponent(view.id)}/logs${query}`);
+    if (version !== logVersion || sessionExpired) return;
+    const entries = result.Entries || [];
+    if (!append) logEntries.replaceChildren();
+    renderLogEntries(entries, view);
+    view.count += entries.length;
+    view.loaded = true;
+    view.nextBefore = result.NextBefore || 0;
+    if (view.kind === 'room' && !append) renderLogMatches(result.Matches || []);
+    emptyRow(logEntries, 5, '기록된 로그가 없습니다.');
+    setDialogStatus(logStatus, view.count ? `${view.count.toLocaleString()}개 로그를 표시합니다.` : '');
+  } catch (error) {
+    if (version === logVersion && !sessionExpired) setDialogStatus(logStatus, error.message, 'danger');
+  } finally {
+    if (version === logVersion) {
+      logLoading = false;
+      updateLogControls();
+    }
+  }
+}
+
+function logDetailLabel(key) {
+  return Object.hasOwn(LOG_DETAIL_LABELS, key) ? LOG_DETAIL_LABELS[key] : key;
+}
+
+function formatLogValue(value, key = '') {
+  if (Array.isArray(value)) return value.map(item => formatLogValue(item, key)).join(', ');
+  if (typeof value === 'boolean') return value ? '예' : '아니오';
+  if (value && typeof value === 'object') return Object.entries(value).map(([name, item]) => `${logDetailLabel(name)}: ${formatLogValue(item, name)}`).join(', ');
+  if (key === 'Reason' && Object.hasOwn(REPORT_REASONS, value)) return REPORT_REASONS[value];
+  return String(value ?? '');
+}
+
+function formatLogDetail(value) {
+  let detail;
+  try { detail = JSON.parse(value || '{}'); }
+  catch { return String(value || ''); }
+  if (!detail || typeof detail !== 'object' || Array.isArray(detail)) return formatLogValue(detail);
+  const text = Object.hasOwn(detail, 'Text') ? formatLogValue(detail.Text) : '';
+  const fields = Object.entries(detail).filter(([key]) => key !== 'Text')
+    .map(([key, item]) => `${logDetailLabel(key)}: ${formatLogValue(item, key)}`).join(' · ');
+  return [text, fields].filter(Boolean).join('\n');
+}
+
+function appendLogReference(cell, text, control) {
+  const element = document.createElement('div');
+  element.className = 'log-reference';
+  const label = document.createElement('span');
+  label.textContent = text;
+  element.append(label);
+  if (control) element.append(control);
+  cell.append(element);
+  return element;
+}
+
+function renderLogEntries(entries, view) {
+  const fragment = document.createDocumentFragment();
+  for (const entry of entries) {
+    const element = row([new Date(entry.CreatedAt).toLocaleString(), '', '', formatLogDetail(entry.Detail), '']);
+    const kind = Object.hasOwn(LOG_KINDS, entry.Kind) ? LOG_KINDS[entry.Kind] : entry.Kind;
+    const tone = LOG_CHAT_KINDS.has(entry.Kind) ? 'blue' : LOG_REWARD_KINDS.has(entry.Kind) ? 'green' : LOG_MODERATION_KINDS.has(entry.Kind) ? 'red' : 'secondary';
+    badge(element.children[1], kind, tone);
+    const account = entry.AccountName || entry.AccountId || '시스템';
+    const isTarget = view.kind === 'account' && entry.TargetAccountId && entry.TargetAccountId.toLowerCase() === view.id.toLowerCase();
+    const actor = appendLogReference(element.children[2], isTarget ? `← 행위자: ${account}` : account,
+      view.kind === 'room' && entry.AccountId ? logButton('로그', 'account', entry.AccountId, entry.AccountName) : null);
+    if (isTarget) actor.classList.add('log-target-actor');
+    element.children[3].className = 'log-detail';
+    const related = element.children[4];
+    if (entry.TargetName || entry.TargetAccountId) {
+      appendLogReference(related, `대상: ${entry.TargetName || entry.TargetAccountId}`,
+        view.kind === 'room' && entry.TargetAccountId ? logButton('로그', 'account', entry.TargetAccountId, entry.TargetName) : null);
+    }
+    if (entry.RoomId && view.kind === 'account') appendLogReference(related, `방 ${entry.RoomId}`, logButton('방 로그', 'room', entry.RoomId));
+    if (entry.MatchId) appendLogReference(related, `경기 ${entry.MatchId.slice(0, 8)}`);
+    fragment.append(element);
+  }
+  logEntries.append(fragment);
+}
+
+function renderLogMatches(matches) {
+  const list = document.getElementById('log-match-list');
+  list.replaceChildren();
+  if (!matches.length) {
+    const empty = document.createElement('p');
+    empty.className = 'text-secondary';
+    empty.textContent = '종료된 경기가 없습니다.';
+    list.append(empty);
+    return;
+  }
+  for (const match of matches) {
+    const element = document.createElement('div');
+    element.className = 'log-match';
+    const summary = document.createElement('p');
+    summary.className = 'log-match-summary';
+    const expires = match.DrawingExpiresAt ? new Date(match.DrawingExpiresAt).toLocaleString() : '없음/만료';
+    summary.textContent = `종료 ${new Date(match.PlayedAt).toLocaleString()} · ${match.PlayerCount}명 · ${match.RoundCount}라운드 · 그림 보관 만료 ${expires}`;
+    element.append(summary);
+    const rounds = document.createElement('div');
+    rounds.className = 'log-round-buttons';
+    for (const round of match.Rounds || []) {
+      const control = button(`${round.Round}R ${round.Topic}/${round.Word}`, 'outline-primary');
+      control.addEventListener('click', () => openDrawing(match.MatchId, round.Round));
+      rounds.append(control);
+    }
+    if (!rounds.children.length) {
+      const empty = document.createElement('span');
+      empty.className = 'text-secondary';
+      empty.textContent = '보관된 그림이 없습니다.';
+      rounds.append(empty);
+    }
+    element.append(rounds);
+    list.append(element);
+  }
+}
+
+async function openDrawing(matchId, round) {
+  if (!logView || logView.kind !== 'room' || logLoading || drawingLoading || sessionExpired) return;
+  clearLogDrawing();
+  const version = drawingVersion;
+  const parentVersion = logVersion;
+  drawingLoading = true;
+  document.getElementById('log-drawing').hidden = false;
+  document.getElementById('log-drawing-title').textContent = `라운드 ${round} 그림 · 경기 ${matchId.slice(0, 8)}`;
+  setDialogStatus(drawingStatus, '그림을 불러오는 중입니다.');
+  updateLogControls();
+  document.getElementById('log-drawing').scrollIntoView({ block: 'start' });
+  try {
+    const result = await request(`api/matches/${encodeURIComponent(matchId)}/drawings/${encodeURIComponent(round)}`);
+    if (version !== drawingVersion || parentVersion !== logVersion || sessionExpired) return;
+    if (!result.Drawing) throw new Error(API_ERRORS.DrawingReplayUnavailable);
+    activeDrawing = result;
+    const all = document.createElement('option');
+    all.value = '';
+    all.textContent = '전체';
+    drawingAuthor.append(all);
+    for (const player of result.Drawing.Players || []) {
+      const option = document.createElement('option');
+      option.value = String(player.PlayerId);
+      option.textContent = player.DisplayName || `플레이어 ${player.PlayerId}`;
+      drawingAuthor.append(option);
+    }
+    renderDrawing();
+    document.getElementById('drawing-content').hidden = false;
+    setDialogStatus(drawingStatus);
+  } catch (error) {
+    if (version === drawingVersion && parentVersion === logVersion && !sessionExpired) setDialogStatus(drawingStatus, error.message, 'danger');
+  } finally {
+    if (version === drawingVersion && parentVersion === logVersion) {
+      drawingLoading = false;
+      updateLogControls();
+    }
+  }
+}
+
+function clamp(value, minimum, maximum) {
+  return Math.min(maximum, Math.max(minimum, Number(value) || 0));
+}
+
+function renderDrawing() {
+  if (!activeDrawing) return;
+  const context = drawingCanvas.getContext('2d');
+  if (!context) throw new Error('그림을 표시할 수 없습니다.');
+  const drawing = activeDrawing.Drawing;
+  const author = drawingAuthor.value;
+  const allStrokes = drawing.Strokes || [];
+  const strokes = author === '' ? allStrokes : allStrokes.filter(stroke => String(stroke.AuthorPlayerId) === author);
+  context.fillStyle = '#fff';
+  context.fillRect(0, 0, 1200, 800);
+  context.lineCap = 'round';
+  context.lineJoin = 'round';
+  for (const stroke of strokes) {
+    const startRadius = clamp((stroke.StartSize > 0 ? stroke.StartSize : stroke.Size) * 1200 * .5, 1, 48);
+    const endRadius = clamp(stroke.Size * 1200 * .5, 1, 48);
+    context.strokeStyle = stroke.Eraser ? '#fff' : `rgb(${clamp(stroke.R, 0, 255)}, ${clamp(stroke.G, 0, 255)}, ${clamp(stroke.B, 0, 255)})`;
+    context.lineWidth = startRadius + endRadius;
+    context.beginPath();
+    context.moveTo(clamp(stroke.X1, 0, 1) * 1200, clamp(stroke.Y1, 0, 1) * 800);
+    context.lineTo(clamp(stroke.X2, 0, 1) * 1200, clamp(stroke.Y2, 0, 1) * 800);
+    context.stroke();
+  }
+  const count = author === '' ? `선 ${strokes.length.toLocaleString()}개` : `선 ${strokes.length.toLocaleString()}개 / 전체 ${allStrokes.length.toLocaleString()}개`;
+  const expires = activeDrawing.ExpiresAt ? ` · 그림 보관 만료 ${new Date(activeDrawing.ExpiresAt).toLocaleString()}` : '';
+  document.getElementById('drawing-summary').textContent = `라운드 ${drawing.Round} · 주제 ${drawing.Topic} · 제시어 ${drawing.Word} · ${count}${expires}`;
 }
 
 async function performAction(control, action, message) {
@@ -280,6 +589,9 @@ function renderReports(reports) {
     actions.className = 'actions';
     const buttons = document.createElement('div');
     buttons.className = 'action-buttons';
+    buttons.append(logButton('대상 로그', 'account', report.TargetAccountId, report.TargetName),
+      logButton('신고자 로그', 'account', report.ReporterAccountId, report.ReporterName));
+    if (report.RoomId) buttons.append(logButton('방 로그', 'room', report.RoomId));
     for (const [label, next] of [['처리 완료', 'Resolved'], ['기각', 'Dismissed']]) {
       const control = button(label, next === 'Resolved' ? 'outline-primary' : 'outline-secondary');
       control.addEventListener('click', () => performAction(control,
@@ -339,6 +651,15 @@ async function load() {
 }
 
 window.addEventListener('hashchange', selectSection);
+logClose.addEventListener('click', () => logDialog.close());
+logDialog.addEventListener('close', () => { if (!logDialog.open) clearLogDialog(); });
+logBack.addEventListener('click', () => {
+  if (logLoading || drawingLoading) return;
+  const previous = logHistory.pop();
+  if (previous) openLogs(previous.kind, previous.id, previous.name, false);
+});
+logMore.addEventListener('click', loadLogPage);
+drawingAuthor.addEventListener('change', renderDrawing);
 refreshButton.addEventListener('click', load);
 searchForm.addEventListener('submit', event => { event.preventDefault(); load(); });
 document.getElementById('search-reset').addEventListener('click', () => { queryInput.value = ''; load(); });

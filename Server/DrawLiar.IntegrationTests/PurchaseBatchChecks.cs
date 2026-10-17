@@ -112,7 +112,7 @@ internal static partial class Integration
             var set = await database.PurchaseBatchAsync(painter, PurchaseBatch("brush", "beret", "painter"));
             Check(set.Coins == 320 && AvatarParts.IsOwned(set.OwnedAccessories, (long)AvatarAccessory.Painter),
                 "화가 세트와 구성품을 함께 보내도 중복 구성품을 추가 차감하면 안 됩니다.");
-            await database.AdminBanAsync(painter, true);
+            await database.AdminBanAsync(painter, true, "검증");
             await ExpectAvatarErrorAsync(() => database.PurchaseBatchAsync(painter, PurchaseBatch("mellow-face")), "AccountUnavailable", 403);
             Report("입력·판매 상품·잔액 검증, 중간 DB 실패 원자 롤백/재시도, 화가 세트 중복 구성품, 정지 계정 거부 검증");
         }

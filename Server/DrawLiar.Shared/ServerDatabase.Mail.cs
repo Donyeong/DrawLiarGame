@@ -87,6 +87,8 @@ public sealed partial class ServerDatabase
                     """, accountId, mail.Id, mail.PaidGems, balance);
                 await ledger.ExecuteNonQueryAsync(cancellationToken);
             }
+            await LogActivity(connection, transaction, "MailClaim", accountId, new { Count = claimed.Count, Coins = coins, PaidGems = paidGems },
+                cancellationToken: cancellationToken);
         }
         var response = new MailClaimResponse
         {

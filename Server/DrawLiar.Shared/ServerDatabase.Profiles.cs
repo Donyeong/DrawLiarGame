@@ -138,6 +138,8 @@ public sealed partial class ServerDatabase
                 """, matchId, accountId, player.Score, player.Rank, player.Won,
                 player.RoundsPlayed, player.CitizenRounds, player.LiarRounds, player.CorrectVotes, player.CorrectGuesses, reward.Coins, reward.Experience);
             await command.ExecuteNonQueryAsync(cancellationToken);
+            await LogActivity(connection, transaction, "MatchReward", accountId, new { reward.Coins, reward.Experience, player.Score, player.Rank, player.Won },
+                roomId: roomId, matchId: matchId, cancellationToken: cancellationToken);
         }
         await StoreDrawingsAsync(connection, transaction, matchId, drawings, drawingExpiresAt, cancellationToken);
         await transaction.CommitAsync(cancellationToken);

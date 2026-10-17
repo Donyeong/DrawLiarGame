@@ -139,7 +139,7 @@ internal sealed class GameClusterClient : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var validation = Task.WhenAll(ValidateSessionsAsync(stoppingToken), EnforceSessionLeasesAsync(stoppingToken));
+        var validation = Task.WhenAll(ValidateSessionsAsync(stoppingToken), EnforceSessionLeasesAsync(stoppingToken), ForwardActivitiesAsync(stoppingToken));
         while (!stoppingToken.IsCancellationRequested)
         {
             try
@@ -259,6 +259,44 @@ internal sealed class GameClusterClient : BackgroundService
             {
                 _rooms.RetryResult(result.MatchId);
                 _logger.LogWarning("완료 경기 기록을 재시도합니다: {FailureType}", exception.GetType().Name);
+            }
+        }
+    }
+
+    private async Task ForwardActivitiesAsync(CancellationToken stoppingToken)
+    {
+        try
+        {
+            using var timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
+            while (await timer.WaitForNextTickAsync(stoppingToken))
+                if (IsReady) await FlushActivitiesAsync(stoppingToken);
+        }
+        catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested) { }
+    }
+
+    internal async Task FlushActivitiesAsync(CancellationToken cancellationToken)
+    {
+        while (true)
+        {
+            var (lastSequence, entries) = _rooms.PendingActivities(RoomActivityBatchRequest.MAX_ENTRIES);
+            if (entries.Length == 0) return;
+            try
+            {
+                using var response = await _http.PostAsJsonAsync("/internal/dedicated/activity",
+                    new RoomActivityBatchRequest(_nodeId, entries), GameplayWire.Json, cancellationToken);
+                if (!response.IsSuccessStatusCode && !IsPermanentResultFailure(response.StatusCode))
+                {
+                    _logger.LogWarning("방 활동 로그 전송을 재시도합니다: HTTP {Status}", (int)response.StatusCode);
+                    return;
+                }
+                if (!response.IsSuccessStatusCode) _logger.LogError("방 활동 로그 {Count}건을 버립니다: HTTP {Status}", entries.Length, (int)response.StatusCode);
+                _rooms.AcknowledgeActivities(lastSequence);
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
+            catch (Exception exception) when (exception is HttpRequestException or OperationCanceledException or IOException)
+            {
+                _logger.LogWarning("방 활동 로그 전송을 재시도합니다: {FailureType}", exception.GetType().Name);
+                return;
             }
         }
     }

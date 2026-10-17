@@ -204,6 +204,7 @@ public sealed partial class ServerDatabase
         } while (await Execute(connection, transaction, "INSERT INTO \"Room\" (\"RoomId\",\"RoomCode\",\"OwnerAccountId\",\"NodeId\",\"Settings\",\"CustomTopics\",\"PasswordHash\") VALUES ($1,$2,$3,$4,$5::jsonb,$6::jsonb,$7) ON CONFLICT (\"RoomCode\") DO NOTHING",
             roomId, roomCode, session.AccountId, nodeId, JsonSerializer.Serialize(settings, ServerRuntime.Json), JsonSerializer.Serialize(request.CustomTopics, ServerRuntime.Json), passwordHash) == 0);
         await Execute(connection, transaction, "INSERT INTO \"RoomGameAuthority\" (\"RoomId\",\"NodeId\") VALUES ($1,$2)", roomId, nodeId);
+        await LogActivity(connection, transaction, "RoomCreate", session.AccountId, new { RoomCode = roomCode, settings.RoomName }, roomId: roomId);
         var assignment = await CreateTicket(connection, transaction, session, roomId, roomCode, publicUrl, false);
         await transaction.CommitAsync();
         return assignment;

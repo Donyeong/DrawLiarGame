@@ -179,7 +179,7 @@ internal static partial class Integration
             var expired = await database.IssueSessionAsync(account, "game:chat-test", expiresAt: DateTimeOffset.UtcNow.AddSeconds(-1));
             await ExpectAuthErrorAsync(() => database.AuthenticateLobbyAsync(expired.Token, "game:chat-test", CancellationToken.None), "Unauthorized");
             var banned = await database.IssueSessionAsync(account, "game:chat-test");
-            await database.AdminBanAsync(account, true);
+            await database.AdminBanAsync(account, true, "검증");
             await ExpectAuthErrorAsync(() => database.AuthenticateLobbyAsync(banned.Token, "game:chat-test", CancellationToken.None), "Unauthorized");
             Report("PostgreSQL 로비 채팅 게임서버 scope·현재 닉네임·상위 세션 로그아웃·만료·차단 인증 거부 검증");
         }

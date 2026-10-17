@@ -27,7 +27,8 @@ public sealed partial class ServerDatabase
         await using var transaction = await connection.BeginTransactionAsync(cancellationToken);
         if (!blocked)
         {
-            await Execute(connection, transaction, "DELETE FROM \"AccountBlock\" WHERE \"BlockerAccountId\"=$1 AND \"BlockedAccountId\"=$2", accountId, targetId);
+            if (await Execute(connection, transaction, "DELETE FROM \"AccountBlock\" WHERE \"BlockerAccountId\"=$1 AND \"BlockedAccountId\"=$2", accountId, targetId) > 0)
+                await LogActivity(connection, transaction, "Unblock", accountId, targetAccountId: targetId, cancellationToken: cancellationToken);
             await transaction.CommitAsync(cancellationToken);
             return;
         }
@@ -38,8 +39,9 @@ public sealed partial class ServerDatabase
         if (!exists && Convert.ToInt64(await Scalar(connection, transaction,
                 "SELECT count(*) FROM \"AccountBlock\" WHERE \"BlockerAccountId\"=$1", accountId)) >= MAX_BLOCKS)
             throw new ApiException("BlockLimit", 409);
-        await Execute(connection, transaction,
-            "INSERT INTO \"AccountBlock\" (\"BlockerAccountId\",\"BlockedAccountId\") VALUES ($1,$2) ON CONFLICT DO NOTHING", accountId, targetId);
+        if (await Execute(connection, transaction,
+                "INSERT INTO \"AccountBlock\" (\"BlockerAccountId\",\"BlockedAccountId\") VALUES ($1,$2) ON CONFLICT DO NOTHING", accountId, targetId) > 0)
+            await LogActivity(connection, transaction, "Block", accountId, targetAccountId: targetId, cancellationToken: cancellationToken);
         await Execute(connection, transaction,
             "DELETE FROM \"Friendship\" WHERE (\"FromAccountId\"=$1 AND \"ToAccountId\"=$2) OR (\"FromAccountId\"=$2 AND \"ToAccountId\"=$1)", accountId, targetId);
         await transaction.CommitAsync(cancellationToken);
@@ -75,6 +77,7 @@ public sealed partial class ServerDatabase
         await Execute(connection, transaction,
             "INSERT INTO \"PlayerReport\" (\"Id\",\"ReporterAccountId\",\"TargetAccountId\",\"Reason\",\"Context\",\"RoomId\",\"WorkshopTopicId\") VALUES ($1,$2,$3,$4,$5,$6,$7)",
             Guid.NewGuid(), accountId, targetId, request.Reason, context, roomId, workshopTopicId);
+        await LogActivity(connection, transaction, "Report", accountId, new { request.Reason }, targetId, roomId, cancellationToken: cancellationToken);
         await transaction.CommitAsync(cancellationToken);
     }
 

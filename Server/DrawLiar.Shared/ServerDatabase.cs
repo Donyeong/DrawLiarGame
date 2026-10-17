@@ -27,6 +27,9 @@ public sealed partial class ServerDatabase : IDisposable
         _drawingReplayRetentionDays = configuration.GetValue<int?>("DrawingReplay:RetentionDays") ?? DrawingReplayRules.DEFAULT_RETENTION_DAYS;
         if (_drawingReplayRetentionDays is < 1 or > DrawingReplayRules.MAX_RETENTION_DAYS)
             throw new InvalidOperationException("DrawingReplay:RetentionDays는 1~365일이어야 합니다.");
+        _activityLogRetentionDays = configuration.GetValue<int?>("ActivityLog:RetentionDays") ?? DEFAULT_ACTIVITY_LOG_RETENTION_DAYS;
+        if (_activityLogRetentionDays is < 1 or > 365)
+            throw new InvalidOperationException("ActivityLog:RetentionDays는 1~365일이어야 합니다.");
         _source = NpgsqlDataSource.Create(connectionString);
     }
 
@@ -116,6 +119,7 @@ public sealed partial class ServerDatabase : IDisposable
         await using (var friends = Command(connection, transaction, friendsSql, EXPIRY_CLEANUP_BATCH_SIZE, DateTimeOffset.UtcNow - _friendRequestLifetime))
             await friends.ExecuteNonQueryAsync(cancellationToken);
         await CleanupDrawingReplaysAsync(connection, transaction, cancellationToken);
+        await CleanupActivityLogsAsync(connection, transaction, _activityLogRetentionDays, cancellationToken);
         await transaction.CommitAsync(cancellationToken);
     }
 
@@ -307,6 +311,7 @@ public sealed partial class ServerDatabase : IDisposable
             if (!AvatarParts.IsOwned(owned, request.Accessory)) throw new ApiException("AccessoryNotOwned", 403);
         }
         await Execute(connection, transaction, "UPDATE \"Account\" SET \"DisplayName\"=$2,\"AvatarColor\"=$3,\"Accessory\"=$4 WHERE \"Id\"=$1", id, name, request.AvatarColor, request.Accessory);
+        await LogActivity(connection, transaction, "ProfileUpdate", id, new { DisplayName = name });
         var profile = await ReadProfile(connection, transaction, id);
         await transaction.CommitAsync();
         return profile;

@@ -61,6 +61,7 @@ public sealed partial class ServerDatabase
             """, roomId, JsonSerializer.Serialize(settings, ServerRuntime.Json), passwordHash, version, accessVersion, operationId,
             JsonSerializer.Serialize(customTopics, ServerRuntime.Json)))
             await update.ExecuteNonQueryAsync(cancellationToken);
+        await LogActivity(connection, transaction, "RoomConfigure", owner, new { settings.RoomName }, roomId: roomId, cancellationToken: cancellationToken);
         if (changeAccess)
         {
             await using (var tickets = Command(connection, transaction, "DELETE FROM \"JoinTicket\" WHERE \"RoomId\"=$1 AND \"AccessVersion\"<>$2", roomId, accessVersion))

@@ -27,11 +27,17 @@ var lobbyChat = new LobbyChatHub(async (token, cancellation) =>
 {
     var identity = await database.AuthenticateLobbyAsync(token, "game:" + nodeId, cancellation);
     return new LobbyChatIdentity(identity.Session.AccountId, identity.DisplayName, identity.Session.ExpiresAt, identity.Level, identity.Cosmetics);
-});
+}, record: (accountId, text, cancellation) => database.LogActivityAsync("LobbyChat", accountId, new { Text = text }, cancellation));
 app.Map("/ws/lobby", lobbyChat.HandleAsync);
 
 app.MapPost("/api/session/enter", (EnterGameRequest request) => database.EnterGameAsync(request.AssignmentToken, nodeId));
-app.MapPost("/api/session/logout", (Func<HttpContext, Task<IResult>>)(async context => { await database.LogoutAsync(await Authenticate(context)); return Results.NoContent(); }));
+app.MapPost("/api/session/logout", (Func<HttpContext, Task<IResult>>)(async context =>
+{
+    var session = await Authenticate(context);
+    await database.LogoutAsync(session);
+    await database.LogActivityAsync("Logout", session.AccountId);
+    return Results.NoContent();
+}));
 app.MapGet("/api/profile", (Func<HttpContext, Task<ProfileData>>)(async context => await database.ProfileAsync((await Authenticate(context)).AccountId)));
 app.MapGet("/api/matches/{matchId}/reward", async (HttpContext context, string matchId) =>
     await database.MatchRewardAsync((await Authenticate(context)).AccountId, matchId, context.RequestAborted));
@@ -147,6 +153,12 @@ app.MapPost("/internal/dedicated/matches", async (HttpContext context, MatchResu
 {
     ServerRuntime.RequireCluster(context, app.Configuration);
     await database.RecordMatchAsync(request, context.RequestAborted);
+    return Results.NoContent();
+});
+app.MapPost("/internal/dedicated/activity", async (HttpContext context, RoomActivityBatchRequest request) =>
+{
+    ServerRuntime.RequireCluster(context, app.Configuration);
+    await database.RecordRoomActivityAsync(request, context.RequestAborted);
     return Results.NoContent();
 });
 app.MapPost("/internal/tickets/redeem", async (HttpContext context, RedeemTicketRequest request) => { ServerRuntime.RequireCluster(context, app.Configuration); return await database.RedeemTicketAsync(request); });

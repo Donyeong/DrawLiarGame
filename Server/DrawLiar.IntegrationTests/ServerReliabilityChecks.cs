@@ -125,6 +125,13 @@ internal static partial class Integration
             received.AddOrUpdate(result!.MatchId, 1, (_, count) => count + 1);
             context.Response.StatusCode = statuses[result.MatchId];
         });
+        int activityStatus = 503;
+        var activities = new ConcurrentQueue<DrawLiar.Server.RoomActivityBatchRequest>();
+        app.MapPost("/internal/dedicated/activity", async (HttpContext context) =>
+        {
+            activities.Enqueue((await context.Request.ReadFromJsonAsync<DrawLiar.Server.RoomActivityBatchRequest>(GameplayWire.Json))!);
+            context.Response.StatusCode = activityStatus;
+        });
         app.MapPost("/internal/sessions/check", async (HttpContext context) =>
         {
             if (sessionMode == -1) { context.Abort(); return Results.Empty; }
@@ -156,6 +163,13 @@ internal static partial class Integration
         var room = rooms.Join(joined, new RedeemTicketResponse { AccountId = account, Room = roomData,
             Profile = new ProfileData { AccountId = account, DisplayName = "검증화가" } });
         Check(room != null, "크기 검사용 방을 구성해야 합니다.");
+        await cluster.FlushActivitiesAsync(CancellationToken.None);
+        Check(activities.Count == 1 && rooms.PendingActivities(64).Entries.Length == 1, "일시 오류인 방 활동 로그는 대기열에 남겨 다시 보내야 합니다.");
+        activityStatus = 204;
+        await cluster.FlushActivitiesAsync(CancellationToken.None);
+        Check(activities.Count == 2 && rooms.PendingActivities(64).Entries.Length == 0 && activities.Last().NodeId == "reliability-node"
+            && activities.Last().Entries.Single() is { Kind: "RoomEnter" } entered && entered.AccountId == account && entered.RoomId == roomData.RoomId,
+            "방 활동 로그는 노드 ID와 함께 보내고 성공한 뒤에만 대기열에서 지워야 합니다.");
         bool rejected = false;
         try
         {
