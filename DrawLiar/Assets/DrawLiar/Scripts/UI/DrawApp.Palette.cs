@@ -64,6 +64,47 @@ namespace DrawLiar
             SetTooltip(button, color.HasValue ? "즐겨찾기 색상 {0}" : "빈 즐겨찾기 {0}", slot + 1);
         }
 
+        private const float SWATCH_GLOW_SPREAD = 4;
+        private static readonly float[] _swatchGlowAlphas = { .42f, .2f, .07f };
+
+        // 배경과 같은 색도 구분되도록 색 버튼 바깥에 점점 옅어지는 링을 겹쳐 그린다.
+        private static void AddSwatchGlow(VisualElement swatch)
+        {
+            var glow = new VisualElement { pickingMode = PickingMode.Ignore };
+            glow.style.position = Position.Absolute;
+            glow.style.left = -SWATCH_GLOW_SPREAD;
+            glow.style.top = -SWATCH_GLOW_SPREAD;
+            glow.style.right = -SWATCH_GLOW_SPREAD;
+            glow.style.bottom = -SWATCH_GLOW_SPREAD;
+            glow.generateVisualContent += PaintSwatchGlow;
+            swatch.Add(glow);
+        }
+
+        private static void PaintSwatchGlow(MeshGenerationContext context)
+        {
+            var rect = context.visualElement.contentRect;
+            float radius = Mathf.Min(rect.width, rect.height) * .5f - SWATCH_GLOW_SPREAD;
+            if (radius <= 0) return;
+            const float K = .5522848f;
+            var painter = context.painter2D;
+            float width = SWATCH_GLOW_SPREAD / _swatchGlowAlphas.Length;
+            painter.lineWidth = width;
+            for (int ring = 0; ring < _swatchGlowAlphas.Length; ring++)
+            {
+                float r = radius + width * (ring + .5f);
+                Vector2 Point(float x, float y) => rect.center + new Vector2(x * r, y * r);
+                painter.strokeColor = new Color(120 / 255f, 103 / 255f, 158 / 255f, _swatchGlowAlphas[ring]);
+                painter.BeginPath();
+                painter.MoveTo(Point(1, 0));
+                painter.BezierCurveTo(Point(1, K), Point(K, 1), Point(0, 1));
+                painter.BezierCurveTo(Point(-K, 1), Point(-1, K), Point(-1, 0));
+                painter.BezierCurveTo(Point(-1, -K), Point(-K, -1), Point(0, -1));
+                painter.BezierCurveTo(Point(K, -1), Point(1, -K), Point(1, 0));
+                painter.ClosePath();
+                painter.Stroke();
+            }
+        }
+
         private static Button CreateColorPickerButton(VisualElement parent, System.Action clicked)
         {
             var button = Button(parent, "", clicked, "secondary brush-picker-open");

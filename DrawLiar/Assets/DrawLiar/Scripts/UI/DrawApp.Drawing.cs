@@ -32,8 +32,8 @@ namespace DrawLiar
                 Color32 color=DrawBrushSettings.Palette[index];
                 var swatch=Button(palette,"",()=>SelectBrushColor(color),"swatch");
                 swatch.userData=color;swatch.name="brush-color-"+index;
-                if(IsMobile){swatch.style.backgroundColor=Color.clear;var dot=Box(swatch,"mobile-swatch-dot");dot.pickingMode=PickingMode.Ignore;dot.style.backgroundColor=(Color)color;}
-                else swatch.style.backgroundColor=(Color)color;
+                if(IsMobile){swatch.style.backgroundColor=Color.clear;var dot=Box(swatch,"mobile-swatch-dot");dot.pickingMode=PickingMode.Ignore;dot.style.backgroundColor=(Color)color;AddSwatchGlow(dot);}
+                else{swatch.style.backgroundColor=(Color)color;AddSwatchGlow(swatch);}
                 SetTooltip(swatch,"색상 {0}",index+1);swatch.EnableInClassList("palette-row-end",index%4==3);_brushSwatches.Add(swatch);
                 if(color.Equals(DrawingSurface.PaperColor))
                 {swatch.name="white-brush";swatch.AddToClassList("white-brush");SetTooltip(swatch,"흰색");swatch.Q<VisualElement>(className:"mobile-swatch-dot")?.AddToClassList("white-brush-dot");}
