@@ -21,6 +21,7 @@
 - 광고는 Android·WebGL에만 노출하고 화가패스 구독 중에는 초기화하지 않는다. 일일 광고 보상은 UTC 날짜별 계정당 한 번 서버에서 기존 보석(`PaidGems`) 잔액·원장과 함께 지급한다. Android는 AdMob SSV 서명을 검증한다. Google H5는 서버 시청 증명이 없으므로 웹 보상은 기본 비활성화하며, `Advertising:Web:AllowClientVerification`은 클라이언트 완료 콜백 신뢰를 허용하는 설정이다. 웹 동의는 사이트의 `window.DrawLiarAdvertisingConsent.request(): Promise<boolean>`과 선택적인 `showPrivacyOptions()`로 연결하며, 승인 후에만 SDK를 로드한다. 광고 계정·동의 설정 없이 성공이나 보상을 흉내 내지 않는다.
 - 우편은 운영툴에서만 발송한다. 코인·보석 보상은 수령 시 서버가 계정당 한 번(`MailClaim`) 원자적으로 지급하고 보석은 `CommerceLedger`(`MailReward`)에 기록한다. 전체 발송은 만료 전까지 이후 가입한 계정도 받으며, 발송 취소는 만료 처리로 이미 지급된 보상은 회수하지 않는다.
 - 배포는 Ubuntu 24.04 x64의 `drawliar-dev` Compose와 `DrawLiar-Server` Jenkins 작업을 사용한다. 같은 머신의 Kona 서비스·DB·배포 경로를 변경하지 않는다. DB 볼륨과 `/srv/drawliar/dev/.env`, 인증서를 배포물에 포함하거나 삭제하지 않는다.
+- VM 최초 설정·템플릿 갱신은 `rascallab@34.158.195.192`와 `C:\Users\RascalLab\Documents\GCPKey\id_ed25519` 관리자 SSH 키를 사용한다. Jenkins의 `kona-deploy` 키는 배포 helper 실행 전용이다.
 - 운영툴은 `Admin:UsersFile`의 계정·비밀번호 해시로 로그인하며 관리 화면·API는 인증 쿠키, 변경 요청은 CSRF 토큰을 요구한다. 로컬 계정 파일은 `Private/admin-users.json`, 운영은 `/srv/drawliar/dev/secrets/admin-users.json`에 둔다. 해시는 `DrawLiar.AdminServer --generate-password-hash`로 생성하고 평문을 커밋하지 않는다. 최초 적용은 운영 계정 파일 배치와 `install.sh` 재실행으로 읽기 권한·인증 볼륨·Razor 배포 검사를 먼저 준비하고 `admin-data-protection` 볼륨을 보존한다.
 - 운영툴 단독 갱신은 `ADMIN_ONLY`로 수행하고 다른 앱의 Shared DLL을 교체하지 않는다. 공개 관리자 경로는 기존 인증서를 검증하는 HTTPS 프록시를 사용한다.
 - 게임 판정 단독 갱신은 `DEDICATED_ONLY`와 확정 커밋 archive를 사용하고, 현재 core와 Shared·DB·계약·정책이 동일한지 검증한다.
