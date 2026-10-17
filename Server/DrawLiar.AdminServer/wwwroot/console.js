@@ -8,13 +8,39 @@ async function request(path, method = 'GET', body) {
   if (location.protocol !== 'https:' && !(location.protocol === 'http:' && loopback)) throw new Error('HTTPS 주소로 접속하세요.');
   if (!adminKey) throw new Error('관리 키를 입력하세요.');
   const response = await fetch(path, { method, cache: 'no-store', headers: { Authorization: `Bearer ${adminKey}`, 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined });
-  if (!response.ok) { const error = await response.json().catch(() => ({})); throw new Error(error.Code === 'Unauthorized' ? '관리 키를 확인하세요.' : error.Code === 'HttpsRequired' ? 'HTTPS 주소로 접속하세요.' : error.Code || `HTTP ${response.status}`); }
+  if (!response.ok) { const error = await response.json().catch(() => ({})); throw new Error(error.Code === 'Unauthorized' ? '관리 키를 확인하세요.' : error.Code === 'HttpsRequired' ? 'HTTPS 주소로 접속하세요.' : error.Code === 'InvalidClientVersion' ? '버전(0.1.0 형식)과 HTTPS 주소를 확인하세요. 강제 버전은 일반 버전보다 높을 수 없습니다.' : error.Code || `HTTP ${response.status}`); }
   return response.status === 204 ? null : response.json();
 }
 function row(values) {
   const element = document.createElement('tr');
   for (const value of values) { const cell = document.createElement('td'); cell.textContent = String(value); element.append(cell); }
   return element;
+}
+function renderClientVersions(policies) {
+  const body = document.getElementById('client-versions'); body.replaceChildren();
+  for (const policy of policies) {
+    const element = row([policy.Platform]);
+    const inputs = {};
+    for (const [field, label, maxLength] of [['MinimumVersion', '강제 업데이트 버전', 32], ['LatestVersion', '일반 업데이트 버전', 32], ['StoreUrl', '스토어 주소', 512]]) {
+      const cell = document.createElement('td');
+      const input = document.createElement('input'); input.type = 'text'; input.value = policy[field]; input.maxLength = maxLength; input.setAttribute('aria-label', `${policy.Platform} ${label}`);
+      input.placeholder = field === 'StoreUrl' ? policy.Platform === 'Android' ? 'https://play.google.com/store/apps/details?id=com.rascallab.liargame' : 'https://' : '0.1.0';
+      inputs[field] = input; cell.append(input); element.append(cell);
+    }
+    const actions = document.createElement('td');
+    const button = document.createElement('button'); button.type = 'button'; button.textContent = '저장';
+    button.addEventListener('click', async () => {
+      const actionVersion = loadVersion; button.disabled = true;
+      try {
+        await request(`api/client-versions/${encodeURIComponent(policy.Platform)}`, 'PUT', { Platform: policy.Platform, MinimumVersion: inputs.MinimumVersion.value, LatestVersion: inputs.LatestVersion.value, StoreUrl: inputs.StoreUrl.value });
+        if (actionVersion !== loadVersion) return;
+        const refreshVersion = loadVersion + 1;
+        if (await load() && refreshVersion === loadVersion) status.textContent = `${policy.Platform}: 클라이언트 버전 저장 완료`;
+      } catch (error) { if (actionVersion === loadVersion) status.textContent = error.message; }
+      finally { button.disabled = false; }
+    });
+    actions.append(button); element.append(actions); body.append(element);
+  }
 }
 async function load() {
   const version = ++loadVersion;
@@ -23,6 +49,8 @@ async function load() {
     const accounts = await request(`api/accounts?search=${query}`);
     if (version !== loadVersion) return false;
     const rooms = await request(`api/rooms?search=${query}`);
+    if (version !== loadVersion) return false;
+    const policies = await request('api/client-versions');
     if (version !== loadVersion) return false;
     const accountsBody = document.getElementById('accounts');
     accountsBody.replaceChildren();
@@ -52,6 +80,7 @@ async function load() {
     for (const room of rooms.Rooms) roomsBody.append(row([room.Name, room.RoomId, room.PlayerCount, room.SpectatorCount, room.IsInProgress ? '진행 중' : '대기 중']));
     const reports = await request('api/reports?status=Open');
     if (version !== loadVersion) return false;
+    renderClientVersions(policies);
     const reportsBody = document.getElementById('reports'); reportsBody.replaceChildren();
     for (const report of reports) {
       const element = row([new Date(report.CreatedAt).toLocaleString(), REPORT_REASONS[report.Reason] || report.Reason,
@@ -77,4 +106,4 @@ async function load() {
 }
 document.getElementById('auth').addEventListener('submit', event => { event.preventDefault(); adminKey = document.getElementById('key').value; document.getElementById('key').value = ''; load(); });
 document.getElementById('search').addEventListener('submit', event => { event.preventDefault(); load(); });
-document.getElementById('logout').addEventListener('click', () => { ++loadVersion; adminKey = ''; document.getElementById('accounts').replaceChildren(); document.getElementById('rooms').replaceChildren(); document.getElementById('reports').replaceChildren(); status.textContent = '연결을 해제했습니다.'; });
+document.getElementById('logout').addEventListener('click', () => { ++loadVersion; adminKey = ''; document.getElementById('client-versions').replaceChildren(); document.getElementById('accounts').replaceChildren(); document.getElementById('rooms').replaceChildren(); document.getElementById('reports').replaceChildren(); status.textContent = '연결을 해제했습니다.'; });

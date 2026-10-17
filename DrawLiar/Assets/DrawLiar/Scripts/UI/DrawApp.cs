@@ -125,6 +125,7 @@ namespace DrawLiar
             AttachTopicWorkshopEvents();
             AttachMatchRewardEvents();
             AttachCommerceEvents();
+            AttachClientVersionEvents();
 #if UNITY_WEBGL && !UNITY_EDITOR
             if(root!=null)_browserTextInput=new DrawBrowserTextInput(root,ChatShortcutTarget,OpenChatShortcut);
 #endif
@@ -146,7 +147,7 @@ namespace DrawLiar
             L.LanguageChanged-=OnLanguageChanged;
             DetachSocialEvents();
             DetachRoomPasswordEvents();
-            DetachTopicWorkshopEvents();SuspendTopicWorkshopPage();DetachMatchRewardEvents();
+            DetachTopicWorkshopEvents();SuspendTopicWorkshopPage();DetachMatchRewardEvents();DetachClientVersionEvents();
             ClearRoomPasswordSecrets();
 #if UNITY_WEBGL && !UNITY_EDITOR
             _browserTextInput?.Dispose();_browserTextInput=null;
@@ -221,6 +222,7 @@ namespace DrawLiar
             AttachRoomPasswordEvents();
             AttachTopicWorkshopEvents();
             content=Box(root,"grow app-content");Home();
+            AttachClientVersionEvents();_=lobby.CheckClientVersionAsync();
             root.schedule.Execute(Tick).Every(100);
             root.schedule.Execute(RefreshRoomsInBackground).Every(1000);
             root.schedule.Execute(RefreshSocialControls).Every(1000);
@@ -2539,7 +2541,7 @@ namespace DrawLiar
             if(IsMobile&&mobileScroll){var scroll=DrawSmoothScroll.Create(ScrollViewMode.Vertical);scroll.AddToClassList("mobile-modal-scroll");modal.Add(scroll);body=Box(scroll,"mobile-modal-body");}
             if(!string.IsNullOrEmpty(title))Text(body,title,"title");HideMobileScrollers();DrawUIMotion.ShowModal(overlay,modal);
             if(_roomCustomizeOverlay!=null){overlay.focusable=true;overlay.Focus();}
-            _roomPasswordOverlay?.BringToFront();return body;
+            _roomPasswordOverlay?.BringToFront();_updateOverlay?.BringToFront();return body;
         }
         private void HideMobileScrollers()
         {

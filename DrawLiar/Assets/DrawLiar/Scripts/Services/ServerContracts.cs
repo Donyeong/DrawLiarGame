@@ -329,4 +329,20 @@ namespace DrawLiar
         public int MemberCount;
         public string Code = "";
     }
+    [Serializable] public sealed class ClientVersionResponse { public bool UpdateRequired; public bool UpdateAvailable; public string LatestVersion = ""; public string StoreUrl = ""; }
+    [Serializable] public sealed class ClientVersionPolicy { public string Platform = ""; public string MinimumVersion = ""; public string LatestVersion = ""; public string StoreUrl = ""; }
+    // 버전 정책은 스토어 배포 플랫폼에만 적용한다. 버전은 0.1.0 형식의 세 자리 숫자다.
+    public static class ClientVersionRules
+    {
+        public const string PLATFORM_HEADER = "X-DrawLiar-Platform", VERSION_HEADER = "X-DrawLiar-Version";
+        public const string PLATFORM_ANDROID = "Android", PLATFORM_WINDOWS = "Windows";
+        public static readonly string[] PLATFORMS = { PLATFORM_ANDROID, PLATFORM_WINDOWS };
+
+        public static bool TryParse(string value, out Version version) =>
+            Version.TryParse(value ?? "", out version) && version.Build >= 0 && version.Revision < 0;
+
+        // 기준 버전이 비어 있으면 적용하지 않고, 현재 버전을 해석할 수 없으면 오래된 버전으로 본다.
+        public static bool IsOlder(string current, string target) =>
+            TryParse(target, out var required) && (!TryParse(current, out var installed) || installed < required);
+    }
 }

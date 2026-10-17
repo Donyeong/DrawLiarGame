@@ -20,6 +20,12 @@ internal static partial class Integration
 
     public static async Task RunAsync(string[] args)
     {
+        if (args.Contains("--client-version-only") || args.Contains("--client-version-rules-only"))
+        {
+            VerifyClientVersionRules();
+            if (args.Contains("--client-version-only")) await VerifyClientVersionDatabaseAsync();
+            return;
+        }
         if (args.Contains("--spy-only"))
         {
             DrawLiar.Editor.GameSelfCheck.Run();

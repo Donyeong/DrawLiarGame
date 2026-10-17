@@ -13973,6 +13973,74 @@
         "झूठे की टीम के राउंड",
         "جولات فريق الكاذب"
       ]
+    },
+    {
+      "Key": "업데이트",
+      "Values": [
+        "업데이트",
+        "Update",
+        "更新",
+        "更新",
+        "アップデート",
+        "Actualizar",
+        "Atualizar",
+        "Mettre à jour",
+        "Aktualisieren",
+        "Perbarui",
+        "अपडेट करें",
+        "تحديث"
+      ]
+    },
+    {
+      "Key": "업데이트 안내",
+      "Values": [
+        "업데이트 안내",
+        "Update",
+        "更新提示",
+        "更新提示",
+        "アップデートのお知らせ",
+        "Actualización",
+        "Atualização",
+        "Mise à jour",
+        "Update",
+        "Pembaruan",
+        "अपडेट",
+        "تحديث"
+      ]
+    },
+    {
+      "Key": "새 버전으로 업데이트해야 이용할 수 있습니다.",
+      "Values": [
+        "새 버전으로 업데이트해야 이용할 수 있습니다.",
+        "Update to the latest version to continue.",
+        "请更新到最新版本后继续使用。",
+        "請更新至最新版本後繼續使用。",
+        "ご利用には最新バージョンへのアップデートが必要です。",
+        "Actualiza a la última versión para continuar.",
+        "Atualize para a versão mais recente para continuar.",
+        "Mettez à jour vers la dernière version pour continuer.",
+        "Aktualisiere auf die neueste Version, um weiterzuspielen.",
+        "Perbarui ke versi terbaru untuk melanjutkan.",
+        "जारी रखने के लिए नवीनतम संस्करण में अपडेट करें।",
+        "حدّث إلى أحدث إصدار للمتابعة."
+      ]
+    },
+    {
+      "Key": "새 버전이 출시되었습니다.",
+      "Values": [
+        "새 버전이 출시되었습니다.",
+        "A new version is available.",
+        "有新版本可用。",
+        "有新版本可用。",
+        "新しいバージョンが利用可能です。",
+        "Hay una nueva versión disponible.",
+        "Uma nova versão está disponível.",
+        "Une nouvelle version est disponible.",
+        "Eine neue Version ist verfügbar.",
+        "Versi baru tersedia.",
+        "नया संस्करण उपलब्ध है।",
+        "يتوفر إصدار جديد."
+      ]
     }
   ]
 }

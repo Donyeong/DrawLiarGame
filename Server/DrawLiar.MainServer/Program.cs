@@ -11,6 +11,24 @@ await ServerRuntime.InitializeAsync(app);
 var database = app.Services.GetRequiredService<ServerDatabase>();
 var google = app.Services.GetRequiredService<GoogleAuthentication>();
 
+Task<ClientVersionResponse> ClientVersion(HttpContext context)
+{
+    if (!context.Request.Headers.TryGetValue(ClientVersionRules.PLATFORM_HEADER, out var platform)
+        || !context.Request.Headers.TryGetValue(ClientVersionRules.VERSION_HEADER, out var version)
+        || platform.ToString().Length > 32 || version.ToString().Length > 32)
+        return Task.FromResult(new ClientVersionResponse());
+    return database.ClientVersionAsync(platform.ToString(), version.ToString());
+}
+
+app.Use(async (context, next) =>
+{
+    if ((context.Request.Path.StartsWithSegments("/api/auth")
+        || string.Equals(context.Request.Path.Value?.TrimEnd('/'), "/api/session/assign", StringComparison.OrdinalIgnoreCase))
+        && (await ClientVersion(context)).UpdateRequired)
+        throw new ApiException("UpdateRequired", 426);
+    await next(context);
+});
+
 async Task<LoginResponse> Login(Guid accountId)
 {
     var issued = await database.IssueSessionAsync(accountId, "main");
@@ -26,6 +44,7 @@ async Task<LoginResponse> CompleteLogin(IssuedSession issued)
 
 Task<ServerSession> Authenticate(HttpContext context) => database.AuthenticateAsync(ServerRuntime.Bearer(context), "main");
 
+app.MapGet("/api/client/version", (Func<HttpContext, Task<ClientVersionResponse>>)ClientVersion);
 app.MapPost("/api/auth/guest", async (HttpContext context, GuestLoginRequest request) =>
     await CompleteLogin(await database.GuestLoginAsync(request, context.RequestAborted))).RequireRateLimiting("auth");
 app.MapPost("/api/auth/login", async (LoginRequest request) => await Login(await database.LoginAsync(request))).RequireRateLimiting("auth");

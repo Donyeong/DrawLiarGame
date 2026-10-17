@@ -267,6 +267,7 @@ namespace DrawLiar
 
         public Task GuestLoginAsync() => RunAsync(async () =>
         {
+            RequireCurrentClient();
             var credentials = DrawGuestCredentialStore.GetOrCreate();
             await EnterOutgameAsync(await SendAsync<LoginResponse>(_config.MainServerUrl, "/api/auth/guest", "POST",
                 new GuestLoginRequest { GuestId = credentials.GuestId, GuestSecret = credentials.GuestSecret }));
@@ -304,6 +305,7 @@ namespace DrawLiar
 
         public Task GoogleLoginAsync(bool link = false) => RunAsync(async () =>
         {
+            RequireCurrentClient();
             if (link && string.IsNullOrEmpty(_mainSession)) throw new InvalidOperationException("먼저 로그인해 주세요.");
             using var cancellation = CancellationTokenSource.CreateLinkedTokenSource(_lifetime);
             DrawAsync.CancelAfter(cancellation, TimeSpan.FromMinutes(4));
@@ -699,6 +701,8 @@ namespace DrawLiar
             request.certificateHandler = _config.CreateCertificateHandler();
             request.timeout = 20;
             request.SetRequestHeader("Accept", "application/json");
+            request.SetRequestHeader(ClientVersionRules.PLATFORM_HEADER, ClientPlatform);
+            request.SetRequestHeader(ClientVersionRules.VERSION_HEADER, Application.version);
             if (body != null)
             {
                 request.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(JsonUtility.ToJson(body)));
@@ -717,6 +721,7 @@ namespace DrawLiar
                 string code = "ConnectionFailed";
                 try { code = JsonUtility.FromJson<ApiError>(request.downloadHandler.text)?.Code ?? code; } catch (ArgumentException) { }
                 string message = DescribeError(code, request.responseCode);
+                if (code == "UpdateRequired") OnUpdateRequired();
                 if (code == "RoomPasswordRequired" || code == "InvalidRoomPassword" || code == "InvalidRoomPasswordFormat")
                     throw new RoomPasswordException(message);
                 throw new ApiRequestException(code, message);
@@ -744,6 +749,7 @@ namespace DrawLiar
             if (code.StartsWith("TopicWorkshop", StringComparison.Ordinal)) return TopicWorkshopErrorMessage(code);
             switch (code)
             {
+                case "UpdateRequired": return UPDATE_REQUIRED_MESSAGE;
                 case "AdsUnavailable": return "광고를 이용할 수 없습니다.";
                 case "AdRewardExpired": return "광고 보상이 만료되었습니다. 다시 시도해 주세요.";
                 case "AdRewardNotReady": return "광고 보상을 확인하고 있습니다. 잠시 후 다시 확인해 주세요.";
