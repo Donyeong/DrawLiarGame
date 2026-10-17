@@ -51,7 +51,7 @@ public sealed partial class ServerDatabase : ICommerceRepository
             return existing;
         }
         await using (var pending = Command(connection, transaction,
-            "SELECT count(*) FROM \"CommerceOrder\" WHERE \"AccountId\"=$1 AND \"State\"='Prepared'", candidate.AccountId))
+            "SELECT count(*) FROM \"CommerceOrder\" WHERE \"AccountId\"=$1 AND \"State\"='Prepared' AND \"CreatedAt\">now()-interval '1 hour'", candidate.AccountId))
             if (Convert.ToInt64(await pending.ExecuteScalarAsync(cancellationToken)) >= 32) throw new ApiException("PaymentOrderLimit", 429);
         await using (var command = Command(connection, transaction, """
             INSERT INTO "CommerceOrder" ("OrderId","AccountId","OperationId","ProductId","Provider","StoreProductId","AccountBinding","ProductJson","CreatedAt","AppScope")
@@ -88,6 +88,10 @@ public sealed partial class ServerDatabase : ICommerceRepository
 
     public async Task<CommercePaymentResponse> CompleteCommerceOrderAsync(CommerceStoredOrder verified, string appScope,
         string transactionId, CancellationToken cancellationToken)
+        => await CompleteCommerceOrderCoreAsync(verified, appScope, transactionId, null, cancellationToken);
+
+    private async Task<CommercePaymentResponse> CompleteCommerceOrderCoreAsync(CommerceStoredOrder verified, string appScope,
+        string transactionId, string? protectedProof, CancellationToken cancellationToken)
     {
         await using var connection = await _source.OpenConnectionAsync(cancellationToken);
         await using var transaction = await connection.BeginTransactionAsync(cancellationToken);
@@ -102,6 +106,13 @@ public sealed partial class ServerDatabase : ICommerceRepository
             stored = ReadCommerceOrder(reader, verified.AccountId);
         }
         if (stored.Order.State == "ReviewRequired") throw new ApiException("PaymentReviewRequired", 409);
+        if (stored.Order.State == "Completed")
+        {
+            await using var owner = Command(connection, transaction, """
+                SELECT 1 FROM "CommerceTransaction" WHERE "OrderId"=$1 AND "Provider"=$2 AND "AppScope"=$3 AND "TransactionHash"=$4
+                """, orderId, stored.Order.Provider, appScope, ServerRuntime.Hash(transactionId));
+            if (await owner.ExecuteScalarAsync(cancellationToken) == null) throw new ApiException("InvalidPayment", 403);
+        }
         if (stored.Order.State != "Completed")
         {
             string hash = ServerRuntime.Hash(transactionId);
@@ -131,6 +142,14 @@ public sealed partial class ServerDatabase : ICommerceRepository
                 "UPDATE \"CommerceOrder\" SET \"State\"='Completed',\"CompletedAt\"=$2 WHERE \"OrderId\"=$1", orderId, completed))
                 await finish.ExecuteNonQueryAsync(cancellationToken);
             stored.Order.State = "Completed"; stored.Order.CompletedAt = ServerRuntime.Timestamp(completed);
+        }
+        if (protectedProof != null)
+        {
+            await using var pending = Command(connection, transaction, """
+                INSERT INTO "CommerceFinalization" ("OrderId","ProtectedProof") VALUES ($1,$2)
+                ON CONFLICT ("OrderId") DO NOTHING
+                """, orderId, protectedProof);
+            await pending.ExecuteNonQueryAsync(cancellationToken);
         }
         var profile = await ReadProfile(connection, transaction, stored.AccountId);
         await transaction.CommitAsync(cancellationToken);
@@ -220,6 +239,9 @@ public sealed partial class ServerDatabase : ICommerceRepository
         await using (var state = Command(connection, transaction,
             "UPDATE \"CommerceOrder\" SET \"State\"='ReviewRequired' WHERE \"OrderId\"=$1", orderId))
             await state.ExecuteNonQueryAsync(cancellationToken);
+        await using (var finalization = Command(connection, transaction,
+            "DELETE FROM \"CommerceFinalization\" WHERE \"OrderId\"=$1", orderId))
+            await finalization.ExecuteNonQueryAsync(cancellationToken);
         await transaction.CommitAsync(cancellationToken);
     }
 }

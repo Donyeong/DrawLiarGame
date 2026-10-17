@@ -14,6 +14,11 @@ namespace DrawLiar
         Task<CommerceOrdersResponse> OrdersAsync(CancellationToken cancellationToken);
     }
 
+    public interface IDrawCommerceOrderLookup
+    {
+        Task<CommerceOrderData> OrderAsync(string orderId, CancellationToken cancellationToken);
+    }
+
     public sealed class DrawPlatformPaymentService : IDisposable
     {
         private readonly IDrawCommerceBackend _backend;
@@ -23,8 +28,11 @@ namespace DrawLiar
         private CancellationTokenSource _session;
         private string _accountId = "";
         private CommerceCatalogue _catalogue = new CommerceCatalogue();
+        private IDrawPlatformPurchaseNotifications _notifications;
+        public bool HasPendingPurchases { get; private set; }
         public event Action PricesChanged;
         public event Action<ProfileData> ProfileConfirmed;
+        public event Action PurchasesChanged;
 
         public DrawPlatformPaymentService(IDrawCommerceBackend backend, Func<IDrawPlatformPaymentProvider> findProvider = null)
         {
@@ -44,11 +52,13 @@ namespace DrawLiar
             if (string.IsNullOrWhiteSpace(accountId)) throw new ArgumentException(nameof(accountId));
             _accountId = accountId;
             _session = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            ObservePurchases();
         }
 
         public void ApplyCatalogue(CommerceCatalogue catalogue)
         {
             _catalogue = catalogue ?? new CommerceCatalogue();
+            ObservePurchases();
             _prices.Clear();
             PricesChanged?.Invoke();
         }
@@ -111,7 +121,12 @@ namespace DrawLiar
                     EnsureSession(account, linked.Token);
                     ValidatePurchase(purchase, order);
                     if (purchase.Cancelled) throw new OperationCanceledException(linked.Token);
-                    if (purchase.Pending) return new CommercePaymentResponse { Order = order, Product = prepared.Product, Profile = prepared.Profile };
+                    if (purchase.Pending)
+                    {
+                        HasPendingPurchases = true;
+                        PurchasesChanged?.Invoke();
+                        return new CommercePaymentResponse { Order = order, Product = prepared.Product, Profile = prepared.Profile };
+                    }
                     return await ConfirmAsync(purchase, order, provider, account, linked.Token);
                 }
                 finally { if (purchase != null) purchase.Proof = ""; }
@@ -133,20 +148,33 @@ namespace DrawLiar
                 if (provider == null) throw Unavailable();
                 var response = await _backend.OrdersAsync(linked.Token);
                 EnsureSession(account, linked.Token);
-                var orders = (response?.Orders ?? Array.Empty<CommerceOrderData>()).Where(order => order != null && order.Provider == provider.Id).ToArray();
+                var orders = (response?.Orders ?? Array.Empty<CommerceOrderData>()).Where(order => order != null && order.Provider == provider.Id
+                    && (order.State == "Prepared" || order.State == "Completed")).ToArray();
                 purchases = await provider.FetchPurchasesAsync(orders, linked.Token) ?? Array.Empty<DrawPlatformPurchase>();
                 EnsureSession(account, linked.Token);
+                HasPendingPurchases = false;
                 int recovered = 0;
+                Exception failure = null;
                 var seen = new HashSet<string>(StringComparer.Ordinal);
                 foreach (var purchase in purchases)
                 {
-                    if (purchase == null || purchase.Cancelled || purchase.Pending || !seen.Add(purchase.OrderId)) continue;
-                    var order = orders.FirstOrDefault(candidate => candidate.OrderId == purchase.OrderId);
-                    if (order == null) continue;
-                    ValidatePurchase(purchase, order);
-                    var confirmed = await ConfirmAsync(purchase, order, provider, account, linked.Token);
-                    if (confirmed.Order.State == "Completed") recovered++;
+                    if (purchase == null || purchase.Cancelled || string.IsNullOrWhiteSpace(purchase.OrderId) || !seen.Add(purchase.OrderId)) continue;
+                    try
+                    {
+                        var order = orders.FirstOrDefault(candidate => candidate.OrderId == purchase.OrderId);
+                        if (order == null && _backend is IDrawCommerceOrderLookup lookup)
+                            order = await lookup.OrderAsync(purchase.OrderId, linked.Token);
+                        EnsureSession(account, linked.Token);
+                        if (order == null || order.Provider != provider.Id || (order.State != "Prepared" && order.State != "Completed")) continue;
+                        ValidatePurchase(purchase, order);
+                        if (purchase.Pending) { HasPendingPurchases = true; continue; }
+                        var confirmed = await ConfirmAsync(purchase, order, provider, account, linked.Token);
+                        if (confirmed.Order.State == "Completed") recovered++;
+                    }
+                    catch (OperationCanceledException) when (linked.IsCancellationRequested) { throw; }
+                    catch (Exception exception) { failure ??= exception; }
                 }
+                if (failure != null) throw failure;
                 return recovered;
             }
             finally
@@ -186,6 +214,17 @@ namespace DrawLiar
                 .Any(candidate => candidate != null && candidate.Id == provider.Id && candidate.Available) ? provider : null;
         }
 
+        private void ObservePurchases()
+        {
+            var notifications = _findProvider() as IDrawPlatformPurchaseNotifications;
+            if (ReferenceEquals(_notifications, notifications)) return;
+            if (_notifications != null) _notifications.PurchasesChanged -= OnPurchasesChanged;
+            _notifications = notifications;
+            if (_notifications != null) _notifications.PurchasesChanged += OnPurchasesChanged;
+        }
+
+        private void OnPurchasesChanged() => PurchasesChanged?.Invoke();
+
         private void EnsureSession(string accountId, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -217,8 +256,11 @@ namespace DrawLiar
 
         public void Reset()
         {
+            if (_notifications != null) _notifications.PurchasesChanged -= OnPurchasesChanged;
+            _notifications = null;
             _session?.Cancel(); _session?.Dispose(); _session = null;
             _accountId = "";
+            HasPendingPurchases = false;
             _catalogue = new CommerceCatalogue();
             _prices.Clear();
             _findProvider()?.Reset();

@@ -20,6 +20,7 @@ namespace DrawLiar
         public LiarMode LiarMode;
         public string[] Topics = Array.Empty<string>();
         public bool IsInProgress;
+        public bool HostHasPainterPass;
         public bool AllowMidRoundJoin = true;
         public string TopicLanguage = ServerRoomSettings.DEFAULT_TOPIC_LANGUAGE;
     }
@@ -168,6 +169,7 @@ namespace DrawLiar
         {
             _lobbyChat.Drain();
             PollAdvertising();
+            PollCommerceRecovery();
             PollPendingMatchRewards();
             if (IsAuthenticated && !_loggingOut && !_lobbyChatPaused && !IsBusy && !_socialPolling
                 && Time.realtimeSinceStartupAsDouble >= _nextSocialPoll)
@@ -240,6 +242,7 @@ namespace DrawLiar
             Inbox = new SocialInboxResponse();
             Friends = Inbox.Friends;
             SocialChanged?.Invoke();
+            ResetMail();
         }
 
         private void RenewSocialCancellation()
@@ -254,8 +257,13 @@ namespace DrawLiar
             _lobbyChatPaused = paused;
             ++_socialRevision;
             if (paused) RenewSocialCancellation();
-            if (!paused) _nextSocialPoll = 0;
+            if (!paused) { _nextSocialPoll = 0; RequestCommerceRecovery(); }
             if (paused) StopLobbyChat(); else StartLobbyChat();
+        }
+
+        private void OnApplicationFocus(bool focused)
+        {
+            if (focused) RequestCommerceRecovery();
         }
 
         public Task SendLobbyChatAsync(string text)
@@ -298,6 +306,7 @@ namespace DrawLiar
             ResetCommerce();
             ResetSocial();
             SetProfile(session.Profile);
+            RequestCommerceRecovery();
             await RefreshBlocksAsync();
             StartLobbyChat();
             SetStatus("로그인했습니다. 방을 만들거나 참가하세요.");
@@ -554,7 +563,7 @@ namespace DrawLiar
         public static ServerRoomData[] SelectQuickJoinRooms(IEnumerable<ServerRoomData> rooms, string topicLanguage) => (rooms ?? Array.Empty<ServerRoomData>())
             .Where(room => room != null && room.Settings != null && !room.IsPrivate && !room.Settings.IsPrivate
                 && room.PlayerCount < room.Settings.MaxPlayers && (!room.IsInProgress || room.Settings.AllowMidRoundJoin))
-            .OrderBy(room => ServerRoomSettings.NormalizeTopicLanguage(room.Settings.TopicLanguage) != topicLanguage)
+            .OrderBy(room => ServerRoomSettings.NormalizeTopicLanguage(room.Settings.TopicLanguage) != ServerRoomSettings.NormalizeTopicLanguage(topicLanguage))
             .ThenBy(room => room.IsInProgress).ThenByDescending(room => room.PlayerCount).Take(3).ToArray();
 
         private async Task<DedicatedAssignment> RequestRoomAssignmentAsync(Func<string, Task<DedicatedAssignment>> request,
@@ -604,6 +613,7 @@ namespace DrawLiar
             foreach (var room in response.Rooms)
                 _publicRooms.Add(new PublicRoomInfo { Id = room.RoomId, Code = room.RoomCode, Name = room.Name, Players = room.PlayerCount,
                     MaxPlayers = room.Settings.MaxPlayers, Spectators = room.SpectatorCount, LiarMode = (LiarMode)room.Settings.LiarMode, IsInProgress = room.IsInProgress,
+                    HostHasPainterPass = room.HostHasPainterPass,
                     AllowMidRoundJoin = room.Settings.AllowMidRoundJoin, Topics = room.Settings.Topics?.ToArray() ?? Array.Empty<string>(),
                     TopicLanguage = ServerRoomSettings.NormalizeTopicLanguage(room.Settings.TopicLanguage) });
             if (_publicRooms.Count == 0) SetStatus("공개 방이 없습니다.");
@@ -784,8 +794,11 @@ namespace DrawLiar
                 case "PaymentProviderUnavailable": return "현재 결제를 이용할 수 없습니다.";
                 case "ProductChanged": return "상품 정보가 변경되었습니다. 상점을 새로고침해 주세요.";
                 case "PaymentReviewRequired":
+                case "PaymentPending":
                 case "PaymentOrderLimit": return "결제 확인을 기다리고 있습니다.";
                 case "PaidGemLimit": return "보유할 수 있는 보석 한도에 도달했습니다.";
+                case "CoinLimit": return "보유할 수 있는 코인 한도에 도달했습니다.";
+                case "InvalidMail": return "우편을 확인할 수 없습니다. 새로고침해 주세요.";
                 case "InvalidPayment":
                 case "PaymentTransactionAlreadyClaimed":
                 case "InvalidPaymentProof":

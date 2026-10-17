@@ -134,6 +134,7 @@ namespace DrawLiar
         public int LocalPlayerId = -1;
         public int HostPlayerId;
         public bool IsHost;
+        public bool HostHasPainterPass;
         public bool CanStart;
         public int CanvasVersion;
         public int DrawingEpoch;

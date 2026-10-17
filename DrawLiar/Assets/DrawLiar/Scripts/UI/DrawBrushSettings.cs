@@ -6,7 +6,9 @@ namespace DrawLiar
     public static class DrawBrushSettings
     {
         private const string PRESSURE_KEY = "DrawLiar.PressureEnabled";
+        private const string FAVORITE_COLORS_KEY_PREFIX = "DrawLiar.FavoriteColors.";
         public const int BASE_COLOR_COUNT = 9;
+        public const int FAVORITE_COLOR_COUNT = 10;
         private static readonly Color32[] _palette =
         {
             new Color32(40,43,39,255), new Color32(225,127,103,255), new Color32(228,182,107,255),
@@ -27,10 +29,48 @@ namespace DrawLiar
 
         public static Color32 ResolveColor(Color32 color, bool painterSubscriber)
         {
-            if (painterSubscriber) return color;
+            if (painterSubscriber)
+            {
+                color.a = 255;
+                return color;
+            }
             for (int index = 0; index < BASE_COLOR_COUNT; index++)
                 if (_palette[index].Equals(color)) return color;
             return _palette[0];
+        }
+
+        public static Color32?[] LoadFavoriteColors(string accountId)
+        {
+            var colors = new Color32?[FAVORITE_COLOR_COUNT];
+            if (string.IsNullOrWhiteSpace(accountId)) return colors;
+
+            string storedColors = PlayerPrefs.GetString(FAVORITE_COLORS_KEY_PREFIX + accountId, string.Empty);
+            string[] slots = storedColors.Split(';');
+            for (int index = 0; index < colors.Length && index < slots.Length; index++)
+            {
+                string slot = slots[index];
+                if (slot.Length != 6 || !ColorUtility.TryParseHtmlString("#" + slot, out Color parsedColor))
+                    continue;
+                Color32 color = parsedColor;
+                color.a = 255;
+                colors[index] = color;
+            }
+            return colors;
+        }
+
+        public static void SetFavoriteColor(string accountId, int slot, Color32? color)
+        {
+            if (string.IsNullOrWhiteSpace(accountId) || slot < 0 || slot >= FAVORITE_COLOR_COUNT) return;
+
+            Color32?[] colors = LoadFavoriteColors(accountId);
+            colors[slot] = color;
+            var slots = new string[FAVORITE_COLOR_COUNT];
+            for (int index = 0; index < colors.Length; index++)
+                slots[index] = colors[index].HasValue
+                    ? ColorUtility.ToHtmlStringRGB(colors[index].Value)
+                    : string.Empty;
+            PlayerPrefs.SetString(FAVORITE_COLORS_KEY_PREFIX + accountId, string.Join(";", slots));
+            PlayerPrefs.Save();
         }
 
         public static void SetPressureEnabled(bool enabled)

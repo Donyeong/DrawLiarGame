@@ -4,8 +4,8 @@ const crypto = require('node:crypto');
 const { GoogleAuth } = require('google-auth-library');
 
 const PACKAGE_NAME = 'com.rascallab.liargame';
-const TRACK = 'internal';
-const STATUS = 'draft';
+const TRACK = 'beta';
+const STATUS = 'completed';
 const MAX_VERSION_CODE = 2100000000;
 const API_ORIGIN = 'https://androidpublisher.googleapis.com';
 const API_ROOT = `/androidpublisher/v3/applications/${PACKAGE_NAME}/edits`;
@@ -114,13 +114,13 @@ function InspectInventory(bundlesResponse, apksResponse, tracksResponse) {
     for (const apk of ListField(apksResponse, 'apks', 'APK'))
         codes.push(ParseVersionCode(RequireObject(apk, 'APK').versionCode, 'Google Play APK 버전 코드'));
     const tracks = ListField(tracksResponse, 'tracks', '트랙');
-    let internal;
+    let target;
     for (const track of tracks) {
         RequireObject(track, '트랙');
         if (typeof track.track !== 'string' || !track.track) throw new SafeError('Google Play 트랙 이름을 확인할 수 없습니다.');
         if (track.track === TRACK) {
-            if (internal) throw new SafeError('Google Play 내부 테스트 트랙이 중복되었습니다.');
-            internal = track;
+            if (target) throw new SafeError('Google Play 공개 테스트 트랙이 중복되었습니다.');
+            target = track;
         }
         for (const release of ListField(track, 'releases', '릴리스')) {
             RequireObject(release, '릴리스');
@@ -131,9 +131,9 @@ function InspectInventory(bundlesResponse, apksResponse, tracksResponse) {
             for (const version of versions) codes.push(ParseVersionCode(version, 'Google Play 트랙 버전 코드'));
         }
     }
-    const releases = internal ? ListField(internal, 'releases', '내부 테스트 릴리스') : [];
-    if (releases.some(release => release.status === STATUS))
-        throw new SafeError('Google Play 내부 테스트에 기존 초안이 있습니다. Play Console에서 완료하거나 폐기한 뒤 다시 실행하세요. 기존 초안은 자동으로 덮어쓰지 않습니다.');
+    const releases = target ? ListField(target, 'releases', '공개 테스트 릴리스') : [];
+    if (releases.filter(release => release.status === 'draft').length > 1)
+        throw new SafeError('Google Play 공개 테스트 초안이 여러 개라 갱신할 메모를 확인할 수 없습니다.');
     return { MaxVersionCode: codes.reduce((maximum, code) => Math.max(maximum, code), 0), Releases: releases };
 }
 
@@ -153,17 +153,14 @@ function ReleaseIdentity(release) {
     });
 }
 
-function VerifyTrack(value, previousReleases, versionCode) {
-    RequireObject(value, '내부 테스트 갱신');
-    const releases = ListField(value, 'releases', '내부 테스트 갱신 릴리스');
-    const drafts = releases.filter(release => release?.status === STATUS);
-    if (value.track !== TRACK || releases.length !== previousReleases.length + 1 || drafts.length !== 1 ||
-        drafts[0].versionCodes?.length !== 1 || String(drafts[0].versionCodes[0]) !== String(versionCode))
-        throw new SafeError('Google Play 내부 테스트 응답이 요청한 단일 초안과 다릅니다.');
-    const remaining = releases.filter(release => release.status !== STATUS).map(ReleaseIdentity).sort();
-    const previous = previousReleases.map(ReleaseIdentity).sort();
-    if (StableJson(remaining) !== StableJson(previous))
-        throw new SafeError('Google Play 내부 테스트 응답에서 기존 릴리스 보존을 확인하지 못했습니다.');
+function VerifyTrack(value, expectedRelease) {
+    RequireObject(value, '공개 테스트 갱신');
+    const releases = ListField(value, 'releases', '공개 테스트 갱신 릴리스');
+    if (value.track !== TRACK || releases.length !== 1 || releases[0]?.status !== STATUS ||
+        releases[0].versionCodes?.length !== 1 || String(releases[0].versionCodes[0]) !== expectedRelease.versionCodes[0])
+        throw new SafeError('Google Play 공개 테스트 응답이 요청한 단일 출시 버전과 다릅니다.');
+    if (ReleaseIdentity(releases[0]) !== ReleaseIdentity(expectedRelease))
+        throw new SafeError('Google Play 공개 테스트 릴리스의 버전·메타데이터가 요청과 다릅니다.');
 }
 
 async function HashArtifact(file) {
@@ -200,13 +197,17 @@ function ApiError(error, stage) {
     const status = Number.isInteger(rawStatus) && rawStatus >= 100 && rawStatus <= 599 ? rawStatus : '연결 오류';
     const details = error?.response?.data?.error?.details;
     if (stage === 'commit' && Array.isArray(details) && details.some(detail => detail?.reason === 'CHANGES_ALREADY_IN_REVIEW'))
-        return new SafeError('Google Play에 심사 중인 변경이 있어 초안 저장을 중단했습니다. 심사가 완료된 뒤 다시 실행하세요.');
+        return new SafeError('Google Play가 최종 저장을 거부했습니다 (CHANGES_ALREADY_IN_REVIEW). 릴리스 상태와 원본 오류를 확인하세요.');
     if (stage === 'insert' && [400, 403, 404].includes(status))
         return new SafeError(`Google Play 편집 시작 실패 (HTTP ${status}). Play Console의 앱·첫 AAB 수동 등록과 서비스 계정 앱 권한·API 활성화를 확인하세요.`);
     if (stage === 'track')
-        return new SafeError(`Google Play 내부 테스트 초안 저장 실패 (HTTP ${status}). 기존 릴리스를 유지한 채 초안을 저장할 수 없어 중단했습니다. Play Console의 트랙 상태를 확인하세요.`);
+        return new SafeError(`Google Play 공개 테스트 업데이트 실패 (HTTP ${status}). 출시 버전 갱신을 확인하지 못해 중단했습니다. Play Console의 트랙 상태를 확인하세요.`);
     if (stage === 'commit')
-        return new SafeError(`Google Play 초안 저장 결과를 확인하지 못했습니다 (HTTP ${status}). 자동 재시도하지 않습니다. Play Console에서 저장 여부·심사 상태를 확인하세요.`);
+        return new SafeError(`Google Play 공개 테스트 출시 제출 결과를 확인하지 못했습니다 (HTTP ${status}). 자동 재시도하지 않습니다. Play Console에서 제출 여부를 확인하세요.`);
+    if ([429, 500, 502, 503, 504].includes(status)) {
+        const operation = { insert: '편집 시작', read: '빌드·트랙 조회', upload: 'AAB 업로드', validate: '출시 검증', delete: '임시 편집 정리' }[stage] || '요청';
+        return new SafeError(`Google Play ${operation} 중 일시적인 서비스 오류가 발생했습니다 (HTTP ${status}).`);
+    }
     return new SafeError(`Google Play 요청 실패 (HTTP ${status}). 앱 등록·권한·버전 코드·업로드 키와 트랙 설정을 확인하세요.`);
 }
 
@@ -246,9 +247,18 @@ async function Main(env = process.env, argv = process.argv, dependencies = {}) {
                 await new GoogleAuth({ keyFile: env.GOOGLE_APPLICATION_CREDENTIALS, scopes: ['https://www.googleapis.com/auth/androidpublisher'] }).getClient();
         } catch { throw new SafeError('Google Play 서비스 계정 인증을 시작하지 못했습니다.'); }
         request = async (resource, stage, options = {}) => {
-            try {
-                return (await auth.request({ url: `${API_ORIGIN}${resource}`, timeout: 60000, retry: false, ...options })).data;
-            } catch (error) { throw ApiError(error, stage); }
+            for (let attempt = 0; ; attempt++) {
+                try {
+                    return (await auth.request({ url: `${API_ORIGIN}${resource}`, timeout: 60000, retry: false, ...options })).data;
+                } catch (error) {
+                    const retryableStage = ['insert', 'read', 'track', 'validate', 'delete'].includes(stage);
+                    const transient = [429, 500, 502, 503, 504].includes(error?.response?.status) ||
+                        ['ECONNRESET', 'ETIMEDOUT', 'EAI_AGAIN'].includes(error?.code);
+                    if (!retryableStage || !transient || attempt >= 2) throw ApiError(error, stage);
+                    console.warn(`Google Play 임시 편집 요청 재시도 (${attempt + 1}/2)`);
+                    await (dependencies.Wait || (milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds))))(1000 * (attempt + 1));
+                }
+            }
         };
         const edit = RequireObject(await request(API_ROOT, 'insert', { method: 'POST', data: {} }), '편집 시작');
         if (typeof edit.id !== 'string' || !/^[A-Za-z0-9_-]{1,128}$/.test(edit.id)) throw new SafeError('Google Play 편집 ID가 잘못되었습니다.');
@@ -266,7 +276,7 @@ async function Main(env = process.env, argv = process.argv, dependencies = {}) {
                 VersionCode: versionCode, Track: TRACK, Status: STATUS, ReservedUtc: new Date().toISOString(),
             };
             WriteJson(planFile, plan);
-            console.log(`Google Play 내부 테스트 초안용 버전 코드 ${versionCode} 예약 완료`);
+            console.log(`Google Play 공개 테스트 업데이트용 버전 코드 ${versionCode} 예약 완료`);
             return plan;
         }
         if (inventory.MaxVersionCode >= build.VersionCode) throw new SafeError('예약한 버전 코드 이상의 빌드가 이미 Google Play에 있습니다. 새 Jenkins 빌드로 다시 예약하세요.');
@@ -283,26 +293,43 @@ async function Main(env = process.env, argv = process.argv, dependencies = {}) {
             typeof bundle.sha256 !== 'string' || !/^[a-fA-F0-9]{64}$/.test(bundle.sha256) || bundle.sha256.toLowerCase() !== hash ||
             await HashArtifact(file) !== hash)
             throw new SafeError('Google Play AAB 응답의 버전 코드·SHA-256이 실제 빌드 파일과 다릅니다.');
+        const previousDraft = inventory.Releases.find(release => release.status === 'draft');
+        const previousRelease = previousDraft || [...inventory.Releases].sort((first, second) =>
+            Math.max(0, ...second.versionCodes.map(Number)) - Math.max(0, ...first.versionCodes.map(Number)))[0];
+        const nextRelease = {
+            name: 'LiarGame: Canvas',
+            versionCodes: [String(build.VersionCode)], status: STATUS,
+        };
+        if (previousRelease?.releaseNotes) nextRelease.releaseNotes = previousRelease.releaseNotes;
+        if (previousRelease?.inAppUpdatePriority !== undefined) nextRelease.inAppUpdatePriority = previousRelease.inAppUpdatePriority;
         const nextTrack = {
             track: TRACK,
-            releases: [...inventory.Releases, { name: `DrawLiar ${build.BundleVersion} (${build.VersionCode})`, versionCodes: [String(build.VersionCode)], status: STATUS }],
+            releases: [nextRelease],
         };
         const savedTrack = await request(`${editRoot}/tracks/${TRACK}`, 'track', { method: 'PUT', data: nextTrack });
-        VerifyTrack(savedTrack, inventory.Releases, build.VersionCode);
+        VerifyTrack(savedTrack, nextRelease);
         const validation = RequireObject(await request(`${editRoot}:validate`, 'validate', { method: 'POST' }), '편집 검증');
         if (validation.id !== editId) throw new SafeError('Google Play 편집 검증 응답이 요청과 다릅니다.');
         commitAttempted = true;
         WriteJson(resultFile, { ...pending, Committed: null, CommitAttempted: true });
-        const confirmation = RequireObject(await request(`${editRoot}:commit?changesInReviewBehavior=ERROR_IF_IN_REVIEW`, 'commit', { method: 'POST' }), '초안 저장');
-        if (confirmation.id !== editId) throw new SafeError('Google Play 초안 저장 응답을 확인하지 못했습니다. Play Console에서 저장 여부를 확인하세요.');
+        const confirmation = RequireObject(await request(`${editRoot}:commit`, 'commit', { method: 'POST' }), '출시 제출');
+        if (confirmation.id !== editId) throw new SafeError('Google Play 출시 제출 응답을 확인하지 못했습니다. Play Console에서 제출 여부를 확인하세요.');
         committed = true;
-        const result = { ...pending, Success: true, Committed: true, CommitAttempted: true, Sha256: hash, CompletedUtc: new Date().toISOString() };
+        const result = {
+            ...pending, Success: true, Committed: true, CommitAttempted: true, Sha256: hash,
+            PreviousVersionCodes: inventory.Releases.flatMap(release => release.versionCodes || []), CompletedUtc: new Date().toISOString(),
+        };
         WriteJson(resultFile, result);
-        console.log('Google Play 내부 테스트 초안 저장 완료');
+        console.log('Google Play 공개 테스트 업데이트 출시 제출 완료');
         return result;
     } catch (error) {
         if (pending && !planOnly) {
-            try { WriteJson(resultFile, { ...pending, Committed: committed ? true : commitAttempted ? null : false, CommitAttempted: commitAttempted }); } catch {}
+            try {
+                WriteJson(resultFile, {
+                    ...pending, Committed: committed ? true : commitAttempted ? null : false, CommitAttempted: commitAttempted,
+                    FailureReason: error instanceof SafeError ? error.message : 'Google Play 제출 처리에 실패했습니다.',
+                });
+            } catch {}
         }
         if (error instanceof SafeError) throw error;
         throw new SafeError('Google Play 제출 처리에 실패했습니다. 파일·서비스 계정·앱 설정을 확인하세요.');

@@ -63,7 +63,7 @@ internal sealed partial class DedicatedRoom
             matchCompleted?.Invoke(new MatchResultRequest
             {
                 NodeId = nodeId, RoomId = RoomId, MatchId = completed.MatchId, PlayedAt = DateTimeOffset.UtcNow.ToString("O"),
-                Mode = (int)completed.Mode, RoundCount = completed.RoundCount,
+                Mode = (int)completed.Mode, RoundCount = completed.RoundCount, HostAccountId = _ownerAccountId,
                 DrawingArchives = _roundDrawings.ToArray(), DrawingsIncomplete = _drawingsIncomplete,
                 Players = completed.Players.Select(player => new MatchPlayerResult
                 {
@@ -106,6 +106,7 @@ internal sealed partial class DedicatedRoom
                 ticket.Profile.Cosmetics)) return false;
             if (_connections.TryGetValue(ticket.AccountId, out var previous)) previous.Abort();
             connection.PlayerId = playerId;
+            connection.SubscriptionExpiresAt = ticket.Profile.SubscriptionExpiresAt ?? "";
             _connections[ticket.AccountId] = connection;
             if (ticket.AdmissionId.Length > 0) _admittedIds.Add(ticket.AdmissionId);
             _reconnectUntil.Remove(ticket.AccountId);
@@ -371,11 +372,14 @@ internal sealed partial class DedicatedRoom
     {
         int hostId = _playerIds.TryGetValue(_ownerAccountId, out int id) ? id : -1;
         var accounts = _playerIds.ToDictionary(pair => pair.Value, pair => pair.Key);
+        bool hostPainterPass = _connections.TryGetValue(_ownerAccountId, out var host)
+            && CommerceRules.IsActive(host.SubscriptionExpiresAt, DateTimeOffset.UtcNow);
         long sequence = ++_sequence;
         foreach (var connection in _connections.Values)
         {
             var snapshot = _session.Snapshot(connection.PlayerId, hostId, now);
             snapshot.CanStart &= !_configurationPending && !_configurationSyncRequired;
+            snapshot.HostHasPainterPass = hostPainterPass;
             foreach (var player in snapshot.Players)
                 player.AccountId = accounts.TryGetValue(player.Id, out string? accountId) ? accountId : "";
             QueueSnapshotLocked(connection, snapshot, sequence);

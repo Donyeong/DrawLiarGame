@@ -7,14 +7,15 @@ pipeline {
         timeout(time: 90, unit: 'MINUTES')
         buildDiscarder(logRotator(numToKeepStr: '10', artifactNumToKeepStr: '5'))
     }
-    triggers { cron('TZ=Asia/Seoul\n0 1 * * *') }
     parameters {
-        choice(name: 'BUILD_FORMAT', choices: ['APK', 'AAB'], description: 'APK는 Firebase 테스트 배포, AAB는 Google Play 제출용 파일 생성')
+        choice(name: 'BUILD_FORMAT', choices: ['APK', 'AAB'], description: 'APK는 설치용, AAB는 Google Play 제출용. 둘 다 Cloud Storage 자동 업로드 지원')
         choice(name: 'SIGNING_PROFILE', choices: ['PLAY_UPLOAD', 'TEST'], description: 'PLAY_UPLOAD는 Firebase APK와 Google Play AAB용 출시 서명, TEST는 기존 테스트 키')
-        string(name: 'BUNDLE_VERSION', defaultValue: '0.1.0', description: 'Android 표시 버전')
+        string(name: 'BUNDLE_VERSION', defaultValue: '0.1.0', description: 'Android 기준 표시 버전. 자동 증가 시 이전 예약 버전과 비교해 마지막 숫자에 1 추가')
+        booleanParam(name: 'AUTO_INCREMENT_VERSION', defaultValue: true, description: '표시 버전을 0.1.0 → 0.1.1 → 0.1.2처럼 자동 증가')
         booleanParam(name: 'DEVELOPMENT_BUILD', defaultValue: false, description: 'Unity Development Build')
+        booleanParam(name: 'UPLOAD_GCS', defaultValue: true, description: '운영툴 Cloud Storage에 APK/AAB를 업로드하고 공개 다운로드 링크 생성')
         booleanParam(name: 'UPLOAD_FIREBASE', defaultValue: true, description: 'APK를 DrawLiar Firebase 앱에 업로드하고 테스터 그룹에 배포')
-        booleanParam(name: 'UPLOAD_GOOGLE_PLAY', defaultValue: false, description: 'AAB를 Google Play 내부 테스트 트랙에 초안으로 업로드 (첫 AAB 수동 업로드 및 게시자 자격 증명 설정 후 사용)')
+        booleanParam(name: 'UPLOAD_GOOGLE_PLAY', defaultValue: false, description: 'AAB를 Google Play 공개 테스트(beta)에 출시 제출하여 기존 사전체험판 업데이트')
         booleanParam(name: 'NOTIFY_DISCORD', defaultValue: false, description: '지정한 DrawLiar Discord 채널에 빌드 결과 전송')
     }
     environment {
@@ -28,6 +29,7 @@ pipeline {
         FIREBASE_PROJECT_NUMBER = '560556107495'
         FIREBASE_PACKAGE_NAME = 'com.rascallab.liargame'
         FIREBASE_GROUPS = 'drawliar-testers'
+        CLOUDSDK_CONFIG = 'C:\\DrawLiarJenkinsCache\\Gcloud'
     }
     stages {
         stage('Snapshot Current Project') {
@@ -43,6 +45,7 @@ pipeline {
                     env.DRAWLIAR_ARTIFACT_URL = ''
                     env.DRAWLIAR_FIREBASE_CONSOLE_URL = ''
                     env.DRAWLIAR_JENKINS_ARTIFACT_URL = ''
+                    env.DRAWLIAR_GCS_DOWNLOAD_URL = ''
                     currentBuild.description = ''
                     if (!(params.BUILD_FORMAT in ['APK', 'AAB'])) { error('Android 빌드 형식은 APK 또는 AAB여야 합니다.') }
                     if (!(params.SIGNING_PROFILE in ['TEST', 'PLAY_UPLOAD'])) { error('Android 서명 프로필은 TEST 또는 PLAY_UPLOAD여야 합니다.') }
@@ -54,6 +57,9 @@ pipeline {
                     }
                     if (params.UPLOAD_GOOGLE_PLAY && (params.BUILD_FORMAT != 'AAB' || params.SIGNING_PROFILE != 'PLAY_UPLOAD' || params.DEVELOPMENT_BUILD)) {
                         error('Google Play 업로드에는 AAB, PLAY_UPLOAD 서명, DEVELOPMENT_BUILD=false가 필요합니다.')
+                    }
+                    if (params.AUTO_INCREMENT_VERSION && !(params.BUNDLE_VERSION ==~ /(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)/)) {
+                        error('표시 버전 자동 증가에는 0.1.0 형식의 세 자리 숫자 버전이 필요합니다.')
                     }
                     env.BUILD_FORMAT = params.BUILD_FORMAT
                     env.BUNDLE_VERSION = params.BUNDLE_VERSION
@@ -159,6 +165,23 @@ pipeline {
                 }
             }
         }
+        stage('Reserve Android Display Version') {
+            when { expression { params.AUTO_INCREMENT_VERSION } }
+            steps {
+                script {
+                    withEnv(["DRAWLIAR_BASE_VERSION=${params.BUNDLE_VERSION}"]) {
+                        env.BUNDLE_VERSION = powershell(returnStdout: true, script: '''
+                            $ErrorActionPreference = 'Stop'
+                            $reservation = & './Tools/Jenkins/Reserve-AndroidVersion.ps1' -BaseVersion $env:DRAWLIAR_BASE_VERSION -BuildNumber ([int]$env:BUILD_NUMBER) -StatePath "$env:DRAWLIAR_CACHE/AndroidBundleVersion.json" | ConvertFrom-Json
+                            $reservation | ConvertTo-Json | Set-Content -LiteralPath './Build/Logs/AndroidVersion.json' -Encoding UTF8
+                            Write-Output $reservation.BundleVersion
+                        ''').trim()
+                    }
+                    currentBuild.description = "${env.BUILD_FORMAT} v${env.BUNDLE_VERSION}"
+                    echo "Android 표시 버전: ${env.BUNDLE_VERSION}"
+                }
+            }
+        }
         stage('Build Android') {
             steps {
                 script {
@@ -192,6 +215,31 @@ pipeline {
                 script {
                     env.DRAWLIAR_BUILD_ARTIFACT_READY = 'true'
                     env.DRAWLIAR_JENKINS_ARTIFACT_URL = "${env.BUILD_URL}artifact/Build/Android/DrawLiar.${env.BUILD_FORMAT.toLowerCase()}"
+                }
+            }
+        }
+        stage('Upload to Cloud Storage') {
+            when { expression { params.UPLOAD_GCS } }
+            steps {
+                withCredentials([file(credentialsId: 'drawliar-builds-gcs', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                    powershell '''
+                        $ErrorActionPreference = 'Stop'
+                        & './Tools/Jenkins/Publish-AndroidBuild.ps1' -ArtifactPath "$env:WORKSPACE/Build/Android/DrawLiar.$($env:BUILD_FORMAT.ToLowerInvariant())" -BuildFormat $env:BUILD_FORMAT -BundleVersion $env:BUNDLE_VERSION -VersionCode ([int]$env:DRAWLIAR_VERSION_CODE) -BuildNumber ([int]$env:BUILD_NUMBER)
+                    '''
+                }
+                script {
+                    env.DRAWLIAR_GCS_DOWNLOAD_URL = powershell(returnStdout: true, script: '''
+                        $ErrorActionPreference = 'Stop'
+                        $upload = Get-Content -Raw -LiteralPath 'Build/Logs/CloudStorageUploadResult.json' | ConvertFrom-Json
+                        if (!$upload.Success -or [string]$upload.BuildNumber -ne $env:BUILD_NUMBER -or
+                            [string]$upload.VersionCode -ne $env:DRAWLIAR_VERSION_CODE -or $upload.Format -ne $env:BUILD_FORMAT -or
+                            $upload.BundleVersion -ne $env:BUNDLE_VERSION -or
+                            !$upload.DownloadUrl.StartsWith('https://storage.googleapis.com/kona-survival-tksqml97/drawliar/builds/android/')) {
+                            throw 'Cloud Storage 업로드 결과가 이번 빌드와 일치하지 않습니다.'
+                        }
+                        Write-Output $upload.DownloadUrl
+                    ''').trim()
+                    echo "${env.BUILD_FORMAT} 다운로드: ${env.DRAWLIAR_GCS_DOWNLOAD_URL}"
                 }
             }
         }
@@ -230,7 +278,7 @@ pipeline {
                 }
             }
         }
-        stage('Upload to Google Play Internal Testing') {
+        stage('Release to Google Play Open Testing') {
             when { expression { params.UPLOAD_GOOGLE_PLAY && params.BUILD_FORMAT == 'AAB' } }
             steps {
                 withCredentials([file(credentialsId: 'drawliar-google-play-publisher', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
@@ -248,14 +296,14 @@ pipeline {
                         $upload = Get-Content -Raw -LiteralPath 'Build/Logs/GooglePlayUploadResult.json' | ConvertFrom-Json
                         if (!$upload.Success -or !$upload.Committed -or $upload.PackageName -ne 'com.rascallab.liargame' -or
                             [string]$upload.BuildNumber -ne $env:BUILD_NUMBER -or [string]$upload.VersionCode -ne $env:DRAWLIAR_VERSION_CODE -or
-                            $upload.Track -ne 'internal' -or $upload.Status -ne 'draft') {
-                            throw 'Google Play internal testing draft does not match this build.'
+                            $upload.Track -ne 'beta' -or $upload.Status -ne 'completed') {
+                            throw 'Google Play open testing release does not match this build.'
                         }
                     '''
                     env.DRAWLIAR_PLAY_UPLOAD_RESULT = 'SUCCESS'
-                    env.DRAWLIAR_PLAY_RELEASE_STATUS = 'DRAFT'
-                    currentBuild.description = 'Google Play 내부 테스트 초안 업로드 완료'
-                    echo 'Google Play 내부 테스트 초안 업로드 완료'
+                    env.DRAWLIAR_PLAY_RELEASE_STATUS = 'COMPLETED'
+                    currentBuild.description = 'Google Play 공개 테스트 업데이트 출시 제출 완료'
+                    echo 'Google Play 공개 테스트 업데이트 출시 제출 완료'
                 }
             }
         }
@@ -281,12 +329,18 @@ pipeline {
                 if (env.DRAWLIAR_BUILD_ARTIFACT_READY == 'true') {
                     archiveArtifacts artifacts: 'Build/Android/*.apk,Build/Android/*.aab', allowEmptyArchive: false, fingerprint: true
                     if (!env.DRAWLIAR_ARTIFACT_URL) {
-                        currentBuild.description = env.DRAWLIAR_PLAY_UPLOAD_RESULT == 'SUCCESS' ? "Google Play 내부 테스트 초안 업로드 완료 · Jenkins 다운로드: ${env.DRAWLIAR_JENKINS_ARTIFACT_URL}" : "Jenkins 다운로드: ${env.DRAWLIAR_JENKINS_ARTIFACT_URL}"
+                        currentBuild.description = env.DRAWLIAR_PLAY_UPLOAD_RESULT == 'SUCCESS' ? "Google Play 공개 테스트 업데이트 제출 완료 · Jenkins 다운로드: ${env.DRAWLIAR_JENKINS_ARTIFACT_URL}" : "Jenkins 다운로드: ${env.DRAWLIAR_JENKINS_ARTIFACT_URL}"
                         echo "Jenkins 다운로드: ${env.DRAWLIAR_JENKINS_ARTIFACT_URL}"
                     }
                 }
                 if (env.DRAWLIAR_SOURCE_READY == 'true') {
                     archiveArtifacts artifacts: 'Build/Logs/AndroidBuildResult.json,Build/Logs/AndroidSource.json,Build/Logs/FirebaseApp.json,Build/Logs/FirebaseUploadResult.json,Build/Logs/GooglePlayPlan.json,Build/Logs/GooglePlayUploadResult.json,Build/Logs/AndroidBuild.log', allowEmptyArchive: true
+                    archiveArtifacts artifacts: 'Build/Logs/CloudStorageUploadResult.json,Build/Logs/AndroidDownloads.txt', allowEmptyArchive: true
+                    archiveArtifacts artifacts: 'Build/Logs/AndroidVersion.json', allowEmptyArchive: true
+                }
+                if (env.DRAWLIAR_GCS_DOWNLOAD_URL) {
+                    currentBuild.description = "${env.BUILD_FORMAT} 다운로드: ${env.DRAWLIAR_GCS_DOWNLOAD_URL}"
+                    echo "Cloud Storage 다운로드: ${env.DRAWLIAR_GCS_DOWNLOAD_URL}"
                 }
                 if (params.NOTIFY_DISCORD && fileExists('Tools/Jenkins/Notify-AndroidBuild.ps1')) {
                     catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {

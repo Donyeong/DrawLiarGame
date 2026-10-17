@@ -25,7 +25,7 @@ public sealed partial class ServerDatabase
         bool mine = false, int offset = 0, int limit = WORKSHOP_PAGE_SIZE, CancellationToken cancellationToken = default,
         string? search = null, string? sort = null)
     {
-        string language = WorkshopLanguage(languageCode);
+        string[] languages = ServerRoomSettings.TopicLanguageAliases(WorkshopLanguage(languageCode));
         string pattern = WorkshopSearch(search);
         string order = WorkshopOrder(sort);
         offset = Math.Max(0, offset);
@@ -37,16 +37,16 @@ public sealed partial class ServerDatabase
             response.OwnCount = ProfileCount(Convert.ToInt64(await count.ExecuteScalarAsync(cancellationToken)));
         const string filter = """
             FROM "TopicWorkshop" t JOIN "Account" a ON a."Id"=t."CreatorAccountId"
-            WHERE NOT a."IsBanned" AND ($2::text='' OR t."LanguageCode"=$2) AND (NOT $3::boolean OR t."CreatorAccountId"=$1)
+            WHERE NOT a."IsBanned" AND (cardinality($2::text[])=0 OR lower(t."LanguageCode")=ANY($2)) AND (NOT $3::boolean OR t."CreatorAccountId"=$1)
                 AND t."Name" ILIKE $4 ESCAPE '\'
             """;
-        await using (var count = Command(connection, transaction, "SELECT count(*) " + filter, accountId, language, mine, pattern))
+        await using (var count = Command(connection, transaction, "SELECT count(*) " + filter, accountId, languages, mine, pattern))
             response.Total = ProfileCount(Convert.ToInt64(await count.ExecuteScalarAsync(cancellationToken)));
         var entries = new List<TopicWorkshopEntry>();
         await using (var command = Command(connection, transaction, """
             SELECT t."Id",t."CreatorAccountId",a."DisplayName",t."Name",t."LanguageCode",jsonb_array_length(t."Words"),t."DownloadCount",t."CreatedAt",
                 t."RecommendationCount",EXISTS(SELECT 1 FROM "TopicWorkshopRecommendation" r WHERE r."TopicId"=t."Id" AND r."AccountId"=$1),a."Experience"
-            """ + " " + filter + " ORDER BY " + order + " OFFSET $5 LIMIT $6", accountId, language, mine, pattern, offset, limit))
+            """ + " " + filter + " ORDER BY " + order + " OFFSET $5 LIMIT $6", accountId, languages, mine, pattern, offset, limit))
         await using (var reader = await command.ExecuteReaderAsync(cancellationToken))
             while (await reader.ReadAsync(cancellationToken)) entries.Add(ReadWorkshopEntry(reader, accountId));
         response.Items = entries.ToArray();
@@ -73,7 +73,8 @@ public sealed partial class ServerDatabase
             creatorLevel = AccountLevelRules.GetLevel(reader.GetInt64(1));
         }
         await using (var duplicate = Command(connection, transaction,
-            "SELECT 1 FROM \"TopicWorkshop\" WHERE \"CreatorAccountId\"=$1 AND \"LanguageCode\"=$2 AND \"Name\"=$3", accountId, normalized.LanguageCode, normalized.Name))
+            "SELECT 1 FROM \"TopicWorkshop\" WHERE \"CreatorAccountId\"=$1 AND lower(\"LanguageCode\")=ANY($2) AND \"Name\"=$3",
+            accountId, ServerRoomSettings.TopicLanguageAliases(normalized.LanguageCode), normalized.Name))
             if (await duplicate.ExecuteScalarAsync(cancellationToken) != null) throw new ApiException("TopicWorkshopNameConflict", 409);
         await using (var count = Command(connection, transaction, "SELECT count(*) FROM \"TopicWorkshop\" WHERE \"CreatorAccountId\"=$1", accountId))
             if (Convert.ToInt64(await count.ExecuteScalarAsync(cancellationToken)) >= _workshopPolicy.Value.Limits.MaxUploadsPerAccount)
@@ -190,7 +191,7 @@ public sealed partial class ServerDatabase
     private static TopicWorkshopEntry ReadWorkshopEntry(NpgsqlDataReader reader, Guid accountId) => new()
     {
         Id = reader.GetGuid(0).ToString(), CreatorAccountId = reader.GetGuid(1).ToString(), CreatorName = reader.GetString(2), CreatorLevel = AccountLevelRules.GetLevel(reader.GetInt64(10)),
-        Name = reader.GetString(3), LanguageCode = reader.GetString(4), WordCount = reader.GetInt32(5),
+        Name = reader.GetString(3), LanguageCode = ServerRoomSettings.TopicLanguageOf(reader.GetString(4)), WordCount = reader.GetInt32(5),
         DownloadCount = ProfileCount(reader.GetInt64(6)), CreatedAt = ServerRuntime.Timestamp(reader.GetFieldValue<DateTimeOffset>(7)),
         RecommendationCount = ProfileCount(reader.GetInt64(8)), IsRecommended = reader.GetBoolean(9),
         IsMine = reader.GetGuid(1) == accountId
@@ -216,7 +217,7 @@ public sealed partial class ServerDatabase
     {
         value = (value ?? "").Trim();
         if (value.Length == 0) return "";
-        return _workshopPolicy.Value.LanguageCodes.FirstOrDefault(code => string.Equals(code, value, StringComparison.OrdinalIgnoreCase))
+        return TopicWorkshopRules.NormalizeLanguage(value, _workshopPolicy.Value, allowLegacy: true)
             ?? throw new ApiException("TopicWorkshopInvalidLanguage");
     }
 

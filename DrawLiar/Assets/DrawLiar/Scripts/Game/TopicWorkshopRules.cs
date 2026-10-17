@@ -28,6 +28,15 @@ namespace DrawLiar
             .Split(new[] { ',', '\n', '\r', ';' }, StringSplitOptions.RemoveEmptyEntries)
             .Where(word => !string.IsNullOrWhiteSpace(word)).ToArray();
 
+        public static string NormalizeLanguage(string value, TopicWorkshopPolicy policy, bool allowLegacy = false)
+        {
+            string direct = policy?.LanguageCodes?.FirstOrDefault(code => string.Equals(code, value, StringComparison.OrdinalIgnoreCase));
+            if (direct != null) return direct;
+            if (!ServerRoomSettings.TryNormalizeTopicLanguage(value, out string language)) return null;
+            string supported = policy?.LanguageCodes?.FirstOrDefault(code => ServerRoomSettings.TopicLanguageOf(code) == language);
+            return supported ?? (allowLegacy && (language == "zh-TW" || language == "pt-BR") ? language : null);
+        }
+
         public static bool TryNormalize(TopicWorkshopPublishRequest request, TopicWorkshopPolicy policy,
             out TopicWorkshopPublishRequest normalized, out string errorCode, bool requirePublishMinimum = false)
         {
@@ -40,8 +49,7 @@ namespace DrawLiar
                 errorCode = "TopicWorkshopInvalidName";
                 return false;
             }
-            string language = policy.LanguageCodes.FirstOrDefault(code =>
-                string.Equals(code, request.LanguageCode, StringComparison.OrdinalIgnoreCase));
+            string language = NormalizeLanguage(request.LanguageCode, policy);
             if (language == null)
             {
                 errorCode = "TopicWorkshopInvalidLanguage";

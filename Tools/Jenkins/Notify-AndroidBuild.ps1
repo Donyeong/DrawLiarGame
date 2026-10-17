@@ -115,6 +115,12 @@ try {
     $Number = Get-NotificationText $env:BUILD_NUMBER 20
     $ArtifactUrl = Get-PublicLink $env:DRAWLIAR_ARTIFACT_URL
     $BuildUrl = Get-PublicLink $env:BUILD_URL
+    $CloudStorageUrl = $null
+    if ($env:DRAWLIAR_BUILD_ARTIFACT_READY -eq 'true' -and $Format -in @('APK', 'AAB') -and
+        $Version -cmatch '^[0-9]+\.[0-9]+\.[0-9]+(?:[.-][A-Za-z0-9]+)*$' -and $VersionCode -cmatch '^[1-9][0-9]*$') {
+        $ExpectedUrl = "https://storage.googleapis.com/kona-survival-tksqml97/drawliar/builds/android/$Version/$VersionCode/DrawLiar-Android-$Version-$VersionCode.$($Format.ToLowerInvariant())"
+        if ($env:DRAWLIAR_GCS_DOWNLOAD_URL -ceq $ExpectedUrl) { $CloudStorageUrl = $ExpectedUrl }
+    }
     $JenkinsArtifactUrl = $null
     if ($env:DRAWLIAR_BUILD_ARTIFACT_READY -eq 'true' -and $BuildUrl -and $Format -in @('APK', 'AAB')) {
         $CandidateUrl = Get-PublicLink $env:DRAWLIAR_JENKINS_ARTIFACT_URL
@@ -153,7 +159,7 @@ try {
             inline = $false
         }) + $Embed.fields
     }
-    $Download = Get-PrivateDownload
+    $Download = if (!$CloudStorageUrl) { Get-PrivateDownload } else { $null }
     $SentDirectDownload = $false
     if ($Download) {
         $Expiry = $Download.ExpiresUtc.ToOffset([TimeSpan]::FromHours(9)).ToString('MM/dd HH:mm')
@@ -174,15 +180,21 @@ try {
             $Embed.fields = @(@{ name = "$DownloadLabel (임시)"; value = $DownloadText; inline = $false }) + $Embed.fields
             $SentDirectDownload = $true
         }
-    } elseif ($env:DRAWLIAR_DOWNLOAD_RESULT) {
+    } elseif (!$CloudStorageUrl -and $env:DRAWLIAR_DOWNLOAD_RESULT) {
         Write-Output 'Android 직접 다운로드 링크를 확인하지 못했습니다.'
     }
-    if (!$TesterDownloadUrl -and !$SentDirectDownload -and $JenkinsArtifactUrl) {
+    if (!$CloudStorageUrl -and !$TesterDownloadUrl -and !$SentDirectDownload -and $JenkinsArtifactUrl) {
         $DownloadLabel = if ($Format -eq 'AAB') { 'AAB 원본 다운로드' } else { "$Format 다운로드" }
         $ArtifactText = "[Jenkins에서 $DownloadLabel]($JenkinsArtifactUrl)"
         if ($Format -eq 'AAB') { $ArtifactText += "`nAAB 파일은 기기에서 직접 설치할 수 없습니다." }
         $Embed.url = $JenkinsArtifactUrl
         $Embed.fields = @(@{ name = '빌드 아티팩트'; value = $ArtifactText; inline = $false }) + $Embed.fields
+    }
+    if ($CloudStorageUrl) {
+        $DownloadText = "[$Format 다운로드]($CloudStorageUrl)"
+        if ($Format -eq 'AAB') { $DownloadText += "`nAAB 파일은 기기에서 직접 설치할 수 없습니다." }
+        $Embed.url = $CloudStorageUrl
+        $Embed.fields = @(@{ name = 'Cloud Storage 다운로드'; value = $DownloadText; inline = $false }) + $Embed.fields
     }
     if ($env:DRAWLIAR_UPLOAD_RESULT) {
         $UploadText = switch ($env:DRAWLIAR_UPLOAD_RESULT) {
@@ -198,11 +210,25 @@ try {
     }
     if ($env:DRAWLIAR_PLAY_UPLOAD_RESULT -and $env:DRAWLIAR_PLAY_UPLOAD_RESULT -ne 'SKIPPED') {
         $PlayUploadText = switch ($env:DRAWLIAR_PLAY_UPLOAD_RESULT) {
-            'SUCCESS' { '내부 테스트 초안 저장 완료 · Play Console에서 검토 가능' }
+            'SUCCESS' { '공개 테스트(beta) 업데이트 출시 제출 완료 · Google Play 반영 대기' }
             'FAILURE' { '업로드 실패' }
             'ABORTED' { '업로드 중단' }
             'RUNNING' { '업로드 완료 확인 필요' }
             default { '업로드 시작 전' }
+        }
+        if ($env:DRAWLIAR_PLAY_UPLOAD_RESULT -eq 'FAILURE') {
+            try {
+                $PlayResultPath = './Build/Logs/GooglePlayUploadResult.json'
+                if ((Test-Path -LiteralPath $PlayResultPath -PathType Leaf) -and (Get-Item -LiteralPath $PlayResultPath).Length -le 65536) {
+                    $PlayResult = [IO.File]::ReadAllText([IO.Path]::GetFullPath($PlayResultPath)) | ConvertFrom-Json
+                    if (!$PlayResult.Success -and $PlayResult.PackageName -eq 'com.rascallab.liargame' -and
+                        [string]$PlayResult.BuildNumber -eq $env:BUILD_NUMBER -and
+                        [string]$PlayResult.VersionCode -eq $env:DRAWLIAR_VERSION_CODE -and
+                        $PlayResult.BundleVersion -eq $env:BUNDLE_VERSION -and $PlayResult.FailureReason) {
+                        $PlayUploadText += "`n" + (Get-NotificationText ([string]$PlayResult.FailureReason) 700 '')
+                    }
+                }
+            } catch {}
         }
         $Embed.fields += @{ name = 'Google Play 업로드'; value = $PlayUploadText; inline = $false }
     }
@@ -241,6 +267,16 @@ try {
         [string]$Response.channel_id -cnotmatch '^[0-9]+$') { throw 'Invalid notification response' }
     $DirectDownloadConfirmed = $false
     $TesterDownloadConfirmed = $false
+    $CloudStorageDownloadConfirmed = $false
+    if ($CloudStorageUrl -and $Response.embeds) {
+        foreach ($DeliveredEmbed in $Response.embeds) {
+            foreach ($DeliveredField in $DeliveredEmbed.fields) {
+                if ([string]$DeliveredField.value -and ([string]$DeliveredField.value).Contains("]($CloudStorageUrl)")) {
+                    $CloudStorageDownloadConfirmed = $true
+                }
+            }
+        }
+    }
     if ($Download -and $Response.embeds) {
         foreach ($DeliveredEmbed in $Response.embeds) {
             if ([string]$DeliveredEmbed.url -ceq $Download.Uri) { $DirectDownloadConfirmed = $true }
@@ -273,12 +309,17 @@ try {
                 SentDirectDownload = $SentDirectDownload
                 HasDirectDownload = $DirectDownloadConfirmed
                 HasTesterDownload = $TesterDownloadConfirmed
+                HasCloudStorageDownload = $CloudStorageDownloadConfirmed
                 DownloadExpiresUtc = $(if ($Download) { $Download.ExpiresUtc.UtcDateTime.ToString('o') } else { $null })
             } |
                 ConvertTo-Json | Set-Content -LiteralPath $Receipt -Encoding UTF8
         } catch { Write-Output 'Discord 전송 완료 · 알림 영수증 저장 실패' }
     }
-    Write-Output 'Discord 완료 알림 전송 성공'
+    if ($CloudStorageUrl -and !$CloudStorageDownloadConfirmed) {
+        Write-Output 'Discord 전송 완료 · Cloud Storage 다운로드 링크 확인 실패'
+    } else {
+        Write-Output 'Discord 완료 알림 전송 성공'
+    }
 } catch {
     Write-Output 'Discord 알림 전송 실패 · 빌드 결과 유지'
 }

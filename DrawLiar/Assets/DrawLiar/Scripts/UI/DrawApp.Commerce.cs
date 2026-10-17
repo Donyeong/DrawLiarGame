@@ -12,8 +12,34 @@ namespace DrawLiar
         private enum ShopSection { Cosmetics, PremiumCosmetics, Gems, Subscription, DailyReward }
         private ShopSection _shopSection;
         private VisualElement _commerceCatalogue;
+        private VisualElement _waitingRoomPainterReward;
         private bool _commerceEventsAttached;
         private bool OwnSubscriberBadge => lobby.IsPainterSubscriber && lobby.Profile?.ShowSubscriberBadge == true;
+
+        private static VisualElement CreatePainterRoomReward(VisualElement parent)
+        {
+            var reward = Box(parent, "painter-room-reward");
+            reward.pickingMode = PickingMode.Ignore;
+            reward.Add(new DrawSubscriberBadge { pickingMode = PickingMode.Ignore });
+            Text(reward, "화가패스 방 · 코인·경험치 {0}배", "painter-room-reward-label",
+                MatchRewardRules.PAINTER_HOST_MULTIPLIER).pickingMode = PickingMode.Ignore;
+            return reward;
+        }
+
+        private void CreateWaitingRoomPainterReward(VisualElement parent)
+        {
+            _waitingRoomPainterReward = CreatePainterRoomReward(parent);
+            _waitingRoomPainterReward.name = "waiting-room-painter-reward";
+            _waitingRoomPainterReward.AddToClassList("waiting-room-painter-reward");
+            _waitingRoomPainterReward.style.display = DisplayStyle.None;
+        }
+
+        private void RefreshWaitingRoomPainterReward(RoomSnapshot state)
+        {
+            if (_waitingRoomPainterReward == null) return;
+            _waitingRoomPainterReward.style.display = state.Phase == GamePhase.Lobby && state.HostHasPainterPass
+                ? DisplayStyle.Flex : DisplayStyle.None;
+        }
 
         private void AttachCommerceEvents()
         {

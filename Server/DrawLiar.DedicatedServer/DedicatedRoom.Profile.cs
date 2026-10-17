@@ -46,6 +46,7 @@ internal sealed partial class DedicatedRoom
             }
             _session.UpdateProfile(connection.PlayerId, profile.DisplayName, profile.AvatarColor, profile.Accessory,
                 profile.Level, profile.Cosmetics);
+            connection.SubscriptionExpiresAt = profile.SubscriptionExpiresAt ?? "";
             BroadcastSnapshotsLocked(RoomRegistry.Now);
             ProfileReplyLocked(connection, requestId, true, "");
         }

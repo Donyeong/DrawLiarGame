@@ -5,6 +5,11 @@ using System.Threading.Tasks;
 
 namespace DrawLiar
 {
+    public interface IDrawPlatformPurchaseNotifications
+    {
+        event Action PurchasesChanged;
+    }
+
     public interface IDrawPlatformPaymentProvider
     {
         string Id { get; }

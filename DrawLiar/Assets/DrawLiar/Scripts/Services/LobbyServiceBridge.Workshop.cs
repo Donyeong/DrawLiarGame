@@ -89,7 +89,7 @@ namespace DrawLiar
             var entry = result.Topic;
             if (entry == null || !string.Equals(entry.Id, id, StringComparison.OrdinalIgnoreCase)
                 || string.IsNullOrWhiteSpace(entry.Name) || entry.Name != GameRules.CleanText(entry.Name, 40)
-                || !TopicWorkshopPolicy.LanguageCodes.Contains(entry.LanguageCode) || result.Words == null
+                || TopicWorkshopRules.NormalizeLanguage(entry.LanguageCode, TopicWorkshopPolicy, allowLegacy: true) == null || result.Words == null
                 || result.Words.Length == 0 || result.Words.Length > 200 || entry.WordCount != result.Words.Length
                 || result.Words.Any(word => string.IsNullOrWhiteSpace(word) || word != GameRules.CleanText(word, 40)))
                 throw new InvalidOperationException(DrawLocalization.Text("주제 이름과 제시어를 확인하세요."));

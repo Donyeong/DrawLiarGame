@@ -39,7 +39,7 @@ namespace DrawLiar
             var data = LoadBuiltIn();
             if (topicLanguage != null)
                 data.Topics = (data.Topics ?? Array.Empty<TopicData>())
-                    .Where(topic => ServerRoomSettings.TopicLanguageOf(topic.LanguageCode) == topicLanguage).ToArray();
+                    .Where(topic => ServerRoomSettings.TopicLanguageOf(topic.LanguageCode) == ServerRoomSettings.NormalizeTopicLanguage(topicLanguage)).ToArray();
             data.Scoring ??= new ScoreRules();
             data.Scoring.LiarUncaught = Mathf.Clamp(data.Scoring.LiarUncaught, 0, 1000);
             data.Scoring.LiarCorrectGuess = Mathf.Clamp(data.Scoring.LiarCorrectGuess, 0, 1000);
@@ -138,7 +138,7 @@ namespace DrawLiar
             var entry = response?.Topic;
             if (entry == null || !Guid.TryParse(entry.Id, out var id) || !TopicWorkshopRules.ValidatePolicy(policy)
                 || string.IsNullOrWhiteSpace(entry.Name) || entry.Name != GameRules.CleanText(entry.Name, 40)
-                || !policy.LanguageCodes.Contains(entry.LanguageCode) || response.Words == null || response.Words.Length == 0
+                || TopicWorkshopRules.NormalizeLanguage(entry.LanguageCode, policy, allowLegacy: true) == null || response.Words == null || response.Words.Length == 0
                 || entry.WordCount != response.Words.Length || response.Words.Length > 200
                 || response.Words.Any(word => string.IsNullOrWhiteSpace(word) || word != GameRules.CleanText(word, 40)))
                 throw new ArgumentException("주제 이름과 제시어를 확인하세요.");

@@ -1,5 +1,19 @@
 <!doctype html>
 <html lang="ko">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DrawLiar 서버 관리</title><link rel="stylesheet" href="console.css"><script src="console.js" defer></script></head>
-<body><main><h1>DrawLiar 서버 관리</h1><form id="auth"><label>관리 키 <input id="key" type="password" required autocomplete="off"></label><button>연결</button><button id="logout" type="button">연결 해제</button></form><p id="status" role="status">관리 키를 입력하세요.</p><form id="search"><label>이름 검색 <input id="query" maxlength="30"></label><button>조회</button></form><h2>클라이언트 버전</h2><table class="client-versions"><thead><tr><th>플랫폼</th><th>강제 업데이트 버전</th><th>일반 업데이트 버전</th><th>스토어 주소</th><th>관리</th></tr></thead><tbody id="client-versions"></tbody></table><h2>계정</h2><table><thead><tr><th>이름</th><th>계정 ID</th><th>코인</th><th>상태</th><th>관리</th></tr></thead><tbody id="accounts"></tbody></table><h2>방</h2><table><thead><tr><th>이름</th><th>방 ID</th><th>참가</th><th>관전</th><th>상태</th></tr></thead><tbody id="rooms"></tbody></table><h2>처리 대기 신고</h2><table><thead><tr><th>접수</th><th>사유</th><th>대상</th><th>신고자</th><th>내용</th><th>관련 ID</th><th>관리</th></tr></thead><tbody id="reports"></tbody></table></main></body>
+<body><main><h1>DrawLiar 서버 관리</h1><form id="auth"><label>관리 키 <input id="key" type="password" required autocomplete="off"></label><button>연결</button><button id="logout" type="button">연결 해제</button></form><p id="status" role="status">관리 키를 입력하세요.</p><form id="search"><label>이름 검색 <input id="query" maxlength="30"></label><button>조회</button></form><h2>클라이언트 버전</h2><table class="client-versions"><thead><tr><th>플랫폼</th><th>강제 업데이트 버전</th><th>일반 업데이트 버전</th><th>스토어 주소</th><th>관리</th></tr></thead><tbody id="client-versions"></tbody></table><h2>계정</h2><table><thead><tr><th>이름</th><th>계정 ID</th><th>코인</th><th>상태</th><th>관리</th></tr></thead><tbody id="accounts"></tbody></table>
+<h2>우편 발송</h2>
+<form id="mail-form" class="mail-form">
+<label class="mail-wide">받는 계정 ID <textarea id="mail-recipients" rows="3" required placeholder="쉼표 또는 줄바꿈으로 구분 (최대 1,000개)"></textarea></label>
+<label class="mail-wide mail-option"><input id="mail-all" type="checkbox"> 전체 발송 (발송 후 가입한 계정 포함)</label>
+<label class="mail-wide">제목 <input id="mail-title" maxlength="40" required></label>
+<label class="mail-wide">내용 <textarea id="mail-message" rows="4" maxlength="500"></textarea></label>
+<label>코인 <input id="mail-coins" type="number" min="0" max="1000000" step="1" value="0" required></label>
+<label>보석 <input id="mail-gems" type="number" min="0" max="10000" step="1" value="0" required></label>
+<label>유효 기간(일) <input id="mail-days" type="number" min="1" max="365" step="1" value="30" required></label>
+<label class="mail-wide mail-option"><input id="mail-confirm" type="checkbox" required> 대상과 보상을 확인했습니다.</label>
+<button id="mail-send" type="submit" disabled>우편 발송</button>
+</form>
+<h2>발송한 우편</h2><div class="mail-table-wrap"><table class="mails"><thead><tr><th>발송 시각</th><th>대상</th><th>제목</th><th>보상</th><th>만료</th><th>수령 수</th><th>관리</th></tr></thead><tbody id="mails"></tbody></table></div>
+<h2>방</h2><table><thead><tr><th>이름</th><th>방 ID</th><th>참가</th><th>관전</th><th>상태</th></tr></thead><tbody id="rooms"></tbody></table><h2>처리 대기 신고</h2><table><thead><tr><th>접수</th><th>사유</th><th>대상</th><th>신고자</th><th>내용</th><th>관련 ID</th><th>관리</th></tr></thead><tbody id="reports"></tbody></table></main></body>
 </html>

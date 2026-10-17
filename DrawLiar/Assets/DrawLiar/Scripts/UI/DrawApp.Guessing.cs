@@ -198,6 +198,22 @@ namespace DrawLiar
             popup.AddToClassList("guess-popup-overlay");
             popup.name = "guess-popup-overlay";
             if (popup.parent != root) root.Add(popup);
+            var mobileLayout = _mobileLayout;
+            void FitPopup()
+            {
+                if (_guessPopupOverlay != popup || popup.panel == null) return;
+                bool mobile = mobileLayout != null && mobileLayout.IsMobile;
+                popup.style.left = mobile ? root.style.paddingLeft : StyleKeyword.Null;
+                popup.style.top = mobile ? root.style.paddingTop : StyleKeyword.Null;
+                popup.style.right = mobile ? root.style.paddingRight : StyleKeyword.Null;
+                popup.style.bottom = mobile ? root.style.paddingBottom : StyleKeyword.Null;
+            }
+            if (mobileLayout != null) mobileLayout.LayoutChanged += FitPopup;
+            popup.RegisterCallback<DetachFromPanelEvent>(evt =>
+            {
+                if (ReferenceEquals(evt.target, popup) && mobileLayout != null) mobileLayout.LayoutChanged -= FitPopup;
+            });
+            FitPopup();
             _guessPopupAutoOpened = true;
             var heading = Box(modal, "row utility-popup-header");
             Text(heading, "정답 입력", "utility-popup-title grow");

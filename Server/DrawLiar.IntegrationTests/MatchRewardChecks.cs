@@ -108,6 +108,24 @@ internal static partial class Integration
             "상점 구매와 보상이 동시에 발생해도 추가·차감 둘 다 보존해야 합니다.");
         Report("인원/완료 라운드/점수 비례·다른 경기 동시 정산·구매와 보상 동시 잔액 검증");
 
+        await using (var subscribe = new NpgsqlCommand("UPDATE \"Account\" SET \"SubscriptionExpiresAt\"=now()+interval '1 day' WHERE \"Id\"=$1", owner))
+        { subscribe.Parameters.AddWithValue(Guid.Parse(accounts[0])); await subscribe.ExecuteNonQueryAsync(); }
+        var painterHost = RewardFixture(accounts.Take(3).ToArray(), assignment.RoomId, 1, 3, new[] { 4, 4, 0 }); painterHost.HostAccountId = accounts[0];
+        var plainHost = RewardFixture(accounts.Take(3).ToArray(), assignment.RoomId, 1, 3, new[] { 4, 4, 0 }); plainHost.HostAccountId = accounts[1];
+        await RewardClusterPostAsync(game, "/internal/dedicated/matches", painterHost);
+        await RewardClusterPostAsync(game, "/internal/dedicated/matches", plainHost);
+        for (int index = 0; index < 3; index++)
+        {
+            var bonus = await RewardGetAsync(game, painterHost.MatchId, users[index].Session.SessionToken);
+            var plain = await RewardGetAsync(game, plainHost.MatchId, users[index].Session.SessionToken);
+            Check(bonus.CoinReward == firstCoins[index] * 3 / 2 && bonus.ExperienceReward == firstCoins[index] * 3 / 2
+                && plain.CoinReward == firstCoins[index] && plain.ExperienceReward == firstCoins[index],
+                "화가패스 구독자가 방장인 경기만 코인·XP를 1.5배 지급해야 합니다.");
+        }
+        var hostless = CloneProfileMatch(painterHost); hostless.HostAccountId = "";
+        await RewardClusterErrorAsync(game, hostless, HttpStatusCode.Conflict, "MatchResultConflict");
+        Report("화가패스 방장 1.5배·일반 방장 기본 보상·방장이 다른 재전송 충돌 검증");
+
         long savedMatches = await ProfileRowCountAsync(owner, "MatchRecord");
         int savedCoins = (await database.ProfileAsync(Guid.Parse(accounts[0]))).Coins;
         long savedExperience = (await database.ProfileAsync(Guid.Parse(accounts[0]))).Experience;
@@ -119,7 +137,8 @@ internal static partial class Integration
             value => value.Players[0].WeightedRoundScore = 257,
             value => { value.Players[0].WeightedRoundParticipants = 0; value.Players[0].WeightedRoundScore = 1; },
             value => value.Players[0].AccountId = users[8].Login.AccountId,
-            value => value.NodeId = "wrong-reward-node"
+            value => value.NodeId = "wrong-reward-node",
+            value => value.HostAccountId = "not-an-account"
         })
         {
             var invalid = RewardFixture(accounts.Take(3).ToArray(), assignment.RoomId, 1, 3, new[] { 4, 4, 0 }); change(invalid);
@@ -181,7 +200,8 @@ internal static partial class Integration
             double now = 0; room.Receive(peers[0], new GameplayEnvelope { Type = "request", Kind = "start" }, now);
             for (int index = 0; index < 30 && completed == null; index++) room.Tick(now += 1000);
             Check(completed != null && completed.Players.Length == 3 && completed.Players.All(player => player.WeightedRoundParticipants == 3
-                && player.WeightedRoundScore == 3L * player.Score) && completed.Players.All(player => player.AccountId != observer.Login.AccountId),
+                && player.WeightedRoundScore == 3L * player.Score) && completed.Players.All(player => player.AccountId != observer.Login.AccountId)
+                && completed.HostAccountId == active[0].Login.AccountId,
                 "데디케이티드는 실제 연결 계정에 게임 가중치를 매핑하고 관전자 보상 보고서를 만들면 안 됩니다.");
             await RewardClusterPostAsync(game, "/internal/dedicated/matches", completed!);
             foreach (var player in completed!.Players)

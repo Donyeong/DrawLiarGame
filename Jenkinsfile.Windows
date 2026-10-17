@@ -1,0 +1,103 @@
+pipeline {
+    agent { node { label 'built-in'; customWorkspace 'C:\\DrawLiarWindowsJenkins' } }
+    options {
+        disableConcurrentBuilds()
+        skipDefaultCheckout(true)
+        timestamps()
+        timeout(time: 90, unit: 'MINUTES')
+        buildDiscarder(logRotator(numToKeepStr: '10', artifactNumToKeepStr: '5'))
+    }
+    parameters {
+        string(name: 'BUNDLE_VERSION', defaultValue: '0.1.0', description: 'Windows 표시 버전')
+        booleanParam(name: 'DEVELOPMENT_BUILD', defaultValue: false, description: 'Unity Development Build')
+        booleanParam(name: 'UPLOAD_GCS', defaultValue: true, description: 'Cloud Storage에 Windows ZIP 업로드 및 다운로드 링크 생성')
+        booleanParam(name: 'NOTIFY_DISCORD', defaultValue: false, description: 'DrawLiar Discord 채널에 빌드 결과와 다운로드 링크 전송')
+    }
+    environment {
+        DRAWLIAR_SOURCE_REPOSITORY = 'C:\\DrawLiar'
+        DRAWLIAR_UNITY_PATH = 'C:\\Program Files\\Unity\\Hub\\Editor\\6000.3.20f1\\Editor\\Unity.exe'
+        CLOUDSDK_CONFIG = 'C:\\DrawLiarWindowsJenkinsCache\\Gcloud'
+    }
+    stages {
+        stage('Snapshot Current Project') {
+            steps {
+                script {
+                    env.DRAWLIAR_SOURCE_READY = 'false'
+                    env.DRAWLIAR_BUILD_ARTIFACT_READY = 'false'
+                    env.DRAWLIAR_GCS_DOWNLOAD_URL = ''
+                }
+                powershell '''
+                    $ErrorActionPreference = 'Stop'
+                    & "$env:DRAWLIAR_SOURCE_REPOSITORY/Tools/Jenkins/Sync-WindowsSource.ps1" -SourceRepository $env:DRAWLIAR_SOURCE_REPOSITORY -Workspace $env:WORKSPACE
+                '''
+                script { env.DRAWLIAR_SOURCE_READY = 'true' }
+            }
+        }
+        stage('Build Windows x64') {
+            steps {
+                withEnv(["DRAWLIAR_BUNDLE_VERSION=${params.BUNDLE_VERSION}", "DRAWLIAR_DEVELOPMENT=${params.DEVELOPMENT_BUILD}"]) {
+                    powershell '''
+                        $ErrorActionPreference = 'Stop'
+                        & './Tools/Jenkins/Build-Windows.ps1' -UnityPath $env:DRAWLIAR_UNITY_PATH -ProjectPath "$env:WORKSPACE/DrawLiar" -BundleVersion $env:DRAWLIAR_BUNDLE_VERSION -BuildNumber ([int]$env:BUILD_NUMBER) -Development:($env:DRAWLIAR_DEVELOPMENT -eq 'true')
+                    '''
+                }
+            }
+        }
+        stage('Archive Windows ZIP') {
+            steps {
+                archiveArtifacts artifacts: 'Build/Windows/*.zip,Build/Windows/*.sha256', fingerprint: true
+                script {
+                    env.DRAWLIAR_BUILD_ARTIFACT_READY = 'true'
+                    currentBuild.description = "Windows x64 | ${params.BUNDLE_VERSION} | ${params.DEVELOPMENT_BUILD ? 'Development' : 'Release'} | local working tree"
+                }
+            }
+        }
+        stage('Upload to Cloud Storage') {
+            when { expression { params.UPLOAD_GCS } }
+            steps {
+                withCredentials([file(credentialsId: 'drawliar-builds-gcs', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                    powershell '''
+                        $ErrorActionPreference = 'Stop'
+                        & './Tools/Jenkins/Publish-WindowsBuild.ps1' -BundleVersion $env:BUNDLE_VERSION -BuildNumber ([int]$env:BUILD_NUMBER) -Development:($env:DEVELOPMENT_BUILD -eq 'true')
+                    '''
+                }
+                script {
+                    env.DRAWLIAR_GCS_DOWNLOAD_URL = powershell(returnStdout: true, script: '''
+                        $ErrorActionPreference = 'Stop'
+                        $upload = Get-Content -Raw -LiteralPath 'Build/Logs/WindowsCloudStorageUploadResult.json' | ConvertFrom-Json
+                        $build = Get-Content -Raw -LiteralPath 'Build/Logs/WindowsBuildResult.json' | ConvertFrom-Json
+                        $flavor = if ($env:DEVELOPMENT_BUILD -eq 'true') { '-Development' } else { '' }
+                        $expected = "https://storage.googleapis.com/kona-survival-tksqml97/drawliar/builds/windows/$env:BUNDLE_VERSION/$env:BUILD_NUMBER/DrawLiar-Windows-x64-$env:BUNDLE_VERSION-$env:BUILD_NUMBER$flavor.zip"
+                        if (!$upload.Success -or $upload.Platform -ne 'Windows-x64' -or $upload.RunId -ne $build.RunId -or
+                            [string]$upload.BuildNumber -ne $env:BUILD_NUMBER -or $upload.BundleVersion -ne $env:BUNDLE_VERSION -or
+                            [bool]$upload.Development -ne ($env:DEVELOPMENT_BUILD -eq 'true') -or $upload.DownloadUrl -cne $expected) {
+                            throw 'Cloud Storage 업로드 결과가 이번 Windows 빌드와 일치하지 않습니다.'
+                        }
+                        Write-Output $upload.DownloadUrl
+                    ''').trim()
+                    currentBuild.description = "Windows 다운로드: ${env.DRAWLIAR_GCS_DOWNLOAD_URL}"
+                }
+            }
+        }
+    }
+    post {
+        always {
+            script {
+                if (env.DRAWLIAR_SOURCE_READY == 'true') {
+                    if (params.NOTIFY_DISCORD) {
+                        catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
+                            timeout(time: 35, unit: 'SECONDS') {
+                                withCredentials([string(credentialsId: 'drawliar-discord-build-webhook', variable: 'DRAWLIAR_DISCORD_WEBHOOK')]) {
+                                    withEnv(["DRAWLIAR_NOTIFY_RESULT=${currentBuild.currentResult}"]) {
+                                        powershell "& './Tools/Jenkins/Notify-WindowsBuild.ps1'"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    archiveArtifacts artifacts: 'Build/Logs/Windows*', allowEmptyArchive: true
+                }
+            }
+        }
+    }
+}

@@ -20,6 +20,7 @@ namespace DrawLiar
             if (lobby == null || _socialEventsAttached) return;
             lobby.SocialChanged += OnSocialChanged;
             lobby.SocialNotice += Toast;
+            lobby.MailChanged += OnMailChanged;
             _socialEventsAttached = true;
         }
 
@@ -28,6 +29,7 @@ namespace DrawLiar
             if (lobby == null || !_socialEventsAttached) return;
             lobby.SocialChanged -= OnSocialChanged;
             lobby.SocialNotice -= Toast;
+            lobby.MailChanged -= OnMailChanged;
             _socialEventsAttached = false;
         }
 
@@ -52,6 +54,7 @@ namespace DrawLiar
         private void OnSocialChanged()
         {
             RefreshSocialControls();
+            RefreshMailControls();
             RefreshPublicProfileFriendship();
             if (_socialActionBusy) return;
             RefreshFriends();

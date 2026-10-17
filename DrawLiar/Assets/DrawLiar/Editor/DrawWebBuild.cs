@@ -140,13 +140,18 @@ namespace DrawLiar.Editor
             {
                 CreateFontAsset("Assets/DrawLiar/WebFonts/NotoSansCJKsc-Regular.otf"),
                 CreateFontAsset("Assets/DrawLiar/WebFonts/NotoSansDevanagari-Regular.ttf"),
-                CreateFontAsset("Assets/DrawLiar/WebFonts/NotoSansArabic-Regular.ttf")
+                CreateFontAsset("Assets/DrawLiar/WebFonts/NotoSansArabic-Regular.ttf"),
+                CreateFontAsset("Assets/DrawLiar/Resources/DrawLiar/Fonts/NotoSansHebrew-Regular.ttf"),
+                CreateFontAsset("Assets/DrawLiar/Resources/DrawLiar/Fonts/NotoSansThai-Regular.ttf")
             };
             EditorUtility.SetDirty(primary);
+            FontAsset languageNames = CreateFontAsset("Assets/DrawLiar/Resources/DrawLiar/Fonts/DrawLiarLanguageNames.ttf");
+            languageNames.fallbackFontAssetTable = new List<FontAsset> { primary };
+            EditorUtility.SetDirty(languageNames);
             PanelSettings panel = CreatePanelSettings();
             var scene = EditorSceneManager.OpenScene(SCENE_PATH, OpenSceneMode.Single);
             var provider = new GameObject("Web Typography").AddComponent<DrawWebTypography>();
-            provider.Configure(primary, panel);
+            provider.Configure(primary, languageNames, panel);
             string path = GENERATED_ASSETS + "/DrawLiar.unity";
             if (!EditorSceneManager.SaveScene(scene, path))
                 throw new IOException("웹 빌드 씬을 저장할 수 없습니다.");

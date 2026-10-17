@@ -27,10 +27,14 @@ public sealed partial class ServerDatabase
         var invitations = new List<RoomInvitationData>();
         await using var connection = await _source.OpenConnectionAsync(cancellationToken);
         await RemoveExpiredInvitations(connection, cancellationToken);
-        await using var command = Command(connection, null, INVITATION_SELECT + " ORDER BY i.\"CreatedAt\" DESC LIMIT 50", accountId);
-        await using var reader = await command.ExecuteReaderAsync(cancellationToken);
-        while (await reader.ReadAsync(cancellationToken)) invitations.Add(ReadInvitation(reader));
-        return new SocialInboxResponse { Friends = friends, RoomInvitations = invitations.ToArray() };
+        await using (var command = Command(connection, null, INVITATION_SELECT + " ORDER BY i.\"CreatedAt\" DESC LIMIT 50", accountId))
+        await using (var reader = await command.ExecuteReaderAsync(cancellationToken))
+            while (await reader.ReadAsync(cancellationToken)) invitations.Add(ReadInvitation(reader));
+        return new SocialInboxResponse
+        {
+            Friends = friends, RoomInvitations = invitations.ToArray(),
+            MailCount = await ReadMailCount(connection, accountId, cancellationToken)
+        };
     }
 
     public async Task<RoomInvitationData> InviteToRoomAsync(ServerSession session, string identifier, Guid target,

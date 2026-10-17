@@ -14,6 +14,8 @@ namespace DrawLiar.Editor
             string path = Path.Combine(directory, "topics.json");
             try
             {
+                VerifyBuiltInLanguages(path);
+                VerifyLegacyWorkshopImports(path);
                 GameDataStore.UpsertCustomTopic("우리 주제", "사과,수박\n사과", path);
                 Check(GameDataStore.LoadCustomTopics(path).Single().Words.SequenceEqual(new[] { "사과", "수박" }), "Create and reload deduplicated custom words.");
                 GameDataStore.UpsertCustomTopic("우리 주제", "딸기", path);
@@ -44,13 +46,58 @@ namespace DrawLiar.Editor
                 try { GameDataStore.UpsertCustomTopic("새 주제", "단어", path); }
                 catch (ArgumentException) { rejected = true; }
                 Check(rejected && File.ReadAllText(path) == "{\"unexpected\":true}", "Unreadable topic data is never overwritten by an edit.");
-                Debug.Log("DrawLiar custom topic file self-check PASS: isolated create/read/update/delete, large-file roundtrip, merge, limits, and preservation.");
+                Debug.Log("DrawLiar custom topic file self-check PASS: 29 language packs, legacy language compatibility, isolated create/read/update/delete, large-file roundtrip, merge, limits, and preservation.");
             }
             finally
             {
                 foreach (string file in new[] { path, path + ".bak", path + ".tmp" })
                     if (File.Exists(file)) File.Delete(file);
                 if (Directory.Exists(directory)) Directory.Delete(directory);
+            }
+        }
+
+        private static void VerifyBuiltInLanguages(string path)
+        {
+            var asset = Resources.Load<TextAsset>("DrawLiar/TopicWorkshopPolicy");
+            var policy = asset == null ? null : JsonUtility.FromJson<TopicWorkshopPolicy>(asset.text);
+            Check(TopicWorkshopRules.ValidatePolicy(policy) && policy.LanguageCodes.SequenceEqual(ServerRoomSettings.TOPIC_LANGUAGES)
+                && policy.LanguageCodes.Length == 29, "방과 창작마당은 같은 순서의 29개 언어를 지원합니다.");
+            var data = GameDataStore.LoadBuiltIn();
+            foreach (string language in ServerRoomSettings.TOPIC_LANGUAGES.Concat(new[] { "zh-TW", "pt-BR" }))
+            {
+                var topics = data.Topics.Where(topic => ServerRoomSettings.TopicLanguageOf(topic.LanguageCode) == language).ToArray();
+                Check(topics.Length == 20 && topics.All(topic => !string.IsNullOrWhiteSpace(topic.Name) && topic.Name.Length <= 40
+                    && topic.Words.Length >= 20 && topic.Words.All(word => !string.IsNullOrWhiteSpace(word) && word.Length <= 40)),
+                    language + " 기본 팩은 20개 주제와 유효한 제시어를 제공합니다.");
+                Check(topics.Select(topic => GameRules.NormalizeGuess(topic.Name)).Distinct().Count() == topics.Length,
+                    language + " 기본 팩에는 같은 이름의 주제가 없습니다.");
+                Check(GameDataStore.Load(path, language).Topics.Select(topic => topic.Name).SequenceEqual(topics.Select(topic => topic.Name)),
+                    language + " 방은 해당 언어의 기본 주제만 불러옵니다.");
+            }
+            foreach (string language in new[] { "ko-KR", "ja-JP", "de-DE", "fr-FR", "hi-IN", "he", "nb" })
+                Check(GameDataStore.Load(path, language).Topics.Select(topic => topic.Name).SequenceEqual(
+                    GameDataStore.Load(path, ServerRoomSettings.NormalizeTopicLanguage(language)).Topics.Select(topic => topic.Name)),
+                    language + " 기존 언어 코드는 원래 제시어를 유지합니다.");
+            Check(ServerRoomSettings.NormalizeTopicLanguage("pt-BR") != ServerRoomSettings.NormalizeTopicLanguage("pt")
+                && ServerRoomSettings.NormalizeTopicLanguage("zh-TW") != ServerRoomSettings.NormalizeTopicLanguage("zh-CN"),
+                "브라질 포르투갈어와 중국어 번체의 기존 팩은 다른 팩과 합치지 않습니다.");
+        }
+
+        private static void VerifyLegacyWorkshopImports(string path)
+        {
+            var policy = JsonUtility.FromJson<TopicWorkshopPolicy>(Resources.Load<TextAsset>("DrawLiar/TopicWorkshopPolicy").text);
+            foreach (string language in new[] { "ko-KR", "zh-TW", "pt-BR", "he" })
+            {
+                var response = new TopicWorkshopDetailResponse
+                {
+                    Topic = new TopicWorkshopEntry { Id = Guid.NewGuid().ToString(), Name = "기존 게시물", LanguageCode = language, WordCount = 2 },
+                    Words = new[] { "원래 제시어", "original word" }
+                };
+                var imported = GameDataStore.ImportWorkshopTopic(response, policy, path);
+                Check(imported.LanguageCode == language && imported.Words.SequenceEqual(response.Words)
+                    && GameDataStore.LoadCustomTopics(path).Single().Words.SequenceEqual(response.Words),
+                    language + " 기존 게시물은 언어와 제시어를 보존하여 다운로드합니다.");
+                GameDataStore.DeleteCustomTopic(imported.Name, path);
             }
         }
 

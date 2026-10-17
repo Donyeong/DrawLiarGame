@@ -7,6 +7,11 @@ public sealed record VerifiedCommercePayment(string OrderId, string Provider, st
 
 public sealed record VerifiedCommerceReversal(string Provider, string AppScope, string TransactionId, string Reason);
 
+public sealed class VerifiedCommerceReversalException(VerifiedCommerceReversal reversal) : Exception("PaymentReversed")
+{
+    public VerifiedCommerceReversal Reversal { get; } = reversal;
+}
+
 public interface ICommerceReversalProvider
 {
     Task<VerifiedCommerceReversal> VerifyReversalAsync(string proof, CancellationToken cancellationToken);
@@ -19,6 +24,12 @@ public interface ICommercePaymentProvider
     bool IsAvailable { get; }
     Task PrepareAsync(CommerceStoredOrder order, string storeProof, CancellationToken cancellationToken);
     Task<VerifiedCommercePayment> VerifyAsync(CommerceStoredOrder order, string proof, CancellationToken cancellationToken);
+}
+
+public interface ICommercePaymentFinalizer
+{
+    string TransactionId(string proof);
+    Task FinalizeAsync(CommerceStoredOrder order, string proof, CancellationToken cancellationToken);
 }
 
 public interface ICommerceRepository
@@ -49,8 +60,12 @@ public sealed class CommerceService
 {
     private readonly ICommerceRepository _repository;
     private readonly IReadOnlyDictionary<string, ICommercePaymentProvider> _providers;
+    private readonly CommerceTokenProtector? _tokenProtector;
+    private readonly ICommerceFinalizationRepository? _finalizations;
+    public bool HasDurableFinalization => _tokenProtector != null && _finalizations != null;
 
-    public CommerceService(ICommerceRepository repository, IEnumerable<ICommercePaymentProvider>? providers = null)
+    public CommerceService(ICommerceRepository repository, IEnumerable<ICommercePaymentProvider>? providers = null,
+        CommerceTokenProtector? tokenProtector = null)
     {
         _repository = repository;
         var registered = (providers ?? new ICommercePaymentProvider[]
@@ -60,6 +75,10 @@ public sealed class CommerceService
         if (registered.Any(provider => provider.Id is not ("Steam" or "GooglePlay")))
             throw new ArgumentException("등록되지 않은 결제 플랫폼입니다.", nameof(providers));
         _providers = registered.ToDictionary(provider => provider.Id, StringComparer.Ordinal);
+        _tokenProtector = tokenProtector;
+        _finalizations = repository as ICommerceFinalizationRepository;
+        if (registered.Any(provider => provider.IsAvailable && provider is ICommercePaymentFinalizer) && !HasDurableFinalization)
+            throw new InvalidOperationException("결제 소비 공급자에는 영구 대기열과 별도 토큰 암호화 키가 필요합니다.");
     }
 
     public CommerceCatalogue Catalogue() => new()
@@ -96,8 +115,17 @@ public sealed class CommerceService
         if (request == null || !Guid.TryParse(request.OrderId, out Guid orderId) || orderId == Guid.Empty
             || request.Proof == null || request.Proof.Length > 8192) throw new ApiException("InvalidPayment");
         var order = await _repository.CommerceOrderAsync(accountId, orderId, cancellationToken);
-        if (order.Order.State == "Completed") return new CommercePaymentResponse { Order = order.Order, Product = order.Product,
-            Profile = await _repository.CommerceProfileAsync(accountId, cancellationToken) };
+        if (order.Order.State == "Completed")
+        {
+            if (_providers.TryGetValue(order.Order.Provider, out var completedProvider)
+                && completedProvider is ICommercePaymentFinalizer completedFinalizer)
+            {
+                Provider(order.Order.Provider);
+                await FinalizeAsync(order, request.Proof, completedFinalizer, cancellationToken);
+            }
+            return new CommercePaymentResponse { Order = order.Order, Product = order.Product,
+                Profile = await _repository.CommerceProfileAsync(accountId, cancellationToken) };
+        }
         if (order.Order.State != "Prepared") throw new ApiException("PaymentReviewRequired", 409);
         var provider = Provider(order.Order.Provider);
         var payment = await provider.VerifyAsync(order, request.Proof, cancellationToken);
@@ -106,7 +134,39 @@ public sealed class CommerceService
             || payment.StoreProductId != order.Order.StoreProductId || payment.AccountBinding != order.Order.AccountBinding
             || string.IsNullOrWhiteSpace(payment.TransactionId) || payment.TransactionId.Length > 256
             || payment.TransactionId.Any(char.IsControl)) throw new ApiException("InvalidPayment", 403);
-        return await _repository.CompleteCommerceOrderAsync(order, provider.AppScope, payment.TransactionId, cancellationToken);
+        var response = provider is ICommercePaymentFinalizer
+            ? await _finalizations!.CompleteWithFinalizationAsync(order, provider.AppScope, payment.TransactionId,
+                _tokenProtector!.Protect(order, request.Proof), cancellationToken)
+            : await _repository.CompleteCommerceOrderAsync(order, provider.AppScope, payment.TransactionId, cancellationToken);
+        if (provider is ICommercePaymentFinalizer finalizer)
+            await FinalizeAsync(order, request.Proof, finalizer, cancellationToken);
+        return response;
+    }
+
+    public async Task RetryFinalizationAsync(PendingCommerceFinalization pending, CancellationToken cancellationToken = default)
+    {
+        if (!HasDurableFinalization || pending.Order.Order.State != "Completed") throw new ApiException("PaymentReviewRequired", 409);
+        if (Provider(pending.Order.Order.Provider) is not ICommercePaymentFinalizer finalizer)
+            throw new ApiException("PaymentProviderUnavailable", 503);
+        string proof = _tokenProtector!.Unprotect(pending.Order, pending.ProtectedProof);
+        await FinalizeAsync(pending.Order, proof, finalizer, cancellationToken);
+    }
+
+    private async Task FinalizeAsync(CommerceStoredOrder order, string proof, ICommercePaymentFinalizer finalizer,
+        CancellationToken cancellationToken)
+    {
+        await _finalizations!.RequireCommerceTransactionAsync(order, finalizer.TransactionId(proof), cancellationToken);
+        try { await finalizer.FinalizeAsync(order, proof, cancellationToken); }
+        catch (VerifiedCommerceReversalException error)
+        {
+            var reversal = error.Reversal;
+            if (reversal.Provider != order.Order.Provider || reversal.AppScope != order.AppScope
+                || reversal.TransactionId != finalizer.TransactionId(proof) || reversal.Reason is not ("Refunded" or "Revoked"))
+                throw new ApiException("InvalidPayment", 403);
+            await _repository.FlagCommerceTransactionForReviewAsync(reversal, cancellationToken);
+            throw new ApiException("PaymentReviewRequired", 409);
+        }
+        await _finalizations.CompleteCommerceFinalizationAsync(Guid.Parse(order.Order.OrderId), cancellationToken);
     }
 
     public async Task ReviewReversalAsync(string providerId, string proof, CancellationToken cancellationToken = default)

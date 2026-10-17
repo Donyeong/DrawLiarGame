@@ -13,7 +13,12 @@ await ServerRuntime.InitializeAsync(app, false);
 app.UseWebSockets(new WebSocketOptions { KeepAliveInterval = TimeSpan.FromSeconds(15), KeepAliveTimeout = TimeSpan.FromSeconds(15) });
 app.MapGet("/health", (MainRegistration registration) => registration.IsReady ? Results.Ok(new { Status = "Ready" }) : Results.StatusCode(503));
 var database = app.Services.GetRequiredService<ServerDatabase>();
-var commerce = new CommerceService(database);
+using var commerceHttp = new HttpClient { Timeout = TimeSpan.FromSeconds(10) };
+var googlePlay = await GooglePlayPaymentProvider.CreateAsync(app.Configuration, commerceHttp, app.Lifetime.ApplicationStopping);
+var commerceProtector = CommerceTokenProtector.Create(app.Configuration);
+var commerce = new CommerceService(database, new[] { new UnconfiguredCommercePaymentProvider("Steam"), googlePlay }, commerceProtector);
+var finalization = new CommerceFinalizationWorker(database, commerce, app.Services.GetRequiredService<ILogger<CommerceFinalizationWorker>>());
+var finalizationTask = finalization.RunAsync(app.Lifetime.ApplicationStopping);
 using var advertisingHttp = new HttpClient { Timeout = TimeSpan.FromSeconds(10) };
 var advertising = new AdvertisingService(database, new AdvertisingSettings(app.Configuration), new AdMobSsvVerifier(advertisingHttp));
 string nodeId = app.Configuration["GameServer:NodeId"] ?? throw new InvalidOperationException("GameServer:NodeId가 필요합니다.");
@@ -40,6 +45,10 @@ app.MapPatch("/api/profile", async (HttpContext context, UpdateProfileRequest re
 app.MapGet("/api/friends", (Func<HttpContext, Task<FriendListResponse>>)(async context => await database.FriendsAsync((await Authenticate(context)).AccountId)));
 app.MapGet("/api/social/inbox", (Func<HttpContext, Task<SocialInboxResponse>>)(async context =>
     await database.SocialInboxAsync((await Authenticate(context)).AccountId, context.RequestAborted)));
+app.MapGet("/api/mail", (Func<HttpContext, Task<MailListResponse>>)(async context =>
+    await database.MailsAsync((await Authenticate(context)).AccountId, context.RequestAborted)));
+app.MapPost("/api/mail/claim", async (HttpContext context, MailClaimRequest request) =>
+    await database.ClaimMailAsync((await Authenticate(context)).AccountId, request, context.RequestAborted));
 app.MapPost("/api/friends/request", async (HttpContext context, FriendRequest request) => { await database.RequestFriendAsync((await Authenticate(context)).AccountId, ServerRuntime.AccountId(request.AccountId)); return Results.NoContent(); });
 app.MapPost("/api/friends/cancel", async (HttpContext context, FriendRequest request) => { await database.CancelFriendRequestAsync((await Authenticate(context)).AccountId, ServerRuntime.AccountId(request.AccountId), context.RequestAborted); return Results.NoContent(); });
 app.MapPost("/api/friends/respond", async (HttpContext context, FriendRespondRequest request) => { await database.RespondFriendAsync((await Authenticate(context)).AccountId, ServerRuntime.AccountId(request.AccountId), request.Accept); return Results.NoContent(); });
@@ -61,6 +70,12 @@ app.MapPost("/api/payments/confirm", async (HttpContext context, CommerceConfirm
     await commerce.ConfirmAsync((await Authenticate(context)).AccountId, request, context.RequestAborted));
 app.MapGet("/api/payments/orders", (Func<HttpContext, Task<CommerceOrdersResponse>>)(async context =>
     await database.CommerceOrdersAsync((await Authenticate(context)).AccountId, context.RequestAborted)));
+app.MapGet("/api/payments/orders/{orderId}", async (HttpContext context, string orderId) =>
+{
+    var account = (await Authenticate(context)).AccountId;
+    if (!Guid.TryParse(orderId, out var id) || id == Guid.Empty) throw new ApiException("InvalidPayment");
+    return (await database.CommerceOrderAsync(account, id, context.RequestAborted)).Order;
+});
 app.MapPost("/api/profile/subscriber-badge", async (HttpContext context, SubscriberBadgeRequest request) =>
     await database.SetSubscriberBadgeAsync((await Authenticate(context)).AccountId, request.ShowBadge, context.RequestAborted));
 app.MapGet("/api/ads", async (HttpContext context, string? platform) =>
@@ -143,3 +158,4 @@ app.MapPost("/internal/profiles/refresh", async (HttpContext context, SessionChe
     return await database.ProfileAsync(ServerRuntime.AccountId(request.AccountId));
 });
 await app.RunAsync();
+await finalizationTask;

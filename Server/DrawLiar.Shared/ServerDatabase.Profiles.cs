@@ -115,6 +115,13 @@ public sealed partial class ServerDatabase
             "SELECT count(*) FROM \"RoomGameAdmission\" WHERE \"RoomId\"=$1 AND \"AccountId\"=ANY($2)", roomId, accounts))
             if (Convert.ToInt64(await command.ExecuteScalarAsync(cancellationToken)) != accounts.Length)
                 throw new ApiException("InvalidMatchParticipant", 403);
+        bool painterHost = false;
+        if (normalized.HostAccountId.Length > 0)
+            await using (var command = Command(connection, transaction, """
+                SELECT EXISTS (SELECT 1 FROM "RoomGameAdmission" g JOIN "Account" a ON a."Id"=g."AccountId"
+                WHERE g."RoomId"=$1 AND g."AccountId"=$2 AND a."SubscriptionExpiresAt">$3)
+                """, roomId, Guid.Parse(normalized.HostAccountId), playedAt))
+                painterHost = (bool)(await command.ExecuteScalarAsync(cancellationToken))!;
         await using (var command = Command(connection, transaction, """
             INSERT INTO "MatchRecord" ("MatchId","RoomId","PlayedAt","PlayerCount","Mode","RoundCount","PayloadHash","DrawingPayloadHash","DrawingExpiresAt","DrawingRetentionDays","DrawingsIncomplete")
             VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
@@ -124,7 +131,7 @@ public sealed partial class ServerDatabase
         foreach (var player in normalized.Players)
         {
             Guid accountId = Guid.Parse(player.AccountId);
-            var reward = await CreditMatchRewardAsync(connection, transaction, accountId, player, cancellationToken);
+            var reward = await CreditMatchRewardAsync(connection, transaction, accountId, player, painterHost, cancellationToken);
             await using var command = Command(connection, transaction, """
                 INSERT INTO "AccountMatch" ("MatchId","AccountId","Score","Rank","Won","RoundsPlayed","CitizenRounds","LiarRounds","CorrectVotes","CorrectGuesses","CoinReward","ExperienceReward")
                 VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)
@@ -144,7 +151,8 @@ public sealed partial class ServerDatabase
             || request.NodeId.Any(character => !char.IsAsciiLetterOrDigit(character) && character != '-' && character != '_')
             || !DateTimeOffset.TryParse(request.PlayedAt, out var playedAt) || playedAt < DateTimeOffset.UnixEpoch
             || playedAt > DateTimeOffset.UtcNow.AddMinutes(5) || request.Mode is < 0 or > 1 || request.RoundCount < 1
-            || request.Players == null || request.Players.Length is < 2 or > 64)
+            || request.Players == null || request.Players.Length is < 2 or > 64
+            || !string.IsNullOrEmpty(request.HostAccountId) && (!Guid.TryParse(request.HostAccountId, out Guid host) || host == Guid.Empty))
             throw new ApiException("InvalidMatchResult");
         var accounts = new HashSet<Guid>();
         var players = new List<MatchPlayerResult>();
@@ -175,6 +183,7 @@ public sealed partial class ServerDatabase
         {
             NodeId = request.NodeId, RoomId = roomId.ToString(), MatchId = matchId.ToString(),
             PlayedAt = ServerRuntime.Timestamp(playedAt.ToUniversalTime()), Mode = request.Mode, RoundCount = request.RoundCount,
+            HostAccountId = string.IsNullOrEmpty(request.HostAccountId) ? "" : Guid.Parse(request.HostAccountId).ToString(),
             Players = players.OrderBy(player => player.AccountId, StringComparer.Ordinal).ToArray(),
             DrawingArchives = request.DrawingArchives, DrawingsIncomplete = request.DrawingsIncomplete
         };

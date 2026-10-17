@@ -148,8 +148,9 @@ public sealed partial class ServerDatabase
 
     private const string ROOM_SELECT = """
         SELECT r."RoomId",r."OwnerAccountId",r."NodeId",r."Settings"::text,r."PlayerCount",r."SpectatorCount",r."IsInProgress",d."PublicUrl",
-        r."PlayerAccountIds"::text,r."SpectatorAccountIds"::text,r."RoomCode",r."ConfigurationVersion",r."AccessVersion"
-        FROM "Room" r JOIN "DedicatedNode" d ON d."NodeId"=r."NodeId"
+        r."PlayerAccountIds"::text,r."SpectatorAccountIds"::text,r."RoomCode",r."ConfigurationVersion",r."AccessVersion",
+        COALESCE(o."SubscriptionExpiresAt">now(),false)
+        FROM "Room" r JOIN "DedicatedNode" d ON d."NodeId"=r."NodeId" JOIN "Account" o ON o."Id"=r."OwnerAccountId"
         """;
 
     private static ServerRoomData ReadRoom(NpgsqlDataReader reader)
@@ -157,7 +158,7 @@ public sealed partial class ServerDatabase
         var settings = JsonSerializer.Deserialize<ServerRoomSettings>(reader.GetString(3), ServerRuntime.Json)!;
         return new ServerRoomData { RoomId = reader.GetGuid(0).ToString(), RoomCode = reader.GetString(10), OwnerAccountId = reader.GetGuid(1).ToString(), NodeId = reader.GetString(2), Settings = settings, Name = settings.RoomName,
             IsPrivate = settings.IsPrivate, PlayerCount = reader.GetInt32(4), SpectatorCount = reader.GetInt32(5), IsInProgress = reader.GetBoolean(6),
-            ConfigurationVersion = reader.GetInt64(11), AccessVersion = reader.GetInt64(12) };
+            ConfigurationVersion = reader.GetInt64(11), AccessVersion = reader.GetInt64(12), HostHasPainterPass = reader.GetBoolean(13) };
     }
 
     public async Task<RoomListResponse> RoomsAsync(string? search, bool includePrivate = false)

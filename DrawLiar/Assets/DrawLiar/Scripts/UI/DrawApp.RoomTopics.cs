@@ -22,6 +22,7 @@ namespace DrawLiar
             var field = new DropdownField(DrawLocalization.Text("주제 언어"), languages.Select(language => language.DisplayName).ToList(),
                 Mathf.Max(0, Array.FindIndex(languages, language => language.Code == selected)));
             SetText(field.labelElement, "주제 언어"); Classes(field, "field topic-language"); field.name = name; parent.Add(field);
+            DrawLocalizedTypography.ApplyLanguageNames(field);
             field.RegisterValueChangedCallback(evt =>
             {
                 if (ReferenceEquals(evt.target, field) && field.index >= 0 && languages[field.index].Code != selected) changed(languages[field.index].Code);

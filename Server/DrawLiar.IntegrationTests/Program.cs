@@ -35,6 +35,11 @@ internal static partial class Integration
             await VerifyMidRoundAsync();
             return;
         }
+        if (args.Contains("--mail-database-only"))
+        {
+            await VerifyMailDatabaseAsync();
+            return;
+        }
         if (args.Contains("--advertising-only") || args.Contains("--advertising-database-only"))
         {
             await VerifyAdvertisingAsync();
@@ -137,6 +142,12 @@ internal static partial class Integration
         if (args.Contains("--match-reward-only"))
         {
             await VerifyMatchRewardsAsync(args.FirstOrDefault(value => !value.StartsWith("--", StringComparison.Ordinal)) ?? "http://127.0.0.1:25550");
+            return;
+        }
+        if (args.Contains("--topic-language-only"))
+        {
+            VerifyTopicWorkshopRules();
+            await VerifyTopicLanguageAsync();
             return;
         }
         if (args.Contains("--topic-workshop-rules-only"))

@@ -185,6 +185,7 @@ namespace DrawLiar
             var codes = (all ? new[] { "" }.Concat(languages.Select(language => language.Code)) : languages.Select(language => language.Code)).ToArray();
             var labels = (all ? new[] { L.Text("전체") }.Concat(languages.Select(language => language.DisplayName)) : languages.Select(language => language.DisplayName)).ToList();
             var field = new DropdownField(L.Text(label), labels, Mathf.Max(0, Array.IndexOf(codes, selected))); SetText(field.labelElement, label); Classes(field, "field workshop-language"); parent.Add(field);
+            DrawLocalizedTypography.ApplyLanguageNames(field);
             field.RegisterValueChangedCallback(evt =>
             {
                 if (!ReferenceEquals(evt.target, field) || field.index < 0 || field.index >= codes.Length) return;

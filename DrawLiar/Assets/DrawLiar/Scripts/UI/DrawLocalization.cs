@@ -12,18 +12,21 @@ namespace DrawLiar
         public string Code { get; }
         public string DisplayName { get; }
         internal string I2Name { get; }
+        internal string LogoCode { get; }
 
-        internal DrawLanguage(string code, string displayName, string i2Name)
+        internal DrawLanguage(string code, string displayName, string i2Name, string logoCode = null)
         {
             Code = code;
             DisplayName = displayName;
             I2Name = i2Name;
+            LogoCode = logoCode ?? code;
         }
     }
 
     [Serializable]
     public sealed class DrawLocalizationCatalogue
     {
+        public string[] LanguageCodes;
         public DrawTranslationTerm[] Terms = Array.Empty<DrawTranslationTerm>();
     }
 
@@ -43,18 +46,35 @@ namespace DrawLiar
         private const string FALLBACK_LANGUAGE_CODE = "en";
         private static readonly IReadOnlyList<DrawLanguage> _languages = Array.AsReadOnly(new[]
         {
-            new DrawLanguage("ko-KR", "한국어", "Korean"),
+            new DrawLanguage("ko", "한국어", "Korean", "ko-KR"),
             new DrawLanguage("en", "English", "English"),
+            new DrawLanguage("ja", "日本語", "Japanese", "ja-JP"),
             new DrawLanguage("zh-CN", "简体中文", "Chinese (Simplified)"),
-            new DrawLanguage("zh-TW", "繁體中文", "Chinese (Traditional)"),
-            new DrawLanguage("ja-JP", "日本語", "Japanese"),
+            new DrawLanguage("de", "Deutsch", "German", "de-DE"),
+            new DrawLanguage("fr", "Français", "French", "fr-FR"),
             new DrawLanguage("es", "Español", "Spanish"),
-            new DrawLanguage("pt-BR", "Português (Brasil)", "Portuguese (Brazil)"),
-            new DrawLanguage("fr-FR", "Français", "French"),
-            new DrawLanguage("de-DE", "Deutsch", "German"),
+            new DrawLanguage("es-419", "Español (Latinoamérica)", "Spanish (Latin America)", "es"),
+            new DrawLanguage("pt", "Português", "Portuguese", "pt-BR"),
+            new DrawLanguage("it", "Italiano", "Italian"),
+            new DrawLanguage("nl", "Nederlands", "Dutch"),
+            new DrawLanguage("da", "Dansk", "Danish"),
+            new DrawLanguage("no", "Norsk", "Norwegian"),
+            new DrawLanguage("sv", "Svenska", "Swedish"),
+            new DrawLanguage("fi", "Suomi", "Finnish"),
+            new DrawLanguage("pl", "Polski", "Polish"),
+            new DrawLanguage("cs", "Čeština", "Czech"),
+            new DrawLanguage("sk", "Slovenčina", "Slovak"),
+            new DrawLanguage("hu", "Magyar", "Hungarian"),
+            new DrawLanguage("ro", "Română", "Romanian"),
+            new DrawLanguage("ru", "Русский", "Russian"),
+            new DrawLanguage("uk", "Українська", "Ukrainian"),
+            new DrawLanguage("tr", "Türkçe", "Turkish"),
+            new DrawLanguage("ar", "العربية", "Arabic"),
+            new DrawLanguage("iw", "עברית", "Hebrew"),
+            new DrawLanguage("hi", "हिन्दी", "Hindi", "hi-IN"),
             new DrawLanguage("id", "Bahasa Indonesia", "Indonesian"),
-            new DrawLanguage("hi-IN", "हिन्दी", "Hindi"),
-            new DrawLanguage("ar", "العربية", "Arabic")
+            new DrawLanguage("th", "ไทย", "Thai"),
+            new DrawLanguage("vi", "Tiếng Việt", "Vietnamese")
         });
         private static readonly IReadOnlyList<string> _languageCodes = BuildLanguageList(false);
         private static readonly IReadOnlyList<string> _nativeLanguageNames = BuildLanguageList(true);
@@ -71,8 +91,8 @@ namespace DrawLiar
         public static IReadOnlyList<string> LanguageCodes => _languageCodes;
         public static IReadOnlyList<string> NativeLanguageNames => _nativeLanguageNames;
         public static string CurrentLanguageCode { get { EnsureInitialized(); return _language.Code; } }
-        public static bool IsRightToLeft => CurrentLanguageCode == "ar";
-        public static string LogoResourcePath => LOGO_RESOURCE_ROOT + CurrentLanguageCode;
+        public static bool IsRightToLeft => CurrentLanguageCode == "ar" || CurrentLanguageCode == "iw";
+        public static string LogoResourcePath { get { EnsureInitialized(); return LOGO_RESOURCE_ROOT + _language.LogoCode; } }
 
         public static string Text(string keyOrSource)
         {
@@ -124,6 +144,14 @@ namespace DrawLiar
 
         public static LanguageSourceData CreateLanguageSource(DrawLocalizationCatalogue catalogue)
         {
+            if (catalogue?.LanguageCodes != null)
+            {
+                if (catalogue.LanguageCodes.Length != _languages.Count)
+                    throw new InvalidOperationException("번역 카탈로그의 언어 수가 지원 언어 수와 다릅니다.");
+                for (int i = 0; i < _languages.Count; i++)
+                    if (catalogue.LanguageCodes[i] != _languages[i].Code)
+                        throw new InvalidOperationException("번역 카탈로그의 언어 순서가 지원 언어 순서와 다릅니다.");
+            }
             var source = new LanguageSourceData
             {
                 IgnoreDeviceLanguage = true,
@@ -142,7 +170,10 @@ namespace DrawLiar
                 if (row == null || string.IsNullOrEmpty(row.Key) || !keys.Add(row.Key))
                     throw new InvalidOperationException("번역 키는 비어 있거나 중복될 수 없습니다.");
                 if (row.Values == null || row.Values.Length != _languages.Count)
-                    throw new InvalidOperationException("각 번역 항목에는 언어 순서에 맞는 12개 값이 필요합니다.");
+                    throw new InvalidOperationException($"각 번역 항목에는 언어 순서에 맞는 {_languages.Count}개 값이 필요합니다.");
+                foreach (string value in row.Values)
+                    if (string.IsNullOrWhiteSpace(value))
+                        throw new InvalidOperationException("비어 있는 UI 번역이 있습니다: " + row.Key);
                 source.mTerms.Add(new TermData
                 {
                     Term = TermKey(row.Key),
@@ -194,8 +225,14 @@ namespace DrawLiar
             _source._AllowUnloadingLanguages = LanguageSourceData.eAllowUnloadLanguages.Never;
             _source.Awake();
             LocalizationManager.InitializeIfNeeded();
-            var savedLanguage = FindLanguage(PlayerPrefs.GetString(LANGUAGE_PREF_KEY, string.Empty));
+            string savedCode = PlayerPrefs.GetString(LANGUAGE_PREF_KEY, string.Empty);
+            var savedLanguage = FindLanguage(savedCode);
             ApplyLanguage(savedLanguage ?? DeviceLanguage());
+            if (savedLanguage != null && savedCode != savedLanguage.Code)
+            {
+                PlayerPrefs.SetString(LANGUAGE_PREF_KEY, savedLanguage.Code);
+                PlayerPrefs.Save();
+            }
             LocalizationManager.SetLanguageAndCode(_language.I2Name, _language.Code, RememberLanguage: false);
             LocalizationManager.OnLocalizeEvent -= OnI2LanguageChanged;
             LocalizationManager.OnLocalizeEvent += OnI2LanguageChanged;
@@ -223,7 +260,7 @@ namespace DrawLiar
 
         private static CultureInfo GetCulture()
         {
-            try { return CultureInfo.GetCultureInfo(_language.Code); }
+            try { return CultureInfo.GetCultureInfo(_language.Code == "iw" ? "he" : _language.Code); }
             catch (CultureNotFoundException) { return CultureInfo.InvariantCulture; }
         }
 
@@ -249,29 +286,72 @@ namespace DrawLiar
         private static DrawLanguage FindLanguage(string code)
         {
             if (string.IsNullOrWhiteSpace(code)) return null;
+            code = code.Trim().Replace('_', '-');
             foreach (var language in _languages)
                 if (string.Equals(language.Code, code, StringComparison.OrdinalIgnoreCase)) return language;
+            string primary = code.Split('-')[0].ToLowerInvariant();
+            if (primary == "zh") primary = "zh-CN";
+            else if (primary == "he") primary = "iw";
+            else if (primary == "nb" || primary == "nn") primary = "no";
+            else if (primary == "in") primary = "id";
+            if (primary == "es" && IsLatinAmericanSpanish(code)) primary = "es-419";
+            foreach (var language in _languages)
+                if (language.Code == primary) return language;
             return null;
+        }
+
+        private static bool IsLatinAmericanSpanish(string code)
+        {
+            switch (code.ToUpperInvariant())
+            {
+                case "ES-419":
+                case "ES-AR": case "ES-BO": case "ES-CL": case "ES-CO": case "ES-CR":
+                case "ES-CU": case "ES-DO": case "ES-EC": case "ES-GT": case "ES-HN":
+                case "ES-MX": case "ES-NI": case "ES-PA": case "ES-PE": case "ES-PR":
+                case "ES-PY": case "ES-SV": case "ES-US": case "ES-UY": case "ES-VE":
+                    return true;
+                default: return false;
+            }
         }
 
         private static DrawLanguage DeviceLanguage()
         {
+            string code;
             switch (Application.systemLanguage)
             {
-                case SystemLanguage.Korean: return _languages[0];
-                case SystemLanguage.ChineseSimplified: return _languages[2];
-                case SystemLanguage.ChineseTraditional: return _languages[3];
-                case SystemLanguage.Chinese: return _languages[2];
-                case SystemLanguage.Japanese: return _languages[4];
-                case SystemLanguage.Spanish: return _languages[5];
-                case SystemLanguage.Portuguese: return _languages[6];
-                case SystemLanguage.French: return _languages[7];
-                case SystemLanguage.German: return _languages[8];
-                case SystemLanguage.Indonesian: return _languages[9];
-                case SystemLanguage.Hindi: return _languages[10];
-                case SystemLanguage.Arabic: return _languages[11];
-                default: return _languages[1];
+                case SystemLanguage.Korean: code = "ko"; break;
+                case SystemLanguage.ChineseSimplified:
+                case SystemLanguage.ChineseTraditional:
+                case SystemLanguage.Chinese: code = "zh-CN"; break;
+                case SystemLanguage.Japanese: code = "ja"; break;
+                case SystemLanguage.German: code = "de"; break;
+                case SystemLanguage.French: code = "fr"; break;
+                case SystemLanguage.Spanish:
+                    code = IsLatinAmericanSpanish(CultureInfo.CurrentUICulture.Name) ? "es-419" : "es"; break;
+                case SystemLanguage.Portuguese: code = "pt"; break;
+                case SystemLanguage.Italian: code = "it"; break;
+                case SystemLanguage.Dutch: code = "nl"; break;
+                case SystemLanguage.Danish: code = "da"; break;
+                case SystemLanguage.Norwegian: code = "no"; break;
+                case SystemLanguage.Swedish: code = "sv"; break;
+                case SystemLanguage.Finnish: code = "fi"; break;
+                case SystemLanguage.Polish: code = "pl"; break;
+                case SystemLanguage.Czech: code = "cs"; break;
+                case SystemLanguage.Slovak: code = "sk"; break;
+                case SystemLanguage.Hungarian: code = "hu"; break;
+                case SystemLanguage.Romanian: code = "ro"; break;
+                case SystemLanguage.Russian: code = "ru"; break;
+                case SystemLanguage.Ukrainian: code = "uk"; break;
+                case SystemLanguage.Turkish: code = "tr"; break;
+                case SystemLanguage.Arabic: code = "ar"; break;
+                case SystemLanguage.Hebrew: code = "iw"; break;
+                case SystemLanguage.Hindi: code = "hi"; break;
+                case SystemLanguage.Indonesian: code = "id"; break;
+                case SystemLanguage.Thai: code = "th"; break;
+                case SystemLanguage.Vietnamese: code = "vi"; break;
+                default: code = FALLBACK_LANGUAGE_CODE; break;
             }
+            return FindLanguage(code);
         }
 
         private static IReadOnlyList<string> BuildLanguageList(bool nativeNames)

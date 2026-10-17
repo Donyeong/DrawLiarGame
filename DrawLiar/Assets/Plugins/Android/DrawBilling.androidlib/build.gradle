@@ -1,0 +1,23 @@
+apply plugin: 'com.android.library'
+
+dependencies {
+    implementation 'com.android.billingclient:billing:8.3.0'
+}
+
+android {
+    namespace 'com.rascallab.liargame.billing'
+    compileSdk getProperty('unity.compileSdkVersion') as int
+    buildToolsVersion getProperty('unity.buildToolsVersion')
+
+    defaultConfig {
+        minSdk getProperty('unity.minSdkVersion') as int
+        targetSdk getProperty('unity.targetSdkVersion') as int
+        consumerProguardFiles 'consumer-rules.pro'
+    }
+
+    sourceSets {
+        main {
+            manifest.srcFile 'AndroidManifest.xml'
+        }
+    }
+}

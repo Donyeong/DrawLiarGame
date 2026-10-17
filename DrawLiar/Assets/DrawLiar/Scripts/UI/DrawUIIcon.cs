@@ -5,7 +5,7 @@ namespace DrawLiar
 {
     public sealed class DrawUIIcon : VisualElement
     {
-        public enum Kind { Refresh, Settings, Close, Bell, Profile, Ballot }
+        public enum Kind { Refresh, Settings, Close, Bell, Profile, Ballot, ColorPicker, Mail }
         private readonly Kind _kind;
 
         public DrawUIIcon(Kind kind)
@@ -27,6 +27,31 @@ namespace DrawLiar
             painter.lineWidth = size / 12;
             painter.lineCap = LineCap.Round;
             painter.lineJoin = LineJoin.Round;
+
+            if (_kind == Kind.ColorPicker)
+            {
+                const int SEGMENTS = 48;
+                var mesh = context.Allocate(SEGMENTS + 1, SEGMENTS * 3);
+                mesh.SetNextVertex(new Vertex { position = new Vector3(origin.x, origin.y, Vertex.nearZ), tint = Color.white });
+                for (int index = 0; index < SEGMENTS; index++)
+                {
+                    float hue = index / (float)SEGMENTS;
+                    float angle = hue * Mathf.PI * 2;
+                    mesh.SetNextVertex(new Vertex
+                    {
+                        position = new Vector3(origin.x + Mathf.Cos(angle) * size * .43f, origin.y + Mathf.Sin(angle) * size * .43f, Vertex.nearZ),
+                        tint = Color.HSVToRGB(hue, 1, 1)
+                    });
+                    mesh.SetNextIndex(0);
+                    mesh.SetNextIndex((ushort)(index + 1));
+                    mesh.SetNextIndex((ushort)((index + 1) % SEGMENTS + 1));
+                }
+                painter.strokeColor = Color.white;
+                painter.lineWidth = size / 16;
+                painter.BeginPath(); painter.MoveTo(Point(.72f, .08f)); painter.LineTo(Point(.72f, .36f)); painter.Stroke();
+                painter.BeginPath(); painter.MoveTo(Point(.58f, .22f)); painter.LineTo(Point(.86f, .22f)); painter.Stroke();
+                return;
+            }
 
             if (_kind == Kind.Refresh)
             {
@@ -69,6 +94,23 @@ namespace DrawLiar
                 painter.BeginPath();
                 painter.MoveTo(Point(.50f, .10f));
                 painter.LineTo(Point(.50f, .19f));
+                painter.Stroke();
+                return;
+            }
+
+            if (_kind == Kind.Mail)
+            {
+                painter.BeginPath();
+                painter.MoveTo(Point(.16f, .26f));
+                painter.LineTo(Point(.84f, .26f));
+                painter.LineTo(Point(.84f, .74f));
+                painter.LineTo(Point(.16f, .74f));
+                painter.ClosePath();
+                painter.Stroke();
+                painter.BeginPath();
+                painter.MoveTo(Point(.18f, .30f));
+                painter.LineTo(Point(.50f, .54f));
+                painter.LineTo(Point(.82f, .30f));
                 painter.Stroke();
                 return;
             }

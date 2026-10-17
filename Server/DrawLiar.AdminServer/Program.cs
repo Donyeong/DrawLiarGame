@@ -30,6 +30,14 @@ app.Use(async (context, next) =>
 });
 app.MapGet("/api/accounts", (string? search) => database.AdminAccountsAsync(search));
 app.MapPatch("/api/accounts/{accountId}/ban", async (string accountId, AdminAccountAction request) => { await database.AdminBanAsync(ServerRuntime.AccountId(accountId), request.IsBanned); return Results.NoContent(); });
+app.MapGet("/api/mail", (Func<HttpContext, Task<AdminMailData[]>>)(context => database.AdminMailsAsync(context.RequestAborted)));
+app.MapPost("/api/mail", (HttpContext context, AdminMailRequest request) => database.AdminSendMailAsync(request, context.RequestAborted));
+app.MapPost("/api/mail/{mailId}/cancel", async (HttpContext context, string mailId) =>
+{
+    if (!Guid.TryParse(mailId, out var id) || id == Guid.Empty) throw new ApiException("InvalidMail");
+    await database.AdminCancelMailAsync(id, context.RequestAborted);
+    return Results.NoContent();
+});
 app.MapGet("/api/rooms", (string? search) => database.RoomsAsync(search, true));
 app.MapGet("/api/reports", (string? status) => database.AdminReportsAsync(string.IsNullOrEmpty(status) ? null : status));
 app.MapPatch("/api/reports/{reportId}", async (string reportId, AdminReportAction request) => { await database.AdminSetReportStatusAsync(ServerRuntime.AccountId(reportId), request.Status); return Results.NoContent(); });

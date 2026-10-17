@@ -37,6 +37,7 @@ internal sealed class GameConnection : IAsyncDisposable
     public bool FrameRateExceeded => _frameCount > 120;
     public bool LeftVoluntarily { get; private set; }
     public bool StateSizeNoticeSent { get; set; }
+    public string SubscriptionExpiresAt { get; set; } = "";
 
     public GameConnection(WebSocket socket, string accountId, string sessionToken, CancellationToken cancellationToken)
     {

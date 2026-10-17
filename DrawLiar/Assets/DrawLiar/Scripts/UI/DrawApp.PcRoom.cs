@@ -33,7 +33,7 @@ namespace DrawLiar
                 || Mathf.Abs(stage.style.maxHeight.value.value - stageHeight) > .5f) stage.style.maxHeight = stageHeight;
             float width = Mathf.Max(0, (frame.contentRect.height - verticalInset) * DrawingSurface.AspectRatio + horizontalInset);
             SetPcRoomWidthLimit(_pcCenter, width);
-            SetPcRoomWidthLimit(_pcRoomShell, width + sides);
+            SetPcRoomWidthLimit(_pcRoomShell, _pcRoomShell.parent.contentRect.width);
             if (_pcRoomChat != null)
             {
                 float height = Mathf.Max(112, stage.parent.contentRect.height * .65f);

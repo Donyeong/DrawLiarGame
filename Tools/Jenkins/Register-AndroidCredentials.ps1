@@ -8,7 +8,8 @@ param(
     [string]$UploadKeystorePasswordFile,
     [string]$UploadKeyAliasFile,
     [string]$UploadKeyPasswordFile,
-    [string]$GooglePlayServiceAccountFile
+    [string]$GooglePlayServiceAccountFile,
+    [string]$CloudStorageServiceAccountFile
 )
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
@@ -67,4 +68,7 @@ if ($UploadKeystoreFile) {
 }
 if ($GooglePlayServiceAccountFile) {
     Save-AndroidCredential 'drawliar-google-play-publisher' $GooglePlayServiceAccountFile $true
+}
+if ($CloudStorageServiceAccountFile) {
+    Save-AndroidCredential 'drawliar-builds-gcs' $CloudStorageServiceAccountFile $true
 }

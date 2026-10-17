@@ -25,7 +25,7 @@ internal static partial class Integration
         {
             var request = new TopicWorkshopPublishRequest { Name = "경계검증", LanguageCode = "KO-kr", Words = WorkshopPublishWords(count) };
             Check(TopicWorkshopRules.TryNormalize(request, policy, out var normalized, out _, requirePublishMinimum: true)
-                && normalized.Words.Length == count && normalized.LanguageCode == "ko-KR", "게시 최소/최대 경계와 언어 정규화는 콘텐츠를 보존해야 합니다.");
+                && normalized.Words.Length == count && normalized.LanguageCode == "ko", "게시 최소/최대 경계와 언어 정규화는 콘텐츠를 보존해야 합니다.");
         }
         var excessive = new TopicWorkshopPublishRequest { Name = "초과검증", LanguageCode = "ko-KR", Words = WorkshopPublishWords(81) };
         Check(!TopicWorkshopRules.TryNormalize(excessive, policy, out _, out code, requirePublishMinimum: true)

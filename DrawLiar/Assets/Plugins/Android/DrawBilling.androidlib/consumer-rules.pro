@@ -1,0 +1,1 @@
+-keep class com.rascallab.liargame.billing.DrawBilling { public *; }

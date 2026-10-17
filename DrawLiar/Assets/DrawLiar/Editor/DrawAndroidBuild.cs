@@ -14,6 +14,7 @@ namespace DrawLiar.Editor
         private const string UNITY_VERSION = "6000.3.20f1";
         private const string SCENE_PATH = "Assets/DrawLiar/Scenes/DrawLiar.unity";
         private const string APPLICATION_ID = "com.rascallab.liargame";
+        private const string PRODUCT_NAME = "LiarGame: Canvas";
         private const long MIN_FREE_DISK_BYTES = 10L * 1024 * 1024 * 1024;
 
         [Serializable]
@@ -122,7 +123,7 @@ namespace DrawLiar.Editor
                 ConfigureAndroidSourcePlugin("Assets/Plugins/Android/DrawGoogleAccount.java");
 
                 PlayerSettings.companyName = "RascalLab";
-                PlayerSettings.productName = "DrawLiar";
+                PlayerSettings.productName = PRODUCT_NAME;
                 PlayerSettings.bundleVersion = result.BundleVersion;
                 PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.Android, APPLICATION_ID);
                 PlayerSettings.SetScriptingBackend(NamedBuildTarget.Android, ScriptingImplementation.IL2CPP);

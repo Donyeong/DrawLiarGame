@@ -1,0 +1,143 @@
+def runNightlyBuild(String label, String jobName, List buildParameters) {
+    if (params.DRY_RUN) {
+        echo "검증: ${label} → ${jobName}, ${buildParameters}"
+        env.DRAWLIAR_NIGHTLY_RESULTS += "${label}|${jobName}||DRY_RUN\n"
+        return
+    }
+    def number = ''
+    def result = 'FAILURE'
+    catchError(buildResult: 'FAILURE', stageResult: 'FAILURE', catchInterruptions: false) {
+        def downstream = build job: jobName, wait: true, propagate: false, parameters: buildParameters
+        number = downstream.number.toString()
+        result = downstream.result
+        echo "${label} #${number}: ${result}"
+        if (result != 'SUCCESS') { error("${label} #${number}: ${result}") }
+    }
+    env.DRAWLIAR_NIGHTLY_RESULTS += "${label}|${jobName}|${number}|${result}\n"
+}
+
+pipeline {
+    agent none
+    options {
+        skipDefaultCheckout(true)
+        disableConcurrentBuilds()
+        timestamps()
+        timeout(time: 8, unit: 'HOURS')
+        buildDiscarder(logRotator(numToKeepStr: '30'))
+    }
+    triggers { cron('TZ=Asia/Seoul\n0 12 * * *') }
+    parameters {
+        booleanParam(name: 'NOTIFY_DISCORD', defaultValue: true, description: '개별 빌드 결과·다운로드 링크와 전체 결과를 Discord에 전송')
+        booleanParam(name: 'DRY_RUN', defaultValue: false, description: '실제 빌드·업로드·Discord 전송 없이 순서와 매개변수만 검증')
+    }
+    stages {
+        stage('Resolve Server Commit') {
+            agent { label 'built-in' }
+            steps {
+                script {
+                    env.DRAWLIAR_NIGHTLY_RESULTS = ''
+                    env.DRAWLIAR_NIGHTLY_COMMIT = powershell(returnStdout: true, script: '''
+                        $ErrorActionPreference = 'Stop'
+                        foreach ($file in @('Build/Metadata/DiscordNotification.json', 'Build/Metadata/DiscordValidation.json')) {
+                            if (Test-Path -LiteralPath $file -PathType Leaf) { Remove-Item -LiteralPath $file -Force }
+                        }
+                        $commit = & git -C 'C:/DrawLiar' rev-parse --verify 'HEAD^{commit}'
+                        if ($LASTEXITCODE -ne 0 -or $commit -cnotmatch '^[a-f0-9]{40}$') {
+                            throw '서버 소스 커밋을 확인할 수 없습니다.'
+                        }
+                        Write-Output $commit
+                    ''').trim()
+                    currentBuild.description = params.DRY_RUN ? '빌드 순서 검증' : 'AAB → APK → Windows → 서버 빌드·배포'
+                }
+            }
+        }
+        stage('Verify Discord Configuration') {
+            agent { label 'built-in' }
+            when { beforeAgent true; expression { params.DRY_RUN && params.NOTIFY_DISCORD } }
+            steps {
+                withCredentials([string(credentialsId: 'drawliar-discord-build-webhook', variable: 'DRAWLIAR_DISCORD_WEBHOOK')]) {
+                    powershell '''
+                        & 'C:/DrawLiar/Tools/Jenkins/Notify-NightlyBuild.ps1' -ResultsPath './Build/Metadata/nightly-results.csv' -ReceiptPath './Build/Metadata/DiscordValidation.json' -ValidateOnly
+                    '''
+                }
+                archiveArtifacts artifacts: 'Build/Metadata/DiscordValidation.json'
+            }
+        }
+        stage('Android AAB') {
+            steps {
+                script {
+                    runNightlyBuild('AAB', 'DrawLiar-Android', [
+                        string(name: 'BUILD_FORMAT', value: 'AAB'),
+                        string(name: 'SIGNING_PROFILE', value: 'PLAY_UPLOAD'),
+                        booleanParam(name: 'DEVELOPMENT_BUILD', value: false),
+                        booleanParam(name: 'UPLOAD_GCS', value: true),
+                        booleanParam(name: 'UPLOAD_FIREBASE', value: false),
+                        booleanParam(name: 'UPLOAD_GOOGLE_PLAY', value: true),
+                        booleanParam(name: 'NOTIFY_DISCORD', value: params.NOTIFY_DISCORD)])
+                }
+            }
+        }
+        stage('Android APK') {
+            steps {
+                script {
+                    runNightlyBuild('APK', 'DrawLiar-Android', [
+                        string(name: 'BUILD_FORMAT', value: 'APK'),
+                        string(name: 'SIGNING_PROFILE', value: 'PLAY_UPLOAD'),
+                        booleanParam(name: 'DEVELOPMENT_BUILD', value: false),
+                        booleanParam(name: 'UPLOAD_GCS', value: true),
+                        booleanParam(name: 'UPLOAD_FIREBASE', value: true),
+                        booleanParam(name: 'UPLOAD_GOOGLE_PLAY', value: false),
+                        booleanParam(name: 'NOTIFY_DISCORD', value: params.NOTIFY_DISCORD)])
+                }
+            }
+        }
+        stage('Windows') {
+            steps {
+                script {
+                    runNightlyBuild('Windows', 'DrawLiar-Windows', [
+                        booleanParam(name: 'DEVELOPMENT_BUILD', value: false),
+                        booleanParam(name: 'UPLOAD_GCS', value: true),
+                        booleanParam(name: 'NOTIFY_DISCORD', value: params.NOTIFY_DISCORD)])
+                }
+            }
+        }
+        stage('Linux Server') {
+            steps {
+                script {
+                    runNightlyBuild('서버', 'DrawLiar-Server', [
+                        string(name: 'SOURCE_COMMIT', value: env.DRAWLIAR_NIGHTLY_COMMIT),
+                        booleanParam(name: 'ADMIN_ONLY', value: false),
+                        booleanParam(name: 'DEDICATED_ONLY', value: false),
+                        booleanParam(name: 'DEPLOY_TO_VM', value: true)])
+                }
+            }
+        }
+    }
+    post {
+        always {
+            node('built-in') {
+                script {
+                    writeFile file: 'Build/Metadata/nightly-results.csv', encoding: 'UTF-8', text:
+                        "Label|Job|Number|Result\n${env.DRAWLIAR_NIGHTLY_RESULTS ?: ''}"
+                    writeFile file: 'Build/Metadata/server-commit.txt', encoding: 'UTF-8', text:
+                        "${env.DRAWLIAR_NIGHTLY_COMMIT ?: ''}\n"
+                    archiveArtifacts artifacts: 'Build/Metadata/nightly-results.csv,Build/Metadata/server-commit.txt'
+                    if (params.NOTIFY_DISCORD && !params.DRY_RUN) {
+                        catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE', catchInterruptions: false) {
+                            timeout(time: 35, unit: 'SECONDS') {
+                                withCredentials([string(credentialsId: 'drawliar-discord-build-webhook', variable: 'DRAWLIAR_DISCORD_WEBHOOK')]) {
+                                    withEnv(["DRAWLIAR_NOTIFY_RESULT=${currentBuild.currentResult}"]) {
+                                        powershell '''
+                                            & 'C:/DrawLiar/Tools/Jenkins/Notify-NightlyBuild.ps1' -ResultsPath './Build/Metadata/nightly-results.csv' -ReceiptPath './Build/Metadata/DiscordNotification.json'
+                                        '''
+                                    }
+                                }
+                            }
+                        }
+                        archiveArtifacts artifacts: 'Build/Metadata/DiscordNotification.json', allowEmptyArchive: true
+                    }
+                }
+            }
+        }
+    }
+}

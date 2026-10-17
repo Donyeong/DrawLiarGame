@@ -38,7 +38,7 @@ internal sealed class RoomRegistry : BackgroundService
                         Accept = alias.Accept.Select(value => GameRules.CleanText(value, 40)).Where(value => value.Length > 0).Take(16).ToArray() })
                     .Where(alias => alias.Word.Length > 0 && alias.Accept.Length > 0).ToArray()
             }).Where(topic => topic.Name.Length > 0 && topic.Words.Length > 0
-                && Array.IndexOf(ServerRoomSettings.TOPIC_LANGUAGES, topic.LanguageCode) >= 0)
+                && ServerRoomSettings.TryNormalizeTopicLanguage(topic.LanguageCode, out _))
             .GroupBy(topic => topic.LanguageCode).SelectMany(language => language.Take(128)).ToArray();
         if (_data.Topics.Length == 0) throw new InvalidDataException("게임 주제 데이터가 비어 있습니다.");
         _data.Scoring ??= new ScoreRules();

@@ -39,8 +39,8 @@ internal static partial class Integration
             Check(nameLimit == 10 && wordLimit == 10 && wordCount == 80 && quota == 20 && limits.GetProperty("MinWordsPerTopic").GetInt32() == 10,
                 "서버 응답은 이름·단어10자, 게시 최소10개·최대80개, 계정20개 정책을 전달해야 합니다.");
             var languages = policy.GetProperty("LanguageCodes").EnumerateArray().Select(value => value.GetString()).ToArray();
-            Check(languages.Length == 12 && languages.Distinct().Count() == 12 && languages.Contains("ko-KR") && languages.Contains("en"),
-                "업로드 언어 정책은 지원12언어를 중복 없이 전달해야 합니다.");
+            Check(languages.Length == 29 && languages.SequenceEqual(ServerRoomSettings.TOPIC_LANGUAGES),
+                "업로드 언어 정책은 지원29언어를 지정된 순서로 전달해야 합니다.");
             await using (var version = new NpgsqlCommand("SELECT count(*) FROM \"SchemaVersion\" WHERE \"Version\"=11", owner))
                 Check(Convert.ToInt32(await version.ExecuteScalarAsync()) == 1, "격리 DB에 작업실 마이그레이션11을 적용해야 합니다.");
             await using (var version = new NpgsqlCommand("SELECT count(*) FROM \"SchemaVersion\" WHERE \"Version\"=16", owner))
@@ -67,8 +67,14 @@ internal static partial class Integration
             var first = await PostAsync<JsonElement>(game, WORKSHOP_PATH, new { Name = exactName, LanguageCode = "ko-KR", Words = exactWords }, author.Session.SessionToken);
             string firstId = WorkshopId(first);
             Check(first.GetProperty("Topic").GetProperty("Name").GetString() == exactName && WorkshopWords(first).SequenceEqual(exactWords)
-                && first.GetProperty("Topic").GetProperty("WordCount").GetInt32() == wordCount,
+                && first.GetProperty("Topic").GetProperty("WordCount").GetInt32() == wordCount
+                && first.GetProperty("Topic").GetProperty("LanguageCode").GetString() == "ko",
                 "정확한 한도값의 업로드는 이름과 모든 단어를 그대로 저장해야 합니다.");
+            await using (var legacy = new NpgsqlCommand("UPDATE \"TopicWorkshop\" SET \"LanguageCode\"='ko-KR' WHERE \"Id\"=$1", owner))
+            {
+                legacy.Parameters.AddWithValue(Guid.Parse(firstId));
+                Check(await legacy.ExecuteNonQueryAsync() == 1, "기존 지역 코드로 저장된 게시물을 준비합니다.");
+            }
             string previewPath = WORKSHOP_PATH + "/" + firstId + "/preview";
             string storedBeforePreview = await WorkshopStoredTopicsAsync(owner);
             await WorkshopErrorAsync(game, HttpMethod.Get, previewPath, null, null, HttpStatusCode.Unauthorized, "Unauthorized");
@@ -99,7 +105,7 @@ internal static partial class Integration
             Check(await WorkshopStoredTopicsAsync(owner) == storedBeforePreview,
                 "미리보기 성공·인증 실패·404는 모든 게시물 값과 PostgreSQL 행 버전을 변경하면 안 됩니다.");
             Report("미리보기 인증·본인/타인 메타데이터·반복/읽기 전용 SELECT·404·게시물/다운로드 수 불변 검증");
-            await WorkshopErrorAsync(game, HttpMethod.Post, WORKSHOP_PATH, new { Name = exactName, LanguageCode = "ko-KR", Words = WorkshopPublishWords() },
+            await WorkshopErrorAsync(game, HttpMethod.Post, WORKSHOP_PATH, new { Name = exactName, LanguageCode = "ko", Words = WorkshopPublishWords() },
                 author.Session.SessionToken, HttpStatusCode.Conflict, "TopicWorkshopNameConflict");
             using (var data = JsonDocument.Parse(typeof(ServerDatabase).Assembly.GetManifestResourceStream("DrawLiar.BuiltInGameData.json")!))
             {
@@ -117,9 +123,13 @@ internal static partial class Integration
                 "다른 사용자는 동일한 콘텐츠와 제작자 정보·증가한 다운로드 수를 받아야 합니다.");
             await GetAsync<JsonElement>(game, WORKSHOP_PATH + "/" + firstId, downloader.Session.SessionToken);
             var listing = await WorkshopListAsync(game, downloader, "?language=ko-KR");
-            Check(WorkshopItems(listing).All(item => item.GetProperty("LanguageCode").GetString() == "ko-KR")
+            Check(WorkshopItems(listing).All(item => item.GetProperty("LanguageCode").GetString() == "ko")
                 && WorkshopItems(listing).Single(item => item.GetProperty("Id").GetString() == firstId).GetProperty("DownloadCount").GetInt32() == 2,
                 "언어 필터와 목록의 다운로드 집계는 실제 저장된 값을 반영해야 합니다.");
+            var canonicalListing = await WorkshopListAsync(game, downloader, "?language=ko");
+            Check(WorkshopItems(canonicalListing).Select(item => item.GetProperty("Id").GetString()).SequenceEqual(
+                WorkshopItems(listing).Select(item => item.GetProperty("Id").GetString())),
+                "새 언어 코드와 기존 지역 코드의 필터는 기존 게시물을 똑같이 검색해야 합니다.");
             string storedAfterDownloads = await WorkshopStoredTopicsAsync(owner);
             var previewAfterDownloads = await GetAsync<JsonElement>(game, previewPath, downloader.Session.SessionToken);
             Check(WorkshopWords(previewAfterDownloads).SequenceEqual(exactWords)

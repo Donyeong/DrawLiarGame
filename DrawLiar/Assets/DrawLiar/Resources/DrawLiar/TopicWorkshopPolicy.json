@@ -6,5 +6,5 @@
     "MaxWordsPerTopic": 80,
     "MaxUploadsPerAccount": 20
   },
-  "LanguageCodes": ["ko-KR", "en", "zh-CN", "zh-TW", "ja-JP", "es", "pt-BR", "fr-FR", "de-DE", "id", "hi-IN", "ar"]
+  "LanguageCodes": ["ko", "en", "ja", "zh-CN", "de", "fr", "es", "es-419", "pt", "it", "nl", "da", "no", "sv", "fi", "pl", "cs", "sk", "hu", "ro", "ru", "uk", "tr", "ar", "iw", "hi", "id", "th", "vi"]
 }

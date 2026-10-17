@@ -5,6 +5,7 @@ internal static partial class Integration
 {
     private static async Task VerifyCommerceAsync()
     {
+        await VerifyGooglePlayCommerceAsync();
         var now = new DateTimeOffset(2026, 10, 9, 0, 0, 0, TimeSpan.Zero);
         var products = CommerceRules.CreateProducts();
         Check(products.Length == 24 && products.Select(product => product.Id).Distinct().Count() == 24
@@ -115,7 +116,7 @@ internal static partial class Integration
             Task.FromResult(new VerifiedCommerceReversal(Id, AppScope, TransactionId, proof == "refund" ? "Refunded" : "Unknown"));
     }
 
-    private sealed class CommerceTestRepository(DateTimeOffset now) : ICommerceRepository
+    private sealed class CommerceTestRepository(DateTimeOffset now) : ICommerceRepository, ICommerceFinalizationRepository
     {
         private readonly object _gate = new();
         private readonly Dictionary<Guid, ProfileData> _profiles = new();
@@ -123,6 +124,8 @@ internal static partial class Integration
         private readonly Dictionary<(string, string, string), Guid> _transactions = new();
         private readonly Dictionary<(Guid, string, Guid), string> _ledger = new();
         private readonly HashSet<Guid> _reviews = new();
+        private readonly Dictionary<Guid, PendingCommerceFinalization> _finalizations = new();
+        public int FinalizationCount => _finalizations.Count;
         public DateTimeOffset Now = now;
         public int OrderCount => _orders.Count;
         public int TransactionCount => _transactions.Count;
@@ -168,6 +171,24 @@ internal static partial class Integration
                 return Task.FromResult(new CommercePaymentResponse { Order = order.Order, Product = order.Product, Profile = Profile(order.AccountId) });
             }
         }
+        public async Task<CommercePaymentResponse> CompleteWithFinalizationAsync(CommerceStoredOrder order, string appScope,
+            string transactionId, string protectedProof, CancellationToken cancellationToken)
+        {
+            var response = await CompleteCommerceOrderAsync(order, appScope, transactionId, cancellationToken);
+            _finalizations.TryAdd(Guid.Parse(order.Order.OrderId), new PendingCommerceFinalization(order, protectedProof, 0));
+            return response;
+        }
+        public Task RequireCommerceTransactionAsync(CommerceStoredOrder order, string transactionId, CancellationToken cancellationToken)
+        {
+            if (!_transactions.TryGetValue((order.Order.Provider, order.AppScope, ServerRuntime.Hash(transactionId)), out var id)
+                || id != Guid.Parse(order.Order.OrderId)) throw new ApiException("InvalidPayment", 403);
+            return Task.CompletedTask;
+        }
+        public Task<PendingCommerceFinalization[]> ClaimCommerceFinalizationsAsync(CancellationToken cancellationToken) =>
+            Task.FromResult(_finalizations.Values.ToArray());
+        public Task CompleteCommerceFinalizationAsync(Guid orderId, CancellationToken cancellationToken)
+        { _finalizations.Remove(orderId); return Task.CompletedTask; }
+        public Task RetryCommerceFinalizationAsync(Guid orderId, int attempts, CancellationToken cancellationToken) => Task.CompletedTask;
         public Task<ProfileData> PurchaseCommerceAsync(Guid accountId, CommercePurchaseRequest request, CancellationToken cancellationToken)
         {
             lock (_gate)
@@ -195,7 +216,7 @@ internal static partial class Integration
         public Task FlagCommerceTransactionForReviewAsync(VerifiedCommerceReversal reversal, CancellationToken cancellationToken)
         {
             var order = _transactions[(reversal.Provider, reversal.AppScope, ServerRuntime.Hash(reversal.TransactionId))];
-            _reviews.Add(order); _orders[order].Order.State = "ReviewRequired"; return Task.CompletedTask;
+            _reviews.Add(order); _orders[order].Order.State = "ReviewRequired"; _finalizations.Remove(order); return Task.CompletedTask;
         }
     }
 }

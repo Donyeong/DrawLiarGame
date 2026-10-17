@@ -94,14 +94,13 @@ namespace DrawLiar
                 if (_mobileControls.parent != _mobilePlayStage) _mobilePlayStage.Add(_mobileControls);
                 if (playerStrip.parent != _mobileRoster) _mobileRoster.Add(playerStrip);
                 var rosterParent = portrait ? _mobileWorkspace : _mobilePlaySide;
-                Place(_mobileRoster, rosterParent, 0);
+                Place(_mobileRoster, rosterParent, portrait ? 2 : 0);
                 var actionParent = portrait ? _mobileWorkspace : _mobilePlaySide;
                 Place(_mobileActions, actionParent, portrait ? 3 : 1);
-                var judgmentParent = portrait ? _mobileActions : landscapeNomination
-                    ? _mobileActions.Q<VisualElement>(className: "mobile-action-row") : _mobilePlayStage;
+                var judgmentParent = portrait ? _mobileActions : _mobilePlayStage;
                 if (_judgmentPanel.parent != judgmentParent)
                 {
-                    if (portrait || landscapeNomination) judgmentParent.Insert(0, _judgmentPanel);
+                    if (portrait) judgmentParent.Insert(0, _judgmentPanel);
                     else judgmentParent.Add(_judgmentPanel);
                 }
                 var current = _judgmentPanel.Q<Label>("nomination-current");
@@ -131,24 +130,29 @@ namespace DrawLiar
                 return;
             }
             _mobilePlayStage.style.height = StyleKeyword.Null;
-            playerStrip.style.height = StyleKeyword.Null;
-            playerStrip.RemoveFromClassList("waiting-roster-compact");
-            float width = _mobileRoster.contentRect.width;
-            if (width > 0)
+            float width = playerStrip.contentRect.width;
+            if (float.IsFinite(width) && width > 0 && float.IsFinite(_mobileWorkspace.contentRect.height) && _mobileWorkspace.contentRect.height > 0)
             {
-                const int COLUMNS = 4;
                 const float GAP = 6;
-                bool compact = _mobileRoomStack.ClassListContains("mobile-compact");
-                float cardWidth = Mathf.Floor((width - GAP * (COLUMNS - 1)) / COLUMNS);
-                float avatarSize = Mathf.Min(compact ? 64 : 80, Mathf.Max(0, cardWidth - 10));
-                float cardHeight = compact ? 144 : 160;
+                int columns = Mathf.Clamp(Mathf.FloorToInt((width + GAP) / 78), 2, 8);
+                if (width < 620) columns = Mathf.Min(columns, 4);
+                int rows = Mathf.Max(1, Mathf.CeilToInt(playerStrip.childCount / (float)columns));
+                bool portrait = _mobileLayout.IsPortrait;
+                float actionsHeight = float.IsFinite(_mobileActions.layout.height) ? Mathf.Max(32, _mobileActions.layout.height) : 32;
+                float controlsHeight = float.IsFinite(_mobileControls.layout.height) ? Mathf.Max(0, _mobileControls.layout.height) : 0;
+                float available = _mobileWorkspace.contentRect.height - actionsHeight - 12 - GAP * (rows - 1)
+                    - (portrait ? controlsHeight + width / DrawingSurface.AspectRatio + 6 : 0);
+                float cardHeight = Mathf.Clamp(Mathf.Floor(available / rows), 80, portrait ? 128 : 92);
+                float cardWidth = Mathf.Max(0, Mathf.Floor((width - GAP * (columns - 1)) / columns) - 1);
+                float avatarSize = Mathf.Max(28, Mathf.Min(portrait ? 72 : 44, Mathf.Min(cardWidth - 10, cardHeight - 50)));
+                playerStrip.style.height = rows * cardHeight + GAP * (rows - 1);
                 int index = 0;
                 foreach (var card in playerStrip.Children())
                 {
                     card.style.width = cardWidth;
                     card.style.height = cardHeight;
-                    card.style.marginRight = ++index % COLUMNS == 0 ? 0 : GAP;
-                    card.style.marginBottom = index <= playerStrip.childCount - (playerStrip.childCount % COLUMNS == 0 ? COLUMNS : playerStrip.childCount % COLUMNS) ? GAP : 0;
+                    card.style.marginRight = ++index % columns == 0 ? 0 : GAP;
+                    card.style.marginBottom = index <= playerStrip.childCount - (playerStrip.childCount % columns == 0 ? columns : playerStrip.childCount % columns) ? GAP : 0;
                     var avatar = card.Q<AvatarElement>();
                     if (avatar != null) { avatar.style.width = avatarSize; avatar.style.height = avatarSize; }
                 }

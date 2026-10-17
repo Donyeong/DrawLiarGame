@@ -14,6 +14,9 @@ namespace DrawLiar
         private string _commerceSession = "", _commerceAccount = "";
         private long _commerceServerTime;
         private double _commerceTimeAnchor;
+        private bool _commerceRecoveryRequested, _commerceRecovering;
+        private int _commerceRecoveryRevision;
+        private double _nextCommerceRecovery;
         public CommerceCatalogue Commerce { get; private set; } = EmptyCommerceCatalogue();
         public bool CommerceLoaded { get; private set; }
         public bool IsPlatformPaymentAvailable => IsAuthenticated && CommerceLoaded && _platformPayments?.IsAvailable == true;
@@ -71,6 +74,7 @@ namespace DrawLiar
             var profile = await SendAsync<ProfileData>(_gameServerUrl, "/api/profile", "GET", bearer: session, cancellationToken: cancellationToken);
             EnsureCommerceIdentity(session, account, cancellationToken);
             ApplyCommerceProfile(profile, account);
+            RequestCommerceRecovery();
         }
 
         public Task PurchaseCommerceAsync(string productId, int expectedPricePaidGems, CancellationToken cancellationToken = default) => RunAsync(async () =>
@@ -100,7 +104,9 @@ namespace DrawLiar
             }
             else
             {
-                var response = await _platformPayments.PurchaseAsync(product, cancellationToken);
+                CommercePaymentResponse response;
+                try { response = await _platformPayments.PurchaseAsync(product, cancellationToken); }
+                finally { RequestCommerceRecovery(); }
                 EnsureCommerceIdentity(session, account, cancellationToken);
                 SetStatus(response.Order.State == "Completed" ? "결제가 확인되었습니다." : "결제 확인을 기다리고 있습니다.");
             }
@@ -159,6 +165,7 @@ namespace DrawLiar
                 _platformPayments = new DrawPlatformPaymentService(new CommerceBackend(this));
                 _platformPayments.PricesChanged += OnCommercePricesChanged;
                 _platformPayments.ProfileConfirmed += OnCommerceProfileConfirmed;
+                _platformPayments.PurchasesChanged += RequestCommerceRecovery;
             }
             if (_commerceSession == _gameSession && _commerceAccount == Profile.AccountId) return;
             _commerceSession = _gameSession;
@@ -168,6 +175,51 @@ namespace DrawLiar
 
         private void OnCommercePricesChanged() => CommerceChanged?.Invoke();
         private void OnCommerceProfileConfirmed(ProfileData profile) => ApplyCommerceProfile(profile, _commerceAccount);
+
+        private void RequestCommerceRecovery()
+        {
+            _commerceRecoveryRequested = true;
+            _nextCommerceRecovery = 0;
+            ++_commerceRecoveryRevision;
+        }
+
+        private void PollCommerceRecovery()
+        {
+            if (!_commerceRecoveryRequested || _commerceRecovering || !IsAuthenticated || IsBusy
+                || _loggingOut || _lobbyChatPaused || DrawPlatformPaymentProviders.Find() == null
+                || (CommerceLoaded && _platformPayments?.IsAvailable != true)
+                || Time.realtimeSinceStartupAsDouble < _nextCommerceRecovery) return;
+            _ = RecoverCommerceAsync();
+        }
+
+        private async Task RecoverCommerceAsync()
+        {
+            _commerceRecovering = true;
+            _commerceRecoveryRequested = false;
+            int revision = _commerceRecoveryRevision;
+            string session = _gameSession, account = Profile.AccountId;
+            try
+            {
+                if (!CommerceLoaded) await RefreshCommerceCoreAsync(_lifetime);
+                EnsureCommerceIdentity(session, account, _lifetime);
+                if (_platformPayments?.IsAvailable != true) return;
+                await _platformPayments.RestoreAsync(_lifetime);
+                EnsureCommerceIdentity(session, account, _lifetime);
+                if (_platformPayments.HasPendingPurchases) _commerceRecoveryRequested = true;
+            }
+            catch (OperationCanceledException) when (_lifetime.IsCancellationRequested || session != _gameSession
+                || account != Profile?.AccountId || _loggingOut) { }
+            catch (Exception)
+            {
+                if (session == _gameSession && account == Profile?.AccountId) _commerceRecoveryRequested = true;
+            }
+            finally
+            {
+                _commerceRecovering = false;
+                if (revision == _commerceRecoveryRevision)
+                    _nextCommerceRecovery = Time.realtimeSinceStartupAsDouble + 30;
+            }
+        }
 
         private void ApplyCommerceProfile(ProfileData profile, string account)
         {
@@ -215,6 +267,8 @@ namespace DrawLiar
         private void ResetCommerce(bool resetIdentity = true)
         {
             _platformPayments?.Reset();
+            _commerceRecoveryRequested = false;
+            ++_commerceRecoveryRevision;
             _commerceSession = _commerceAccount = "";
             Commerce = EmptyCommerceCatalogue();
             CommerceLoaded = false;
@@ -232,11 +286,12 @@ namespace DrawLiar
             if (_platformPayments == null) return;
             _platformPayments.PricesChanged -= OnCommercePricesChanged;
             _platformPayments.ProfileConfirmed -= OnCommerceProfileConfirmed;
+            _platformPayments.PurchasesChanged -= RequestCommerceRecovery;
             _platformPayments.Dispose();
             _platformPayments = null;
         }
 
-        private sealed class CommerceBackend : IDrawCommerceBackend
+        private sealed class CommerceBackend : IDrawCommerceBackend, IDrawCommerceOrderLookup
         {
             private readonly LobbyServiceBridge _owner;
             public CommerceBackend(LobbyServiceBridge owner) => _owner = owner;
@@ -248,6 +303,15 @@ namespace DrawLiar
                 => _owner.SendAsync<CommercePaymentResponse>(_owner._gameServerUrl, "/api/payments/confirm", "POST", request, _owner._commerceSession, cancellationToken);
             public Task<CommerceOrdersResponse> OrdersAsync(CancellationToken cancellationToken)
                 => _owner.SendAsync<CommerceOrdersResponse>(_owner._gameServerUrl, "/api/payments/orders", "GET", bearer: _owner._commerceSession, cancellationToken: cancellationToken);
+            public async Task<CommerceOrderData> OrderAsync(string orderId, CancellationToken cancellationToken)
+            {
+                try
+                {
+                    return await _owner.SendAsync<CommerceOrderData>(_owner._gameServerUrl, "/api/payments/orders/" + Uri.EscapeDataString(orderId),
+                        "GET", bearer: _owner._commerceSession, cancellationToken: cancellationToken);
+                }
+                catch (ApiRequestException exception) when (exception.Code == "PaymentOrderNotFound") { return null; }
+            }
         }
     }
 }

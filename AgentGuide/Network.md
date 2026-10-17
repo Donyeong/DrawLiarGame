@@ -15,17 +15,19 @@
 - 차단은 서버의 계정 단위 기록이고, 채팅 숨기기는 기기 로컬 설정이다. 차단·신고의 대상·사유·한도는 서버가 검증하며, 상대에게 차단 사실을 알리지 않는다.
 - 데디케이티드의 미전송 경기 결과는 `Dedicated:OutboxPath`(`dedicated-outbox` 볼륨)에 보관한다. 재배포 시 이 볼륨을 보존한다.
 - 창작마당 한도와 지원 언어는 `TopicWorkshopPolicy.json`을 클라이언트·서버가 공유한다. 게시물 소유권과 계정별 한도는 서버에서 검증하고, 다운로드 시 동명인 기존 로컬 주제를 덮어쓰지 않는다.
-- 경기 코인·경험치는 서버가 완료 라운드 참가·점수로 계산하고, 전적 기록과 함께 원자적으로 한 번만 지급한다. 경험치는 코인 잔액·구매와 독립적으로 누적하고 레벨은 공유 `AccountLevelRules`로 계산한다. 클라이언트는 확정된 지급 내역만 표시한다.
+- 경기 코인·경험치는 서버가 완료 라운드 참가·점수로 계산하고, 전적 기록과 함께 원자적으로 한 번만 지급한다. 경험치는 코인 잔액·구매와 독립적으로 누적하고 레벨은 공유 `AccountLevelRules`로 계산한다. 화가패스 방장 배율은 데디케이티드가 보고한 경기 종료 시점 방장의 서버 구독 만료(경기 시각 기준)로 판정한다. 클라이언트는 확정된 지급 내역만 표시한다.
 - 전적 그림은 경기·라운드 단위 공용 압축 기록으로 보관하고 참가 계정만 조회한다. `DrawingReplay:RetentionDays`(기본 30일)는 경기 종료 시각부터 계산하며, 만료된 그림만 삭제하고 전적·보상 기록은 유지한다. 결과 재전송으로 그림 보관기간을 연장하거나 삭제된 그림을 복구하지 않는다.
-- 유료 보석·구독 만료는 서버가 관리하며 클라이언트나 공개 개발 API에서 지급하지 않는다. 결제 공급자는 계정·앱·상품·수량·구매 상태를 검증하고, 플랫폼·앱·거래의 전역 중복 방지와 잔액·구독·원장을 한 트랜잭션에 저장한다. 스토어 승인·소비는 지급 확정 이후 수행하며 미연결 공급자는 비활성 상태로 유지한다. 구독자 뱃지는 서버 UTC 만료와 표시 선택을 모두 검증한다.
+- 유료 보석·구독 만료는 서버가 관리하며 클라이언트나 공개 개발 API에서 지급하지 않는다. 결제 공급자는 계정·앱·상품·수량·구매 상태를 검증하고, 플랫폼·앱·거래의 전역 중복 방지와 잔액·구독·원장을 한 트랜잭션에 저장한다. 스토어 승인·소비는 지급 확정 이후 수행하며 미연결 공급자는 비활성 상태로 유지한다. Google Play 소비 재시도용 `TokenEncryptionKeyFile`은 서비스 계정과 별도의 32바이트 서버 비밀 키이며, 대기열이 남아 있는 동안 교체·삭제하지 않는다. 구독자 뱃지는 서버 UTC 만료와 표시 선택을 모두 검증한다.
 - 광고는 Android·WebGL에만 노출하고 화가패스 구독 중에는 초기화하지 않는다. 일일 광고 보상은 UTC 날짜별 계정당 한 번 서버에서 기존 보석(`PaidGems`) 잔액·원장과 함께 지급한다. Android는 AdMob SSV 서명을 검증한다. Google H5는 서버 시청 증명이 없으므로 웹 보상은 기본 비활성화하며, `Advertising:Web:AllowClientVerification`은 클라이언트 완료 콜백 신뢰를 허용하는 설정이다. 웹 동의는 사이트의 `window.DrawLiarAdvertisingConsent.request(): Promise<boolean>`과 선택적인 `showPrivacyOptions()`로 연결하며, 승인 후에만 SDK를 로드한다. 광고 계정·동의 설정 없이 성공이나 보상을 흉내 내지 않는다.
+- 우편은 운영툴에서만 발송한다. 코인·보석 보상은 수령 시 서버가 계정당 한 번(`MailClaim`) 원자적으로 지급하고 보석은 `CommerceLedger`(`MailReward`)에 기록한다. 전체 발송은 만료 전까지 이후 가입한 계정도 받으며, 발송 취소는 만료 처리로 이미 지급된 보상은 회수하지 않는다.
 - 배포는 Ubuntu 24.04 x64의 `drawliar-dev` Compose와 `DrawLiar-Server` Jenkins 작업을 사용한다. 같은 머신의 Kona 서비스·DB·배포 경로를 변경하지 않는다. DB 볼륨과 `/srv/drawliar/dev/.env`, 인증서를 배포물에 포함하거나 삭제하지 않는다.
 - 운영툴 단독 갱신은 `ADMIN_ONLY`로 수행하고 다른 앱의 Shared DLL을 교체하지 않는다. 공개 관리자 경로는 기존 인증서를 검증하는 HTTPS 프록시를 사용한다.
 - 게임 판정 단독 갱신은 `DEDICATED_ONLY`와 확정 커밋 archive를 사용하고, 현재 core와 Shared·DB·계약·정책이 동일한지 검증한다.
 - 서버 배포 helper는 릴리스의 `compose.yaml`·Dockerfile을 쓰지 않고 VM의 root 소유 템플릿(`/opt/drawliar/deploy`)을 사용한다. `Tools/Docker` 템플릿 변경은 VM에서 `install.sh`를 root로 다시 실행해야 반영되므로, 그 전에 배포하는 서버 코드는 기존 템플릿으로도 시작되어야 한다.
 - 개발 인증·HTTP/WS는 명시적으로 허용한 로컬 개발 환경에만 사용한다. 공개 연결은 HTTPS/WSS로 유지하며 비밀 키·토큰·비밀번호를 로그에 남기지 않는다.
-- Android CI는 로컬 작업 트리를 별도 작업 폴더에 복사한다. 이를 원격 커밋 빌드로 취급하지 않는다. 서명 키·웹후크는 Jenkins Credentials로 전달하고, Firebase의 임시 APK/AAB 다운로드 링크는 Discord 전송 뒤 삭제하며 로그·보관 산출물에 넣지 않는다. Firebase AAB 배포에는 동일 패키지의 Google Play 앱 연결과 게시 상태가 필요하다.
-- Google Play 자동 업로드는 최초 콘솔 빌드 등록 이후 DrawLiar의 내부 테스트 초안에만 수행한다. 출시용 업로드 키·게시 서비스 계정은 테스트 서명·Firebase 자격 증명과 분리하고, CI 캐시의 예약된 Play 버전 코드를 재사용하지 않는다. 기존 초안·심사 중인 릴리스를 자동 교체하거나 정식 출시하지 않는다.
+- Android CI는 로컬 작업 트리를 별도 작업 폴더에 복사한다. 이를 원격 커밋 빌드로 취급하지 않는다. 표시 버전 자동 증가 상태(`C:\DrawLiarJenkinsCache\AndroidBundleVersion.json`)는 캐시 정리 시에도 보존한다. 서명 키·웹후크는 Jenkins Credentials로 전달하고, Firebase의 임시 APK/AAB 다운로드 링크는 Discord 전송 뒤 삭제하며 로그·보관 산출물에 넣지 않는다. Firebase AAB 배포에는 동일 패키지의 Google Play 앱 연결과 게시 상태가 필요하다.
+- 공유 Cloud Storage에는 `drawliar/builds/android/` 아래에 검증된 APK/AAB, `drawliar/builds/windows/` 아래에 검증된 Windows ZIP만 게시한다. 기존 파일을 덮어쓰거나 다른 서비스의 경로·버킷 권한을 변경하지 않는다. 업로드 인증은 Jenkins Credentials로 전달한다.
+- Google Play 자동 배포는 DrawLiar의 공개 테스트(`beta`)를 새 버전의 `completed` 릴리스로 갱신한다. 기존 릴리스 메모와 다른 트랙은 보존하며 정식 출시(`production`)하지 않는다. 출시용 업로드 키·게시 서비스 계정은 테스트 서명·Firebase 자격 증명과 분리하고, CI 캐시의 예약된 Play 버전 코드를 재사용하지 않는다.
 - Unity Mono는 `ClientWebSocket`의 인증서 콜백을 적용하지 않는다. WSS는 `DrawWebSocketClient`의 `SslStream` 검증과 관리형 WebSocket을 사용한다.
 - WebGL은 브라우저 WebSocket과 동일 원점 HTTPS 프록시를 사용하며 Google 웹 인증은 서버의 일회용 nonce를 검증한다. 프록시는 공개 API와 채팅·게임 경로만 전달하며 전달 IP는 설정한 프록시에서만 신뢰한다.
 - 아바타 착용값은 JavaScript의 안전한 정수 범위를 넘을 수 있다. WebGL 브리지는 관련 JSON을 파싱·재직렬화하지 않고 원문 UTF-8로 전달하며, 로컬 착용값은 십진 문자열로 보관한다.

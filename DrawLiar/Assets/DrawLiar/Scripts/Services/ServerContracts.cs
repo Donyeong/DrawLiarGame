@@ -106,6 +106,7 @@ namespace DrawLiar
         public string PlayedAt = "";
         public int Mode;
         public int RoundCount;
+        public string HostAccountId = "";
         public MatchPlayerResult[] Players = Array.Empty<MatchPlayerResult>();
         public RoundDrawingArchiveData[] DrawingArchives = Array.Empty<RoundDrawingArchiveData>();
         public bool DrawingsIncomplete;
@@ -135,6 +136,7 @@ namespace DrawLiar
     {
         public FriendListResponse Friends = new FriendListResponse();
         public RoomInvitationData[] RoomInvitations = Array.Empty<RoomInvitationData>();
+        public int MailCount;
     }
     [Serializable] public sealed class RoomInvitationData
     {
@@ -146,6 +148,10 @@ namespace DrawLiar
         public string ExpiresAt = "";
     }
     [Serializable] public sealed class RoomInvitationRespondRequest { public bool Accept; public string Password = ""; }
+    [Serializable] public sealed class MailData { public string MailId = "", Title = "", Message = "", CreatedAt = "", ExpiresAt = ""; public int Coins, PaidGems; }
+    [Serializable] public sealed class MailListResponse { public MailData[] Mails = Array.Empty<MailData>(); }
+    [Serializable] public sealed class MailClaimRequest { public const int MAX_MAILS = 100; public string[] MailIds = Array.Empty<string>(); }
+    [Serializable] public sealed class MailClaimResponse { public int ClaimedCount, Coins, PaidGems; public ProfileData Profile = new ProfileData(); }
     [Serializable] public sealed class ShopProduct { public string Id = ""; public string Name = ""; public int Price; public long Accessory; }
     [Serializable] public sealed class ShopResponse { public ShopProduct[] Products = Array.Empty<ShopProduct>(); }
     [Serializable] public sealed class PurchaseRequest { public string ProductId = ""; public string OperationId = ""; }
@@ -158,11 +164,63 @@ namespace DrawLiar
     [Serializable] public sealed class ServerRoomSettings
     {
         public const int MAX_PLAYERS = 8;
-        public const string DEFAULT_TOPIC_LANGUAGE = "ko-KR";
-        public static readonly string[] TOPIC_LANGUAGES = { "ko-KR", "en", "zh-CN", "zh-TW", "ja-JP", "es", "pt-BR", "fr-FR", "de-DE", "id", "hi-IN", "ar" };
-        public static string NormalizeTopicLanguage(string code) => Array.IndexOf(TOPIC_LANGUAGES, code) >= 0 ? code : DEFAULT_TOPIC_LANGUAGE;
+        public const string DEFAULT_TOPIC_LANGUAGE = "ko";
+        public static readonly string[] TOPIC_LANGUAGES = { "ko", "en", "ja", "zh-CN", "de", "fr", "es", "es-419", "pt", "it", "nl", "da", "no", "sv", "fi", "pl", "cs", "sk", "hu", "ro", "ru", "uk", "tr", "ar", "iw", "hi", "id", "th", "vi" };
+        public static string NormalizeTopicLanguage(string code) => TryNormalizeTopicLanguage(code, out string language) ? language : DEFAULT_TOPIC_LANGUAGE;
+
+        public static bool TryNormalizeTopicLanguage(string code, out string language)
+        {
+            string value = (code ?? "").Trim().Replace('_', '-');
+            foreach (string supported in TOPIC_LANGUAGES)
+                if (string.Equals(supported, value, StringComparison.OrdinalIgnoreCase)) { language = supported; return true; }
+            switch (value.ToLowerInvariant())
+            {
+                case "ko-kr": language = "ko"; return true;
+                case "en-us": case "en-gb": language = "en"; return true;
+                case "ja-jp": language = "ja"; return true;
+                case "zh": case "zh-hans": case "zh-sg": language = "zh-CN"; return true;
+                case "de-de": language = "de"; return true;
+                case "fr-fr": language = "fr"; return true;
+                case "es-es": language = "es"; return true;
+                case "es-mx": language = "es-419"; return true;
+                case "pt-pt": language = "pt"; return true;
+                case "nb": case "nn": case "nb-no": case "nn-no": case "no-no": language = "no"; return true;
+                case "he": case "he-il": case "iw-il": language = "iw"; return true;
+                case "hi-in": language = "hi"; return true;
+                case "in": case "in-id": case "id-id": language = "id"; return true;
+                // 기존 지역별 팩과 게시물은 다른 언어의 제시어로 바꾸지 않는다.
+                case "zh-tw": case "zh-hant": language = "zh-TW"; return true;
+                case "pt-br": language = "pt-BR"; return true;
+                default: language = ""; return false;
+            }
+        }
+
+        public static string[] TopicLanguageAliases(string code)
+        {
+            if (!TryNormalizeTopicLanguage(code, out string language)) return Array.Empty<string>();
+            switch (language)
+            {
+                case "ko": return new[] { "ko", "ko-kr" };
+                case "en": return new[] { "en", "en-us", "en-gb" };
+                case "ja": return new[] { "ja", "ja-jp" };
+                case "zh-CN": return new[] { "zh-cn", "zh", "zh-hans", "zh-sg" };
+                case "de": return new[] { "de", "de-de" };
+                case "fr": return new[] { "fr", "fr-fr" };
+                case "es": return new[] { "es", "es-es" };
+                case "es-419": return new[] { "es-419", "es-mx" };
+                case "pt": return new[] { "pt", "pt-pt" };
+                case "no": return new[] { "no", "nb", "nn", "nb-no", "nn-no", "no-no" };
+                case "iw": return new[] { "iw", "he", "he-il", "iw-il" };
+                case "hi": return new[] { "hi", "hi-in" };
+                case "id": return new[] { "id", "in", "in-id", "id-id" };
+                case "zh-TW": return new[] { "zh-tw", "zh-hant" };
+                default: return new[] { language.ToLowerInvariant() };
+            }
+        }
+
         // 언어 코드가 없는 기존 기본 주제는 한국어로 본다.
-        public static string TopicLanguageOf(string languageCode) => string.IsNullOrEmpty(languageCode) ? DEFAULT_TOPIC_LANGUAGE : languageCode;
+        public static string TopicLanguageOf(string languageCode) => string.IsNullOrEmpty(languageCode) ? DEFAULT_TOPIC_LANGUAGE
+            : TryNormalizeTopicLanguage(languageCode, out string language) ? language : languageCode;
         public string TopicLanguage = DEFAULT_TOPIC_LANGUAGE;
         public int MaxPlayers = MAX_PLAYERS;
         public int LiarCount = 1;
@@ -196,6 +254,7 @@ namespace DrawLiar
         public int SpectatorCount;
         public bool IsInProgress;
         public bool IsPrivate;
+        public bool HostHasPainterPass;
         public long ConfigurationVersion;
         public long AccessVersion;
     }
@@ -256,6 +315,16 @@ namespace DrawLiar
         public string RoomId = "", WorkshopTopicId = "", Status = "", CreatedAt = "";
     }
     [Serializable] public sealed class AdminReportAction { public string Status = ""; }
+    [Serializable] public sealed class AdminMailRequest
+    {
+        public const int MAX_TITLE_LENGTH = 40, MAX_MESSAGE_LENGTH = 500, MAX_COINS = 1000000, MAX_PAID_GEMS = 10000, MAX_EXPIRES_IN_DAYS = 365, MAX_RECIPIENTS = 1000;
+        public string[] AccountIds = Array.Empty<string>();
+        public bool SendToAll;
+        public string Title = "", Message = "";
+        public int Coins, PaidGems, ExpiresInDays = 30;
+    }
+    [Serializable] public sealed class AdminMailSendResponse { public int Created; }
+    [Serializable] public sealed class AdminMailData { public string MailId = "", AccountId = "", AccountName = "", Title = "", Message = "", CreatedAt = "", ExpiresAt = ""; public int Coins, PaidGems, ClaimCount; }
     [Serializable] public sealed class LobbyChatMessage
     {
         public long Id;

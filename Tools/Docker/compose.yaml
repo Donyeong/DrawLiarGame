@@ -65,6 +65,10 @@ services:
       GameServer__PublicUrl: https://${DRAWLIAR_PUBLIC_HOST}:19060
       GameServer__MainServerUrl: https://main:19050
       GameServer__NodeId: game-1
+      Commerce__GooglePlay__Enabled: ${DRAWLIAR_GOOGLE_PLAY_ENABLED:-false}
+      Commerce__GooglePlay__PackageName: com.rascallab.liargame
+      Commerce__GooglePlay__CredentialsFile: ${DRAWLIAR_GOOGLE_PLAY_CREDENTIALS_FILE:-/secrets/google-play.json}
+      Commerce__GooglePlay__TokenEncryptionKeyFile: ${DRAWLIAR_GOOGLE_PLAY_TOKEN_KEY_FILE:-/secrets/google-play-token.key}
   dedicated:
     <<: *app
     image: ${DRAWLIAR_DEDICATED_IMAGE:-${DRAWLIAR_IMAGE:-drawliar-app:current}}

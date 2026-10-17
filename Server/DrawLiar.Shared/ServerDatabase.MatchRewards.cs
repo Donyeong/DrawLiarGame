@@ -44,7 +44,7 @@ public sealed partial class ServerDatabase
     }
 
     private static async Task<(int Coins, int Experience)> CreditMatchRewardAsync(NpgsqlConnection connection, NpgsqlTransaction transaction, Guid accountId,
-        MatchPlayerResult player, CancellationToken cancellationToken)
+        MatchPlayerResult player, bool painterHost, CancellationToken cancellationToken)
     {
         int currentCoins;
         long currentExperience;
@@ -55,9 +55,9 @@ public sealed partial class ServerDatabase
             currentCoins = reader.GetInt32(0);
             currentExperience = reader.GetInt64(1);
         }
-        int reward = MatchRewardRules.Calculate(_matchRewardPolicy.Value, player.WeightedRoundParticipants, player.WeightedRoundScore, currentCoins);
+        int reward = MatchRewardRules.Calculate(_matchRewardPolicy.Value, player.WeightedRoundParticipants, player.WeightedRoundScore, currentCoins, painterHost);
         int experience = (int)Math.Min(long.MaxValue - currentExperience,
-            MatchRewardRules.Calculate(_matchRewardPolicy.Value, player.WeightedRoundParticipants, player.WeightedRoundScore, 0));
+            MatchRewardRules.Calculate(_matchRewardPolicy.Value, player.WeightedRoundParticipants, player.WeightedRoundScore, 0, painterHost));
         if (reward > 0 || experience > 0)
         {
             await using var command = Command(connection, transaction,
@@ -83,6 +83,8 @@ public sealed partial class ServerDatabase
                 normalized.NodeId, normalized.RoomId, normalized.MatchId, normalized.PlayedAt, normalized.Mode, normalized.RoundCount,
                 normalized.Players
             };
-        return ServerRuntime.Hash(JsonSerializer.Serialize(payload, ServerRuntime.Json));
+        string json = JsonSerializer.Serialize(payload, ServerRuntime.Json);
+        // 방장 정보가 없는 기존 결과의 재전송은 기존 해시와 일치해야 한다.
+        return ServerRuntime.Hash(normalized.HostAccountId.Length == 0 ? json : json + "\nHost:" + normalized.HostAccountId);
     }
 }

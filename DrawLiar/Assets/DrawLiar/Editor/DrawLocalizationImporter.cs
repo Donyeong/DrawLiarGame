@@ -1,5 +1,7 @@
 using System;
 using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
 using I2.Loc;
 using UnityEditor;
 using UnityEngine;
@@ -68,6 +70,7 @@ namespace DrawLiar.Editor
                 var catalogue = JsonUtility.FromJson<DrawLocalizationCatalogue>(json);
                 if (catalogue?.Terms == null) throw new InvalidOperationException("UI 번역 카탈로그에 Terms 배열이 필요합니다.");
                 var source = DrawLocalization.CreateLanguageSource(catalogue);
+                ValidateFormats(catalogue);
                 var asset = AssetDatabase.LoadAssetAtPath<LanguageSourceAsset>(SOURCE_PATH);
                 if (asset == null)
                 {
@@ -92,5 +95,21 @@ namespace DrawLiar.Editor
                 Debug.LogError("UI 번역 카탈로그를 가져올 수 없습니다: " + error.Message);
             }
         }
+
+        private static void ValidateFormats(DrawLocalizationCatalogue catalogue)
+        {
+            foreach (var row in catalogue.Terms)
+            {
+                string[] expected = FormatTokens(row.Key);
+                int separators = row.Key.Count(character => character == '|');
+                for (int i = 0; i < row.Values.Length; i++)
+                    if (!expected.SequenceEqual(FormatTokens(row.Values[i]))
+                        || row.Values[i].Count(character => character == '|') != separators)
+                        throw new InvalidOperationException($"번역 서식 인수나 연출 구분자가 다릅니다: {DrawLocalization.LanguageCodes[i]} / {row.Key}");
+            }
+        }
+
+        private static string[] FormatTokens(string value) => Regex.Matches(value, @"\{\d+[^{}]*\}")
+            .Cast<Match>().Select(match => match.Value).OrderBy(token => token, StringComparer.Ordinal).ToArray();
     }
 }

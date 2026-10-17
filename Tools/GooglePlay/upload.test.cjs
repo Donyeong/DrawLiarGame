@@ -31,7 +31,7 @@ function Fixture(t) {
     Build();
     const Reserve = versionCode => {
         env.DRAWLIAR_VERSION_CODE = String(versionCode);
-        Write(env.GOOGLE_PLAY_PLAN, { Success: true, PackageName: PACKAGE_NAME, Track: 'internal', Status: 'draft', BuildNumber: 15, VersionCode: versionCode });
+        Write(env.GOOGLE_PLAY_PLAN, { Success: true, PackageName: PACKAGE_NAME, Track: 'beta', Status: 'completed', BuildNumber: 15, VersionCode: versionCode });
         Write(env.GOOGLE_PLAY_VERSION_STATE, { PackageName: PACKAGE_NAME, HighWaterVersionCode: versionCode, BuildNumber: 15 });
         Build();
     };
@@ -43,6 +43,7 @@ function Api(overrides = {}) {
     const calls = [];
     const fake = {
         Calls: calls,
+        Wait: async () => {},
         CreateAuth: async () => ({
             request: async options => {
                 calls.push(options);
@@ -118,46 +119,85 @@ test('트랙 버전 코드가 최댓값이면 API 값을 기준으로 예약한�
     assert.equal(plan.VersionCode, 701);
 });
 
-test('내부 테스트 초안만 생성하고 기존 completed·inProgress·halted 릴리스를 보존한다', async t => {
+test('기존 공개 테스트를 새 completed 버전으로 교체하고 다른 트랙은 변경하지 않는다', async t => {
     const fixture = Fixture(t);
     const releases = [
         { name: 'live', status: 'completed', versionCodes: ['11'], releaseNotes: [{ language: 'ko-KR', text: '유지' }], inAppUpdatePriority: 2 },
         { name: 'rollout', status: 'inProgress', versionCodes: ['12'], userFraction: 0.25 },
         { name: 'paused', status: 'halted', versionCodes: ['13'], userFraction: 0.1 },
     ];
-    const api = Api({ Tracks: [{ track: 'internal', releases }] });
+    const api = Api({ Tracks: [{ track: 'beta', releases }, { track: 'internal', releases: [{ status: 'draft', versionCodes: ['14'] }] }, { track: 'production', releases: [] }] });
     const result = await Main(fixture.env, [], api);
     assert.equal(result.Success, true);
     assert.equal(result.Committed, true);
-    assert.equal(result.Track, 'internal');
-    assert.equal(result.Status, 'draft');
+    assert.equal(result.Track, 'beta');
+    assert.equal(result.Status, 'completed');
     assert.equal(result.VersionCode, 15);
     assert.equal(result.Sha256, crypto.createHash('sha256').update(fs.readFileSync(fixture.env.BUILD_FILE)).digest('hex'));
     const upload = api.Calls.find(call => call.url.includes('/upload/'));
     assert.equal(upload.timeout, 20 * 60000);
     assert.equal(new URL(upload.url).searchParams.get('uploadType'), 'media');
     const track = api.Calls.find(call => call.method === 'PUT');
-    assert.ok(track.url.endsWith('/tracks/internal'));
-    assert.deepEqual(track.data.releases.slice(0, 3), releases);
-    assert.deepEqual(track.data.releases[3].versionCodes, ['15']);
-    assert.equal(track.data.releases[3].status, 'draft');
-    assert.deepEqual(Methods(api), ['POST edits', 'GET bundles', 'GET apks', 'GET tracks', 'POST bundles', 'PUT internal', 'POST edit123:validate', 'POST edit123:commit']);
+    assert.ok(track.url.endsWith('/tracks/beta'));
+    assert.equal(api.Calls.filter(call => call.method === 'PUT').length, 1);
+    assert.deepEqual(track.data.releases, [{ name: 'LiarGame: Canvas', versionCodes: ['15'], status: 'completed' }]);
+    assert.deepEqual(result.PreviousVersionCodes, ['11', '12', '13']);
+    assert.deepEqual(Methods(api), ['POST edits', 'GET bundles', 'GET apks', 'GET tracks', 'POST bundles', 'PUT beta', 'POST edit123:validate', 'POST edit123:commit']);
     const commit = api.Calls.at(-1);
-    assert.equal(new URL(commit.url).searchParams.get('changesInReviewBehavior'), 'ERROR_IF_IN_REVIEW');
+    assert.equal(new URL(commit.url).searchParams.has('changesNotSentForReview'), false);
+    assert.equal(new URL(commit.url).searchParams.has('changesInReviewBehavior'), false);
     assert.equal(commit.data, undefined);
     assert.equal(api.Calls.at(-2).data, undefined);
     assert.ok(api.Calls.every(call => call.url.startsWith('https://androidpublisher.googleapis.com/')));
     assert.deepEqual(fixture.Read(fixture.env.GOOGLE_PLAY_RESULT), result);
 });
 
-test('기존 draft는 예약·업로드 전에 중단하고 편집을 삭제한다', async t => {
+test('기존 초안이 있어도 이전 버전보다 높은 버전 코드를 예약한다', async t => {
     const fixture = Fixture(t);
-    const tracks = [{ track: 'internal', releases: [{ status: 'draft', versionCodes: ['14'] }] }];
-    for (const argv of [[], ['--plan']]) {
-        const api = Api({ Tracks: tracks });
-        await assert.rejects(Main(fixture.env, argv, api), /기존 초안/);
-        assert.equal(api.Calls.some(call => call.url.includes('/upload/')), false);
-        assert.equal(api.Calls.at(-1).method, 'DELETE');
+    const tracks = [{ track: 'internal', releases: [{ status: 'draft', versionCodes: ['24'] }] }];
+    const api = Api({ Tracks: tracks });
+    const plan = await Main(fixture.env, ['--plan'], api);
+    assert.equal(plan.VersionCode, 25);
+    assert.equal(api.Calls.some(call => call.url.includes('/upload/') || call.method === 'PUT'), false);
+    assert.equal(api.Calls.at(-1).method, 'DELETE');
+});
+
+test('공개 테스트 초안의 메모와 우선순위를 보존하며 새 버전 전체 출시를 제출한다', async t => {
+    const fixture = Fixture(t);
+    const live = { name: 'live', status: 'completed', versionCodes: ['11'], releaseNotes: [{ language: 'ko-KR', text: '배포 중' }] };
+    const draft = { name: 'previous', status: 'draft', versionCodes: ['14'], releaseNotes: [{ language: 'ko-KR', text: '다음 버전 메모' }], inAppUpdatePriority: 2 };
+    const api = Api({ Tracks: [{ track: 'beta', releases: [draft, live] }] });
+    const result = await Main(fixture.env, [], api);
+    const releases = api.Calls.find(call => call.method === 'PUT').data.releases;
+    assert.equal(releases.length, 1);
+    assert.deepEqual(releases[0], { ...draft, name: 'LiarGame: Canvas', versionCodes: ['15'], status: 'completed' });
+    assert.deepEqual(result.PreviousVersionCodes, ['14', '11']);
+    assert.equal(result.Committed, true);
+});
+
+test('기존 공개 출시의 번역 메모를 유지하고 단계적 배포 비율을 새 전체 출시에 전달하지 않는다', async t => {
+    const fixture = Fixture(t);
+    const notes = [{ language: 'ko-KR', text: '공개 테스트' }, { language: 'en-US', text: 'Open testing' }];
+    const api = Api({ Tracks: [{ track: 'beta', releases: [
+        { status: 'completed', versionCodes: ['11'], releaseNotes: [{ language: 'ko-KR', text: '이전 내용' }] },
+        { status: 'inProgress', versionCodes: ['14'], releaseNotes: notes, userFraction: 0.1, inAppUpdatePriority: 2 },
+    ] }] });
+    await Main(fixture.env, [], api);
+    assert.deepEqual(api.Calls.find(call => call.method === 'PUT').data, { track: 'beta', releases: [
+        { name: 'LiarGame: Canvas', versionCodes: ['15'], status: 'completed', releaseNotes: notes, inAppUpdatePriority: 2 },
+    ] });
+});
+
+test('갱신 응답에 이전 초안이 남거나 초안 메모가 바뀌면 commit하지 않는다', async t => {
+    const fixture = Fixture(t);
+    const draft = { name: 'previous', status: 'draft', versionCodes: ['14'], releaseNotes: [{ language: 'ko-KR', text: '유지할 메모' }] };
+    for (const mutate of [
+        value => ({ ...value, releases: [...value.releases, draft] }),
+        value => ({ ...value, releases: value.releases.map(release => ({ ...release, releaseNotes: [] })) }),
+    ]) {
+        const api = Api({ Tracks: [{ track: 'beta', releases: [draft] }], Response: (operation, value) => operation === 'track' ? mutate(value) : value });
+        await assert.rejects(Main(fixture.env, [], api), /단일 출시 버전|메타데이터/);
+        assert.equal(api.Calls.some(call => call.url.includes(':commit')), false);
     }
 });
 
@@ -166,7 +206,7 @@ test('다른 트랙의 기존 초안은 변경하지 않는다', async t => {
     const api = Api({ Tracks: [{ track: 'production', releases: [{ status: 'draft', versionCodes: ['14'] }] }, { track: 'internal', releases: [] }] });
     await Main(fixture.env, [], api);
     assert.equal(api.Calls.filter(call => call.method === 'PUT').length, 1);
-    assert.ok(api.Calls.find(call => call.method === 'PUT').url.endsWith('/tracks/internal'));
+    assert.ok(api.Calls.find(call => call.method === 'PUT').url.endsWith('/tracks/beta'));
 });
 
 test('예약 이후 AAB·APK·트랙 버전 충돌은 업로드 전에 중단한다', async t => {
@@ -196,7 +236,7 @@ test('파일 경로·빌드 결과·버전·크기·Development 불일치는 인
 test('계획 패키지·Jenkins 번호·실제 코드 및 예약 상태 소유권을 검증한다', async t => {
     const fixture = Fixture(t);
     const original = fixture.Read(fixture.env.GOOGLE_PLAY_PLAN);
-    for (const mismatch of [{ PackageName: 'other.app' }, { BuildNumber: 14 }, { VersionCode: 14 }, { Status: 'completed' }, { Track: 'production' }, { Success: false }]) {
+    for (const mismatch of [{ PackageName: 'other.app' }, { BuildNumber: 14 }, { VersionCode: 14 }, { Status: 'draft' }, { Track: 'internal' }, { Track: 'production' }, { Success: false }]) {
         fixture.Write(fixture.env.GOOGLE_PLAY_PLAN, { ...original, ...mismatch });
         const api = Api();
         await assert.rejects(Main(fixture.env, [], api), /예약 계획/);
@@ -248,19 +288,24 @@ test('업로드 동안 실제 AAB 파일이 변경되면 commit하지 않는다'
     assert.equal(api.Calls.some(call => call.url.includes(':commit')), false);
 });
 
-test('track 응답이 기존 릴리스를 제거하거나 새 릴리스를 발행하면 validate·commit하지 않는다', async t => {
+test('track 응답의 트랙·버전·출시 상태가 다르면 validate·commit하지 않는다', async t => {
     const fixture = Fixture(t);
-    for (const mutate of [value => ({ ...value, releases: value.releases.slice(1) }), value => ({ ...value, releases: value.releases.map((release, index) => index === 1 ? { ...release, status: 'completed' } : release) })]) {
-        const api = Api({ Tracks: [{ track: 'internal', releases: [{ status: 'completed', versionCodes: ['14'] }] }], Response: (operation, value) => operation === 'track' ? mutate(value) : value });
-        await assert.rejects(Main(fixture.env, [], api), /단일 초안|릴리스 보존/);
+    for (const mutate of [
+        value => ({ ...value, releases: [] }),
+        value => ({ ...value, track: 'production' }),
+        value => ({ ...value, releases: [{ ...value.releases[0], status: 'draft' }] }),
+        value => ({ ...value, releases: [{ ...value.releases[0], versionCodes: ['14'] }] }),
+    ]) {
+        const api = Api({ Tracks: [{ track: 'beta', releases: [{ status: 'completed', versionCodes: ['14'] }] }], Response: (operation, value) => operation === 'track' ? mutate(value) : value });
+        await assert.rejects(Main(fixture.env, [], api), /단일 출시 버전/);
         assert.equal(api.Calls.some(call => call.url.includes(':validate') || call.url.includes(':commit')), false);
     }
 });
 
-test('tracks.update가 기존 릴리스 보존을 거부하면 안전한 오류로 중단하고 fallback 발행하지 않는다', async t => {
+test('tracks.update 실패는 안전한 오류로 중단하고 다른 트랙으로 fallback하지 않는다', async t => {
     const fixture = Fixture(t);
     const api = Api({ Fail: 'track', Error: { response: { status: 400, data: { error: { message: 'secret-server-body' } } }, config: { headers: { Authorization: 'secret-token' } } } });
-    await assert.rejects(Main(fixture.env, [], api), error => /기존 릴리스를 유지/.test(error.message) && !/secret/.test(error.message));
+    await assert.rejects(Main(fixture.env, [], api), error => /출시 버전 갱신/.test(error.message) && !/secret/.test(error.message));
     assert.equal(api.Calls.filter(call => call.method === 'PUT').length, 1);
     assert.equal(api.Calls.some(call => call.url.includes(':commit')), false);
     assert.equal(api.Calls.at(-1).method, 'DELETE');
@@ -279,14 +324,14 @@ test('validate 실패는 commit 없이 정리하고 실패 공개 결과만 남�
     assert.ok(!JSON.stringify(result).includes('secret'));
 });
 
-test('기존 릴리스 메타데이터·validate ID 변경은 commit 전에 차단한다', async t => {
+test('기존 공개 테스트 메모를 유지하고 메타데이터·validate ID 변경은 commit 전에 차단한다', async t => {
     const fixture = Fixture(t);
     const preserved = { name: 'live', status: 'completed', versionCodes: ['14'], releaseNotes: [{ language: 'ko-KR', text: '기존 내용' }] };
-    const metadataApi = Api({ Tracks: [{ track: 'internal', releases: [preserved] }], Response: (operation, value) => {
+    const metadataApi = Api({ Tracks: [{ track: 'beta', releases: [preserved] }], Response: (operation, value) => {
         if (operation === 'track') value.releases[0].releaseNotes[0].text = '변경된 내용';
         return value;
     } });
-    await assert.rejects(Main(fixture.env, [], metadataApi), /릴리스 보존/);
+    await assert.rejects(Main(fixture.env, [], metadataApi), /메타데이터/);
     assert.equal(metadataApi.Calls.some(call => call.url.includes(':commit')), false);
     const validationApi = Api({ Response: (operation, value) => operation === 'validate' ? { id: 'otherEdit' } : value });
     await assert.rejects(Main(fixture.env, [], validationApi), /편집 검증 응답/);
@@ -309,16 +354,16 @@ test('실패한 임시 편집 삭제의 원문은 출력하지 않고 원래 실
 test('commit 응답 ID가 다르면 저장 성공을 표시하거나 자동 재시도하지 않는다', async t => {
     const fixture = Fixture(t);
     const api = Api({ Response: (operation, value) => operation === 'commit' ? { id: 'otherEdit' } : value });
-    await assert.rejects(Main(fixture.env, [], api), /초안 저장 응답/);
+    await assert.rejects(Main(fixture.env, [], api), /출시 제출 응답/);
     assert.equal(api.Calls.filter(call => call.url.includes(':commit')).length, 1);
     assert.equal(fixture.Read(fixture.env.GOOGLE_PLAY_RESULT).Success, false);
     assert.equal(fixture.Read(fixture.env.GOOGLE_PLAY_RESULT).Committed, null);
 });
 
-test('심사 보호 오류는 심사 취소 옵션이나 commit 재시도 없이 중단한다', async t => {
+test('심사 오류 응답은 콘솔 상태로 단정하지 않고 저장 거부 코드로 표시한다', async t => {
     const fixture = Fixture(t);
     const api = Api({ Fail: 'commit', Error: { response: { status: 400, data: { error: { message: 'secret', details: [{ reason: 'CHANGES_ALREADY_IN_REVIEW' }] } } } } });
-    await assert.rejects(Main(fixture.env, [], api), /심사 중/);
+    await assert.rejects(Main(fixture.env, [], api), /CHANGES_ALREADY_IN_REVIEW/);
     assert.equal(api.Calls.filter(call => call.url.includes(':commit')).length, 1);
     assert.ok(api.Calls.every(call => !call.url.includes('CANCEL_IN_REVIEW')));
     assert.equal(api.Calls.at(-1).method, 'DELETE');
@@ -326,6 +371,7 @@ test('심사 보호 오류는 심사 취소 옵션이나 commit 재시도 없이
     assert.equal(result.Success, false);
     assert.equal(result.Committed, null);
     assert.equal(result.CommitAttempted, true);
+    assert.match(result.FailureReason, /CHANGES_ALREADY_IN_REVIEW/);
 });
 
 test('commit 연결 오류는 불확실 상태를 표시하고 원문·헤더를 공개하지 않는다', async t => {
@@ -334,6 +380,41 @@ test('commit 연결 오류는 불확실 상태를 표시하고 원문·헤더를
     await assert.rejects(Main(fixture.env, [], api), error => /자동 재시도하지 않습니다/.test(error.message) && !/private-key|signed-url|Bearer/.test(error.message));
     assert.equal(api.Calls.filter(call => call.url.includes(':commit')).length, 1);
     assert.equal(fixture.Read(fixture.env.GOOGLE_PLAY_RESULT).Committed, null);
+});
+
+test('조회 중 일시적인 503은 두 번까지 재시도하고 제출을 계속한다', async t => {
+    const fixture = Fixture(t);
+    let attempts = 0;
+    const api = Api({ Response: (operation, value) => {
+        if (operation === 'bundles' && ++attempts <= 2) throw { response: { status: 503 } };
+        return value;
+    } });
+    const waits = [];
+    api.Wait = async milliseconds => waits.push(milliseconds);
+    const result = await Main(fixture.env, [], api);
+    assert.equal(result.Success, true);
+    assert.equal(attempts, 3);
+    assert.deepEqual(waits, [1000, 2000]);
+    assert.equal(api.Calls.filter(call => call.url.includes(':commit')).length, 1);
+});
+
+test('지속적인 조회 503은 한도를 지키고 업로드·출시 전에 중단한다', async t => {
+    const fixture = Fixture(t);
+    const api = Api({ Fail: 'bundles', Error: { response: { status: 503 } } });
+    await assert.rejects(Main(fixture.env, [], api), /조회 중 일시적인 서비스 오류.*503/);
+    assert.equal(api.Calls.filter(call => call.url.endsWith('/bundles')).length, 3);
+    assert.equal(api.Calls.some(call => call.url.includes('/upload/') || call.url.includes(':commit')), false);
+    assert.equal(fixture.Read(fixture.env.GOOGLE_PLAY_RESULT).Committed, false);
+});
+
+test('503이어도 AAB 스트림·최종 commit은 자동 재시도하지 않는다', async t => {
+    const fixture = Fixture(t);
+    for (const operation of ['upload', 'commit']) {
+        const api = Api({ Fail: operation, Error: { response: { status: 503 } } });
+        await assert.rejects(Main(fixture.env, [], api), /503/);
+        assert.equal(api.Calls.filter(call => operation === 'upload' ? call.url.includes('/upload/') : call.url.includes(':commit')).length, 1);
+        assert.equal(fixture.Read(fixture.env.GOOGLE_PLAY_RESULT).Committed, operation === 'commit' ? null : false);
+    }
 });
 
 test('앱 최초 미등록·권한 400·403 실패는 첫 AAB 안내와 정제된 오류만 반환한다', async t => {
