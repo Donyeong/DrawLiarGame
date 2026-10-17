@@ -76,7 +76,7 @@ def validate_apps(context, services):
             if not (context/'Apps'/service/artifact).is_file():
                 raise RuntimeError('필수 서버 산출물이 없습니다.')
     if 'AdminServer' in services:
-        for asset in ('index.html', 'console.js', 'console.css'):
+        for asset in ('console.js', 'console.css', 'vendor/tabler/tabler.min.css', 'vendor/tabler/tabler.min.js', 'vendor/tabler/LICENSE.txt'):
             if not (context/'Apps'/'AdminServer'/'wwwroot'/asset).is_file():
                 raise RuntimeError('관리자 UI 산출물이 없습니다.')
 

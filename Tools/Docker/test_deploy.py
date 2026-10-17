@@ -19,6 +19,8 @@ spec = importlib.util.spec_from_file_location('drawliar_deploy', pathlib.Path(__
 deploy = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(deploy)
 
+ADMIN_ASSETS = ('console.js', 'console.css', 'vendor/tabler/tabler.min.css', 'vendor/tabler/tabler.min.js', 'vendor/tabler/LICENSE.txt')
+
 
 class DeploymentTests(unittest.TestCase):
     def package(self, root, entries):
@@ -86,9 +88,19 @@ class DeploymentTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, 'UI'):
                 deploy.validate_apps(root, ('AdminServer',))
             (admin / 'wwwroot').mkdir()
-            for name in ('index.html', 'console.js', 'console.css'):
-                (admin / 'wwwroot' / name).write_bytes(b'asset')
+            for name in ADMIN_ASSETS:
+                asset = admin / 'wwwroot' / name
+                asset.parent.mkdir(parents=True, exist_ok=True)
+                asset.write_bytes(b'asset')
             deploy.validate_apps(root, ('AdminServer',))
+            self.assertFalse((admin / 'wwwroot/index.html').exists())
+            for name in ADMIN_ASSETS:
+                with self.subTest(asset=name):
+                    asset = admin / 'wwwroot' / name
+                    asset.unlink()
+                    with self.assertRaisesRegex(RuntimeError, 'UI'):
+                        deploy.validate_apps(root, ('AdminServer',))
+                    asset.write_bytes(b'asset')
             (admin / 'DrawLiar.Shared.dll').unlink()
             with self.assertRaisesRegex(RuntimeError, '서버'):
                 deploy.validate_apps(root, ('AdminServer',))
@@ -224,7 +236,7 @@ class DeploymentTests(unittest.TestCase):
             (base / 'current-image').write_text('live-game\n')
             (base / '.env').write_text('protected-environment\n')
             entries = [('Apps/AdminServer/'+name, b'app') for name in ('DrawLiar.AdminServer.dll', 'DrawLiar.AdminServer.deps.json', 'DrawLiar.AdminServer.runtimeconfig.json', 'DrawLiar.Shared.dll')]
-            entries += [('Apps/AdminServer/wwwroot/'+name, b'asset') for name in ('index.html', 'console.js', 'console.css')]
+            entries += [('Apps/AdminServer/wwwroot/'+name, b'asset') for name in ADMIN_ASSETS]
             payload = self.package(root, entries).read_bytes()
             release = 'release-20261009000000-1234abcd'
             real_open = open
@@ -279,7 +291,7 @@ class DeploymentTests(unittest.TestCase):
             for app in (('DedicatedServer',) if mode == 'dedicated' else deploy.APP_SERVICES):
                 entries += [('Apps/'+app+'/'+name,b'app') for name in ('DrawLiar.'+app+'.dll','DrawLiar.'+app+'.deps.json','DrawLiar.'+app+'.runtimeconfig.json','DrawLiar.Shared.dll')]
             if mode == 'all':
-                entries += [('Apps/AdminServer/wwwroot/'+name,b'asset') for name in ('index.html','console.js','console.css')]
+                entries += [('Apps/AdminServer/wwwroot/'+name,b'asset') for name in ADMIN_ASSETS]
             payload = self.package(root,entries).read_bytes()
             release = 'release-20261009000000-1234abcd'
             image = 'drawliar-app:'+release

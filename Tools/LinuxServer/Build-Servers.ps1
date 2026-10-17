@@ -47,7 +47,7 @@ foreach ($name in $services) {
     if ($LASTEXITCODE -ne 0) { throw "$name 게시 실패" }
 }
 if (!$DedicatedOnly) {
-    foreach ($asset in @('index.html','console.js','console.css')) {
+    foreach ($asset in @('console.js','console.css','vendor/tabler/tabler.min.css','vendor/tabler/tabler.min.js','vendor/tabler/LICENSE.txt')) {
         if (!(Test-Path -LiteralPath (Join-Path $output "Apps/AdminServer/wwwroot/$asset") -PathType Leaf)) { throw "관리자 UI 산출물 누락: $asset" }
     }
 }

@@ -1,0 +1,57 @@
+@page "/"
+@model IndexModel
+@{
+    ViewData["Title"] = "운영 도구";
+}
+<div class="page-header d-print-none mb-4">
+    <div class="row align-items-center g-3">
+        <div class="col"><div id="page-pretitle" class="page-pretitle">Operations</div><h1 id="page-title" class="page-title">운영 현황</h1></div>
+        <div class="col-auto"><button id="refresh" class="btn btn-white" type="button"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M6 7a7 7 0 0 1 11.6-1L20 9M4 15l2.4 3A7 7 0 0 0 18 17"/></svg>새로고침</button></div>
+    </div>
+</div>
+<div id="status" class="alert alert-info" role="status" aria-live="polite">운영 정보를 불러오는 중입니다.</div>
+<form id="search" class="search-toolbar mb-3" hidden>
+    <label class="visually-hidden" for="query">계정 또는 방 이름 검색</label>
+    <input id="query" class="form-control" maxlength="30" placeholder="계정 또는 방 이름 검색" />
+    <button class="btn btn-primary" type="submit">조회</button>
+    <button id="search-reset" class="btn btn-white" type="button">초기화</button>
+</form>
+<section data-panel="overview" aria-label="운영 현황">
+    <div class="row row-cards mb-4">
+        <div class="col-sm-6 col-xl-3"><div class="card metric-card"><div class="card-body"><div class="subheader">조회 계정</div><div id="metric-accounts" class="metric-value mt-2">—</div><a class="metric-link" href="#accounts">계정 관리 <span aria-hidden="true">→</span></a></div></div></div>
+        <div class="col-sm-6 col-xl-3"><div class="card metric-card"><div class="card-body"><div class="subheader">조회한 방</div><div id="metric-rooms" class="metric-value mt-2">—</div><a class="metric-link" href="#rooms">방 모니터링 <span aria-hidden="true">→</span></a></div></div></div>
+        <div class="col-sm-6 col-xl-3"><div class="card metric-card warning"><div class="card-body"><div class="subheader">처리 대기 신고</div><div id="metric-reports" class="metric-value mt-2">—</div><a class="metric-link" href="#reports">신고 관리 <span aria-hidden="true">→</span></a></div></div></div>
+        <div class="col-sm-6 col-xl-3"><div class="card metric-card"><div class="card-body"><div class="subheader">발송한 우편</div><div id="metric-mails" class="metric-value mt-2">—</div><a class="metric-link" href="#mail">우편 발송 <span aria-hidden="true">→</span></a></div></div></div>
+    </div>
+    <div class="card"><div class="card-header"><h2 class="card-title">방 현황</h2><span id="overview-updated" class="ms-auto text-secondary small">—</span></div><div class="card-body"><div class="row g-4"><div class="col-sm-4"><div class="text-secondary mb-2">게임 진행 중</div><div id="metric-playing" class="h1 mb-0">—</div></div><div class="col-sm-4"><div class="text-secondary mb-2">대기 중</div><div id="metric-waiting" class="h1 mb-0">—</div></div><div class="col-sm-4"><div class="text-secondary mb-2">방 참가 · 관전</div><div id="metric-players" class="h1 mb-0">—</div></div></div></div></div>
+</section>
+<section data-panel="versions" aria-label="클라이언트 버전" hidden>
+    <div class="card"><div class="card-header"><h2 class="card-title">플랫폼별 업데이트 설정</h2></div><div class="table-responsive"><table class="table table-vcenter card-table client-versions"><thead><tr><th>플랫폼</th><th>강제 업데이트 버전</th><th>일반 업데이트 버전</th><th>스토어 주소</th><th>관리</th></tr></thead><tbody id="client-versions"></tbody></table></div></div>
+</section>
+<section data-panel="accounts" aria-label="계정 관리" hidden>
+    <div class="card"><div class="card-header"><h2 class="card-title">계정 목록</h2><span id="accounts-count" class="ms-auto text-secondary small"></span></div><div class="table-responsive"><table class="table table-vcenter card-table accounts-table"><thead><tr><th>이름</th><th>계정 ID</th><th>코인</th><th>상태</th><th>관리</th></tr></thead><tbody id="accounts"></tbody></table></div></div>
+</section>
+<section data-panel="mail" aria-label="우편 발송" hidden>
+    <div class="card mb-4"><div class="card-header"><h2 class="card-title">우편 발송</h2></div><div class="card-body">
+        <form id="mail-form" class="mail-form">
+            <div class="mail-wide"><label class="form-label" for="mail-recipients">받는 계정 ID</label><textarea id="mail-recipients" class="form-control" rows="3" required placeholder="쉼표 또는 줄바꿈으로 구분 (최대 1,000개)"></textarea></div>
+            <label class="form-check mail-wide"><input id="mail-all" class="form-check-input" type="checkbox" /><span class="form-check-label">전체 발송 (발송 후 가입한 계정 포함)</span></label>
+            <div class="mail-wide"><label class="form-label" for="mail-title">제목</label><input id="mail-title" class="form-control" maxlength="40" required /></div>
+            <div class="mail-wide"><label class="form-label" for="mail-message">내용</label><textarea id="mail-message" class="form-control" rows="4" maxlength="500"></textarea></div>
+            <div><label class="form-label" for="mail-coins">코인</label><input id="mail-coins" class="form-control" type="number" min="0" max="1000000" step="1" value="0" required /></div>
+            <div><label class="form-label" for="mail-gems">보석</label><input id="mail-gems" class="form-control" type="number" min="0" max="10000" step="1" value="0" required /></div>
+            <div><label class="form-label" for="mail-days">유효 기간 (일)</label><input id="mail-days" class="form-control" type="number" min="1" max="365" step="1" value="30" required /></div>
+            <div class="mail-wide mail-submit"><label class="form-check mb-0"><input id="mail-confirm" class="form-check-input" type="checkbox" required /><span class="form-check-label">대상과 보상을 확인했습니다.</span></label><button id="mail-send" class="btn btn-primary" type="submit" disabled>우편 발송</button></div>
+        </form>
+    </div></div>
+    <div class="card"><div class="card-header"><h2 class="card-title">발송한 우편</h2><span id="mails-count" class="ms-auto text-secondary small"></span></div><div class="table-responsive"><table class="table table-vcenter card-table mails-table"><thead><tr><th>발송 시각</th><th>대상</th><th>제목</th><th>보상</th><th>만료</th><th>수령 수</th><th>관리</th></tr></thead><tbody id="mails"></tbody></table></div></div>
+</section>
+<section data-panel="rooms" aria-label="방 모니터링" hidden>
+    <div class="card"><div class="card-header"><h2 class="card-title">방 목록</h2><span id="rooms-count" class="ms-auto text-secondary small"></span></div><div class="table-responsive"><table class="table table-vcenter card-table rooms-table"><thead><tr><th>이름</th><th>방 ID</th><th>참가</th><th>관전</th><th>상태</th></tr></thead><tbody id="rooms"></tbody></table></div></div>
+</section>
+<section data-panel="reports" aria-label="신고 관리" hidden>
+    <div class="card"><div class="card-header"><h2 class="card-title">처리 대기 신고</h2><span id="reports-count" class="ms-auto text-secondary small"></span></div><div class="table-responsive"><table class="table table-vcenter card-table reports-table"><thead><tr><th>접수</th><th>사유</th><th>대상</th><th>신고자</th><th>내용</th><th>관련 ID</th><th>관리</th></tr></thead><tbody id="reports"></tbody></table></div></div>
+</section>
+@section Scripts {
+    <script src="console.js" defer></script>
+}

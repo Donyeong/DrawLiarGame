@@ -1,0 +1,48 @@
+@page "/login"
+@model LoginModel
+@{
+    Layout = null;
+}
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>관리자 로그인 - DrawLiar Admin</title>
+    <link rel="stylesheet" href="vendor/tabler/tabler.min.css" />
+    <link rel="stylesheet" href="console.css" />
+</head>
+<body class="d-flex flex-column login-page">
+    <main class="page page-center">
+        <div class="container container-tight py-4">
+            <div class="text-center mb-4 login-brand">
+                <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5 4 4M4 20l4-1L20 7a2.8 2.8 0 0 0-4-4L4 15z"/><path d="M4 15 9 20"/></svg></span>
+                <div><strong>DrawLiar</strong><small>OPERATIONS</small></div>
+            </div>
+            <div class="card card-md login-card">
+                <div class="card-body">
+                    <div class="text-secondary text-uppercase fw-bold small mb-2">Administrator Access</div>
+                    <h1 class="h2 mb-1">관리자 로그인</h1>
+                    <p class="text-secondary mb-4">운영 도구에 접근하려면 계정 정보를 입력하세요.</p>
+                    <form method="post">
+                        @Html.AntiForgeryToken()
+                        <input asp-for="ReturnUrl" type="hidden" />
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                        <div class="mb-3">
+                            <label asp-for="Username" class="form-label">아이디</label>
+                            <input asp-for="Username" class="form-control form-control-lg" autocomplete="username" autofocus required />
+                            <span asp-validation-for="Username" class="text-danger small"></span>
+                        </div>
+                        <div class="mb-4">
+                            <label asp-for="Password" class="form-label">비밀번호</label>
+                            <input asp-for="Password" class="form-control form-control-lg" type="password" autocomplete="current-password" required />
+                            <span asp-validation-for="Password" class="text-danger small"></span>
+                        </div>
+                        <button class="btn btn-primary btn-lg w-100" type="submit">로그인</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

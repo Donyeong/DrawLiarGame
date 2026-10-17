@@ -92,11 +92,17 @@ services:
     image: ${DRAWLIAR_ADMIN_IMAGE:-${DRAWLIAR_IMAGE:-drawliar-app:current}}
     working_dir: /apps/AdminServer
     command: ["dotnet", "DrawLiar.AdminServer.dll"]
+    volumes:
+      - /srv/drawliar/dev/secrets:/secrets:ro
+      - admin-data-protection:/var/lib/drawliar/admin-data-protection
     environment:
       <<: *environment
       ASPNETCORE_Kestrel__Endpoints__Public__Url: https://0.0.0.0:19080
-      Admin__Key: ${DRAWLIAR_ADMIN_KEY}
+      Admin__Key: ${DRAWLIAR_ADMIN_KEY:-}
+      Admin__UsersFile: /secrets/admin-users.json
+      Admin__DataProtectionKeysPath: /var/lib/drawliar/admin-data-protection
     ports: ["19080:19080"]
 volumes:
   database:
   dedicated-outbox:
+  admin-data-protection:

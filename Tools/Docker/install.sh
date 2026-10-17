@@ -19,7 +19,7 @@ import os,pathlib,secrets
 root=pathlib.Path('/srv/drawliar/dev')
 password=secrets.token_hex(32)
 tls=secrets.token_hex(32)
-values={'DRAWLIAR_PUBLIC_HOST':os.environ['DRAWLIAR_SETUP_HOST'],'DRAWLIAR_DB_PASSWORD':password,'DRAWLIAR_DATABASE':'Host=db;Port=5432;Database=drawliar;Username=drawliar;Password='+password+';Maximum Pool Size=15','DRAWLIAR_CLUSTER_KEY':secrets.token_hex(48),'DRAWLIAR_ADMIN_KEY':secrets.token_hex(48),'DRAWLIAR_TLS_PASSWORD':tls}
+values={'DRAWLIAR_PUBLIC_HOST':os.environ['DRAWLIAR_SETUP_HOST'],'DRAWLIAR_DB_PASSWORD':password,'DRAWLIAR_DATABASE':'Host=db;Port=5432;Database=drawliar;Username=drawliar;Password='+password+';Maximum Pool Size=15','DRAWLIAR_CLUSTER_KEY':secrets.token_hex(48),'DRAWLIAR_TLS_PASSWORD':tls}
 path=root/'.env'
 path.write_text(''.join(k+'='+v+'\n' for k,v in values.items()))
 path.chmod(0o600)
@@ -34,6 +34,10 @@ if [[ ! -f /srv/drawliar/dev/secrets/server.pfx ]]; then
   chmod 0600 /srv/drawliar/dev/secrets/server.key
   chown 1654:1654 /srv/drawliar/dev/secrets/server.pfx
   chmod 0400 /srv/drawliar/dev/secrets/server.pfx
+fi
+if [[ -f /srv/drawliar/dev/secrets/admin-users.json ]]; then
+  chown 1654:1654 /srv/drawliar/dev/secrets/admin-users.json
+  chmod 0400 /srv/drawliar/dev/secrets/admin-users.json
 fi
 install -m 0755 -o root -g root "$(dirname "$0")/deploy.py" /usr/local/sbin/drawliar-deploy
 printf 'kona-deploy ALL=(root) NOPASSWD: /usr/local/sbin/drawliar-deploy\n' > /etc/sudoers.d/drawliar-deploy
