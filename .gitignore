@@ -28,6 +28,10 @@
 /ReferenceFiles/
 /Docs/
 
+# 로컬 Unity 템플릿 프로젝트
+/Client/
+/DrawLiarClient/
+
 # Asset meta data should only be ignored when the corresponding asset is also ignored
 !/[Aa]ssets/**/*.meta
 
