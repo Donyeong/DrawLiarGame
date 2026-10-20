@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c932e31a05764a21bcf96eceb5bfc442, type: 3}
   m_Name: DrawAdvertisingConfig
   m_EditorClassIdentifier: Assembly-CSharp::DrawLiar.DrawAdvertisingConfig
-  _enabled: 0
-  _androidAppId:
+  _enabled: 1
+  _androidAppId: ca-app-pub-4880070368400184~8738349886
   _webConsentRequired: 1
