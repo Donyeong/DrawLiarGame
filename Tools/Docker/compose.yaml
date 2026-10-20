@@ -69,6 +69,14 @@ services:
       Commerce__GooglePlay__PackageName: com.rascallab.liargame
       Commerce__GooglePlay__CredentialsFile: ${DRAWLIAR_GOOGLE_PLAY_CREDENTIALS_FILE:-/secrets/google-play.json}
       Commerce__GooglePlay__TokenEncryptionKeyFile: ${DRAWLIAR_GOOGLE_PLAY_TOKEN_KEY_FILE:-/secrets/google-play-token.key}
+      Advertising__Enabled: ${DRAWLIAR_ADS_ENABLED:-false}
+      Advertising__Android__Enabled: ${DRAWLIAR_ADS_ANDROID_ENABLED:-false}
+      Advertising__Android__BannerAdUnitId: ${DRAWLIAR_ADS_ANDROID_BANNER_ID:-}
+      Advertising__Android__RewardedAdUnitId: ${DRAWLIAR_ADS_ANDROID_REWARDED_ID:-}
+      Advertising__Web__Enabled: ${DRAWLIAR_ADS_WEB_ENABLED:-false}
+      Advertising__Web__PublisherId: ${DRAWLIAR_ADS_WEB_PUBLISHER_ID:-}
+      Advertising__Web__BannerSlotId: ${DRAWLIAR_ADS_WEB_BANNER_SLOT_ID:-}
+      Advertising__Web__AllowClientVerification: ${DRAWLIAR_ADS_WEB_CLIENT_VERIFICATION:-false}
   dedicated:
     <<: *app
     image: ${DRAWLIAR_DEDICATED_IMAGE:-${DRAWLIAR_IMAGE:-drawliar-app:current}}

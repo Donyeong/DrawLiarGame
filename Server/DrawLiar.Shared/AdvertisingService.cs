@@ -37,7 +37,10 @@ public sealed class AdvertisingService(ServerDatabase database, AdvertisingSetti
     {
         if (!settings.RewardProviderEnabled(AdsRules.ANDROID)) throw new ApiException("AdsUnavailable", 503);
         var verified = await verifier.VerifyAsync(rawQuery, settings.AndroidRewardedAdUnitId, cancellationToken);
-        await database.CompleteVerifiedAdRewardAsync(verified, settings, cancellationToken);
+        if (verified == null) return;
+        // 서명이 유효한 콜백은 지급하지 않더라도 200으로 응답해 AdMob 재시도를 막고, 일시 장애(5xx)만 재시도시킨다.
+        try { await database.CompleteVerifiedAdRewardAsync(verified, settings, cancellationToken); }
+        catch (ApiException exception) when (exception.Status is >= 400 and < 500) { }
     }
 
     private static void ValidateTicket(string platform, string ticket)

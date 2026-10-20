@@ -14,7 +14,7 @@ public sealed class AdMobSsvVerifier(HttpClient client)
     private IReadOnlyDictionary<long, byte[]> _keys = new Dictionary<long, byte[]>();
     private DateTimeOffset _keysFetchedAt;
 
-    public async Task<VerifiedAdReward> VerifyAsync(string rawQuery, string expectedAdUnit, CancellationToken cancellationToken = default)
+    public async Task<VerifiedAdReward?> VerifyAsync(string rawQuery, string expectedAdUnit, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrEmpty(rawQuery) || rawQuery.Length > 16384 || rawQuery[0] != '?') throw Invalid();
         string query = rawQuery[1..];
@@ -41,26 +41,27 @@ public sealed class AdMobSsvVerifier(HttpClient client)
                 HashAlgorithmName.SHA256, DSASignatureFormat.Rfc3279DerSequence)) throw Invalid();
         }
         catch (CryptographicException) { throw Invalid(); }
+        // 서명이 유효한 Google 요청 중 보상 대상이 아닌 콜백(콘솔 URL 확인 등)은 null로 수락한다.
         var parameters = new Dictionary<string, string>(StringComparer.Ordinal);
         foreach (string pair in content.Split('&'))
         {
             int split = pair.IndexOf('=');
-            if (split < 1) throw Invalid();
-            try { if (!parameters.TryAdd(Decode(pair[..split]), Decode(pair[(split + 1)..]))) throw Invalid(); }
-            catch (UriFormatException) { throw Invalid(); }
+            if (split < 1) return null;
+            try { if (!parameters.TryAdd(Decode(pair[..split]), Decode(pair[(split + 1)..]))) return null; }
+            catch (UriFormatException) { return null; }
         }
-        string Value(string name) => parameters.TryGetValue(name, out string? value) ? value : throw Invalid();
+        string Value(string name) => parameters.TryGetValue(name, out string? value) ? value : "";
         string adUnit = Value("ad_unit");
-        if (adUnit != expectedAdUnit && adUnit != expectedAdUnit[(expectedAdUnit.LastIndexOf('/') + 1)..]) throw Invalid();
+        if (adUnit != expectedAdUnit && adUnit != expectedAdUnit[(expectedAdUnit.LastIndexOf('/') + 1)..]) return null;
         string ticket = Value("custom_data"), user = Value("user_id"), transaction = Value("transaction_id");
         if (ticket.Length != 64 || !ticket.All(Uri.IsHexDigit) || user.Length != 64 || !user.All(Uri.IsHexDigit)
             || transaction.Length is < 1 or > 256 || transaction.Any(char.IsControl)
             || !long.TryParse(Value("timestamp"), NumberStyles.None, CultureInfo.InvariantCulture, out long timestamp)
             || !int.TryParse(Value("reward_amount"), NumberStyles.None, CultureInfo.InvariantCulture, out int reward) || reward < 1)
-            throw Invalid();
+            return null;
         DateTimeOffset rewardedAt;
         try { rewardedAt = DateTimeOffset.FromUnixTimeMilliseconds(timestamp); }
-        catch (ArgumentOutOfRangeException) { throw Invalid(); }
+        catch (ArgumentOutOfRangeException) { return null; }
         return new VerifiedAdReward(ticket, user, transaction, rewardedAt);
     }
 

@@ -42,6 +42,30 @@ mergeInto(LibraryManager.library, {
       });
       return pending;
     },
+    // 사이트 동의 훅이 없으면 AdSense 태그가 띄우는 Google CMP의 TCF 동의 결정을 기다린다.
+    google: {
+      request: function (publisher) {
+        return DrawAds.load(publisher).then(function () {
+          return new Promise(function (resolve) {
+            var deadline = Date.now() + 15000;
+            (function wait() {
+              if (typeof window.__tcfapi !== "function") {
+                if (Date.now() > deadline) resolve(false); else setTimeout(wait, 100);
+                return;
+              }
+              window.__tcfapi("addEventListener", 2, function (data, success) {
+                if (!success || !data) { resolve(false); return; }
+                if (data.gdprApplies !== false && data.eventStatus !== "tcloaded" && data.eventStatus !== "useractioncomplete") return;
+                if (data.gdprApplies && window.googlefc && typeof window.googlefc.showRevocationMessage === "function")
+                  DrawAds.google.showPrivacyOptions = function () { window.googlefc.showRevocationMessage(); };
+                window.__tcfapi("removeEventListener", 2, function () {}, data.listenerId);
+                resolve(true);
+              });
+            })();
+          });
+        });
+      }
+    },
     live: function (session) { return session && !session.closed && DrawAds.sessions[session.id] === session; },
     start: function (session) {
       if (!DrawAds.live(session)) return Promise.resolve();
@@ -169,10 +193,11 @@ mergeInto(LibraryManager.library, {
     document.addEventListener("visibilitychange", session.visibilityListener);
     document.addEventListener("fullscreenchange", session.visibilityListener);
     window.addEventListener("resize", session.visibilityListener);
-    var gate = window.DrawLiarAdvertisingConsent;
+    var gate = window.DrawLiarAdvertisingConsent || (consentRequired ? DrawAds.google : null);
+    session.gate = gate;
     var consent;
     try {
-      consent = gate && typeof gate.request === "function" ? Promise.resolve(gate.request()) : Promise.resolve(!consentRequired);
+      consent = gate && typeof gate.request === "function" ? Promise.resolve(gate.request(publisher)) : Promise.resolve(!consentRequired);
     } catch (error) { consent = Promise.resolve(false); }
     consent.then(function (allowed) {
       if (!DrawAds.live(session)) return;
@@ -242,7 +267,7 @@ mergeInto(LibraryManager.library, {
   DrawAdsPrivacy__deps: ["$DrawAds"],
   DrawAdsPrivacy: function (id) {
     var session = DrawAds.sessions[id];
-    var gate = window.DrawLiarAdvertisingConsent;
+    var gate = session && session.gate;
     if (!DrawAds.live(session) || !gate || typeof gate.showPrivacyOptions !== "function" || session.state.PrivacyOpen) return;
     session.state.PrivacyOpen = true;
     Promise.resolve().then(function () { return gate.showPrivacyOptions(); }).then(function (allowed) {

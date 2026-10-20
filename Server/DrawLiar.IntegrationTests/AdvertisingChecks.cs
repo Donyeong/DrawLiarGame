@@ -32,13 +32,17 @@ internal static partial class Integration
         }
         string query = Signed(content);
         var result = await verifier.VerifyAsync(query, "ca-app-pub-3940256099942544/5224354917");
-        Check(result.Ticket == ticket && result.UserId == user && result.TransactionId == "verification-test", "공식 형식의 원문 ECDSA DER 서명을 검증해야 합니다.");
+        Check(result != null && result.Ticket == ticket && result.UserId == user && result.TransactionId == "verification-test", "공식 형식의 원문 ECDSA DER 서명을 검증해야 합니다.");
         await AdsError(() => verifier.VerifyAsync(query.Replace(ticket, new string('c', 64)), "ca-app-pub-3940256099942544/5224354917"), "InvalidAdVerification");
-        await AdsError(() => verifier.VerifyAsync(query, "ca-app-pub-3940256099942544/0000000000"), "InvalidAdVerification");
         await AdsError(() => verifier.VerifyAsync(query + "&extra=1", "ca-app-pub-3940256099942544/5224354917"), "InvalidAdVerification");
-        await AdsError(() => verifier.VerifyAsync(Signed(content + "&custom_data=" + ticket), "ca-app-pub-3940256099942544/5224354917"), "InvalidAdVerification");
         await AdsError(() => verifier.VerifyAsync(Signed(content).Replace("key_id=12345", "key_id=12346"), "ca-app-pub-3940256099942544/5224354917"), "InvalidAdVerification");
-        Console.WriteLine("광고 플랫폼·UTC 갱신·기본 비활성·AdMob 원문 서명·변조·광고단위·중복 매개변수 검증 통과");
+        string consoleTest = "ad_network=5450213213286189855&ad_unit=1234567890&reward_amount=1&reward_item=Reward&timestamp="
+            + DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() + "&transaction_id=123456789";
+        Check(await verifier.VerifyAsync(query, "ca-app-pub-3940256099942544/0000000000") == null
+            && await verifier.VerifyAsync(Signed(content + "&custom_data=" + ticket), "ca-app-pub-3940256099942544/5224354917") == null
+            && await verifier.VerifyAsync(Signed(consoleTest), "ca-app-pub-3940256099942544/5224354917") == null,
+            "서명이 유효한 비대상 콜백(다른 광고단위·중복 매개변수·콘솔 URL 확인)은 지급 없이 수락해야 합니다.");
+        Console.WriteLine("광고 플랫폼·UTC 갱신·기본 비활성·AdMob 원문 서명·변조·비대상 콜백 수락 검증 통과");
     }
 
     private sealed class AdKeyHandler(string json) : HttpMessageHandler
