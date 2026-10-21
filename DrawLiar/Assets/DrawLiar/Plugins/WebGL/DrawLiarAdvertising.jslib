@@ -43,14 +43,15 @@ mergeInto(LibraryManager.library, {
       return pending;
     },
     // 사이트 동의 훅이 없으면 AdSense 태그가 띄우는 Google CMP의 TCF 동의 결정을 기다린다.
+    // Google CMP는 규제 지역 방문자에게만 로드되므로, 태그 로드 후에도 없으면 동의가 필요 없는 지역으로 본다.
     google: {
       request: function (publisher) {
         return DrawAds.load(publisher).then(function () {
           return new Promise(function (resolve) {
-            var deadline = Date.now() + 15000;
+            var deadline = Date.now() + 5000;
             (function wait() {
               if (typeof window.__tcfapi !== "function") {
-                if (Date.now() > deadline) resolve(false); else setTimeout(wait, 100);
+                if (Date.now() > deadline) resolve(true); else setTimeout(wait, 100);
                 return;
               }
               window.__tcfapi("addEventListener", 2, function (data, success) {
