@@ -93,7 +93,7 @@ mergeInto(LibraryManager.library, {
     banner: function (session) {
       if (!DrawAds.live(session) || !session.allowed || !session.slot || window.innerWidth < 320) return;
       var container = document.createElement("div");
-      container.style.cssText = "position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:center;align-items:center;visibility:hidden;background:#fff;padding-bottom:env(safe-area-inset-bottom,0px);z-index:10000;pointer-events:none;";
+      container.style.cssText = "position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:center;align-items:center;visibility:hidden;transform:translateY(calc(100% + 64px));background:#fff;padding-bottom:env(safe-area-inset-bottom,0px);z-index:10000;pointer-events:none;";
       var unit = document.createElement("ins");
       unit.className = "adsbygoogle";
       unit.style.cssText = "display:inline-block;width:320px;height:50px;pointer-events:auto;";
@@ -121,6 +121,8 @@ mergeInto(LibraryManager.library, {
       if (session.banner.parentNode !== parent) parent.appendChild(session.banner);
       var visible = session.state.BannerReady && session.visible && !document.hidden && window.innerWidth >= 320 && (!full || wrapper);
       session.banner.style.visibility = visible ? "visible" : "hidden";
+      // AdSense가 자식 iframe을 visibility:visible로 덮어쓰므로, 숨길 때는 화면 밖으로 내려 보이거나 클릭되지 않게 한다.
+      session.banner.style.transform = visible ? "" : "translateY(calc(100% + 64px))";
       var scale = canvas && canvas.getBoundingClientRect().height > 0 ? canvas.height / canvas.getBoundingClientRect().height : window.devicePixelRatio || 1;
       session.state.BannerHeight = visible ? Math.ceil(session.banner.getBoundingClientRect().height * scale) : 0;
     },
